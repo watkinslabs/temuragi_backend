@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block theme_content %}
+    <header class="head-wrapper">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid" style="width:250px;">
+                <a class="navbar-brand fw-bold" style="color:darkslategrey;" href="/">
+                    {{ site_name }}
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="quick-link-btn"></span>
+                </button>
+            </div>
+                
+            
+        </nav>
+    </header>
+
+    <!-- Sidebar and Main Content Wrapper -->
+    <main class="main-wrapper">
+        <!-- Render a sidebar menu for a specific section -->
+        {{ render_menu(get_menu("ADMIN", 'be338427-3c44-4fd4-9856-ae92fe87be95'), 
+        template_string=menu_templates.NAVBAR_MENU) | safe }}
+        <div class="module-container">
+            <div class="full-width-header">
+                <div class="menu_sub_title">
+                    
+                </div>
+            </div>
+        
+            
+        
+            <!-- Main Content Area -->
+            <div class="main-content">
+                {% block subnav %} {% endblock %}
+                {{ content|safe }}
+                {% block content %}{% endblock %}
+
+            </div>
+        </div>
+    </main>
+    <!-- Flash Message Modal -->
+    <div class="modal fade" id="flashModal" tabindex="-1" aria-labelledby="flashModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="flashModalLabel">Notification</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="flash-modal-content">
+            <!-- Flash messages will be inserted here -->
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <footer class="foot-wrapper footer dark-mode">
+        <span>&copy; {{ current_year }} {{ site_name }} - All rights reserved.</span>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+    
+    $(document).ready(function () {
+        $('.toggle-favorite').bind('click', function () {
+            var $button = $(this);
+            var itemId = $button.attr('data-id');
+            var action = $button.attr('data-action');
+    
+            $.ajax({
+                url: '/menu/add_to_favorites',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ item_id: itemId, action: action }),
+                success: function (data) {
+                    if (data.status === 'success') {
+                        // Toggle button icon and action
+                        var $icon = $button.find('i');
+                        if (action === 'add') {
+                            $button.attr('data-action', 'remove');
+                            $icon.removeClass('fa-plus-square').addClass('fa-minus-square'); // Change to minus icon
+                        } else {
+                            $button.attr('data-action', 'add');
+                            $icon.removeClass('fa-minus-square').addClass('fa-plus-square'); // Change to plus icon
+                        }
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the quick link.');
+                }
+            });
+        });
+    
+        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        var flash_content = '';
+        var modal_category = 'info'; // Default category
+        var modal_title = 'Notification'; // Default title
+        
+        {% for category, message in messages %}
+            flash_content += '<div class="alert alert-{{ category }}">' + 
+                            '{{ message|safe }}' + 
+                            '</div>';
+            
+            // Set the modal header style based on the first message category
+            {% if loop.first %}
+                modal_category = '{{ category }}';
+                // Update title based on category
+                if ('{{ category }}' === 'success') {
+                    modal_title = 'Success';
+                } else if ('{{ category }}' === 'error' || '{{ category }}' === 'danger') {
+                    modal_title = 'Error';
+                } else if ('{{ category }}' === 'warning') {
+                    modal_title = 'Warning';
+                } else if ('{{ category }}' === 'info') {
+                    modal_title = 'Information';
+                }
+            {% endif %}
+        {% endfor %}
+        
+        // Insert flash messages into modal
+        $('#flash-modal-content').html(flash_content);
+        
+        // Update modal header style and title
+        var modalHeader = $('#flashModal .modal-header');
+        modalHeader.removeClass('modal-header-success modal-header-danger modal-header-warning modal-header-info');
+        
+        if (modal_category === 'success') {
+            modalHeader.addClass('modal-header-success');
+        } else if (modal_category === 'error' || modal_category === 'danger') {
+            modalHeader.addClass('modal-header-danger');
+        } else if (modal_category === 'warning') {
+            modalHeader.addClass('modal-header-warning');
+        } else {
+            modalHeader.addClass('modal-header-info');
+        }
+        
+        // Update modal title
+        $('#flashModalLabel').text(modal_title);
+        
+        // Show the modal
+        var flashModal = new bootstrap.Modal(document.getElementById('flashModal'));
+        flashModal.show();
+    {% endif %}
+{% endwith %}
+    
+    
+    });
+
+    </script>
+    <style>
+        .modal-header-success {
+          background-color: #28a745;
+          color: white;
+        }
+        
+        .modal-header-danger {
+          background-color: #dc3545;
+          color: white;
+        }
+        
+        .modal-header-warning {
+          background-color: #ffc107;
+          color: black;
+        }
+        
+        .modal-header-info {
+          background-color: #17a2b8;
+          color: white;
+        }
+      </style>
+{% endblock %}

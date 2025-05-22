@@ -1,0 +1,308 @@
+<!-- A/R Settings Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>A/R Settings</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table ar_settings_table">
+            <thead>
+                <tr>
+                    <th>Setting</th>
+                    <th>Value</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Active ?</td>
+                    <td>{% if customer.ar.is_active %}Yes{% else %}No{% endif %}</td>
+                    <td rowspan="9" class="edit_cell">
+                        <a href="#" id="edit_ar_settings_btn" class="edit_link">Edit</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Payment Terms</td>
+                    <td>{{ customer.ar.payment_terms }}</td>
+                </tr>
+                <tr>
+                    <td>Charge Tax?</td>
+                    <td>{% if customer.ar.charge_tax %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Tax ID for</td>
+                    <td>{{ customer.ar.tax_id_for|default:"" }}</td>
+                </tr>
+                <tr>
+                    <td>Tax ID Exp.</td>
+                    <td>{% if customer.ar.tax_id_expiry %}{{ customer.ar.tax_id_expiry|date:"m/d/Y" }}{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Statement ?</td>
+                    <td>{% if customer.ar.send_statement %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Credit Limit</td>
+                    <td>{{ customer.ar.credit_limit }}</td>
+                </tr>
+                <tr>
+                    <td>CrossX ?</td>
+                    <td>{% if customer.ar.cross_company %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Paperless?</td>
+                    <td>{% if customer.ar.paperless %}Yes{% else %}No{% endif %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- A/R Settings Edit Modal -->
+<div id="ar_settings_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3>Edit A/R Settings</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="ar_settings_form" method="post" action="{% url 'save_ar_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="is_active" id="is_active" {% if customer.ar.is_active %}checked{% endif %}>
+                        Active ?
+                    </label>
+                </div>
+                
+                <div class="form_group">
+                    <label for="payment_terms">Payment Terms</label>
+                    <select name="payment_terms" id="payment_terms" required>
+                        <option value="COD" {% if customer.ar.payment_terms == 'COD' %}selected{% endif %}>COD</option>
+                        <option value="NET10" {% if customer.ar.payment_terms == 'NET10' %}selected{% endif %}>Net 10</option>
+                        <option value="NET30" {% if customer.ar.payment_terms == 'NET30' %}selected{% endif %}>Net 30</option>
+                        <option value="NET60" {% if customer.ar.payment_terms == 'NET60' %}selected{% endif %}>Net 60</option>
+                    </select>
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="charge_tax" id="charge_tax" {% if customer.ar.charge_tax %}checked{% endif %}>
+                        Charge Tax?
+                    </label>
+                </div>
+                
+                <div class="form_group">
+                    <label for="tax_id_for">Tax ID for</label>
+                    <input type="text" name="tax_id_for" id="tax_id_for" value="{{ customer.ar.tax_id_for|default:'' }}">
+                </div>
+                
+                <div class="form_group">
+                    <label for="tax_id_expiry">Tax ID Exp.</label>
+                    <input type="date" name="tax_id_expiry" id="tax_id_expiry" 
+                           value="{% if customer.ar.tax_id_expiry %}{{ customer.ar.tax_id_expiry|date:'Y-m-d' }}{% endif %}">
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="send_statement" id="send_statement" {% if customer.ar.send_statement %}checked{% endif %}>
+                        Statement ?
+                    </label>
+                </div>
+                
+                <div class="form_group">
+                    <label for="credit_limit">Credit Limit</label>
+                    <input type="number" name="credit_limit" id="credit_limit" value="{{ customer.ar.credit_limit }}" min="0">
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="cross_company" id="cross_company" {% if customer.ar.cross_company %}checked{% endif %}>
+                        CrossX ?
+                    </label>
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="paperless" id="paperless" {% if customer.ar.paperless %}checked{% endif %}>
+                        Paperless?
+                    </label>
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Pricing Levels Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Pricing Levels</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table pricing_levels_table">
+            <thead>
+                <tr>
+                    <th>Family</th>
+                    <th>Level</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pricing in customer.pricing_levels.all %}
+                <tr>
+                    <td>{{ pricing.family }}</td>
+                    <td>{{ pricing.level }}</td>
+                    <td>
+                        <a href="#" class="edit_pricing" data-id="{{ pricing.id }}" 
+                           data-family="{{ pricing.family }}" data-level="{{ pricing.level }}">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No pricing levels found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pricing Level Edit Modal -->
+<div id="pricing_edit_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 id="pricing_modal_title">Edit Pricing Level</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="pricing_form" method="post" action="{% url 'save_pricing_level' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                <input type="hidden" name="pricing_id" id="pricing_id" value="">
+                
+                <div class="form_group">
+                    <label for="pricing_family">Family</label>
+                    <select name="pricing_family" id="pricing_family" required>
+                        <option value="AC">AC</option>
+                        <option value="C&I">C&I</option>
+                        <option value="CRSH">CRSH</option>
+                        <option value="ENC">ENC</option>
+                        <option value="EXH">EXH</option>
+                        <option value="FUEL">FUEL</option>
+                    </select>
+                </div>
+                
+                <div class="form_group">
+                    <label for="pricing_level">Level</label>
+                    <select name="pricing_level" id="pricing_level" required>
+                        <option value="GP">GP</option>
+                        <option value="WD">WD</option>
+                        <option value="RT">RT</option>
+                        <option value="CP">CP</option>
+                    </select>
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Tax Certificates Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Tax Certificates</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table tax_certificates_table">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Tax ID</th>
+                    <th>Exp Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cert in customer.tax_certificates.all %}
+                <tr>
+                    <td>{{ cert.state }}</td>
+                    <td>{{ cert.tax_id }}</td>
+                    <td>{% if cert.expiry_date %}{{ cert.expiry_date|date:"m/d/Y" }}{% endif %}</td>
+                    <td>
+                        <a href="#" class="edit_tax_cert" data-id="{{ cert.id }}" 
+                           data-state="{{ cert.state }}" data-tax-id="{{ cert.tax_id }}"
+                           data-expiry="{% if cert.expiry_date %}{{ cert.expiry_date|date:'Y-m-d' }}{% endif %}">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No tax certificates found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="component_actions">
+            <a href="#" id="add_tax_cert_btn" class="add_link">Add</a>
+        </div>
+    </div>
+</div>
+
+<!-- Tax Certificate Edit Modal -->
+<div id="tax_cert_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 id="tax_cert_modal_title">Add Tax Certificate</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="tax_cert_form" method="post" action="{% url 'save_tax_certificate' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                <input type="hidden" name="tax_cert_id" id="tax_cert_id" value="">
+                
+                <div class="form_group">
+                    <label for="tax_cert_state">State</label>
+                    <select name="tax_cert_state" id="tax_cert_state" required>
+                        <option value="">Select a state</option>
+                        <option value="AL">Alabama</option>
+                        <option value="AK">Alaska</option>
+                        <option value="AZ">Arizona</option>
+                        <!-- Add all other states here -->
+                        <option value="WA">Washington</option>
+                        <option value="WV">West Virginia</option>
+                        <option value="WI">Wisconsin</option>
+                        <option value="WY">Wyoming</option>
+                    </select>
+                </div>
+                
+                <div class="form_group">
+                    <label for="tax_cert_id">Tax ID</label>
+                    <input type="text" name="tax_cert_id" id="tax_cert_tax_id" required>
+                </div>
+                
+                <div class="form_group">
+                    <label for="tax_cert_expiry">Expiration Date</label>
+                    <input type="date" name="tax_cert_expiry" id="tax_cert_expiry">
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                    {% if editing_tax_cert %}
+                    <button type="button" class="btn_delete" data-id="{{ tax_cert.id }}">Delete</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

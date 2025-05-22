@@ -1,0 +1,9 @@
+*.log
+*.tar
+*.zip
+*.gz
+*.bz
+*.lock
+*.flort.txt
+__pycache__
+venv

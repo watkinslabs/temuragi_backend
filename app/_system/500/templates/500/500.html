@@ -1,0 +1,19 @@
+{% extends "public_base.html" %}
+
+{% block title %}500 - Server Error{% endblock %}
+
+{% block custom_css %}
+{% endblock %}
+
+{% block content %}
+<h1>500 - Internal Server Error</h1>
+    <p>Type: {{ error_info.error_type }}</p>
+    <p>Message: {{ error_info.error_message }}</p>
+    <pre>{{ error_info.error_traceback }}</pre>
+
+{% endblock %}
+
+{% block custom_js %}
+{% endblock %}
+
+

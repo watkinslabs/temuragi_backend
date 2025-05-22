@@ -1,0 +1,649 @@
+<script>
+    $(function() {
+      // Handle tab switching - focus on textarea when tab is shown
+      $('#queryTabs button').on('shown.bs.tab', function(e) {
+        // Map tabs to their corresponding textareas
+        const tabTextareaMap = {
+          'select-tab': 'query_select',
+          'insert-tab': 'query_insert',
+          'update-tab': 'query_update',
+          'delete-tab': 'query_delete',
+          'data-tab': 'columns',
+          'settings-tab': 'results_limit'
+        };
+        
+        // Get the id of the activated tab
+        const activeTabId = $(e.target).attr('id');
+        
+        // Get the corresponding textarea id
+        const textareaId = tabTextareaMap[activeTabId];
+        
+        // Focus on the textarea if found
+        if (textareaId) {
+          $('#' + textareaId).focus();
+        }
+      });
+    
+      // Operation checkboxes click handling
+      $('#is_read, #is_create, #is_update, #is_delete').on('change', function() {
+        const id = $(this).attr('id');
+        const isChecked = $(this).is(':checked');
+        
+        // Map to tab IDs
+        const tabMap = {
+          'is_read': 'select-tab',
+          'is_create': 'insert-tab',
+          'is_update': 'update-tab',
+          'is_delete': 'delete-tab'
+        };
+        
+        // Find the corresponding tab
+        const tabId = tabMap[id];
+        
+        if (!isChecked) {
+          // If unchecked, disable the tab
+          $('#' + tabId).addClass('disabled');
+          // If the disabled tab is active, switch to another tab
+          if ($('#' + tabId).hasClass('active')) {
+            // Find the first enabled tab
+            const firstEnabledTab = $('#queryTabs button:not(.disabled)').first();
+            if (firstEnabledTab.length > 0) {
+              // Activate it
+              firstEnabledTab.tab('show');
+            }
+          }
+        } else {
+          // If checked, enable the tab
+          $('#' + tabId).removeClass('disabled');
+        }
+      });
+      
+      // Show/hide datatable options
+      $('#is_datatable').on('change', function() {
+        if ($(this).is(':checked')) {
+          $('#datatable_options').slideDown();
+        } else {
+          $('#datatable_options').slideUp();
+        }
+      });
+      
+      // Show/hide export formats row
+      $('#dt_is_exportable').on('change', function() {
+        if ($(this).is(':checked')) {
+          $('#export_formats_row').slideDown();
+        } else {
+          $('#export_formats_row').slideUp();
+        }
+      });
+      
+      // Initialize tab states based on checkboxes
+      $('#is_read, #is_create, #is_update, #is_delete').each(function() {
+        $(this).trigger('change');
+      });
+    
+      // Handle the Run Query button
+      $('#run_select_query').on('click', function() {
+        const query = $('#query_select').val().trim();
+        const connection_uuid = $('#connection_uuid').val();
+        
+        if (!query) {
+          showQueryResultMessage('Please enter a SELECT query', 'danger');
+          return;
+        }
+        
+        if (!connection_uuid) {
+          showQueryResultMessage('Please select a database connection', 'danger');
+          return;
+        }
+        
+        // Show loading state
+        $(this).prop('disabled', true);
+        $(this).html('<i class="fas fa-spinner fa-spin"></i> Running...');
+        showQueryResultMessage('Running query...', 'info');
+        
+        // Send AJAX request
+        $.ajax({
+          url: "{{ url_for('core.run_query_ajax') }}",
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            query: query,
+            connection_uuid: connection_uuid
+          }),
+          success: function(response) {
+            if (response.success) {
+              showQueryResultMessage('Query executed successfully!', 'success');
+              
+              // Update the columns container with the detected columns
+              updateColumnsFromQuery(response.columns);
+              
+              // Switch to the data definitions tab
+              $('#data-tab').tab('show');
+            } else {
+              showQueryResultMessage('Error: ' + response.message, 'danger');
+            }
+          },
+          error: function(xhr) {
+            let errorMsg = 'An error occurred';
+            try {
+              errorMsg = xhr.responseJSON.message || errorMsg;
+            } catch (e) {}
+            showQueryResultMessage('Error: ' + errorMsg, 'danger');
+          },
+          complete: function() {
+            // Reset button state
+            $('#run_select_query').prop('disabled', false);
+            $('#run_select_query').html('<i class="fas fa-play"></i> Run');
+          }
+        });
+      });
+      
+      // Function to show query result messages
+      function showQueryResultMessage(message, type) {
+        const $msg = $('#query_result_message');
+        $msg.removeClass('alert-success alert-danger alert-info')
+          .addClass('alert-' + type)
+          .text(message)
+          .show();
+          
+        // Auto-hide successful messages after 5 seconds
+        if (type === 'success') {
+          setTimeout(function() {
+            $msg.fadeOut();
+          }, 5000);
+        }
+      }
+      
+      // Function to update columns from query results
+      function updateColumnsFromQuery(columns) {
+        // Clear existing columns except the template
+        $('#columns-container .column-row:not(:last)').remove();
+        
+        // If no columns, show message
+        if (!columns || columns.length === 0) {
+          showQueryResultMessage('No columns detected in query results', 'warning');
+          return;
+        }
+        
+        // Add each detected column
+        columns.forEach(function(column, index) {
+          const $template = $('#columns-container .column-row:last').clone();
+          
+          // Update the input names and values
+          $template.find('input[name$="[name]"]').attr('name', 'columns[' + index + '][name]').val(column.name);
+          $template.find('input[name$="[display]"]').attr('name', 'columns[' + index + '][display]').val(column.display || column.name);
+          $template.find('select[name$="[type]"]').attr('name', 'columns[' + index + '][type]').val(column.type);
+          $template.find('input[name$="[desc]"]').attr('name', 'columns[' + index + '][desc]').val(column.desc || '');
+          
+          // Set the order attribute
+          $template.attr('data-order', column.order || index);
+          $template.find('.column-order-input').attr('name', 'columns[' + index + '][order]').val(column.order || index);
+          
+          // Insert before the template
+          $template.insertBefore('#columns-container .column-row:last');
+        });
+        
+        // Update the template row indices
+        const newIndex = columns.length;
+        const $template = $('#columns-container .column-row:last');
+        $template.attr('data-order', newIndex);
+        $template.find('input, select').each(function() {
+          const name = $(this).attr('name');
+          if (name) {
+            $(this).attr('name', name.replace(/\[\d+\]/, '[' + newIndex + ']'));
+          }
+        });
+        $template.find('.column-order-input').val(newIndex);
+        
+        // Clear template values
+        $template.find('input[type="text"]').val('');
+        $template.find('select').prop('selectedIndex', 0);
+      }
+
+      // Handle Add Column button
+      $('#add-column').on('click', function() {
+        const $template = $('#columns-container .column-row:last').clone();
+        const newIndex = $('#columns-container .column-row').length;
+        
+        // Update the indices in the names and set order
+        $template.attr('data-order', newIndex);
+        $template.find('input, select').each(function() {
+          const name = $(this).attr('name');
+          if (name) {
+            $(this).attr('name', name.replace(/\[\d+\]/, '[' + newIndex + ']'));
+          }
+        });
+        $template.find('.column-order-input').val(newIndex);
+        
+        // Clear values
+        $template.find('input[type="text"]').val('');
+        $template.find('select').prop('selectedIndex', 0);
+        
+        // Add to container
+        $('#columns-container').append($template);
+      });
+
+
+      // Handle Remove Column button
+
+      // Handle Remove Column button
+      $('#columns-container').on('click', '.remove-column', function() {
+        // Don't remove if it's the last row and has no name
+        const $row = $(this).closest('.column-row');
+        const name = $row.find('input[name$="[name]"]').val();
+        const isLastRow = $row.is(':last-child');
+        
+        if (isLastRow && !name) {
+          // Just clear the last row instead of removing it
+          $row.find('input[type="text"]').val('');
+          $row.find('select').prop('selectedIndex', 0);
+          return;
+        }
+        
+        // Remove the row
+        $row.remove();
+        
+        // Reindex remaining rows
+        $('#columns-container .column-row').each(function(index) {
+          $(this).attr('data-order', index);
+          $(this).find('.column-order-input').val(index);
+          $(this).find('input, select').each(function() {
+            const name = $(this).attr('name');
+            if (name) {
+              $(this).attr('name', name.replace(/\[\d+\]/, '[' + index + ']'));
+            }
+          });
+        });
+      });
+
+      // Handle Add Variable button
+      $('#add-variable').on('click', function() {
+        const $template = $('#variables-container .variable-row:last').clone();
+        const newIndex = $('#variables-container .variable-row').length;
+        
+        // Update the indices and order
+        $template.attr('data-order', newIndex);
+        $template.find('input, select').each(function() {
+          const name = $(this).attr('name');
+          if (name) {
+            $(this).attr('name', name.replace(/\[\d+\]/, '[' + newIndex + ']'));
+          }
+        });
+        $template.find('.order-input').val(newIndex);
+        
+        // Clear values
+        $template.find('input[type="text"]').val('');
+        $template.find('select').prop('selectedIndex', 0);
+        
+        // Add to container
+        $('#variables-container').append($template);
+      });
+      
+      // Handle Remove Variable button
+      $('#variables-container').on('click', '.remove-variable', function() {
+        // Don't remove if it's the last row
+        if ($('#variables-container .variable-row').length > 1) {
+          $(this).closest('.variable-row').remove();
+          
+          // Reindex remaining rows
+          $('#variables-container .variable-row').each(function(index) {
+            $(this).attr('data-order', index);
+            $(this).find('.order-input').val(index);
+            $(this).find('input, select').each(function() {
+              const name = $(this).attr('name');
+              if (name) {
+                $(this).attr('name', name.replace(/\[\d+\]/, '[' + index + ']'));
+              }
+            });
+          });
+        } else {
+          // Clear the last row instead of removing it
+          $(this).closest('.variable-row').find('input[type="text"]').val('');
+          $(this).closest('.variable-row').find('select').prop('selectedIndex', 0);
+        }
+      });
+      
+      // Function to get variable data from the current stored JSON
+      function getVariableData(varName) {
+        let varData = {};
+        
+        try {
+          // Try to parse from the variables JSON
+          const variablesData = JSON.parse($('#variables').val() || '{}');
+          if (variablesData && variablesData[varName]) {
+            varData = variablesData[varName];
+          }
+        } catch (e) {
+          console.error('Error parsing variables JSON:', e);
+        }
+        
+        return varData;
+      }
+      
+      // Update modal fields based on variable type
+      function updateModalTypeFields(type, data) {
+        // Hide all type-specific fields first
+        $('#modal-text-limits, #modal-range-fields, #modal-select-options, #modal-url-pattern').hide();
+        
+        // Show fields based on type
+        switch (type) {
+          case 'text':
+          case 'alpha':
+            $('#modal-text-limits').show();
+            $('#modal-variable-max-length').val(data.limits?.max_length || '');
+            break;
+            
+          case 'int':
+          case 'numeric':
+          case 'money':
+          case 'number':
+            $('#modal-range-fields').show();
+            $('#modal-variable-min').val(data.limits?.min || '');
+            $('#modal-variable-max').val(data.limits?.max || '');
+            break;
+            
+          case 'select':
+            $('#modal-select-options').show();
+            $('#modal-variable-options').val(Array.isArray(data.options) ? data.options.join(',') : '');
+            break;
+            
+          case 'url':
+            $('#modal-url-pattern').show();
+            $('#modal-variable-pattern').val(data.pattern || '');
+            break;
+        }
+      }
+      
+      // Handle variable type change in modal
+      $('#modal-variable-type').on('change', function() {
+        updateModalTypeFields($(this).val(), {});
+      });
+      
+      // Handle save in Variable Edit modal
+      $('#save-variable-modal').on('click', function() {
+        const form = document.getElementById('variable-edit-form');
+        
+        // Basic validation
+        if (!form.checkValidity()) {
+          form.classList.add('was-validated');
+          return;
+        }
+        
+        const index = $('#modal-variable-index').val();
+        const name = $('#modal-variable-name').val();
+        const display = $('#modal-variable-display').val();
+        const type = $('#modal-variable-type').val();
+        const defaultValue = $('#modal-variable-default').val();
+        const order = $('#modal-variable-order').val();
+        
+        // Get the row
+        const $row = $('#variables-container .variable-row').eq(index);
+        
+        // Update row inputs
+        $row.find('input[name$="[name]"]').val(name);
+        $row.find('input[name$="[display]"]').val(display);
+        $row.find('select').val(type);
+        $row.find('input[name$="[default]"]').val(defaultValue);
+        
+        // Prepare limits/options based on type
+        let limits = {};
+        let options = null;
+        let pattern = null;
+        
+        switch (type) {
+          case 'text':
+          case 'alpha':
+            const maxLength = $('#modal-variable-max-length').val();
+            if (maxLength) limits.max_length = parseInt(maxLength);
+            break;
+            
+          case 'int':
+          case 'numeric':
+          case 'money':
+            const min = $('#modal-variable-min').val();
+            const max = $('#modal-variable-max').val();
+            if (min) limits.min = type === 'int' ? parseInt(min) : parseFloat(min);
+            if (max) limits.max = type === 'int' ? parseInt(max) : parseFloat(max);
+            break;
+            
+          case 'select':
+            const optionsText = $('#modal-variable-options').val();
+            if (optionsText) {
+              options = optionsText.split(',').map(opt => opt.trim()).filter(opt => opt);
+            }
+            break;
+            
+          case 'url':
+            pattern = $('#modal-variable-pattern').val();
+            break;
+        }
+        
+        // Store the additional data in data attributes for later saving
+        $row.data('limits', limits);
+        if (options) $row.data('options', options);
+        if (pattern) $row.data('pattern', pattern);
+        
+        // Close the modal
+        $('#variableEditModal').modal('hide');
+      });
+      
+      // Initialize sortable for variables
+      if ($.fn.sortable) {
+        $('#variables-container').sortable({
+          items: '.variable-row',
+          handle: '.sort-handle',
+          axis: 'y',
+          update: function(event, ui) {
+            // Update order values after sorting
+            $('#variables-container .variable-row').each(function(index) {
+              $(this).attr('data-order', index);
+              $(this).find('.order-input').val(index);
+            });
+          }
+        });
+        
+        // Make columns sortable too
+        $('#columns-container').sortable({
+          items: '.column-row',
+          handle: '.sort-handle',
+          axis: 'y',
+          update: function(event, ui) {
+            // Update order values after sorting
+            $('#columns-container .column-row').each(function(index) {
+              $(this).attr('data-order', index);
+              $(this).find('.column-order-input').val(index);
+            });
+          }
+        });
+      }
+      
+      // Form submission handling with proper indexing
+      $('#crud_def_form').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate required fields
+        if (!$('#name').val().trim()) {
+          alert('Name is required');
+          $('#name').focus();
+          return false;
+        }
+        
+        if (!$('#display').val().trim()) {
+          alert('Display name is required');
+          $('#display').focus();
+          return false;
+        }
+        
+        // Validate queries based on which operations are enabled
+        if ($('#is_read').is(':checked') && !$('#query_select').val().trim()) {
+          alert('SELECT query is required when Read operation is enabled');
+          $('#select-tab').tab('show');
+          $('#query_select').focus();
+          return false;
+        }
+        
+        if ($('#is_create').is(':checked') && !$('#query_insert').val().trim()) {
+          alert('INSERT query is required when Create operation is enabled');
+          $('#insert-tab').tab('show');
+          $('#query_insert').focus();
+          return false;
+        }
+        
+        if ($('#is_update').is(':checked') && !$('#query_update').val().trim()) {
+          alert('UPDATE query is required when Update operation is enabled');
+          $('#update-tab').tab('show');
+          $('#query_update').focus();
+          return false;
+        }
+        
+        if ($('#is_delete').is(':checked') && !$('#query_delete').val().trim()) {
+          alert('DELETE query is required when Delete operation is enabled');
+          $('#delete-tab').tab('show');
+          $('#query_delete').focus();
+          return false;
+        }
+        
+        // Disable submit button to prevent double-clicks
+        $('#save_btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+        
+        // Simple collection of columns data based on row position
+        const columns = {};
+        $('#columns-container .column-row').each(function(index) {
+          const name = $(this).find('input[name$="[name]"]').val();
+          // Only include columns with a name
+          if (name && name.trim() !== '') {
+            columns[name] = {
+              name: name,
+              display: $(this).find('input[name$="[display]"]').val() || name,
+              type: $(this).find('select').val(),
+              desc: $(this).find('input[name$="[desc]"]').val() || '',
+              order: index  // Set order based on row position
+            };
+          }
+        });
+        
+        // Simple collection of variables data based on row position
+        const variables = {};
+        $('#variables-container .variable-row').each(function(index) {
+          const name = $(this).find('input[name$="[name]"]').val();
+          // Only include variables with a name
+          if (name && name.trim() !== '') {
+            const order = parseInt($(this).find('.order-input').val());
+            const varData = {
+              name: name,
+              display: $(this).find('input[name$="[display]"]').val() || name,
+              type: $(this).find('select').val(),
+              default: $(this).find('input[name$="[default]"]').val() || '',
+              order: order || index  // Use provided order or fallback to index if not available
+            };
+            
+            // Add any limits/options/patterns from data attributes
+            if ($(this).data('limits')) varData.limits = $(this).data('limits');
+            if ($(this).data('options')) varData.options = $(this).data('options');
+            if ($(this).data('pattern')) varData.pattern = $(this).data('pattern');
+            
+            variables[name] = varData;
+          }
+        });
+
+        // Log the collected data
+        console.log('Columns data:', columns);
+        console.log('Variables data:', variables);
+        
+        // Build options object from form values
+        const options = {
+          // CRUD operations
+          is_read: $('#is_read').is(':checked'),
+          is_create: $('#is_create').is(':checked'),
+          is_update: $('#is_update').is(':checked'),
+          is_delete: $('#is_delete').is(':checked'),
+          
+          // DataTable settings
+          results_limit: parseInt($('#results_limit').val()) || 0,
+          is_datatable: $('#is_datatable').is(':checked'),
+          datatable: {
+            is_live: $('#dt_is_live').is(':checked'),
+            is_searchable: $('#dt_is_searchable').is(':checked'),
+            is_filterable: $('#dt_is_filterable').is(':checked'),
+            is_exportable: $('#dt_is_exportable').is(':checked'),
+            export_formats: $('#dt_export_formats').val() || 'csv,xlsx'
+          }
+        };
+        
+        // Get the connection_uuid (can be empty string)
+        const connection_uuid = $('#connection_uuid').val();
+        
+        // Prepare the payload
+        const payload = {
+          uuid: $('#uuid').val(),
+          name: $('#name').val().trim(),
+          display: $('#display').val().trim(),
+          description: $('#description').val().trim() || null,
+          connection_uuid: connection_uuid || null, // Allow null connection
+          query_select: $('#query_select').val().trim(),
+          query_insert: $('#query_insert').val().trim(),
+          query_update: $('#query_update').val().trim(),
+          query_delete: $('#query_delete').val().trim(),
+          columns: columns,  // Now properly populated
+          variables: variables, // Now properly populated
+          options: options,
+          active: $('#active').is(':checked')
+        };
+        
+        console.log('Sending payload:', payload);
+        
+        // Submit the form via AJAX
+        $.ajax({
+          url: "{{ url_for('core.crud_def_update_ajax') }}",
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(payload),
+          success: function(response) {
+            if (response.success) {
+              // Show success message before redirecting
+              alert('CRUD definition saved successfully!');
+              window.location.href = "{{ url_for('core.crud_defs') }}";
+            } else {
+              alert('Error: ' + response.msg);
+              $('#save_btn').prop('disabled', false).html('Save');
+            }
+          },
+          error: function(xhr) {
+            console.error('AJAX Error:', xhr);
+            let errorMsg = 'An unknown error occurred';
+            if (xhr.responseJSON && xhr.responseJSON.msg) {
+              errorMsg = xhr.responseJSON.msg;
+            } else if (xhr.statusText) {
+              errorMsg = xhr.statusText;
+            }
+            alert('Error: ' + errorMsg);
+            $('#save_btn').prop('disabled', false).html('Save');
+          }
+        });
+      });
+    
+      // Handle opening Variable Edit modal
+      $('#variables-container').on('click', '.btn-edit-variable', function() {
+        const $row = $(this).closest('.variable-row');
+        const index = $row.index();
+        
+        // Populate modal with row data
+        $('#modal-variable-index').val(index);
+        $('#modal-variable-name').val($row.find('input[name$="[name]"]').val());
+        $('#modal-variable-display').val($row.find('input[name$="[display]"]').val());
+        $('#modal-variable-type').val($row.find('select').val());
+        $('#modal-variable-default').val($row.find('input[name$="[default]"]').val());
+        $('#modal-variable-order').val($row.data('order'));
+        
+        // Get limits/options data from the row data attributes (or build from JSON)
+        const rowVarName = $row.find('input[name$="[name]"]').val();
+        const varData = getVariableData(rowVarName);
+        
+        // Set type-specific fields
+        updateModalTypeFields($row.find('select').val(), varData);
+        
+        // Show the modal
+        $('#variableEditModal').modal('show');
+      });
+    });
+</script>

@@ -1,0 +1,25 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+
+
+{% block subnav %}
+<div>
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item">
+    <a class="nav-link {% if request.endpoint == 'firewall.index' %}active{% endif %}" href="{{ url_for('firewall.home') }}">
+      IP Patterns
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if request.endpoint == 'firewall.view_logs' %}active{% endif %}" href="{{ url_for('firewall.view_logs') }}">
+      Request Logs
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if request.endpoint == 'firewall.view_stats' %}active{% endif %}" href="{{ url_for('firewall.view_stats') }}">
+      Statistics
+    </a>
+  </li>
+</ul>
+</div>
+{% endblock %}

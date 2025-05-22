@@ -1,0 +1,199 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Select Your Theme</h2>
+    <form method="POST" action="{{ url_for('theme.update_preferences') }}">
+        <div class="row">
+            {% for theme in themes %}
+                <div class="col-md-4 mb-4">
+                    <div class="theme-card card h-100 {% if theme.id == user_theme %}active-theme{% endif %}"
+                         onclick="document.getElementById('theme_{{ theme.id }}').checked = true;">
+                        
+                        <!-- Theme Preview -->
+                        <div class="theme-preview" style="background-color: {% if theme.dark_mode %}#2c3e50{% else %}#f8f9fa{% endif %};">
+                            
+                            <div class="preview-content d-flex">
+                                {% if theme.menu_location == 'Left' %}
+                                <div class="preview-sidebar" style="background-color: {% if theme.dark_mode %}#34495e{% else %}#e9ecef{% endif %};">
+                                    {% if theme.show_icons %}
+                                    <div class="sidebar-item"></div>
+                                    <div class="sidebar-item"></div>
+                                    <div class="sidebar-item"></div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="preview-main">
+                                    {% if theme.menu_location == 'Top' %}
+                                    <div class="preview-topnav" style="background-color: {% if theme.dark_mode %}#34495e{% else %}#e9ecef{% endif %};">
+                                        {% if theme.show_icons %}
+                                        <div class="topnav-item"></div>
+                                        <div class="topnav-item"></div>
+                                        <div class="topnav-item"></div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if theme.search %}
+                                    <div class="preview-search" style="background-color: {% if theme.dark_mode %}#3d5871{% else %}#f1f3f5{% endif %};"></div>
+                                    {% endif %}
+                                    
+                                    <div class="preview-content-blocks">
+                                        <div class="content-block"></div>
+                                        <div class="content-block"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Theme Details -->
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input type="radio" class="form-check-input" name="theme_id" id="theme_{{ theme.id }}" 
+                                       value="{{ theme.id }}" {{ 'checked' if theme.id == user_theme else '' }}>
+                                <label class="form-check-label" for="theme_{{ theme.id }}">
+                                    <h5 class="card-title">{{ theme.name }}</h5>
+                                </label>
+                            </div>
+                            
+                            <p class="card-text small text-muted">{{ theme.description }}</p>
+                            
+                            <div class="theme-features">
+                                <span class="badge {% if theme.dark_mode %}bg-dark{% else %}bg-light text-dark border{% endif %} me-2">
+                                    {% if theme.dark_mode %}Dark{% else %}Light{% endif %} Mode
+                                </span>
+                                
+                                <span class="badge bg-secondary me-2">
+                                    {{ theme.menu_location }} Menu
+                                </span>
+                                
+                                {% if theme.wide %}
+                                <span class="badge bg-info text-dark me-2">Wide</span>
+                                {% endif %}
+                                
+                                {% if theme.search %}
+                                <span class="badge bg-primary me-2">Search</span>
+                                {% endif %}
+                                
+                                {% if theme.show_icons %}
+                                <span class="badge bg-success me-2">Icons</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4 py-2">Save Theme</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .theme-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    
+    .theme-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .active-theme {
+        border-color: #0d6efd;
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.2);
+    }
+    
+    .theme-preview {
+        height: 160px;
+        overflow: hidden;
+        border-top-left-radius: calc(0.25rem - 1px);
+        border-top-right-radius: calc(0.25rem - 1px);
+    }
+    
+    .preview-header {
+        height: 30px;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .preview-title {
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .preview-content {
+        height: 130px;
+    }
+    
+    .preview-sidebar {
+        width: 30px;
+        height: 100%;
+        padding: 5px;
+    }
+    
+    .sidebar-item {
+        height: 8px;
+        margin-bottom: 8px;
+        background-color: rgba(255,255,255,0.4);
+        border-radius: 2px;
+    }
+    
+    .preview-main {
+        flex: 1;
+        padding: 8px;
+    }
+    
+    .preview-topnav {
+        height: 20px;
+        margin-bottom: 8px;
+        display: flex;
+        padding: 0 5px;
+    }
+    
+    .topnav-item {
+        height: 6px;
+        width: 20px;
+        margin-right: 8px;
+        background-color: rgba(255,255,255,0.4);
+        border-radius: 2px;
+    }
+    
+    .preview-search {
+        height: 20px;
+        margin-bottom: 8px;
+        border-radius: 3px;
+    }
+    
+    .preview-content-blocks {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .content-block {
+        height: 15px;
+        background-color: rgba(255,255,255,0.2);
+        border-radius: 3px;
+    }
+    
+    .theme-features {
+        margin-top: 10px;
+    }
+    
+    .badge {
+        font-size: 0.7rem;
+        font-weight: normal;
+    }
+</style>
+{% endblock %}

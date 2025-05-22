@@ -1,0 +1,265 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block title %}Session Debug Viewer{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0 fs-4">Session Debugger</h2>
+                    <div>
+                        {% if session_ttl %}
+                        <span class="badge bg-info">Session TTL: {{ session_ttl }} seconds</span>
+                        {% endif %}
+                        <span class="badge bg-success ms-2">Session ID: {{ session.get('_id', 'Not available') }}</span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-0">
+                    <ul class="nav nav-tabs" id="debugTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="session-tab" data-bs-toggle="tab" data-bs-target="#session-data" type="button" role="tab">Session Data</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="request-tab" data-bs-toggle="tab" data-bs-target="#request-data" type="button" role="tab">Request Info</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="config-tab" data-bs-toggle="tab" data-bs-target="#config-data" type="button" role="tab">App Config</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content p-3" id="debugTabsContent">
+                        <!-- Session Data Tab -->
+                        <div class="tab-pane fade show active" id="session-data" role="tabpanel">
+                            {% if session|length > 0 %}
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Key</th>
+                                                <th>Value</th>
+                                                <th>Type</th>
+                                                <th>TTL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for key, value in session.items() %}
+                                                {% set expiry = session_expiry.get(key, 'Same as session') %}
+                                                <tr>
+                                                    <td><code>{{ key }}</code></td>
+                                                    <td>
+                                                        {% if value is mapping %}
+                                                            <pre class="mb-0"><code>{{ value|pprint }}</code></pre>
+                                                        {% elif value is sequence and value is not string %}
+                                                            <pre class="mb-0"><code>{{ value|pprint }}</code></pre>
+                                                        {% else %}
+                                                            {{ value }}
+                                                        {% endif %}
+                                                    </td>
+                                                    <td><span class="badge bg-secondary">{{ value|type }}</span></td>
+                                                    <td>
+                                                        {% if expiry != 'Same as session' %}
+                                                            <span class="badge bg-warning text-dark">{{ expiry }} seconds</span>
+                                                        {% else %}
+                                                            <span class="badge bg-light text-dark">{{ expiry }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">No session data available.</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Request Info Tab -->
+                        <div class="tab-pane fade" id="request-data" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">Request Details</div>
+                                        <div class="card-body">
+                                            <ul class="list-group">
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Method</span>
+                                                    <span class="badge bg-primary">{{ debug_info.request_method }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Path</span>
+                                                    <span>{{ debug_info.request_path }}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">Query Parameters</div>
+                                        <div class="card-body">
+                                            {% if debug_info.request_args %}
+                                                <ul class="list-group">
+                                                    {% for key, value in debug_info.request_args.items() %}
+                                                        <li class="list-group-item d-flex justify-content-between">
+                                                            <span>{{ key }}</span>
+                                                            <span>{{ value }}</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                <div class="alert alert-info mb-0">No query parameters.</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">Request Headers</div>
+                                        <div class="card-body">
+                                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                                <table class="table table-sm table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Header</th>
+                                                            <th>Value</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for key, value in debug_info.request_headers.items() %}
+                                                            <tr>
+                                                                <td><code>{{ key }}</code></td>
+                                                                <td>{{ value }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">Cookies</div>
+                                        <div class="card-body">
+                                            {% if debug_info.request_cookies %}
+                                                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                                    <table class="table table-sm table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <th>Value</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for key, value in debug_info.request_cookies.items() %}
+                                                                <tr>
+                                                                    <td><code>{{ key }}</code></td>
+                                                                    <td>{{ value }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% else %}
+                                                <div class="alert alert-info mb-0">No cookies found.</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- App Config Tab -->
+                        <div class="tab-pane fade" id="config-data" role="tabpanel">
+                            <div class="alert alert-warning">
+                                <strong>Note:</strong> Only non-sensitive configuration values are shown.
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Configuration Key</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in debug_info.app_config.items()|sort %}
+                                            <tr>
+                                                <td><code>{{ key }}</code></td>
+                                                <td>{{ value }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Session Info</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Created</span>
+                                    <span>{{ session_created|default('Unknown') }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Last Activity</span>
+                                    <span>{{ session_last_activity|default('Unknown') }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Expires</span>
+                                    <span>{{ session_expires|default('Unknown') }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span>Backend</span>
+                                    <span>{{ debug_info.session_backend }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Session Controls</h5>
+                            <div class="d-grid gap-2">
+                                <a href="?action=clear" class="btn btn-warning">Clear Session Data</a>
+                                <a href="?action=refresh" class="btn btn-info">Refresh TTL</a>
+                                <a href="{{ url_for('debug.home') }}" class="btn btn-secondary">Refresh Page</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-format JSON data for better display
+    document.addEventListener('DOMContentLoaded', function() {
+        const preTags = document.querySelectorAll('pre code');
+        preTags.forEach(function(preTag) {
+            try {
+                const content = preTag.textContent.trim();
+                if (content.startsWith('{') || content.startsWith('[')) {
+                    const obj = JSON.parse(content);
+                    preTag.textContent = JSON.stringify(obj, null, 2);
+                }
+            } catch (e) {
+                // Not JSON or invalid JSON, keep as is
+            }
+        });
+    });
+</script>
+{% endblock %}

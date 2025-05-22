@@ -1,0 +1,116 @@
+<!-- Addresses Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Addresses</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table addresses_table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Title</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for address in customer.addresses.all %}
+                <tr>
+                    <td>{{ address.type }}</td>
+                    <td>{{ address.title|default:"---" }}</td>
+                    <td>
+                        {{ address.name }}<br>
+                        {{ address.street_line1 }}<br>
+                        {% if address.street_line2 %}{{ address.street_line2 }}<br>{% endif %}
+                        {% if address.street_line3 %}{{ address.street_line3 }}<br>{% endif %}
+                        {{ address.city }}, {{ address.state }} {{ address.zip_code }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No addresses found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="component_actions">
+            <a href="{% url 'edit_customer_address' customer.id %}" class="edit_link">Edit</a>
+            {% if customer.addresses.count < 1 %}
+            <a href="{% url 'add_customer_address' customer.id %}" class="add_link">Add Address</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Address Edit Modal Template -->
+<div id="address_edit_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3>Edit Address</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="address_form" method="post" action="{% url 'save_customer_address' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                <input type="hidden" name="address_id" id="address_id" value="">
+                
+                <div class="form_group">
+                    <label for="address_type">Type</label>
+                    <select name="address_type" id="address_type" required>
+                        <option value="Primary">Primary</option>
+                        <option value="Billing">Billing</option>
+                        <option value="Shipping">Shipping</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form_group">
+                    <label for="address_title">Title</label>
+                    <input type="text" name="address_title" id="address_title">
+                </div>
+                
+                <div class="form_group">
+                    <label for="address_name">Name</label>
+                    <input type="text" name="address_name" id="address_name" required>
+                </div>
+                
+                <div class="form_group">
+                    <label for="address_street1">Street Line 1</label>
+                    <input type="text" name="address_street1" id="address_street1" required>
+                </div>
+                
+                <div class="form_group">
+                    <label for="address_street2">Street Line 2</label>
+                    <input type="text" name="address_street2" id="address_street2">
+                </div>
+                
+                <div class="form_group">
+                    <label for="address_street3">Street Line 3</label>
+                    <input type="text" name="address_street3" id="address_street3">
+                </div>
+                
+                <div class="form_row">
+                    <div class="form_group">
+                        <label for="address_city">City</label>
+                        <input type="text" name="address_city" id="address_city" required>
+                    </div>
+                    
+                    <div class="form_group">
+                        <label for="address_state">State</label>
+                        <input type="text" name="address_state" id="address_state" required maxlength="2">
+                    </div>
+                    
+                    <div class="form_group">
+                        <label for="address_zip">ZIP Code</label>
+                        <input type="text" name="address_zip" id="address_zip" required>
+                    </div>
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

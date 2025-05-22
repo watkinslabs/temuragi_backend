@@ -1,0 +1,313 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block title %}Connections{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Manage Connections</h4>
+  <button id="btn_new" class="btn btn-success btn-sm">+ New Connection</button>
+</div>
+<p class="text-muted small mb-3">Create or edit your database connections</p>
+
+<div class="table-responsive">
+  <table id="connections_table" class="display nowrap table table-striped" style="width:100%">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>DB Type</th>
+        <th>Connection String</th>
+        <th>Active</th>
+        <th style="width:150px">Actions</th>
+      </tr>
+      <tr>
+        <th>
+          <div class="position-relative">
+            <input type="text"
+                   class="form-control form-control-sm column-search"
+                   data-column="0"
+                   placeholder="Name">
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th>
+          <div class="position-relative">
+            <select class="form-select form-select-sm column-search"
+                    data-column="1"
+                    style="max-width:120px">
+              <option value="">All</option>
+              {% for name, display in db_types %}
+                <option value="{{ name }}">{{ display }}</option>
+              {% endfor %}
+            </select>
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th>
+          <div class="position-relative">
+            <input type="text"
+                   class="form-control form-control-sm column-search"
+                   data-column="2"
+                   placeholder="Connection String">
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th>
+          <div class="position-relative">
+            <select class="form-select form-select-sm column-search"
+                    data-column="3"
+                    style="max-width:80px">
+              <option value="">All</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Modal for Create/Edit -->
+<div class="modal fade" id="conn_modal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="conn_form">
+        <div class="modal-header">
+          <h5 class="modal-title"><span id="modal_mode">New</span> Connection</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="form_alert" class="alert alert-danger d-none"></div>
+          <input type="hidden" id="uuid" name="uuid">
+
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input id="name" name="name" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="db_type" class="form-label">DB Type</label>
+            <select id="db_type" name="db_type" class="form-select" required>
+              {% for name, display in db_types %}
+                <option value="{{ name }}">{{ display }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="connection_string" class="form-label">Connection String</label>
+            <textarea id="connection_string"
+                      name="connection_string"
+                      class="form-control"
+                      rows="3"
+                      required></textarea>
+          </div>
+
+          <div class="mb-3 row">
+            <div class="col">
+              <label for="cred_user" class="form-label">Username</label>
+              <input id="cred_user" class="form-control">
+            </div>
+            <div class="col">
+              <label for="cred_password" class="form-label">Password</label>
+              <input id="cred_password" type="password" class="form-control">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="options" class="form-label">Options (JSON)</label>
+            <textarea id="options"
+                      name="options"
+                      class="form-control"
+                      rows="2"
+                      placeholder='{"sslmode": "require"}'></textarea>
+          </div>
+
+          <div class="form-check mb-0">
+            <input id="active" name="active" type="checkbox" class="form-check-input">
+            <label for="active" class="form-check-label">Active</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" id="save_btn">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+$(function(){
+  
+  const table = $('#connections_table').DataTable({
+  orderCellsTop: true,
+  dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"p>><"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+  ajax: {
+    url: "{{ url_for('connection.data_ajax') }}",
+    type: "POST",
+    contentType: "application/json",
+    data: function(d) {
+      return JSON.stringify(d);
+    }
+  },
+  columns: [
+    { data: 'name' },
+    { data: 'db_type' },
+    { data: 'connection_string', render: d=>`<code>${d}</code>` },
+    { data: 'active' },
+    { data: null, orderable: false, searchable: false, render: (data, type, row) =>
+      `<button class="btn btn-sm btn-primary edit-btn me-1" data-uuid="${row.uuid}">Edit</button>
+       <button class="btn btn-sm btn-danger del-btn" data-uuid="${row.uuid}">Delete</button>`
+    }
+  ],
+  processing: true,
+  serverSide: true, 
+  orderCellsTop: true,
+  order: [[0, "asc"]],
+  pagingType: 'full_numbers',
+  lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+  pageLength: 10,
+  language: {
+    paginate: {
+      first: "«",
+      last: "»",
+      previous: "‹",
+      next: "›"
+    },
+    lengthMenu: "Show _MENU_ entries",
+    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+    infoEmpty: "Showing 0 to 0 of 0 entries",
+    emptyTable: "No connections available"
+  },
+  drawCallback: function(settings) {
+    // Get pagination info
+    const api = this.api();
+    const pageInfo = api.page.info();
+    
+    // If we have fewer rows than pageLength, add empty rows to make up the difference
+    if (pageInfo.recordsDisplay < pageInfo.length && pageInfo.recordsDisplay > 0) {
+      const numEmptyRows = pageInfo.length - pageInfo.recordsDisplay;
+      const $tbody = $(this).find('tbody');
+      
+      // Add empty rows with the same number of cells as the table has columns
+      for (let i = 0; i < numEmptyRows; i++) {
+        let emptyRow = '<tr class="empty-row">';
+        for (let j = 0; j < $(this).find('thead tr:first th').length; j++) {
+          emptyRow += '<td>&nbsp;</td>';
+        }
+        emptyRow += '</tr>';
+        $tbody.append(emptyRow);
+      }
+    }
+  },
+  // Improve styling
+  initComplete: function() {
+    // Style the length select
+    $('.dataTables_length select').addClass('form-select form-select-sm ms-2 me-2').css({
+      'width': 'auto',
+      'display': 'inline-block'
+    });
+    
+    // Add spacing to pagination
+    $('.dataTables_paginate .paginate_button').addClass('px-3 py-1 mx-1 rounded');
+    
+    // Add container styling
+    $('.dataTables_wrapper').addClass('p-0');
+  }
+});
+
+  function show_modal(mode, data={}) {
+    $('#modal_mode').text(mode);
+    $('#form_alert').addClass('d-none').text('');
+    $('#conn_form')[0].reset();
+    $('#uuid').val(data.uuid||'');
+    $('#name').val(data.name||'');
+    $('#db_type').val(data.db_type||'');
+    $('#connection_string').val(data.connection_string||'');
+    // prefill creds if present
+    if (data.credentials) {
+      $('#cred_user').val(data.credentials.user||'');
+      $('#cred_password').val(data.credentials.password||'');
+    }
+    $('#options').val(data.options? JSON.stringify(data.options): '');
+    $('#active').prop('checked', data.active==='Yes');
+    $('#conn_modal').modal('show');
+  }
+
+  $('#btn_new').on('click', ()=> show_modal('New'));
+
+  $('#connections_table').on('click','.edit-btn', e=>{
+    const row = table.row($(e.currentTarget).closest('tr')).data();
+    show_modal('Edit', row);
+  });
+
+  $('#connections_table').on('click','.del-btn', e=>{
+    if(!confirm('Delete this connection?')) return;
+    $.ajax({
+      url: "{{ url_for('connection.delete_ajax') }}",
+      method:'POST',
+      contentType:'application/json',
+      data: JSON.stringify({uuid: e.currentTarget.dataset.uuid}),
+      success: ()=> table.ajax.reload(),
+      error:xhr=> alert(xhr.responseJSON?.msg||'Error')
+    });
+  });
+
+  $('.column-search').on('input change', function(){
+    const col = $(this).data('column');
+    table.column(col).search(this.value).draw();
+  });
+  $('.clear-search').on('click', function(){
+    const $in = $(this).siblings('.column-search');
+    $in.val('');
+    table.column($in.data('column')).search('').draw();
+  });
+
+  $('#conn_form').on('submit', function(e){
+    e.preventDefault();
+    const credentials = {
+      user: $('#cred_user').val().trim(),
+      password: $('#cred_password').val()
+    };
+    const payload = {
+      uuid: $('#uuid').val(),
+      name: $('#name').val().trim(),
+      db_type: $('#db_type').val(),
+      connection_string: $('#connection_string').val().trim(),
+      credentials: credentials.user || credentials.password ? credentials : null,
+      options: $('#options').val() ? JSON.parse($('#options').val()): null,
+      active: $('#active').is(':checked')
+    };
+    const url = payload.uuid
+      ? "{{ url_for('connection.update_ajax') }}"
+      : "{{ url_for('connection.create_ajax') }}";
+
+    $.ajax({
+      url, method:'POST', contentType:'application/json',
+      data: JSON.stringify(payload),
+      success: ()=> {
+        $('#conn_modal').modal('hide');
+        table.ajax.reload();
+      },
+      error: xhr=>{
+        $('#form_alert').removeClass('d-none').text(xhr.responseJSON?.msg||'An error occurred');
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

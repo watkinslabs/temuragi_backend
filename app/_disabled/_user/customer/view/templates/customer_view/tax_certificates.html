@@ -1,0 +1,89 @@
+<!-- Tax Certificates Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Tax Certificates</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table tax_certificates_table">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Tax ID</th>
+                    <th>Exp Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cert in customer.tax_certificates.all %}
+                <tr>
+                    <td>{{ cert.state }}</td>
+                    <td>{{ cert.tax_id }}</td>
+                    <td>{% if cert.expiry_date %}{{ cert.expiry_date|date:"m/d/Y" }}{% endif %}</td>
+                    <td>
+                        <a href="#" class="edit_tax_cert" data-id="{{ cert.id }}" 
+                           data-state="{{ cert.state }}" data-tax-id="{{ cert.tax_id }}"
+                           data-expiry="{% if cert.expiry_date %}{{ cert.expiry_date|date:'Y-m-d' }}{% endif %}">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No tax certificates found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="component_actions">
+            <a href="#" id="add_tax_cert_btn" class="add_link">Add</a>
+        </div>
+    </div>
+</div>
+
+<!-- Tax Certificate Edit Modal -->
+<div id="tax_cert_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 id="tax_cert_modal_title">Add Tax Certificate</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="tax_cert_form" method="post" action="{% url 'save_tax_certificate' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                <input type="hidden" name="tax_cert_id" id="tax_cert_id" value="">
+                
+                <div class="form_group">
+                    <label for="tax_cert_state">State</label>
+                    <select name="tax_cert_state" id="tax_cert_state" required>
+                        <option value="">Select a state</option>
+                        <option value="AL">Alabama</option>
+                        <option value="AK">Alaska</option>
+                        <option value="AZ">Arizona</option>
+                        <!-- Add all other states here -->
+                        <option value="WA">Washington</option>
+                        <option value="WV">West Virginia</option>
+                        <option value="WI">Wisconsin</option>
+                        <option value="WY">Wyoming</option>
+                    </select>
+                </div>
+                
+                <div class="form_group">
+                    <label for="tax_cert_id">Tax ID</label>
+                    <input type="text" name="tax_cert_id" id="tax_cert_tax_id" required>
+                </div>
+                
+                <div class="form_group">
+                    <label for="tax_cert_expiry">Expiration Date</label>
+                    <input type="date" name="tax_cert_expiry" id="tax_cert_expiry">
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                    {% if editing_tax_cert %}
+                    <button type="button" class="btn_delete" data-id="{{ tax_cert.id }}">Delete</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

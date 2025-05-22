@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block theme_content %}
+    <header class="head-wrapper">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid" style="width:250px;">
+                <a class="navbar-brand fw-bold" style="color:darkslategrey;" href="/">
+                    {% if server_addr != "10.0.0.51" %}Dev {% endif %}Performance Radiator®
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="quick-link-btn"></span>
+                </button>
+            </div>
+                
+            <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        {% set ticket_users = {
+                            111: '111',
+                            1428: '1482',
+                            1685: '1685'
+                        } %}
+                        
+                        {% if session.user_id in ticket_users %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold d-flex align-items-center" style="color:slategrey" target="_blank" href="/tickets">
+                                    <i class="fas fa-ticket-alt me-2"></i>Tickets
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold d-flex align-items-center" style="color:slategrey" target="_blank" href="https://portal.office.com">
+                                <i class="fas fa-envelope me-2"></i>WebMail
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            {% set icon_color = 'text-danger' if mail.unread > 0 else 'text-greg' %}
+                            <a href="{{ url_for('messages.home') }}" class="nav-link fw-bold d-flex align-items-center" style="color:slategrey">
+                                <i class="fas fa-envelope me-2 {{ icon_color }}"></i>
+                                {{ session.username|upper }} - {{ session.user_id }} - [{{ session.home_loc }}]
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold d-flex align-items-center" style="color:slategrey" target="_blank" href="{{ url_for('auth.logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Sidebar and Main Content Wrapper -->
+    <main class="main-wrapper">
+        <div class="top_nav" id="scrollableSidebar">
+            <div class="accordion" id="accordionSidebar">
+                    {{ menu.html|safe }}
+            </div>
+        </div>
+        
+        <div class='module-container'>
+            <div class="full-width-header">
+                <div class="menu_sub_title">
+                    {{ menu.breadcrumbs|safe }}
+                </div>
+                <div class="active-customer-switcher">
+                    {% if active_customer_switcher is defined %}
+                        {{ active_customer_switcher|safe }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                {{ content|safe }}
+                {% block content %}{% endblock %}
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="foot-wrapper footer dark-mode">
+        <span>&copy; {{ current_year }} Performance Radiator® - All rights reserved.</span>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+    
+    $(document).ready(function () {
+        $('.toggle-favorite').bind('click', function () {
+            var $button = $(this);
+            var itemId = $button.attr('data-id');
+            var action = $button.attr('data-action');
+    
+            $.ajax({
+                url: '/menu/add_to_favorites',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ item_id: itemId, action: action }),
+                success: function (data) {
+                    if (data.status === 'success') {
+                        // Toggle button icon and action
+                        var $icon = $button.find('i');
+                        if (action === 'add') {
+                            $button.attr('data-action', 'remove');
+                            $icon.removeClass('fa-plus-square').addClass('fa-minus-square'); // Change to minus icon
+                        } else {
+                            $button.attr('data-action', 'add');
+                            $icon.removeClass('fa-minus-square').addClass('fa-plus-square'); // Change to plus icon
+                        }
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the quick link.');
+                }
+            });
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Select the form
+        return;
+        const form = document.getElementById('searchByNumberForm');
+    
+        if (form) {
+            // Add Bootstrap styles to buttons
+            form.querySelectorAll('button').forEach(button => {
+                button.classList.add('btn', 'btn-primary', 'btn-sm');
+            });
+    
+            // Add Bootstrap styles to selects
+            form.querySelectorAll('select').forEach(select => {
+                select.classList.add('form-select', 'form-select-sm');
+            });
+        }
+    });
+    </script>
+{% endblock %}

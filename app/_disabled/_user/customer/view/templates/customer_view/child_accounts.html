@@ -1,0 +1,94 @@
+<!-- Certifications Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>608/609 Certifications</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table certifications_table">
+            <thead>
+                <tr>
+                    <th>Certified Technicians</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tech in customer.certified_technicians.all %}
+                <tr>
+                    <td>{{ tech.name }}</td>
+                    <td>
+                        <a href="#" class="edit_tech" data-id="{{ tech.id }}" data-name="{{ tech.name }}">Edit</a>
+                        <a href="#" class="delete_tech" data-id="{{ tech.id }}">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">No certified technicians found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="component_actions">
+            <a href="#" id="add_tech_btn" class="add_link">Add</a>
+        </div>
+    </div>
+</div>
+
+<!-- Certification Edit Modal -->
+<div id="tech_edit_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 id="tech_modal_title">Add Certified Technician</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="tech_form" method="post" action="{% url 'save_certified_tech' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                <input type="hidden" name="tech_id" id="tech_id" value="">
+                
+                <div class="form_group">
+                    <label for="tech_name">Technician Name</label>
+                    <input type="text" name="tech_name" id="tech_name" required>
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sales Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Recent Sales Totals</h3>
+    </div>
+    <div class="component_content">
+        <div id="sales_data_container">
+            {% if customer.sales_data %}
+                <table class="data_table sales_table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Sales</th>
+                            <th>Margin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for period in customer.sales_data %}
+                        <tr>
+                            <td>{{ period.name }}</td>
+                            <td>${{ period.sales|floatformat:2 }}</td>
+                            <td>{{ period.margin|floatformat:2 }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <a href="#" id="get_sales_data" class="action_link">Click here to Retrieve Recent Sales Data</a>
+            {% endif %}
+        </div>
+    </div>
+</div>

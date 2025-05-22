@@ -1,0 +1,145 @@
+<!-- Phone Numbers Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Phone Numbers</h3>
+        <div class="component_subtitle">(Click Phone # to Edit)</div>
+    </div>
+    <div class="component_content">
+        <table class="data_table phone_table">
+            <thead>
+                <tr>
+                    <th>Phone</th>
+                    <th>Ext</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for phone in customer.phones.all %}
+                <tr>
+                    <td>
+                        <a href="#" class="edit_phone" data-id="{{ phone.id }}" data-number="{{ phone.number }}" 
+                           data-ext="{{ phone.extension }}" data-type="{{ phone.type }}" data-desc="{{ phone.description }}">
+                            {{ phone.number }}
+                        </a>
+                    </td>
+                    <td>{{ phone.extension|default:"" }}</td>
+                    <td>{{ phone.type }}</td>
+                    <td>{{ phone.description|default:"" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No phone numbers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="component_actions">
+            <a href="#" id="add_phone_btn" class="add_link">Add #</a>
+        </div>
+    </div>
+</div>
+
+<!-- Phone Edit Modal Template -->
+<div id="phone_edit_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 id="phone_modal_title">Edit Phone Number</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="phone_form" method="post" action="{% url 'save_customer_phone' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                <input type="hidden" name="phone_id" id="phone_id" value="">
+                
+                <div class="form_group">
+                    <label for="phone_number">Phone Number</label>
+                    <input type="tel" name="phone_number" id="phone_number" required 
+                           pattern="\(\d{3}\) \d{3}-\d{4}" placeholder="(123) 456-7890">
+                    <small>Format: (123) 456-7890</small>
+                </div>
+                
+                <div class="form_group">
+                    <label for="phone_ext">Extension</label>
+                    <input type="text" name="phone_ext" id="phone_ext">
+                </div>
+                
+                <div class="form_group">
+                    <label for="phone_type">Type</label>
+                    <select name="phone_type" id="phone_type" required>
+                        <option value="Work">Work</option>
+                        <option value="Mobile">Mobile</option>
+                        <option value="Home">Home</option>
+                        <option value="Fax">Fax</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form_group">
+                    <label for="phone_desc">Description</label>
+                    <input type="text" name="phone_desc" id="phone_desc">
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                    {% if editing_phone %}
+                    <button type="button" class="btn_delete" data-id="{{ phone.id }}">Delete</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Email Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Accounting Email</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table email_table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {{ customer.accounting_email }}
+                        <a href="#" id="edit_email_btn" class="edit_link">Edit</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Email Edit Modal Template -->
+<div id="email_edit_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3>Edit Accounting Email</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="email_form" method="post" action="{% url 'save_customer_email' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                
+                <div class="form_group">
+                    <label for="accounting_email">Email Address</label>
+                    <input type="email" name="accounting_email" id="accounting_email" 
+                           value="{{ customer.accounting_email }}" required>
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

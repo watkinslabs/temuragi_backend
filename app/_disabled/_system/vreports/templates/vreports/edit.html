@@ -1,0 +1,195 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Edit Report: {{ report.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="report-form" action="{{ url_for('virtual_reports.edit') }}">
+                        <input type="hidden" name="id" value="{{ report.id }}">
+                        <input type="hidden" name="link_id" value="{{ report.link_id }}">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="name">Report Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ report.name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="display">Display Name</label>
+                                    <input type="text" class="form-control" id="display" name="display" value="{{ report.display }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="link_text">Menu Link Text</label>
+                                    <input type="text" class="form-control" id="link_text" name="link_text" value="{{ report.link_text }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="link_parent">Parent Group</label>
+                                    <select class="form-control" id="link_parent" name="link_parent">
+                                        {% for grouper in groupers %}
+                                        <option value="{{ grouper.id }}" {% if report.link_parent == grouper.id %}selected{% endif %}>
+                                            {{ grouper.controller }} - {{ grouper.title }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="related_report">Related Report</label>
+                                    <select class="form-control" id="related_report" name="related_report">
+                                        <option value="--NONE--">--NONE--</option>
+                                        {% for report_item in reports %}
+                                        <option value="{{ report_item.id }}" {% if report.related_report == report_item.id %}selected{% endif %}>
+                                            {{ report_item.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3">{{ report.description }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="limit_by_user" name="limit_by_user" {% if report.limit_by_user == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="limit_by_user">Limit By User</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="limit_display" name="limit_display" {% if report.limit_display == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="limit_display">Limit Display</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_wide" name="is_wide" {% if report.is_wide == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_wide">Wide Display</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_ajax" name="is_ajax" {% if report.is_ajax == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_ajax">Use AJAX</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_auto_run" name="is_auto_run" {% if report.is_auto_run == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_auto_run">Auto Run</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_searchable" name="is_searchable" {% if report.is_searchable == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_searchable">Searchable</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_public" name="is_public" {% if report.is_public == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_public">Public</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- New row for download options -->
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_download_csv" name="is_download_csv" {% if report.is_download_csv == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_download_csv">Allow Download CSV</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_download_xlsx" name="is_download_xlsx" {% if report.is_download_xlsx == 1 %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_download_xlsx">Allow Download XLSX</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="query">SQL Query</label>
+                                    <textarea class="form-control" id="query" name="query" rows="10">{{ report.query }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% include 'vreports/edit_variables.html' %}
+                        {% include 'vreports/edit_columns.html' %}
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                              <div class="btn-group" role="group">
+                                <!-- Save -->
+                                <button type="submit" name="save" value="1" class="btn btn-primary">
+                                  Save
+                                </button>
+                                <!-- Run -->
+                                <button type="submit" name="run" value="1" class="btn btn-info">
+                                  Run Query
+                                </button>
+                                <a href="{{ url_for('virtual_reports.index') }}" class="btn btn-secondary">
+                                  Back to List
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                          
+
+
+                    </form>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <form
+                              action="{{ url_for('virtual_reports.view') }}"
+                              method="post"
+                              style="display:inline;">
+                              <input type="hidden" name="id" value="{{ report.id }}">
+                              <button type="submit" value='1' class="btn btn-success">
+                                View Report
+                              </button>
+                            </form>
+                        </div>
+                      </div>
+
+                    {% include 'vreports/edit_modal.html' %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'vreports/edit_javascript.html' %}
+
+{% endblock %}

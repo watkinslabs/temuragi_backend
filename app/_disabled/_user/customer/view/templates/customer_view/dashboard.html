@@ -1,0 +1,102 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block title %}Customer Account{% endblock %}
+
+{% block content %}
+    {% if customer %}
+    <div class="customer_container">
+        <!-- Header section -->
+        <div class="customer_header">
+            <div class="customer_title">
+                <h1>{{ customer.name }} [{{ customer.id }}]</h1>
+                <div class="customer_rep">
+                    {% if customer.rep %}
+                        Rep: {{ customer.rep }}
+                    {% else %}
+                        No Rep Match [{{ customer.location_code }}] 
+                        <a href="#" class="detail_link">(Show Details)</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="customer_contact">
+                Contact: {{ customer.location }} [{{ customer.zip_code }}]
+                <a href="#" class="action_btn">Add Account Notice</a>
+            </div>
+        </div>
+
+        <!-- Overview content -->
+        <div class="tab_content">
+            <div class="content_header">
+                <h2>Overview</h2>
+            </div>
+
+            <div class="overview_content">
+                <div class="content_left">
+                    <!-- Customer Rank -->
+                    {% include "customer_view/rank.html" %}
+                    
+                    <!-- Account Balance -->
+                    {% include "customer_view/balance.html" %}
+                    
+                    <!-- Addresses -->
+                    {% include "customer_view/addresses.html" %}
+                    
+                    <!-- Phone Numbers -->
+                    {% include "customer_view/phones.html" %}
+                    
+                    <!-- Accounting Email -->
+                    {% include "customer_view/email.html" %}
+                    
+                    <!-- Web Accounts -->
+                    {% include "customer_view/web_accounts.html" %}
+                    
+                    <!-- Child Accounts -->
+                    {% include "customer_view/child_accounts.html" %}
+                    
+                    <!-- Certifications -->
+                    {% include "customer_view/certifications.html" %}
+                </div>
+                
+                <div class="content_right">
+                    <!-- Recent Sales -->
+                    {% include "customer_view/recent_sales.html" %}
+                    
+                    <!-- Account Activity -->
+                    {% include "customer_view/account_activity.html" %}
+                    
+                    <!-- Account Settings -->
+                    {% include "customer_view/account_settings.html" %}
+                    
+                    <!-- A/R Settings -->
+                    {% include "customer_view/ar_settings.html" %}
+                    
+                    <!-- Pricing Levels -->
+                    {% include "customer_view/pricing_levels.html" %}
+                    
+                    <!-- Tax Certificates -->
+                    {% include "customer_view/tax_certificates.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty_customer_container">
+        <div class="empty_state">
+            <div class="empty_icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <h2>No Customer Selected</h2>
+            <p>Please search or select a customer to view their account information.</p>
+            <div class="search_box">
+                <form action="{% url_for('customer_search','') %}" method="get">
+                    <input type="text" name="q" placeholder="Search by name, code, or phone number..." class="search_input">
+                    <button type="submit" class="search_button">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

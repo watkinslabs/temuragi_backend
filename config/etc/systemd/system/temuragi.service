@@ -1,0 +1,13 @@
+[Unit]
+Description     = uWSGI service for temuragi.watkinslabs.com
+After           = network.target
+
+[Service]
+User            = temuragi
+Group           = nginx
+WorkingDirectory= /web/temuragi
+ExecStart       = /web/temuragi/venv/bin/uwsgi --ini /web/temuragi/config/uwsgi.ini
+Restart         = always
+
+[Install]
+WantedBy        = multi-user.target

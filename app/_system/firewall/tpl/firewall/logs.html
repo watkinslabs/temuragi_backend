@@ -1,0 +1,86 @@
+{% extends "firewall/base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>Firewall Logs</h1>
+  
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>Filter Logs</h5>
+    </div>
+    <div class="card-body">
+      <form method="get" action="{{ url_for('firewall.view_logs') }}">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="ip_address">IP Address (contains)</label>
+              <input type="text" class="form-control" id="ip_address" name="ip_address" value="{{ ip_address }}">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="status">Status</label>
+              <select class="form-control" id="status" name="status">
+                <option value="" {% if not status %}selected{% endif %}>All</option>
+                <option value="allowed" {% if status == 'allowed' %}selected{% endif %}>Allowed</option>
+                <option value="blocked" {% if status == 'blocked' %}selected{% endif %}>Blocked</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="days">Time Period</label>
+              <select class="form-control" id="days" name="days">
+                <option value="1" {% if days == 1 %}selected{% endif %}>Last 24 hours</option>
+                <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <h5>Log Entries ({{ logs|length }} results)</h5>
+    </div>
+    <div class="card-body">
+      {% if logs %}
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>IP Address</th>
+              <th>Status</th>
+              <th>Request Path</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr>
+              <td>{{ log.timestamp|datetime }}</td>
+              <td>{{ log.ip_address }}</td>
+              <td>
+                <span class="badge badge-{{ 'success' if log.status == 'allowed' else 'danger' }}">
+                  {{ log.status }}
+                </span>
+              </td>
+              <td>{{ log.request_path }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="text-muted">No log entries found matching your criteria.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

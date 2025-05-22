@@ -1,0 +1,48 @@
+<!-- Customer Rank Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Customer Rank</h3>
+        <div class="component_actions">
+            <a href="{% url 'edit_customer_rank' customer.id %}" class="edit_link">Edit</a> | 
+            <a href="#" class="info_link">Descriptions</a>
+        </div>
+    </div>
+    <div class="component_content rank_container">
+        <div class="rank_options">
+            <label class="rank_option {% if customer.rank == 'A' %}selected{% endif %}">
+                <input type="radio" name="rank" value="A" {% if customer.rank == 'A' %}checked{% endif %} disabled>
+                <span class="rank_label">A</span>
+            </label>
+            <label class="rank_option {% if customer.rank == 'B' %}selected{% endif %}">
+                <input type="radio" name="rank" value="B" {% if customer.rank == 'B' %}checked{% endif %} disabled>
+                <span class="rank_label">B</span>
+            </label>
+            <label class="rank_option {% if customer.rank == 'C' %}selected{% endif %}">
+                <input type="radio" name="rank" value="C" {% if customer.rank == 'C' %}checked{% endif %} disabled>
+                <span class="rank_label">C</span>
+            </label>
+            <label class="rank_option {% if customer.rank == 'D' %}selected{% endif %}">
+                <input type="radio" name="rank" value="D" {% if customer.rank == 'D' %}checked{% endif %} disabled>
+                <span class="rank_label">D</span>
+            </label>
+            <label class="rank_option {% if customer.rank == 'E' %}selected{% endif %}">
+                <input type="radio" name="rank" value="E" {% if customer.rank == 'E' %}checked{% endif %} disabled>
+                <span class="rank_label">E</span>
+            </label>
+            <label class="rank_option {% if customer.rank == 'F' %}selected{% endif %}">
+                <input type="radio" name="rank" value="F" {% if customer.rank == 'F' %}checked{% endif %} disabled>
+                <span class="rank_label">F</span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<!-- Account Balance Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Account Balance</h3>
+    </div>
+    <div class="component_content">
+        <div class="balance_amount">${{ customer.account_balance|floatformat:2 }}</div>
+    </div>
+</div>

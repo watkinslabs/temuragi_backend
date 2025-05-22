@@ -1,0 +1,137 @@
+.sidebar {
+    flex: 0 0 250px;
+    background-color: var(--bs-sidebar-bg);
+    color: var(--bs-sidebar-text);
+    height: calc(100vh - 95px);
+    position: relative;
+    overflow-y: auto;
+    padding-top: 0;
+}
+.sidebar_accordion_header {
+    background-color: var(--bs-sidebar-bg);
+    color: var(--bs-sidebar-text);
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Sidebar Items Styling */
+.sidebar .sidebar_list_group_item {
+    background-color: var(--bs-sidebar-bg);
+    color: var(--bs-sidebar-text);
+    border: none;
+    font-size: 14px;
+    padding: .3em;
+    padding-left: 15px;
+}
+
+.sidebar .sidebar_list_group_item:hover {
+    background-color: #F0F0F0;
+    color: black;
+}
+
+/* Main Menu Items (First Level) */
+.sidebar_accordion_button {
+    background-color: var(--bs-sidebar-bg);
+    color: var(--bs-sidebar-text);
+    border: none;
+    font-size: ..8rem;
+    padding: .5em;
+    padding-left: 10px;
+}
+
+.sidebar_accordion_item {
+    border: None;
+}
+
+.sidebar_accordion_button {
+    font-size: 14px;
+}
+
+.sidebar_accordion_button:not(.collapsed) {
+    background-color: #e6e6e6;
+    color: var(--bs-body-color);
+    font-weight: bold;
+    border-left-style: solid;
+    border-left-color: #262632;
+    border-left-width: 5px;
+}
+
+.sidebar_accordion_button::after {
+    filter: none;
+}
+
+/* Grouping Items (Second Level) */
+.sidebar_accordion_button.sidebar_level_2 {
+    background-color: var(--bs-sidebar-bg-l2);
+    color: 'var(--bs-sidebar-text)';
+    font-size: 12px;
+    padding-left: 20px;
+    font-weight: bold;
+}
+
+/* Actual Items (Third Level) */
+.sidebar_list_group_item.sidebar_level_3 {
+    font-size: 12px;
+    padding-left: 27px;
+    color: var(--bs-sidebar-text);
+    background-color: var(--bs-sidebar-bg-l3);
+}
+
+/* Removing Box Around Accordion Body */
+.sidebar_accordion_body {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+}
+
+/* Icon Styling for Sidebar */
+.sidebar_icon {
+    margin-right: 10px;
+    color: var(--bs-link-color);
+}
+
+
+
+/* BREADCRUMV CSS */
+
+
+.breadcrumb {
+padding: 0.0rem 0rem;
+margin-bottom: 0rem;
+
+border-radius: 0.0rem;
+align-items: center;
+}
+
+.breadcrumb-item {
+display: inline-flex;
+align-items: center;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+content: '/';
+padding: 0 0.5rem;
+color: #6c757d;
+}
+
+.breadcrumb-item a {
+color: var(--bs-primary);
+text-decoration: none;
+}
+
+.breadcrumb-item.active {
+color: #6c757d;
+}
+
+.breadcrumb-item a:hover {
+text-decoration: underline;
+}
+
+.breadcrumb .fa-home {
+font-size: 0.9em;
+margin-right: 0.2em;
+}
+    
+

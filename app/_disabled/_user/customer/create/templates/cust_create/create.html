@@ -1,0 +1,733 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block title %}Create Customer{% endblock %}
+
+{% block content %}
+<div class="container ">
+  <h3 ">Create Customer</h3>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category,message in messages %}
+        <div class="alert alert-{{ category }} mb-4">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if success %}
+    <div class="alert alert-success mb-4">
+      Account created… Code: {{ customer_code }} | Temp password: {{ password }}
+    </div>
+  {% else %}
+    {% if errors %}
+      <div class="alert alert-danger mb-4">
+        <ul class="mb-0">
+          {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('customer_create.index') }}">
+      <input type="hidden" name="code" value="{{ code|default(-1) }}">
+      <input type="hidden" name="region" value="{{ region }}">
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="col-4 mb-4">
+            <select id="region" name="region" class="form-control form-control">
+              <option value="Pacific" {% if region=='pacific' %}selected{% endif %}>Pacific</option>
+              <option value="Canada" {% if region=='canada' %}selected{% endif %}>Canada</option>
+            </select>
+          </div>
+                
+          <div class="form-group mb-3">
+            <input type="text" id="customer_name" name="customer_name" class="form-control form-control" required 
+                   value="{{ customer_data.customer_name|default('') }}" placeholder="Customer Name *">
+          </div>
+          
+          <div class="form-group mb-3">
+            <input type="text" id="address1" name="address1" class="form-control form-control" required 
+                   value="{{ customer_data.address1|default('') }}" placeholder="Address 1 *">
+          </div>
+          
+          <div class="form-group mb-3">
+            <input type="text" id="address2" name="address2" class="form-control form-control" 
+                   value="{{ customer_data.address2|default('') }}" placeholder="Address 2">
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-5">
+              <input type="text" id="city" name="city" class="form-control form-control" required 
+                     value="{{ customer_data.city|default('') }}" placeholder="City *">
+              <div id="city_info" class="mt-2 small"></div>
+            </div>
+            <div class="col-md-4">
+              <select id="state" name="state" class="form-control form-control" required>
+                <option value="">State/Province</option>
+              </select>
+              <div id="state_info" class="mt-2 small"></div>
+            </div>
+            <div class="col-md-3">
+              <input type="text" id="zip_code" name="zip_code" class="form-control form-control" required 
+                     value="{{ customer_data.zip_code|default('') }}" placeholder="Zip/Postal *">
+            </div>
+          </div>
+          
+          <div class="form-group col-md-6 mb-3">
+            <select id="customer_class" name="customer_class" class="form-control form-control" required>
+              <option value="">Class *</option>
+              {% for c in class_list %}
+                <option value="{{ c.value }}" {% if customer_data.customer_class==c.value %}selected{% endif %}>{{ c.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+
+          <div class="form-group mb-3">
+            <input type="text" id="comments1" name="comments1" class="form-control form-control" maxlength="60" 
+                   value="{{ customer_data.comments1|default('') }}" placeholder="Comments">
+          </div>
+          
+          <div class="form-group mb-3">
+            <input type="text" id="comments2" name="comments2" class="form-control form-control" maxlength="60" 
+                   value="{{ customer_data.comments2|default('') }}" placeholder="Additional Comments">
+          </div>
+    
+
+        </div>
+
+        <div class="col-md-6">
+          <!-- Reorganized short fields in 3 columns -->
+          <div class="row mb-3">
+            <div class="col-4">
+              <select id="mail_preference" name="mail_preference" class="form-control form-control">
+                <option value="N" {% if customer_data.mail_preference=='N' %}selected{% endif %}>Mail: No</option>
+                <option value="Y" {% if customer_data.mail_preference=='Y' %}selected{% endif %}>Mail: Yes</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <select id="po_required" name="po_required" class="form-control form-control">
+                <option value="N" {% if customer_data.po_required=='N' %}selected{% endif %}>PO: No</option>
+                <option value="Y" {% if customer_data.po_required=='Y' %}selected{% endif %}>PO: Yes</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <select id="saturday_delivery" name="saturday_delivery" class="form-control form-control">
+                <option value="N" {% if customer_data.saturday_delivery=='N' %}selected{% endif %}>Sat Delivery: No</option>
+                <option value="Y" {% if customer_data.saturday_delivery=='Y' %}selected{% endif %}>Sat Delivery: Yes</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-4">
+              <select id="lucky7" name="lucky7" class="form-control form-control">
+                <option value="N" {% if customer_data.lucky7=='N' %}selected{% endif %}>Lucky7: No</option>
+                <option value="Y" {% if customer_data.lucky7=='Y' %}selected{% endif %}>Lucky7: Yes</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <select id="statement_type" name="statement_type" class="form-control form-control">
+                <option value="E" {% if customer_data.statement_type=='E' %}selected{% endif %}>Statement: Email</option>
+                <option value="Y" {% if customer_data.statement_type=='Y' %}selected{% endif %}>Statement: Mail</option>
+                <option value="N" {% if customer_data.statement_type=='N' %}selected{% endif %}>Statement: None</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <input type="text" id="contact_person" name="contact_person" class="form-control form-control" 
+                   value="{{ customer_data.contact_person|default('') }}" placeholder="Contact Person">
+          </div>
+          
+          <div class="form-group mb-3">
+            <input type="email" id="email" name="email" class="form-control form-control" 
+                   value="{{ customer_data.email|default('') }}" placeholder="Email">
+          </div>
+
+
+          <h6 class="mt-4 mb-2">Telephone</h6>
+          <div class="row mb-3">
+            <div class="col-md-5">
+              <input type="tel" id="phone_number" name="phone_number" class="form-control form-control" required 
+                     value="{{ customer_data.phone_number|default('') }}" placeholder="Phone Number *">
+            </div>
+            <div class="col-md-3">
+              <input type="text" id="phone_ext" name="phone_ext" class="form-control form-control" 
+                     value="{{ customer_data.phone_ext|default('') }}" placeholder="Ext">
+            </div>
+            <div class="col-md-4">
+              <select id="phone_type" name="phone_type" class="form-control form-control">
+                <option value="W" {% if customer_data.phone_type=='W' %}selected{% endif %}>Work</option>
+                <option value="P" {% if customer_data.phone_type=='P' %}selected{% endif %}>Personal</option>
+                <option value="C" {% if customer_data.phone_type=='C' %}selected{% endif %}>Cell</option>
+                <option value="H" {% if customer_data.phone_type=='H' %}selected{% endif %}>Home</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group mb-3">
+            <input type="text" id="phone_desc" name="phone_desc" class="form-control form-control" 
+                   value="{{ customer_data.phone_desc|default('') }}" placeholder="Phone Description (e.g. Reception)">
+          </div>
+
+          <div class="form-group mb-3">
+            <input type="tel" id="fax_number" name="fax_number" class="form-control form-control" 
+                   value="{{ customer_data.fax_number|default('') }}" placeholder="Fax Number">
+            <input type="hidden" id="fax_type" name="fax_type" value="F">
+          </div>
+
+        </div>
+      </div>
+
+      
+      <button type="submit" class="btn btn-primary mt-4">Create Customer</button>
+    </form>
+  {% endif %}
+</div>
+
+<!-- Phone Lookup Modal -->
+<div class="modal fade" id="phoneExistsModal" tabindex="-1" aria-labelledby="phoneExistsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="phoneExistsModalLabel">Duplicate Phone Number</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-danger mb-3">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong>Error:</strong> This phone number is already assigned to another customer. 
+            Duplicate phone numbers are not allowed in the system.
+          </div>
+          
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <strong>Existing Customer Information</strong>
+            </div>
+            <div class="card-body">
+              <table class="table table-sm">
+                <tr>
+                  <th style="width: 35%">Customer Code:</th>
+                  <td id="modal_customer_code"></td>
+                </tr>
+                <tr>
+                  <th>Customer Name:</th>
+                  <td id="modal_customer_name"></td>
+                </tr>
+                <tr>
+                  <th>Phone Number:</th>
+                  <td id="modal_phone_number"></td>
+                </tr>
+                <tr>
+                  <th>Extension:</th>
+                  <td id="modal_phone_ext"></td>
+                </tr>
+                <tr>
+                  <th>Phone Type:</th>
+                  <td id="modal_phone_type"></td>
+                </tr>
+                <tr>
+                  <th>Description:</th>
+                  <td id="modal_phone_desc"></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          
+          <p class="fw-bold">What to do next:</p>
+          <ul>
+            <li>Enter a different phone number for this customer</li>
+            <li>Contact existing customer to update their information</li>
+            <li>If you believe this is an error, contact IT support</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Zip Code Error Modal -->
+
+  <div class="modal fade" id="zipErrorModal" tabindex="-1" aria-labelledby="zipErrorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="zipErrorModalLabel">Invalid Postal Code</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger mb-3">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          <strong>Error:</strong> <span id="zip_modal_message"></span>
+        </div>
+        
+        <div class="mt-3">
+          <p><strong>Requirements:</strong></p>
+          <ul>
+            <li><strong>Pacific region:</strong> 5 digits only (e.g., 90210)</li>
+            <li><strong>Canada region:</strong> 7 alphanumeric characters (e.g., A1B2C3D)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+
+
+
+$(document).ready(function() {
+  // Cache selectors
+  const $zip_code = $('#zip_code');
+  const $phone_number = $('#phone_number');
+  const $region = $('#region');
+  const $state = $('#state');
+  const $city = $('#city');
+  const $city_info = $('#city_info');
+  const $state_info = $('#state_info');
+  
+  // Enable Bootstrap form validation
+  $('form').addClass('needs-validation');
+  $('form').attr('novalidate', true);
+  
+  // Form validation on submit
+  $('form').submit(function(e) {
+    if (!this.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    $(this).addClass('was-validated');
+    
+    // If there are errors, scroll to the first one
+    if ($('.is-invalid').length) {
+      $('html, body').animate({
+        scrollTop: $('.is-invalid').first().offset().top - 100
+      }, 200);
+    }
+  });
+
+  // Initialize state dropdown based on current region
+  update_state_dropdown();
+  
+  // Phone number validation events
+  $phone_number.blur(function() {
+    process_phone_number();
+  });
+  
+  // Handle Enter key in phone number field
+  $phone_number.on('keypress', function(e) {
+    if (e.which === 13) { // Enter key
+      e.preventDefault(); // Prevent form submission
+      if (process_phone_number()) {
+        // If valid, move to next field
+        if (!$(this).hasClass('is-invalid')) {
+          // Find the next focusable element
+          $(this).closest('.col-md-3').next().find('input, select').focus();
+        }
+      }
+    }
+  });
+  
+  // Continue with phone button
+  $('#continueWithPhoneBtn').click(function() {
+    // Just close the modal and let the user continue with form
+    bootstrap.Modal.getInstance(document.getElementById('phoneExistsModal')).hide();
+  });
+  
+  // Region change handler
+  $region.change(function() {
+    update_state_dropdown();
+  });
+
+  // Zip code events
+  $zip_code.blur(function() {
+    process_zip_code();
+  });
+  
+  // Handle Enter key in zip code field
+  $zip_code.on('keypress', function(e) {
+    if (e.which === 13) { // Enter key
+      e.preventDefault(); // Prevent form submission
+      if (process_zip_code()) {
+        // If valid, move to next field
+        if (!$(this).hasClass('is-invalid')) {
+          // Find the next focusable element
+          $(this).closest('.col-md-3').next().find('input, select').focus();
+        }
+      }
+    }
+  });
+  
+  // Clear validation when region changes
+  $region.change(function() {
+    $zip_code.val('');
+    $('#zip_error').remove();
+    $zip_code.removeClass('is-invalid');
+  });
+  
+
+  $('form').submit(function(e) {
+    // Clear any previous validation
+    $('.is-invalid').removeClass('is-invalid');
+    
+    // Manually check each required field
+    $('input[required], select[required]').each(function() {
+      if (!$(this).val()) {
+        $(this).addClass('is-invalid');
+        if (!$(this).next('.invalid-feedback').length) {
+          $(this).after('<div class="invalid-feedback">This field is required</div>');
+        }
+        e.preventDefault();
+      }
+    });
+    
+    // Add custom validations like zip code here
+    if (!validate_zip_format()) {
+      e.preventDefault();
+    }
+    
+    // If there are errors, scroll to the first one
+    if ($('.is-invalid').length) {
+      $('html, body').animate({
+        scrollTop: $('.is-invalid').first().offset().top - 100
+      }, 200);
+    }
+  });
+
+  //=============================================
+  // PHONE FUNCTIONS
+  //=============================================
+  
+  // Central function to process phone number validation and lookup
+  function process_phone_number() {
+    const phone_val = $phone_number.val().trim().replace(/[^\d]/g, ''); // Strip non-digits
+    
+
+    $.ajax({
+        url: "{{ url_for('customer_create.lookup_phone') }}",
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ phone_number: phone_val }),
+        dataType: 'json',
+        success: function(result) {
+        // Clear any existing error states
+        $('#phone_number').removeClass('is-invalid');
+        
+        if (result.success && result.status === 'exists') {
+            // Access the phone_data directly from the result
+            const phone_data = result.phone_data;
+            
+            // Format phone number nicely
+            const formatted_phone = format_phone_number(phone_data.phone_number);
+            
+            // Populate the modal with data
+            $('#modal_customer_code').text(phone_data.customer_code);
+            $('#modal_customer_name').text(phone_data.customer_name);
+            $('#modal_phone_number').text(formatted_phone);
+            $('#modal_phone_ext').text(phone_data.phone_ext || 'None');
+            
+            // Format phone type to be more readable
+            let phone_type_text = 'Unknown';
+            switch(phone_data.phone_type) {
+            case 'C': phone_type_text = 'Cell'; break;
+            case 'F': phone_type_text = 'Fax'; break;
+            case 'H': phone_type_text = 'Home'; break;
+            case 'P': phone_type_text = 'Personal'; break;
+            case 'W': phone_type_text = 'Work'; break;
+            default: phone_type_text = phone_data.phone_type;
+            }
+            $('#modal_phone_type').text(phone_type_text);
+            
+            // Set description
+            $('#modal_phone_desc').text(phone_data.phone_desc || 'None');
+            
+            // Highlight the phone number field as an error
+            $('#phone_number').addClass('is-invalid');
+            
+            // Show the modal
+            const phone_modal = new bootstrap.Modal(document.getElementById('phoneExistsModal'));
+            phone_modal.show();
+            
+            // Add an event listener to clear the field when the modal is dismissed
+            // Using one-time event listener to prevent multiple handlers
+            $('#phoneExistsModal').off('hidden.bs.modal').one('hidden.bs.modal', function() {
+            $('#phone_number').val('').focus().removeClass('is-invalid');
+            // Ensure backdrop is removed
+            $('.modal-backdrop').remove();
+            // Ensure body classes are removed
+            $('body').removeClass('modal-open').css('padding-right', '');
+            });
+        } else if (result.status === 'invalid') {
+            // Invalid phone number
+            $('#phone_number').addClass('is-invalid');
+            
+            // Make sure we have an error display container
+            if ($('#phone_error').length === 0) {
+            $phone_number.after('<div id="phone_error" class="invalid-feedback">' + (result.message || 'Invalid phone number format') + '</div>');
+            } else {
+            $('#phone_error').text(result.message || 'Invalid phone number format');
+            }
+        } else if (result.status === 'not_found') {
+            // Valid but not found - good to go
+            $('#phone_number').removeClass('is-invalid');
+            $('#phone_error').remove();
+            
+            // If you want to show the cleaned phone number in the field
+            if (result.cleaned_number) {
+            $phone_number.val(result.cleaned_number);
+            }
+        }
+        },
+        error: function(xhr, status, error) {
+        console.error('Error looking up phone number:', error);
+        $('#phone_number').addClass('is-invalid');
+        
+        // Make sure we have an error display container
+        if ($('#phone_error').length === 0) {
+            $phone_number.after('<div id="phone_error" class="invalid-feedback">Error checking phone number</div>');
+        } else {
+            $('#phone_error').text('Error checking phone number');
+        }
+        }
+    });
+    
+    return true;
+    }
+
+
+// Helper function to format phone numbers nicely
+  function format_phone_number(phone_number_string) {
+    const cleaned = ('' + phone_number_string).replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return '(' + match[1] + ') ' + match[2] + '-' + match[3];
+    }
+    return phone_number_string;
+  }
+  
+  //=============================================
+  // ZIP CODE FUNCTIONS
+  //=============================================
+  
+  // Process zipcode input - this is our main function for handling zip validation and lookups
+  function process_zip_code() {
+    const zip_val = $zip_code.val().trim();
+    
+    // First, perform format validation
+    if (!validate_zip_format()) {
+      return false; // Stop if validation fails
+    }
+    
+    // Only proceed with AJAX lookup if validation passes and we have a value
+    if (zip_val.length > 0) {
+      $.ajax({
+        url: "{{ url_for('customer_create.lookup_zip') }}",
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ zip_code: zip_val }),
+        dataType: 'json',
+        success: function(data) {
+          if (data.success) {
+            // First update region (this will rebuild the state dropdown)
+            if (data.country && data.country.toUpperCase().indexOf('CANADA') >= 0) {
+              $region.val('Canada').trigger('change');
+            } else {
+              $region.val('Pacific').trigger('change');
+            }
+            
+            // Then set city and state values AFTER region change
+            $city.val(data.city);
+            setTimeout(function() {
+              $state.val(data.state);
+            }, 100); // Small delay to ensure dropdown is populated
+            
+            // Clear any previous error indicators
+            $zip_code.removeClass('is-invalid');
+            $('#zip_error').remove();
+            
+            // Keep the valid zip code in the field (don't clear it)
+            $zip_code.val(zip_val);
+          } else {
+            // Show error modal for invalid zip code from server
+            show_zip_error('The zip/postal code you entered was not found in our database.');
+          }
+        },
+        error: function() {
+          $city_info.text('Lookup error');
+        }
+      });
+    }
+    
+    return true;
+  }
+  
+  // Format validation only - returns true/false
+  function validate_zip_format() {
+    const region = $region.val().toLowerCase();
+    const zip_val = $zip_code.val().trim();
+    
+    // Skip validation if empty
+    if (zip_val.length === 0) {
+      return true;
+    }
+    
+    let is_valid = true;
+    let error_msg = '';
+    
+    if (region === 'pacific') {
+      // Pacific region: only 5 digits, no 'aloha'
+      is_valid = /^\d{5}$/.test(zip_val) && !/aloha/i.test(zip_val);
+      error_msg = 'Pacific zip must be exactly 5 digits';
+    } else if (region === 'canada') {
+      // Canada region: 7 alphanumeric characters
+      is_valid = /^[a-z0-9]{7}$/i.test(zip_val);
+      error_msg = 'Canadian postal code must be 7 alphanumeric characters';
+    }
+    
+    if (!is_valid) {
+      show_zip_error(error_msg);
+    } else {
+      // Clear any previous error state
+      $zip_code.removeClass('is-invalid');
+      $('#zip_error').remove();
+    }
+    
+    return is_valid;
+  }
+  
+  // Helper to show zip error modal and UI feedback
+  function show_zip_error(message) {
+    // Add visual error indicator
+    $zip_code.addClass('is-invalid');
+    if (!$('#zip_error').length) {
+      $zip_code.after('<div id="zip_error" class="invalid-feedback">' + message + '</div>');
+    } else {
+      $('#zip_error').text(message);
+    }
+    
+    // Show modal if it's not already visible
+    if (!$('#zipErrorModal').hasClass('show')) {
+      $('#zip_modal_message').text(message);
+      const zip_modal = new bootstrap.Modal(document.getElementById('zipErrorModal'));
+      zip_modal.show();
+      
+      // ONLY clear the field when the modal is closed for errors
+      $('#zipErrorModal').one('hidden.bs.modal', function() {
+        $zip_code.val('').focus().removeClass('is-invalid');
+        $('#zip_error').remove();
+      });
+    }
+  }
+  
+  //=============================================
+  // STATE DROPDOWN FUNCTIONS
+  //=============================================
+  
+  // State dropdown updater function
+  function update_state_dropdown() {
+    const region = $region.val().toLowerCase();
+    
+    // Clear existing options
+    $state.empty().append('<option value="">State/Province</option>');
+    
+    if (region === 'canada') {
+      // Add Canadian provinces
+      const provinces = [
+        {code: 'AB', name: 'Alberta'},
+        {code: 'BC', name: 'British Columbia'},
+        {code: 'MB', name: 'Manitoba'},
+        {code: 'NB', name: 'New Brunswick'},
+        {code: 'NL', name: 'Newfoundland and Labrador'},
+        {code: 'NT', name: 'Northwest Territories'},
+        {code: 'NS', name: 'Nova Scotia'},
+        {code: 'NU', name: 'Nunavut'},
+        {code: 'ON', name: 'Ontario'},
+        {code: 'PE', name: 'Prince Edward Island'},
+        {code: 'QC', name: 'Quebec'},
+        {code: 'SK', name: 'Saskatchewan'},
+        {code: 'YT', name: 'Yukon'}
+      ];
+      
+      $.each(provinces, function(i, province) {
+        const selected = (province.code === "{{ customer_data.state|default('') }}") ? 'selected' : '';
+        $state.append(`<option value="${province.code}" ${selected}>${province.name}</option>`);
+      });
+    } else {
+      // Default to US states (Pacific)
+      const states = [
+        {code: 'AL', name: 'Alabama'},
+        {code: 'AK', name: 'Alaska'},
+        {code: 'AZ', name: 'Arizona'},
+        {code: 'AR', name: 'Arkansas'},
+        {code: 'CA', name: 'California'},
+        {code: 'CO', name: 'Colorado'},
+        {code: 'CT', name: 'Connecticut'},
+        {code: 'DE', name: 'Delaware'},
+        {code: 'FL', name: 'Florida'},
+        {code: 'GA', name: 'Georgia'},
+        {code: 'HI', name: 'Hawaii'},
+        {code: 'ID', name: 'Idaho'},
+        {code: 'IL', name: 'Illinois'},
+        {code: 'IN', name: 'Indiana'},
+        {code: 'IA', name: 'Iowa'},
+        {code: 'KS', name: 'Kansas'},
+        {code: 'KY', name: 'Kentucky'},
+        {code: 'LA', name: 'Louisiana'},
+        {code: 'ME', name: 'Maine'},
+        {code: 'MD', name: 'Maryland'},
+        {code: 'MA', name: 'Massachusetts'},
+        {code: 'MI', name: 'Michigan'},
+        {code: 'MN', name: 'Minnesota'},
+        {code: 'MS', name: 'Mississippi'},
+        {code: 'MO', name: 'Missouri'},
+        {code: 'MT', name: 'Montana'},
+        {code: 'NE', name: 'Nebraska'},
+        {code: 'NV', name: 'Nevada'},
+        {code: 'NH', name: 'New Hampshire'},
+        {code: 'NJ', name: 'New Jersey'},
+        {code: 'NM', name: 'New Mexico'},
+        {code: 'NY', name: 'New York'},
+        {code: 'NC', name: 'North Carolina'},
+        {code: 'ND', name: 'North Dakota'},
+        {code: 'OH', name: 'Ohio'},
+        {code: 'OK', name: 'Oklahoma'},
+        {code: 'OR', name: 'Oregon'},
+        {code: 'PA', name: 'Pennsylvania'},
+        {code: 'RI', name: 'Rhode Island'},
+        {code: 'SC', name: 'South Carolina'},
+        {code: 'SD', name: 'South Dakota'},
+        {code: 'TN', name: 'Tennessee'},
+        {code: 'TX', name: 'Texas'},
+        {code: 'UT', name: 'Utah'},
+        {code: 'VT', name: 'Vermont'},
+        {code: 'VA', name: 'Virginia'},
+        {code: 'WA', name: 'Washington'},
+        {code: 'WV', name: 'West Virginia'},
+        {code: 'WI', name: 'Wisconsin'},
+        {code: 'WY', name: 'Wyoming'}
+      ];
+      
+      $.each(states, function(i, state) {
+        const selected = (state.code === "{{ customer_data.state|default('') }}") ? 'selected' : '';
+        $state.append(`<option value="${state.code}" ${selected}>${state.name}</option>`);
+      });
+    }
+  }
+});
+
+
+
+
+
+</script>
+{% endblock %}

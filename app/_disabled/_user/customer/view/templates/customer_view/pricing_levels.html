@@ -1,0 +1,78 @@
+
+<!-- Pricing Levels Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Pricing Levels</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table pricing_levels_table">
+            <thead>
+                <tr>
+                    <th>Family</th>
+                    <th>Level</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pricing in customer.pricing_levels.all %}
+                <tr>
+                    <td>{{ pricing.family }}</td>
+                    <td>{{ pricing.level }}</td>
+                    <td>
+                        <a href="#" class="edit_pricing" data-id="{{ pricing.id }}" 
+                           data-family="{{ pricing.family }}" data-level="{{ pricing.level }}">Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No pricing levels found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pricing Level Edit Modal -->
+<div id="pricing_edit_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3 id="pricing_modal_title">Edit Pricing Level</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="pricing_form" method="post" action="{% url 'save_pricing_level' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                <input type="hidden" name="pricing_id" id="pricing_id" value="">
+                
+                <div class="form_group">
+                    <label for="pricing_family">Family</label>
+                    <select name="pricing_family" id="pricing_family" required>
+                        <option value="AC">AC</option>
+                        <option value="C&I">C&I</option>
+                        <option value="CRSH">CRSH</option>
+                        <option value="ENC">ENC</option>
+                        <option value="EXH">EXH</option>
+                        <option value="FUEL">FUEL</option>
+                    </select>
+                </div>
+                
+                <div class="form_group">
+                    <label for="pricing_level">Level</label>
+                    <select name="pricing_level" id="pricing_level" required>
+                        <option value="GP">GP</option>
+                        <option value="WD">WD</option>
+                        <option value="RT">RT</option>
+                        <option value="CP">CP</option>
+                    </select>
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

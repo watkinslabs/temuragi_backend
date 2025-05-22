@@ -1,0 +1,53 @@
+<h4>Columns</h4>
+<div id="columns-container">
+    {% set columns = columns if columns is defined and columns is not none and columns != false else [] %}
+    
+    {% for column in columns %}
+    <div class="row mb-2 column-row">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="columns[{{ loop.index0 }}][name]" placeholder="Name" value="{{ column.name }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="columns[{{ loop.index0 }}][display]" placeholder="Display" value="{{ column.display or column.name }}">
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" name="columns[{{ loop.index0 }}][type]">
+                <option value="text" {% if column.type == 'text' %}selected{% endif %}>Text</option>
+                <option value="number" {% if column.type == 'number' %}selected{% endif %}>Number</option>
+                <option value="date" {% if column.type == 'date' %}selected{% endif %}>Date</option>
+                <option value="link" {% if column.type == 'link' %}selected{% endif %}>Link</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="columns[{{ loop.index0 }}][desc]" placeholder="Description" value="{{ column.desc }}">
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger remove-column">X</button>
+        </div>
+    </div>
+    {% endfor %}
+    <!-- Empty column row template -->
+    <div class="row mb-2 column-row">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="columns[{{ columns|length }}][name]" placeholder="Name">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="columns[{{ columns|length }}][display]" placeholder="Display">
+        </div>
+        <div class="col-md-2">
+            <select class="form-control" name="columns[{{ columns|length }}][type]">
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="date">Date</option>
+                <option value="link">Link</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="columns[{{ columns|length }}][desc]" placeholder="Description">
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger remove-column">X</button>
+        </div>
+    </div>
+</div>
+<button type="button" id="add-column" class="btn btn-secondary mt-2 mb-4">Add Column</button>

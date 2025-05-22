@@ -1,0 +1,91 @@
+
+{% block edit_modal %}
+<!-- Variable Edit Modal -->
+<div class="modal fade" id="variableEditModal" tabindex="-1" role="dialog" aria-labelledby="variableEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="variableEditModalLabel">Edit Variable</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="variable-edit-form" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" id="modal-variable-name" required>
+                            <div class="invalid-feedback">Please provide a name.</div>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Display</label>
+                            <input type="text" class="form-control" id="modal-variable-display" required>
+                            <div class="invalid-feedback">Please provide a display name.</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Type</label>
+                            <select class="form-control" id="modal-variable-type" required>
+                              {% for var_type in variable_types %}
+                              <option value="{{ var_type.name }}">{{ var_type.display }}</option>
+                              {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Order</label>
+                            <input type="number" class="form-control" id="modal-variable-order" min="0" readonly>
+                            <small class="form-text text-muted">Drag rows to reorder variables</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="modal-default-container">
+                        <label>Default Value</label>
+                        <input type="text" class="form-control" id="modal-variable-default">
+                        <div class="invalid-feedback" id="default-validation-message"></div>
+                    </div>
+
+                    <!-- Type-specific fields -->
+                    <div id="modal-text-limits" class="form-group" style="display: none;">
+                        <label>Character Limit</label>
+                        <input type="number" class="form-control" id="modal-variable-max-length" min="1">
+                    </div>
+
+                    <div id="modal-range-fields" class="form-group" style="display: none;">
+                        <div class="row">
+                            <div class="col">
+                                <label>Minimum Value</label>
+                                <input type="text" class="form-control range-limit" id="modal-variable-min">
+                            </div>
+                            <div class="col">
+                                <label>Maximum Value</label>
+                                <input type="text" class="form-control range-limit" id="modal-variable-max">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="modal-select-options" class="form-group" style="display: none;">
+                        <label>Options (comma separated)</label>
+                        <input type="text" class="form-control" id="modal-variable-options">
+                        <div class="invalid-feedback">Please provide at least one option.</div>
+                    </div>
+
+                    <div id="modal-url-pattern" class="form-group" style="display: none;">
+                        <label>URL Pattern (optional)</label>
+                        <input type="text" class="form-control" id="modal-variable-pattern" 
+                            placeholder="e.g. https://example.com/{value}">
+                        <small class="form-text text-muted">Use {value} as placeholder for the variable value</small>
+                    </div>
+
+                    <!-- Hidden field to store row index -->
+                    <input type="hidden" id="modal-variable-index">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-variable-modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

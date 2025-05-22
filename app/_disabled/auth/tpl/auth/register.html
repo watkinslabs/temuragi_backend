@@ -1,0 +1,433 @@
+{% extends "public_base.html" %}
+
+{% block title %}Register -{{ site_name }}{% endblock %}
+
+{% block custom_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .register-container {
+        max-width: 500px;
+        width: 100%;
+        padding: 2rem;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .card-header {
+        background-color: transparent;
+        border-bottom: none;
+        padding: 1.5rem 1.5rem 0;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .logo-container {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-container h2 {
+        color: #333;
+        font-weight: 700;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.2rem;
+    }
+    
+    .form-floating > label {
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #e1e1e1;
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(0, 114, 255, 0.25);
+        border-color: #0072ff;
+    }
+    
+    .form-select {
+        border-radius: 8px;
+        border: 1px solid #e1e1e1;
+        height: calc(3.5rem + 2px);
+        padding-top: 1.25rem;
+        padding-bottom: 0.25rem;
+    }
+    
+    .form-select:focus {
+        box-shadow: 0 0 0 0.25rem rgba(0, 114, 255, 0.25);
+        border-color: #0072ff;
+    }
+    
+    .form-floating > .form-select {
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+    }
+    
+    .btn-register {
+        background-color: #0072ff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 0;
+        font-weight: 600;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+    }
+    
+    .btn-register:hover {
+        background-color: #005ecf;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+    }
+    
+    .login-link {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        color: #0072ff;
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+    
+    .login-link:hover {
+        text-decoration: underline;
+    }
+    
+    .password-strength {
+        height: 5px;
+        margin-top: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .password-feedback {
+        font-size: 0.8rem;
+        margin-top: -1rem;
+        margin-bottom: 1rem;
+        color: #6c757d;
+    }
+    
+    .alert {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .terms-check {
+        margin-bottom: 1.5rem;
+    }
+    
+    .invalid-feedback {
+        font-size: 0.8rem;
+    }
+    
+    .row {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+    }
+    
+    .col, .col-md-6 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="card">
+        <div class="card-header">
+            <div class="logo-container">
+                <h2>
+                    {{ site_name }}
+                </h2>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="text-center mb-3">Create Account</h4>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" action="{{ url_for('auth.register') }}" novalidate class="needs-validation">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First name" required>
+                            <label for="first_name">First name</label>
+                            <div class="invalid-feedback">Please enter your first name.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Last name" required>
+                            <label for="last_name">Last name</label>
+                            <div class="invalid-feedback">Please enter your last name.</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                    <label for="username">Username</label>
+                    <div class="invalid-feedback">Please choose a username.</div>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email address" required>
+                    <label for="email">Email address</label>
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+                
+                <div class="form-floating">
+                    <select class="form-select" id="location" name="location" required>
+                        <option value="" selected disabled>Select your location</option>
+                        <option value="HQ">Headquarters</option>
+                        <option value="BRANCH1">Branch Office 1</option>
+                        <option value="BRANCH2">Branch Office 2</option>
+                        <option value="REMOTE">Remote</option>
+                    </select>
+                    <label for="location">Location</label>
+                    <div class="invalid-feedback">Please select your location.</div>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    <label for="password">Password</label>
+                    <div class="invalid-feedback">Please create a password.</div>
+                </div>
+                
+                <div class="progress password-strength">
+                    <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="password-feedback"></div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                    <label for="confirm_password">Confirm password</label>
+                    <div class="invalid-feedback">Passwords do not match.</div>
+                </div>
+                
+                <div class="form-check terms-check">
+                    <input class="form-check-input" type="checkbox" id="agree_terms" name="agree_terms" required>
+                    <label class="form-check-label" for="agree_terms">
+                        I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms & Conditions</a> and <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                    </label>
+                    <div class="invalid-feedback">You must agree before submitting.</div>
+                </div>
+                
+                <button type="submit" class="btn btn-register">Create Account</button>
+            </form>
+            
+            <a href="{{ url_for('auth.login') }}" class="login-link">Already have an account? Sign in</a>
+        </div>
+    </div>
+    <div class="text-center mt-3 text-white">
+        <small>&copy; {{ current_year }} {{ site_name }} - All rights reserved.</small>
+    </div>
+</div>
+
+<!-- Terms & Conditions Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Terms & Conditions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Acceptance of Terms</h6>
+                <p>By registering for and using {{ site_name }}, you agree to be bound by these Terms & Conditions.</p>
+                
+                <h6>2. User Accounts</h6>
+                <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+                
+                <h6>3. Acceptable Use</h6>
+                <p>You agree to use the system only for lawful purposes and in accordance with these Terms.</p>
+                
+                <h6>4. Intellectual Property</h6>
+                <p>All content, features, and functionality of Performance Radiator® are owned by the company and are protected by copyright, trademark, and other intellectual property laws.</p>
+                
+                <h6>5. Termination</h6>
+                <p>We reserve the right to suspend or terminate your access to the system for violations of these Terms.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Policy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Information We Collect</h6>
+                <p>We collect personal information that you provide when registering for an account, including your name, email address, and location.</p>
+                
+                <h6>2. How We Use Your Information</h6>
+                <p>We use your information to provide and improve our services, communicate with you, and ensure security of our platform.</p>
+                
+                <h6>3. Data Security</h6>
+                <p>We implement appropriate security measures to protect your personal information against unauthorized access or disclosure.</p>
+                
+                <h6>4. Cookie Policy</h6>
+                <p>We use cookies to enhance your experience, analyze usage, and deliver personalized content.</p>
+                
+                <h6>5. Your Rights</h6>
+                <p>You have the right to access, correct, or delete your personal information at any time.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Focus first name field on page load
+        document.getElementById('first_name').focus();
+        
+        // Password strength meter
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirm_password');
+        const strengthBar = document.querySelector('.password-strength .progress-bar');
+        const feedbackDiv = document.querySelector('.password-feedback');
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            let feedback = '';
+            
+            // Calculate password strength
+            if (password.length >= 8) {
+                strength += 25;
+            }
+            
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) {
+                strength += 25;
+            }
+            
+            if (password.match(/\d/)) {
+                strength += 25;
+            }
+            
+            if (password.match(/[^a-zA-Z\d]/)) {
+                strength += 25;
+            }
+            
+            // Update the strength bar
+            strengthBar.style.width = strength + '%';
+            
+            // Set the appropriate color
+            if (strength <= 25) {
+                strengthBar.className = 'progress-bar bg-danger';
+                feedback = 'Weak password';
+            } else if (strength <= 50) {
+                strengthBar.className = 'progress-bar bg-warning';
+                feedback = 'Could be stronger';
+            } else if (strength <= 75) {
+                strengthBar.className = 'progress-bar bg-info';
+                feedback = 'Good password';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                feedback = 'Strong password';
+            }
+            
+            feedbackDiv.textContent = feedback;
+        });
+        
+        // Form validation
+        const form = document.querySelector('form');
+        
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+            
+            if (password !== confirm) {
+                event.preventDefault();
+                confirmInput.setCustomValidity('Passwords do not match!');
+            } else {
+                confirmInput.setCustomValidity('');
+            }
+            
+            form.classList.add('was-validated');
+        });
+        
+        // Reset custom validity when input changes
+        confirmInput.addEventListener('input', function() {
+            if (this.value === passwordInput.value) {
+                this.setCustomValidity('');
+            } else {
+                this.setCustomValidity('Passwords do not match!');
+            }
+        });
+        
+        // Username availability check (example)
+        const usernameInput = document.getElementById('username');
+        
+        usernameInput.addEventListener('blur', function() {
+            if (this.value.length < 3) return;
+            
+            // Simulate checking username availability
+            // In a real implementation, this would make an AJAX request to your server
+            const username = this.value.toLowerCase();
+            
+            // Example usernames to demonstrate availability check
+            const takenUsernames = ['admin', 'user', 'test', 'demo'];
+            
+            if (takenUsernames.includes(username)) {
+                this.classList.add('is-invalid');
+                this.setCustomValidity('Username is already taken');
+                
+                // Find the invalid feedback element and update its text
+                const feedback = this.nextElementSibling.nextElementSibling;
+                feedback.textContent = 'This username is already taken.';
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+                this.setCustomValidity('');
+            }
+        });
+    });
+</script>
+{% endblock %}

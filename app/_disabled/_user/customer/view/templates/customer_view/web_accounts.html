@@ -1,0 +1,64 @@
+<!-- Web Accounts Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Web Accounts</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table web_accounts_table">
+            <thead>
+                <tr>
+                    <th>M</th>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in customer.web_accounts.all %}
+                <tr>
+                    <td>{% if account.is_main %}M{% endif %}</td>
+                    <td>
+                        {{ account.username }}
+                        {% if account.activation_code %}
+                        <div class="activation_code">Activation Code: {{ account.activation_code }}</div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">No web accounts found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Child Accounts Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Child Accounts</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table child_accounts_table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>CustCode</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for child in customer.child_accounts.all %}
+                <tr>
+                    <td>
+                        <a href="{% url 'customer_overview' child.id %}">{{ child.name }}</a>
+                    </td>
+                    <td>{{ child.customer_code }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2">No child accounts found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

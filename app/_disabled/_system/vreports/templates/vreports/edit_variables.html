@@ -1,0 +1,102 @@
+<h4>Variables</h4>
+<div id="variables-container" class="sortable-container">
+    {% set variables = variables if variables is defined and variables is not none and variables != false else [] %}
+        {% for variable in variables %}
+        <div class="row mb-2 variable-row" data-order="{{ variable.order|default(loop.index0) }}">
+            <div class="col-md-1 handle-col">
+                <div class="sort-handle"><i class="fas fa-grip-vertical"></i></div>
+                <input type="hidden" name="variables[{{ loop.index0 }}][order]" value="{{ variable.order|default(loop.index0) }}" class="order-input">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="variables[{{ loop.index0 }}][name]" placeholder="Name" value="{{ variable.name }}">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="variables[{{ loop.index0 }}][display]" placeholder="Display" value="{{ variable.display }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-control variable-type-select" name="variables[{{ loop.index0 }}][type]">
+                    <option value="text" {% if variable.type == 'text' %}selected{% endif %}>Text</option>
+                    <option value="int" {% if variable.type == 'int' %}selected{% endif %}>Integer</option>
+                    <option value="bool" {% if variable.type == 'bool' %}selected{% endif %}>Boolean</option>
+                    <option value="select" {% if variable.type == 'select' %}selected{% endif %}>Select</option>
+                    <option value="alpha" {% if variable.type == 'alpha' %}selected{% endif %}>Alpha</option>
+                    <option value="numeric" {% if variable.type == 'numeric' %}selected{% endif %}>Numeric</option>
+                    <option value="date" {% if variable.type == 'date' %}selected{% endif %}>Date</option>
+                    <option value="datetime" {% if variable.type == 'datetime' %}selected{% endif %}>DateTime</option>
+                    <option value="money" {% if variable.type == 'money' %}selected{% endif %}>Money</option>
+                    <option value="url" {% if variable.type == 'url' %}selected{% endif %}>URL</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control default-input" name="variables[{{ loop.index0 }}][default]" 
+                    placeholder="Default value" value="{{ variable.default }}">
+            </div>
+            <div class="col-md-2">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary btn-edit-variable"><i class="fas fa-edit"></i></button>
+                    <button type="button" class="btn btn-danger remove-variable">X</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    <!-- Empty variable row template -->
+    <div class="row mb-2 variable-row" data-order="{{ variables|length }}">
+        <div class="col-md-1 handle-col">
+            <div class="sort-handle"><i class="fas fa-grip-vertical"></i></div>
+            <input type="hidden" name="variables[{{ variables|length }}][order]" value="{{ variables|length }}" class="order-input">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="variables[{{ variables|length }}][name]" placeholder="Name">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="variables[{{ variables|length }}][display]" placeholder="Display">
+        </div>
+        <div class="col-md-2">
+            <select class="form-control variable-type-select" name="variables[{{ variables|length }}][type]">
+                <option value="text">Text</option>
+                <option value="int">Integer</option>
+                <option value="bool">Boolean</option>
+                <option value="select">Select</option>
+                <option value="alpha">Alpha</option>
+                <option value="numeric">Numeric</option>
+                <option value="date">Date</option>
+                <option value="datetime">DateTime</option>
+                <option value="money">Money</option>
+                <option value="url">URL</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control default-input" name="variables[{{ variables|length }}][default]" 
+                placeholder="Default value">
+        </div>
+        <div class="col-md-2">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary btn-edit-variable"><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-danger remove-variable">X</button>
+            </div>
+        </div>
+    </div>
+</div>
+<button type="button" id="add-variable" class="btn btn-secondary mt-2 mb-4">Add Variable</button>
+
+<!-- Add some CSS for the drag handle -->
+<style>
+.sortable-container .variable-row {
+    transition: background-color 0.2s;
+}
+.sortable-container .variable-row.ui-sortable-helper {
+    background-color: #f8f9fa;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.sort-handle {
+    cursor: move;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+.sort-handle:hover {
+    color: #495057;
+}
+</style>

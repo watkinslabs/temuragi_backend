@@ -1,0 +1,324 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block content %}
+<style>
+    table td {
+        max-width: 120px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        overflow: hidden;
+    }
+    table th {
+        max-width: 120px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        overflow: hidden;
+    }
+    </style>
+<div class="container{% if wide %}-fluid{% endif %} ">
+    <div class="row  mb-3">
+        <div class="col-md-6">
+            <h3>{{ report.display if report.display else report.name }}</h3>
+        </div>
+        <div class="col-md-6">
+            <div class="float-end">
+                {% if is_csv_download %}
+                <button type="button" class="btn btn-sm btn-success" id="export-csv">
+                    <i class="fas fa-file-csv"></i> Export to CSV
+                </button>
+                {% endif %}
+                {% if is_xls_download %}
+                <button type="button" class="btn btn-sm btn-success ml-2" id="export-excel">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
+                {% endif %}
+                {% if is_admin %}
+                <a href="{{ url_for('virtual_reports.edit', id=report_id) }}" class="btn btn-sm btn-secondary ml-2">Edit Report</a>
+                {% endif %}
+        
+        </div>    </div>
+    </div>
+    
+    {% if report.description %}
+    <div class="info">
+        {{ report.description }}
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-md-4">
+            {% if variables %}
+            <form id="report-form" method="post" action="{{ url_for('virtual_reports.view', id=report_id) }}">
+                {% for variable in variables %}
+                <div class="form-group ">
+                    {% set value = variable.default %}
+                    {% if variable.type == 'string' or variable.type == 'text' %}
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light font-weight-bold">{{ variable.display }}</span>
+                        </div>
+                        <input type="text" class="form-control" id="var_{{ variable.name }}"
+                               name="vars[{{ variable.name }}]" value="{{ value }}">
+                    </div>
+                    
+                    {% elif variable.type == 'int' %}
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light font-weight-bold">{{ variable.display }}</span>
+                        </div>
+                        <input type="number" step="1" class="form-control" id="var_{{ variable.name }}"
+                               name="vars[{{ variable.name }}]" value="{{ value }}">
+                    </div>
+                    
+                    {% elif variable.type == 'money' %}
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light font-weight-bold">{{ variable.display }}</span>
+                        </div>
+                        <input type="number" step="0.01" class="form-control" id="var_{{ variable.name }}"
+                               name="vars[{{ variable.name }}]" value="{{ value }}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">$</span>
+                        </div>
+                    </div>
+
+                    {% elif variable.type == 'date' %}
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light font-weight-bold">{{ variable.display }}</span>
+                        </div>
+                        <input type="date" class="form-control" id="var_{{ variable.name }}"
+                               name="vars[{{ variable.name }}]" value="{{ value }}">
+                    </div>
+
+                    {% elif variable.type == 'bool' %}
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light font-weight-bold">{{ variable.display }}</span>
+                        </div>
+                        <select class="form-control" id="var_{{ variable.name }}" name="vars[{{ variable.name }}]">
+                            <option value="">-- Select --</option>
+                            <option value="1" {% if value == '1' %}selected{% endif %}>True</option>
+                            <option value="0" {% if value == '0' %}selected{% endif %}>False</option>
+                        </select>
+                    </div>
+
+                    {% elif variable.type == 'select' %}
+                    <div class="input-group input-group-sm">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light font-weight-bold">{{ variable.display }}</span>
+                        </div>
+                        <select class="form-control" id="var_{{ variable.name }}" name="vars[{{ variable.name }}]">
+                            <option value="">-- Select --</option>
+                            {% if variable.options %}
+                            {% for option in variable.options %}
+                            <option value="{{ option.value }}"
+                                {% if value == option.value %}selected{% endif %}>
+                                {{ option.text }}
+                            </option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    {% if variable.desc %}
+                    <small class="form-text text-muted">{{ variable.desc }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </form>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6">
+            <div class="form-group">
+                <div class="input-group ">
+                    <button type="submit" form="report-form" class="btn btn-sm btn-primary">Run Report</button>
+                    <div class="input-group-append">
+                        {% if report.is_auto_run == 1 %}
+                        <span class="badge badge-info ml-2">Auto-Run Enabled</span>
+                        {% endif %}
+                        {% if report.is_searchable == 1 %}
+                        <span class="badge badge-secondary ml-2">Searchable</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+            <div class="table-responsive">
+                <table id="report-table" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            {% for column in columns %}
+                            <th title="{{ column.desc }}">{{ column.display or column.name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be loaded via AJAX -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Initialize DataTable with AJAX
+    var report_table = $('#report-table').DataTable({
+        "processing": true,
+        "serverSide": true,
+        pagingType: "full_numbers",        
+        pageLength: 15,
+        lengthMenu: [
+            [10, 15, 20, 30, 40, 100, 200, 300, 500, 1000],
+            [10, 15, 20, 30, 40, 100, 200, 300, 500, 1000]
+        ],
+        dom: '<"top d-flex justify-content-end"l p>rt<"bottom d-flex justify-content-end"l p>',
+        language: {
+            paginate: {
+                first: "First",
+                last: "Last",
+                previous: "&laquo;",
+                next: "&raquo;"
+            },
+            lengthMenu: "_MENU_", // This removes the "entries per page" text
+            emptyTable: "No data available in table",
+            zeroRecords: "No matching records found",
+            info: "Showing _START_ to _END_ entries", // Remove the "(filtered from _MAX_ total entries)" part
+            infoEmpty: "Showing 0 to 0 entries",
+            infoFiltered: "", // This is the key - setting it to empty removes the filtered text
+        },
+        // This is the key option - it creates empty rows when data is insufficient
+        fnDrawCallback: function(settings) {
+            if (settings._iDisplayLength > settings.fnRecordsDisplay()) {
+                var emptyRows = settings._iDisplayLength - settings.fnRecordsDisplay();
+                
+                // If there are no rows at all, subtract one for the "No data" row
+                if (settings.fnRecordsDisplay() === 0) {
+                    emptyRows -= 1;
+                }
+                
+                $(this).find('tbody').append(Array(emptyRows).fill().map(function() {
+                    return '<tr class="empty-row"><td colspan="' + settings.aoColumns.length + '">&nbsp;</td></tr>';
+                }).join(''));
+            }
+        },
+       initComplete: function() {
+            $('.column-search').on('keyup', function() {
+                table.draw();
+            });
+
+            // Clear button functionality
+            $('.clear-search').on('click', function() {
+                var input = $(this).siblings('.column-search');
+                input.val('');
+                table.draw();
+            });
+
+        },
+    
+        "ajax": {
+            "url": "{{ url_for('virtual_reports.run_report', id=report_id) }}",
+            "type": "POST",
+            "data": function(d) {
+                
+                var form_data = $('#report-form').serializeArray();
+                $.each(form_data, function(i, field) {
+                    d[field.name] = field.value;
+                });
+                d.report_id = '{{ report.id }}';
+                return d;
+            }
+        },
+        "responsive": true,
+        "columnsDefs": [
+        {% for column in columns %}
+        { responsivePriority: 0, targets: -1 },
+        {% endfor %}]
+        ,
+
+       "columns": [
+        {% for column in columns %}
+        {
+            "data": "{{ column.name }}",
+            "render": function(data, type, row) {
+                {% if column.type == 'link' %}
+                if (data) {
+                    return '<a href="' + data + '" target="_blank">' + data + '</a>';
+                }
+                return '';
+                {% elif column.type == 'date' or column.type == 'datetime' %}
+                if (data) {
+                    return new Date(data).toLocaleDateString();
+                }
+                return '';
+                {% elif column.type == 'int' %}
+                return data ? '<span class="int-value">' + parseInt(data).toLocaleString() + '</span>' : '';
+                {% elif column.type == 'numeric' %}
+                return data ? '<span class="numeric-value">' + parseFloat(data).toLocaleString() + '</span>' : '';
+                {% elif column.type == 'money' %}
+                if (data) {
+                    var value = parseFloat(data);
+                    var className = value < 0 ? 'negative-money' : 'money-value';
+                    return '<span class="' + className + '">' + value.toFixed(2).toLocaleString() + '</span>';
+                }
+                return '';
+                {% elif column.type == 'bool' %}
+                return data ? '<span class="bool-true">Yes</span>' : '<span class="bool-false">No</span>';
+                {% else %}
+                return data || '';
+                {% endif %}
+            }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+        
+    });
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    // Submit form to refresh table
+    $('#report-form').on('submit', function(e) {
+        e.preventDefault();
+        report_table.ajax.reload();
+    });
+    
+    // Export to CSV
+    $('#export-csv').on('click', function() {
+        var form_data = $('#report-form').serialize();
+        window.location.href = "{{ url_for('virtual_reports.export_csv', id=report_id) }}?" + form_data;
+    });
+    
+    {% if report.is_auto_run == 1 %}
+    // Auto-run the report when the page loads
+    $(document).ready(function() {
+        setTimeout(function() {
+            report_table.ajax.reload();
+        }, 500);
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}
+{% endblock %}

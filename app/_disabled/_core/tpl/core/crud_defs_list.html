@@ -1,0 +1,246 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+{% block title %}CRUD Definitions{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Manage CRUD Definitions</h4>
+  <button id="btn_new" class="btn btn-success btn-sm">+ New CRUD Definition</button>
+</div>
+<p class="text-muted small mb-3">Create or edit CRUD definitions for database operations.</p>
+<div class="table-responsive">
+  <table id="crud_defs_table" class="display nowrap table table-striped" style="width:100%">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Display Name</th>
+        <th>Description</th>
+        <th>Active</th>
+        <th style="width:150px">Actions</th>
+      </tr>
+      <tr>
+        <th>
+          <div class="position-relative">
+            <input type="text"
+                   class="form-control form-control-sm column-search"
+                   data-column="0"
+                   placeholder="Name">
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th>
+          <div class="position-relative">
+            <input type="text"
+                   class="form-control form-control-sm column-search"
+                   data-column="1"
+                   placeholder="Display Name">
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th>
+          <div class="position-relative">
+            <input type="text"
+                   class="form-control form-control-sm column-search"
+                   data-column="2"
+                   placeholder="Description">
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th>
+          <div class="position-relative">
+            <select class="form-select form-select-sm column-search"
+                    data-column="3"
+                    style="max-width:80px">
+              <option value="">All</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+            <button type="button"
+                    class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y"
+                    style="border:none;">×</button>
+          </div>
+        </th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Hidden form for edit navigation -->
+<form id="edit_form" action="{{ url_for('core.crud_def_edit') }}" method="post" style="display:none;">
+  <input type="hidden" name="uuid" id="edit_uuid">
+</form>
+{% endblock %}
+{% block custom_js %}
+<script>
+$(function(){
+  
+  const table = $('#crud_defs_table').DataTable({
+    orderCellsTop: true,
+    dom: '<"row mb-3"<"col-sm-6"l><"col-sm-6 text-end"p>><"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-6"i><"col-sm-6 text-end"p>>',
+    ajax: {
+      url: "{{ url_for('core.crud_defs_data_ajax') }}",
+      type: "POST",
+      contentType: "application/json",
+      data: function(d) {
+        return JSON.stringify(d);
+      }
+    },
+    columns: [
+      { data: 'name' },
+      { data: 'display' },
+      { data: 'description' },
+      { data: 'active' },
+      { data: null, orderable: false, searchable: false, render: (data, type, row) =>
+        `<button class="btn btn-sm btn-primary edit-btn me-1" data-uuid="${row.uuid}">Edit</button>
+         ${row.active === 'Yes' 
+           ? `<button class="btn btn-sm btn-warning toggle-btn me-1" data-uuid="${row.uuid}" data-active="No">Deactivate</button>` 
+           : `<button class="btn btn-sm btn-success toggle-btn me-1" data-uuid="${row.uuid}" data-active="Yes">Activate</button>`
+         }
+         <button class="btn btn-sm btn-danger del-btn" data-uuid="${row.uuid}">Delete</button>`
+      }
+    ],
+    processing: true,
+    serverSide: true, 
+    orderCellsTop: true,
+    order: [[0, "asc"]],
+    pagingType: 'full_numbers',
+    lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+    pageLength: 10,
+    language: {
+      paginate: {
+        first: "«",
+        last: "»",
+        previous: "‹",
+        next: "›"
+      },
+      lengthMenu: "Show _MENU_ entries",
+      info: "Showing _START_ to _END_ of _TOTAL_ entries",
+      infoEmpty: "Showing 0 to 0 of 0 entries",
+      emptyTable: "No CRUD definitions available"
+    },
+    drawCallback: function(settings) {
+      // Get pagination info
+      const api = this.api();
+      const pageInfo = api.page.info();
+      
+      // If we have fewer rows than pageLength, add empty rows to make up the difference
+      if (pageInfo.recordsDisplay < pageInfo.length && pageInfo.recordsDisplay > 0) {
+        const numEmptyRows = pageInfo.length - pageInfo.recordsDisplay;
+        const $tbody = $(this).find('tbody');
+        
+        // Add empty rows with the same number of cells as the table has columns
+        for (let i = 0; i < numEmptyRows; i++) {
+          let emptyRow = '<tr class="empty-row">';
+          for (let j = 0; j < $(this).find('thead tr:first th').length; j++) {
+            emptyRow += '<td>&nbsp;</td>';
+          }
+          emptyRow += '</tr>';
+          $tbody.append(emptyRow);
+        }
+      }
+    },
+    // Improve styling
+    initComplete: function() {
+      // Style the length select
+      $('.dataTables_length select').addClass('form-select form-select-sm ms-2 me-2').css({
+        'width': 'auto',
+        'display': 'inline-block'
+      });
+      
+      // Add spacing to pagination
+      $('.dataTables_paginate .paginate_button').addClass('px-3 py-1 mx-1 rounded');
+      
+      // Add container styling
+      $('.dataTables_wrapper').addClass('p-0');
+    }
+  });
+
+  // Handle New CRUD button click
+  $('#btn_new').on('click', function(e) {
+    e.preventDefault();
+    
+    // Show loading indicator
+    $(this).prop('disabled', true);
+    $(this).html('<i class="fas fa-spinner fa-spin"></i> Creating...');
+    
+    // Make AJAX call to create default CRUD definition
+    $.ajax({
+      url: "{{ url_for('core.crud_def_new_default_ajax') }}",
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        connection_uuid: null  // Allow connection to be empty as requested
+      }),
+      success: function(response) {
+        if (response.success) {
+          // Redirect to edit page with the new UUID
+          $('#edit_uuid').val(response.uuid);
+          $('#edit_form').submit();
+        } else {
+          alert('Error creating CRUD definition: ' + response.msg);
+          $('#btn_new').prop('disabled', false);
+          $('#btn_new').html('+ New CRUD Definition');
+        }
+      },
+      error: function(xhr) {
+        var errorMsg = xhr.responseJSON ? xhr.responseJSON.msg : 'Server error';
+        alert('Error creating CRUD definition: ' + errorMsg);
+        $('#btn_new').prop('disabled', false);
+        $('#btn_new').html('+ New CRUD Definition');
+      }
+    });
+  });
+
+  // Handle click on edit button - submit form to edit page
+  $('#crud_defs_table').on('click', '.edit-btn', function(e) {
+    const uuid = $(this).data('uuid');
+    $('#edit_uuid').val(uuid);
+    $('#edit_form').submit();
+  });
+
+  $('#crud_defs_table').on('click', '.toggle-btn', e => {
+    const btn = $(e.currentTarget);
+    const uuid = btn.data('uuid');
+    const active = btn.data('active') === 'Yes';
+    
+    $.ajax({
+      url: "{{ url_for('core.crud_def_toggle_ajax') }}",
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({uuid: uuid, active: active}),
+      success: () => table.ajax.reload(),
+      error: xhr => alert(xhr.responseJSON?.msg || 'Error toggling status')
+    });
+  });
+
+  $('#crud_defs_table').on('click', '.del-btn', e => {
+    if (!confirm('Delete this CRUD definition? This action cannot be undone.')) return;
+    $.ajax({
+      url: "{{ url_for('core.crud_def_delete_ajax') }}",
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({uuid: e.currentTarget.dataset.uuid}),
+      success: () => table.ajax.reload(),
+      error: xhr => alert(xhr.responseJSON?.msg || 'Error deleting definition')
+    });
+  });
+
+  $('.column-search').on('input change', function() {
+    const col = $(this).data('column');
+    table.column(col).search(this.value).draw();
+  });
+  
+  $('.clear-search').on('click', function() {
+    const $in = $(this).siblings('.column-search');
+    $in.val('');
+    table.column($in.data('column')).search('').draw();
+  });
+});
+</script>
+{% endblock %}

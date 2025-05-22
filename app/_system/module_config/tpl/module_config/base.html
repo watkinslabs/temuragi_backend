@@ -1,0 +1,14 @@
+<!-- module_config/tpl/module_config/base.html -->
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block subnav %}
+<div>
+<ul class="nav nav-tabs mb-4">
+  <li class="nav-item">
+    <a class="nav-link {% if request.endpoint == 'module_config.home' %}active{% endif %}" href="{{ url_for('module_config.home') }}">
+      Module Configurations
+    </a>
+  </li>
+</ul>
+</div>
+{% endblock %}

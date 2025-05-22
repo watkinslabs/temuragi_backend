@@ -1,0 +1,101 @@
+ <!-- CRUD Operation Checkboxes -->
+ <div class="card mb-3">
+    <div class="card-header">
+      <strong>CRUD Operations</strong>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="is_read" name="is_read" 
+                  {% if crud_def.options.is_read %}checked{% endif %}>
+            <label class="form-check-label" for="is_read">
+              <i class="fas fa-search"></i> Read (SELECT)
+            </label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="is_create" name="is_create"
+                  {% if crud_def.options.is_create %}checked{% endif %}>
+            <label class="form-check-label" for="is_create">
+              <i class="fas fa-plus-circle"></i> Create (INSERT)
+            </label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="is_update" name="is_update"
+                  {% if crud_def.options.is_update %}checked{% endif %}>
+            <label class="form-check-label" for="is_update">
+              <i class="fas fa-edit"></i> Update (UPDATE)
+            </label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="is_delete" name="is_delete"
+                  {% if crud_def.options.is_delete %}checked{% endif %}>
+            <label class="form-check-label" for="is_delete">
+              <i class="fas fa-trash-alt"></i> Delete (DELETE)
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs mb-3" id="queryTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="select-tab" data-bs-toggle="tab" data-bs-target="#select-tab-pane" type="button" role="tab">Select Query</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="insert-tab" data-bs-toggle="tab" data-bs-target="#insert-tab-pane" type="button" role="tab">Insert Query</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="update-tab" data-bs-toggle="tab" data-bs-target="#update-tab-pane" type="button" role="tab">Update Query</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete-tab-pane" type="button" role="tab">Delete Query</button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="queryTabsContent">
+    <div class="tab-pane fade show active" id="select-tab-pane" role="tabpanel" tabindex="0">
+
+      <div class="tab-pane fade show active" id="select-tab-pane" role="tabpanel" tabindex="0">
+        <div class="mb-3">
+          <label for="query_select" class="form-label">SELECT Query</label>
+          <div class="input-group">
+            <textarea id="query_select" name="query_select" class="form-control code-area" rows="10">{{ crud_def.query_select }}</textarea>
+            <button type="button" id="run_select_query" class="btn btn-primary">
+              <i class="fas fa-play"></i> Run
+            </button>
+          </div>
+          <div class="form-text">Query to retrieve records. Use :placeholder for variables.</div>
+          <div id="query_result_message" class="alert mt-2" style="display: none;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="insert-tab-pane" role="tabpanel" tabindex="0">
+      <div class="mb-3">
+        <label for="query_insert" class="form-label">INSERT Query</label>
+        <textarea id="query_insert" name="query_insert" class="form-control code-area" rows="10">{{ crud_def.query_insert }}</textarea>
+        <div class="form-text">Query to create new records. Use :placeholder for variables.</div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="update-tab-pane" role="tabpanel" tabindex="0">
+      <div class="mb-3">
+        <label for="query_update" class="form-label">UPDATE Query</label>
+        <textarea id="query_update" name="query_update" class="form-control code-area" rows="10">{{ crud_def.query_update }}</textarea>
+        <div class="form-text">Query to update existing records. Use :placeholder for variables.</div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="delete-tab-pane" role="tabpanel" tabindex="0">
+      <div class="mb-3">
+        <label for="query_delete" class="form-label">DELETE Query</label>
+        <textarea id="query_delete" name="query_delete" class="form-control code-area" rows="10">{{ crud_def.query_delete }}</textarea>
+        <div class="form-text">Query to delete records. Use :placeholder for variables.</div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block theme_content %}
+
+    <header class="head-wrapper">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid" style="width:250px;">
+                <a class="navbar-brand fw-bold" style="color:darkslategrey;" href="/">
+                    {% if server_addr != "10.0.0.51" %}Dev {% endif %}Performance Radiator®
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="quick-link-btn"></span>
+                </button>
+            </div>
+                
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if logged_in %}
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        {% set ticket_users = {
+                            111: '111',
+                            1428: '1482',
+                            1685: '1685'
+                        } %}
+                        
+                        {% if session.user_id in ticket_users %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold d-flex align-items-center" style="color:slategrey" target="_blank" href="/tickets">
+                                    <i class="fas fa-ticket-alt me-2"></i>Tickets
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold d-flex align-items-center" style="color:slategrey" target="_blank" href="https://portal.office.com">
+                                <i class="fas fa-envelope me-2"></i>WebMail
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            {% set icon_color = 'text-danger' if mail.unread > 0 else 'text-greg' %}
+                            <a href="{{ url_for('messages.home') }}" class="nav-link fw-bold d-flex align-items-center" style="color:slategrey">
+                                <i class="fas fa-envelope me-2 {{ icon_color }}"></i>
+                                {{ session.username|upper }} - {{ session.user_id }} - [{{ session.home_loc }}]
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold d-flex align-items-center" style="color:slategrey" target="_blank" href="{{ url_for('auth.logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul><li>Unauthorized</li></ul>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <!-- Sidebar and Main Content Wrapper -->
+    <main class="main-wrapper">
+        {% if logged_in %}
+            <div class="{% if theme.menu_location == 'top' %}top_nav{% else %}sidebar{% endif %}" id="scrollableSidebar">
+                {% if  theme.menu_location == 'left' %}
+                    <div class="d-flex align-items-center border m-0" style="background-color: #EEE;">
+                        <!-- Search Icon -->
+                        <span class="ms-2 me-2" style="color: #6c757d;">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <!-- Search Input -->
+                        <input type="text" id="sidebarSearch" class="form-control border-0" placeholder="Search menu items..." style="background-color: #ddd; color: #000;">
+                        <!-- Clear Button -->
+                        <button id="clearSearch" class="btn" style="color: #6c757d; font-size: 1.25rem; display: none;">
+                            &times;
+                        </button>
+                    </div>
+                {% endif %}
+
+                <div class="accordion" id="accordionSidebar">
+                    {% if logged_in %}
+                        {{ menu.html|safe }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class='module-container'>
+            <div class="full-width-header">
+                <div class="menu_sub_title">
+                    {{ menu.breadcrumbs|safe }}
+                </div>
+                <div class="active-customer-switcher">
+                    {% if active_customer_switcher is defined %}
+                        {{ active_customer_switcher|safe }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content" {% if theme == 'bootstrap-2024' %}id="bootstrap"{% endif %}>
+                {{ content|safe }}
+                {% block content %}{% endblock %}
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="foot-wrapper footer dark-mode">
+        <span>&copy; {{ current_year }} Performance Radiator® - All rights reserved.</span>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+    {% if theme.menu_location=='left' %}
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("sidebarSearch");
+        const clearButton = document.getElementById("clearSearch");
+        const menuLinks = document.querySelectorAll("#accordionSidebar .list-group-item"); // Leaf nodes (actual links)
+        const accordionItems = document.querySelectorAll("#accordionSidebar .accordion-item"); // Categories (parent nodes)
+    
+        // Handle search input
+        searchInput.addEventListener("input", function () {
+            const searchTerm = searchInput.value.toLowerCase();
+            clearButton.style.display = searchTerm ? "inline-block" : "none"; // Show or hide the clear button
+    
+            menuLinks.forEach(link => {
+                const text = link.textContent.trim().toLowerCase();
+                const parentAccordion = link.closest(".accordion-collapse");
+    
+                if (text.includes(searchTerm)) {
+                    link.style.display = ""; // Show matching link
+                    if (parentAccordion) {
+                        const parentButton = document.querySelector(`[data-bs-target="#${parentAccordion.id}"]`);
+                        parentButton.classList.remove("collapsed");
+                        parentAccordion.classList.add("show");
+                    }
+                } else {
+                    link.style.display = "none"; // Hide non-matching link
+                }
+            });
+    
+            // Show or hide categories based on visible children
+            accordionItems.forEach(item => {
+                const visibleLinks = item.querySelectorAll(".list-group-item:not([style='display: none;'])");
+                const accordionCollapse = item.querySelector(".accordion-collapse");
+                const parentButton = item.querySelector(".accordion-button");
+    
+                if (visibleLinks.length > 0) {
+                    item.style.display = ""; // Show category
+                    parentButton.classList.remove("collapsed");
+                    accordionCollapse.classList.add("show");
+                } else {
+                    item.style.display = "none"; // Hide category
+                    parentButton.classList.add("collapsed");
+                    accordionCollapse.classList.remove("show");
+                }
+            });
+    
+            if (searchTerm === "") {
+                resetMenu();
+            }
+        });
+    
+        // Handle clear button click
+        clearButton.addEventListener("click", function () {
+            searchInput.value = ""; // Clear the input
+            clearButton.style.display = "none"; // Hide the clear button
+            resetMenu();
+        });
+    
+        // Function to reset the menu to its default state
+        function resetMenu() {
+            accordionItems.forEach(item => {
+                item.style.display = ""; // Show all categories
+                const accordionCollapse = item.querySelector(".accordion-collapse");
+                const parentButton = item.querySelector(".accordion-button");
+                parentButton.classList.add("collapsed");
+                accordionCollapse.classList.remove("show");
+            });
+            menuLinks.forEach(link => link.style.display = ""); // Show all links
+        }
+    });
+    {% endif %}
+    
+    $(document).ready(function () {
+        $('.toggle-favorite').bind('click', function () {
+            var $button = $(this);
+            var itemId = $button.attr('data-id');
+            var action = $button.attr('data-action');
+    
+            $.ajax({
+                url: '/menu/add_to_favorites',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ item_id: itemId, action: action }),
+                success: function (data) {
+                    if (data.status === 'success') {
+                        // Toggle button icon and action
+                        var $icon = $button.find('i');
+                        if (action === 'add') {
+                            $button.attr('data-action', 'remove');
+                            $icon.removeClass('fa-plus-square').addClass('fa-minus-square'); // Change to minus icon
+                        } else {
+                            $button.attr('data-action', 'add');
+                            $icon.removeClass('fa-minus-square').addClass('fa-plus-square'); // Change to plus icon
+                        }
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the quick link.');
+                }
+            });
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        // Select the form
+        return;
+        const form = document.getElementById('searchByNumberForm');
+    
+        if (form) {
+            // Add Bootstrap styles to buttons
+            form.querySelectorAll('button').forEach(button => {
+                button.classList.add('btn', 'btn-primary', 'btn-sm');
+            });
+    
+            // Add Bootstrap styles to selects
+            form.querySelectorAll('select').forEach(select => {
+                select.classList.add('form-select', 'form-select-sm');
+            });
+        }
+    });
+    </script>
+{% endblock %}

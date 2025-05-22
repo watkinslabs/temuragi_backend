@@ -1,0 +1,450 @@
+<script>
+
+
+$(document).ready(function() {
+
+    $(document).on('click', '[data-dismiss="modal"]', function() {
+        $('#variableEditModal').modal('hide');
+    });
+    
+    $('#cancel-variable-modal').click(function(e) {
+        e.preventDefault();
+        $('#variableEditModal').modal('hide');
+    });
+
+    $('form').on('submit', function(e) {
+        // Don't prevent default - let the form submit naturally
+        console.log('Form submitting...');
+    });
+    
+    // Make sure the form buttons trigger form submission
+    $('button[type="submit"]').on('click', function(e) {
+        console.log('Submit button clicked: ', $(this).attr('name'), $(this).val());
+        // The button's value should be submitted with the form
+    });
+
+    // Initialize sortable for variables
+    $("#variables-container").sortable({
+        items: ".variable-row",
+        handle: ".sort-handle",
+        cursor: "move",
+        axis: "y",
+        update: function(event, ui) {
+            // After sorting, update all order inputs and data attributes
+            updateVariableOrder();
+        }
+    });
+
+    
+    // Add Variable
+    $('#add-variable').click(function() {
+        var lastRow = $('#variables-container .variable-row:last');
+        var newRow = lastRow.clone();
+        
+        // Get the next order value
+        var nextOrder = $('#variables-container .variable-row').length;
+        
+        // Update indices
+        var newIndex = parseInt(lastRow.find('input:first').attr('name').match(/\d+/)[0]) + 1;
+        newRow.find('input, select, textarea').each(function() {
+            var name = $(this).attr('name');
+            if (name) {
+                $(this).attr('name', name.replace(/\d+/, newIndex));
+            }
+            $(this).val('');
+        });
+        
+        // Set the order
+        newRow.attr('data-order', nextOrder);
+        newRow.find('.order-input').val(nextOrder);
+        
+        // Reset checkboxes
+        newRow.find('input[type="checkbox"]').prop('checked', false);
+        
+        lastRow.after(newRow);
+    });
+    
+    // Remove Variable
+    $(document).on('click', '.remove-variable', function() {
+        var variableRows = $('#variables-container .variable-row');
+        if (variableRows.length > 1) {
+            $(this).closest('.variable-row').remove();
+            
+            // Renumber the rows and update order
+            updateVariableIndices();
+            updateVariableOrder();
+        } else {
+            // Clear fields instead of removing the last row
+            $(this).closest('.variable-row').find('input, select, textarea').val('');
+            $(this).closest('.variable-row').attr('data-order', '0');
+            $(this).closest('.variable-row').find('.order-input').val('0');
+        }
+    });
+    
+    // Add Column
+    $('#add-column').click(function() {
+        var lastRow = $('#columns-container .column-row:last');
+        var newRow = lastRow.clone();
+        
+        // Update indices
+        var newIndex = parseInt(lastRow.find('input:first').attr('name').match(/\d+/)[0]) + 1;
+        newRow.find('input, select').each(function() {
+            var name = $(this).attr('name');
+            if (name) {
+                $(this).attr('name', name.replace(/\d+/, newIndex));
+            }
+            $(this).val('');
+        });
+        
+        lastRow.after(newRow);
+    });
+    
+    // Remove Column
+    $(document).on('click', '.remove-column', function() {
+        var columnRows = $('#columns-container .column-row');
+        if (columnRows.length > 1) {
+            $(this).closest('.column-row').remove();
+            
+            // Renumber the remaining rows
+            $('#columns-container .column-row').each(function(index) {
+                $(this).find('input, select').each(function() {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        $(this).attr('name', name.replace(/columns\[\d+\]/, 'columns[' + index + ']'));
+                    }
+                });
+            });
+        } else {
+            // Clear fields instead of removing the last row
+            $(this).closest('.column-row').find('input, select').val('');
+        }
+    });
+    
+  // Open Edit Modal
+$(document).on('click', '.btn-edit-variable', function() {
+    // Reset form validation state
+    $('#variable-edit-form').removeClass('was-validated');
+    $('.is-invalid').removeClass('is-invalid');
+    
+    var row = $(this).closest('.variable-row');
+    var rowIndex = row.index();
+    var orderInput = row.find('.order-input');
+    var nameInput = row.find('input[name$="[name]"]');
+    var displayInput = row.find('input[name$="[display]"]');
+    var typeSelect = row.find('select[name$="[type]"]');
+    var defaultInput = row.find('input[name$="[default]"]');
+    
+    // Get additional fields if they exist
+    var maxLengthInput = row.find('input[name$="[max_length]"]');
+    var minInput = row.find('input[name$="[min]"]');
+    var maxInput = row.find('input[name$="[max]"]');
+    var optionsInput = row.find('input[name$="[options]"]');
+    var patternInput = row.find('input[name$="[pattern]"]');
+    
+    // Set modal values
+    $('#modal-variable-index').val(rowIndex);
+    $('#modal-variable-name').val(nameInput.val());
+    $('#modal-variable-display').val(displayInput.val());
+    $('#modal-variable-type').val(typeSelect.val());
+    
+    // Store default value (for non-boolean types this is used directly)
+    $('#modal-variable-default').val(defaultInput.val());
+    $('#modal-variable-order').val(orderInput.val());
+    
+    if (maxLengthInput.length) {
+        $('#modal-variable-max-length').val(maxLengthInput.val());
+    } else {
+        $('#modal-variable-max-length').val('');
+    }
+    
+    if (minInput.length) {
+        $('#modal-variable-min').val(minInput.val());
+    } else {
+        $('#modal-variable-min').val('');
+    }
+    
+    if (maxInput.length) {
+        $('#modal-variable-max').val(maxInput.val());
+    } else {
+        $('#modal-variable-max').val('');
+    }
+    
+    if (optionsInput.length) {
+        $('#modal-variable-options').val(optionsInput.val());
+    } else {
+        $('#modal-variable-options').val('');
+    }
+    
+    if (patternInput.length) {
+        $('#modal-variable-pattern').val(patternInput.val());
+    } else {
+        $('#modal-variable-pattern').val('');
+    }
+    
+    // Update modal fields based on type
+    updateModalFields(typeSelect.val());
+    
+    // For boolean type, we need to update the checkbox after the modal fields are updated
+    if (typeSelect.val() === 'bool') {
+        // Set checkbox state based on the 0/1 value
+        $('#modal-variable-default').prop('checked', defaultInput.val() === '1');
+    }
+    
+    // Show the modal
+    $('#variableEditModal').modal('show');
+});
+ 
+    // Handle changes to range limits
+    $(document).on('change', '.range-limit, #modal-variable-default', function() {
+        validateDefaultRange();
+    });
+    
+    // Handle modal dismiss events (X button and Cancel button)
+    $('#variableEditModal').on('hidden.bs.modal', function() {
+        // Reset form validation state
+        $('#variable-edit-form').removeClass('was-validated');
+        $('.is-invalid').removeClass('is-invalid');
+    });
+    
+        // Save changes from modal
+    $('#save-variable-modal').click(function() {
+        // Perform validation
+        if (!validateVariableForm()) {
+            return;
+        }
+        
+        var rowIndex = $('#modal-variable-index').val();
+        var row = $('#variables-container .variable-row').eq(rowIndex);
+        var index = rowIndex;
+        var nameBase = 'variables[' + index + ']';
+        
+        // Update the row with modal values
+        row.find('input[name$="[name]"]').val($('#modal-variable-name').val());
+        row.find('input[name$="[display]"]').val($('#modal-variable-display').val());
+        
+        var type = $('#modal-variable-type').val();
+        row.find('select[name$="[type]"]').val(type);
+        
+        // Remove any existing hidden fields except order
+        row.find('input[type="hidden"]').not('[name="' + nameBase + '[order]"]').remove();
+        
+        // Handle default value and type-specific fields in one switch
+        switch(type) {
+            case 'bool':
+                // Set default to 0 or 1 based on checkbox
+                row.find('input[name$="[default]"]').val($('#modal-variable-default').is(':checked') ? '1' : '0');
+                break;
+                
+            case 'text':
+            case 'alpha':
+                // Set text default
+                row.find('input[name$="[default]"]').val($('#modal-variable-default').val());
+                // Add max length if present
+                if ($('#modal-variable-max-length').val()) {
+                    row.append('<input type="hidden" name="' + nameBase + '[max_length]" value="' + $('#modal-variable-max-length').val() + '">');
+                }
+                break;
+                
+            case 'int':
+            case 'numeric':
+            case 'money':
+                // Set numeric default
+                row.find('input[name$="[default]"]').val($('#modal-variable-default').val());
+                // Add min/max if present
+                if ($('#modal-variable-min').val()) {
+                    row.append('<input type="hidden" name="' + nameBase + '[min]" value="' + $('#modal-variable-min').val() + '">');
+                }
+                if ($('#modal-variable-max').val()) {
+                    row.append('<input type="hidden" name="' + nameBase + '[max]" value="' + $('#modal-variable-max').val() + '">');
+                }
+                break;
+                
+            case 'select':
+                // Set select default
+                row.find('input[name$="[default]"]').val($('#modal-variable-default').val());
+                // Add options if present
+                if ($('#modal-variable-options').val()) {
+                    row.append('<input type="hidden" name="' + nameBase + '[options]" value="' + $('#modal-variable-options').val() + '">');
+                }
+                break;
+                
+            case 'url':
+                // Set URL default
+                row.find('input[name$="[default]"]').val($('#modal-variable-default').val());
+                // Add pattern if present
+                if ($('#modal-variable-pattern').val()) {
+                    row.append('<input type="hidden" name="' + nameBase + '[pattern]" value="' + $('#modal-variable-pattern').val() + '">');
+                }
+                break;
+                
+            default:
+                // For any other types (date, datetime, etc)
+                row.find('input[name$="[default]"]').val($('#modal-variable-default').val());
+                break;
+        }
+        
+        // Close the modal
+        $('#variableEditModal').modal('hide');
+    });
+
+
+// Validate the variable form before saving
+// Validate the variable form before saving
+function validateVariableForm() {
+    var form = document.getElementById('variable-edit-form');
+    
+    // Check if form exists before trying to validate
+    if (!form) {
+        console.error('Form element not found');
+        return false;
+    }
+    
+    var isValid = form.checkValidity();
+    
+    // Add the validation class to enable validation styles
+    form.classList.add('was-validated');
+    
+    // Additional validation logic based on type
+    var type = $('#modal-variable-type').val();
+    
+    if (type === 'select' && $('#modal-variable-options').val().trim() === '') {
+        $('#modal-variable-options').addClass('is-invalid');
+        isValid = false;
+    }
+    
+    // Range validation for numeric types
+    if (['int', 'numeric', 'money'].includes(type)) {
+        isValid = validateDefaultRange() && isValid;
+    }
+    
+    return isValid;
+}
+
+// Validate default value is within min and max range
+function validateDefaultRange() {
+    var defaultValue = $('#modal-variable-default').val();
+    var min = $('#modal-variable-min').val();
+    var max = $('#modal-variable-max').val();
+    var type = $('#modal-variable-type').val();
+    
+    // Skip validation if default is empty
+    if (defaultValue === '') {
+        $('#modal-variable-default').removeClass('is-invalid');
+        return true;
+    }
+    
+    // Skip validation if both min and max are empty
+    if (min === '' && max === '') {
+        $('#modal-variable-default').removeClass('is-invalid');
+        return true;
+    }
+    
+    var defaultNum = parseFloat(defaultValue);
+    var minNum = min !== '' ? parseFloat(min) : null;
+    var maxNum = max !== '' ? parseFloat(max) : null;
+    
+    // For money, ensure we compare with 2 decimal places
+    if (type === 'money') {
+        defaultNum = parseFloat(defaultNum.toFixed(2));
+        if (minNum !== null) minNum = parseFloat(minNum.toFixed(2));
+        if (maxNum !== null) maxNum = parseFloat(maxNum.toFixed(2));
+    }
+    
+    var isValid = true;
+    
+    // Check min
+    if (minNum !== null && defaultNum < minNum) {
+        $('#default-validation-message').text('Default value must be greater than or equal to ' + min);
+        isValid = false;
+    }
+    
+    // Check max
+    if (maxNum !== null && defaultNum > maxNum) {
+        $('#default-validation-message').text('Default value must be less than or equal to ' + max);
+        isValid = false;
+    }
+    
+    // Set validation state
+    if (isValid) {
+        $('#modal-variable-default').removeClass('is-invalid');
+    } else {
+        $('#modal-variable-default').addClass('is-invalid');
+    }
+    
+    return isValid;
+}
+
+// Update all variable order inputs and data attributes
+function updateVariableOrder() {
+    $('#variables-container .variable-row').each(function(index) {
+        $(this).attr('data-order', index);
+        $(this).find('.order-input').val(index);
+    });
+}
+
+// Update variable indices in name attributes
+function updateVariableIndices() {
+    $('#variables-container .variable-row').each(function(index) {
+        $(this).find('input, select, textarea').each(function() {
+            var name = $(this).attr('name');
+            if (name) {
+                $(this).attr('name', name.replace(/variables\[\d+\]/, 'variables[' + index + ']'));
+            }
+        });
+    });
+}
+
+function updateModalFields(type) {
+    // Hide all type-specific fields first
+    $('#modal-text-limits, #modal-range-fields, #modal-select-options, #modal-url-pattern').hide();
+    
+    // Reset validation messages
+    $('#default-validation-message').text('');
+    $('#modal-variable-default').removeClass('is-invalid');
+    
+    // Show relevant fields based on type
+    switch(type) {
+        case 'bool':
+            $('#modal-default-container').html('<label>Default Value</label><div class="form-check"><input type="checkbox" class="form-check-input" id="modal-variable-default"></div>');
+            break;
+            
+        case 'text':
+        case 'alpha':
+            $('#modal-text-limits').show();
+            $('#modal-default-container').html('<label>Default Value</label><input type="text" class="form-control" id="modal-variable-default"><div class="invalid-feedback" id="default-validation-message"></div>');
+            break;
+            
+        case 'int':
+        case 'numeric':
+        case 'money':
+            $('#modal-range-fields').show();
+            $('#modal-default-container').html('<label>Default Value</label><input type="number" class="form-control" id="modal-variable-default"><div class="invalid-feedback" id="default-validation-message"></div>');
+            if (type === 'money') {
+                $('#modal-variable-default').attr('step', '0.01');
+            } else {
+                $('#modal-variable-default').attr('step', '1');
+            }
+            break;
+            
+        case 'date':
+            $('#modal-default-container').html('<label>Default Value</label><input type="date" class="form-control" id="modal-variable-default"><div class="invalid-feedback" id="default-validation-message"></div>');
+            break;
+            
+        case 'datetime':
+            $('#modal-default-container').html('<label>Default Value</label><input type="datetime-local" class="form-control" id="modal-variable-default"><div class="invalid-feedback" id="default-validation-message"></div>');
+            break;
+            
+        case 'select':
+            $('#modal-select-options').show();
+            $('#modal-default-container').html('<label>Default Value</label><input type="text" class="form-control" id="modal-variable-default"><div class="invalid-feedback" id="default-validation-message"></div>');
+            break;
+            
+        case 'url':
+            $('#modal-url-pattern').show();
+            $('#modal-default-container').html('<label>Default Value</label><input type="url" class="form-control" id="modal-variable-default"><div class="invalid-feedback" id="default-validation-message"></div>');
+            break;
+    }
+}
+
+});
+</script>

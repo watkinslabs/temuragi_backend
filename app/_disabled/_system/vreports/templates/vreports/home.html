@@ -1,0 +1,176 @@
+{% extends 'site-themes/' + theme.system_id + '.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Edit Reports</h4>
+    <form method="post" action="{{ url_for('virtual_reports.edit') }}">
+      <button type="submit" name="new" class="btn btn-success btn-sm" value="1">New Report</button>
+    </form>
+  </div>
+  <p class="text-muted small mb-3">Update virtual reports for display in Ahoy!</p>
+
+
+
+<!-- Column Search Inputs -->
+<div class="table-responsive" style="max-width: 100%; overflow-x: auto;">
+    <table id="reportsTable" class="display nowrap" style="width: 100%;">
+        <thead>
+            <tr>
+                <th style="width: 50px;">ID</th>
+                <th>Title</th>
+                <th>Controller</th>
+                <th>Name</th>
+                <th>Edit</th>
+                <th>View</th>
+                <th>Delete</th>
+            </tr>
+            <tr>
+                <th>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-sm column-search" data-column="0" placeholder="ID" style="max-width: 50px;">
+                        <button type="button" class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y" style="border: none;">×</button>
+                    </div>
+                </th>
+                <th>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-sm column-search" data-column="1" placeholder="Title">
+                        <button type="button" class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y" style="border: none;">×</button>
+                    </div>
+                </th>
+                <th>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-sm column-search" data-column="2" placeholder="Controller">
+                        <button type="button" class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y" style="border: none;">×</button>
+                    </div>
+                </th>
+                <th>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-sm column-search" data-column="3" placeholder="Name">
+                        <button type="button" class="clear-search btn btn-sm btn-outline-secondary position-absolute end-0 top-50 translate-middle-y" style="border: none;">×</button>
+                    </div>
+                </th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+// Store the base URLs for the actions
+var editBaseUrl = "{{ url_for('virtual_reports.edit') }}"
+var deleteBaseUrl = "{{ url_for('virtual_reports.delete') }}"
+var viewBaseUrl = "{{ url_for('virtual_reports.view') }}"
+
+$(document).ready(function() {
+    var table = $('#reportsTable').DataTable({
+        "processing": true,
+        "serverSide": true, 
+        "orderCellsTop": true,
+
+        "ajax": {
+            "url": "{{ url_for('virtual_reports.get_reports') }}",
+            "type": "POST",
+            "data": function(d) {
+                // Create columnsSearch object
+                d.columnsSearch = {};
+                
+                // Add values from column search inputs
+                $('.column-search').each(function() {
+                    var columnIndex = $(this).data('column');
+                    d.columnsSearch[columnIndex] = $(this).val();
+                });
+                
+                console.log("Search data being sent:", d); // Debug log
+            }
+        },
+        "columns": [
+            { "data": "id", "width": "50px" },
+            { "data": "title" },
+            { "data": "controller" },
+            { "data": "name" },
+            { 
+                data: "id",
+                orderable: false,
+                searchable: false,
+                render: function(data) {
+                    return ''
+                    + '<form method="post" action="' + editBaseUrl + '" style="display:inline-block; margin-right:4px;">'
+                    +   '<input type="hidden" name="id" value="' + data + '">'
+                    +   '<button type="submit" class="btn btn-sm btn-primary">Edit</button>'
+                    + '</form>';
+                }
+                },
+                { 
+                data: "id",
+                orderable: false,
+                searchable: false,
+                render: function(data) {
+                    return ''
+                    + '<form method="post" action="' + viewBaseUrl + '" target="_blank" style="display:inline-block; margin-right:4px;">'
+                    +   '<input type="hidden" name="id" value="' + data + '">'
+                    +   '<button type="submit" class="btn btn-sm btn-info">View</button>'
+                    + '</form>';
+                }
+                },
+                {
+                data: "id",
+                orderable: false,
+                searchable: false,
+                render: function(data, type, row) {
+                    return ''
+                    + '<form method="post" action="' + deleteBaseUrl + '" style="display:inline-block;" onsubmit="return confirm(\'Delete ‘ + row.title + ’?’);">'
+                    +   '<input type="hidden" name="id" value="' + data + '">'
+                    +   '<button type="submit" class="btn btn-sm btn-danger">Delete</button>'
+                    + '</form>';
+                }
+            }
+
+        ],
+        "order": [[1, "asc"]],
+        "pagingType": "full_numbers",
+        "lengthMenu": [[10, 25, 50], [10, 25, 50]],
+        "language": {
+            "paginate": {
+                "first": "First",
+                "last": "Last",
+                "previous": "&laquo;",
+                "next": "&raquo;"
+            }
+        }
+    });
+    
+    // Add data-column attributes to search inputs
+    $('.column-search').each(function(index) {
+        $(this).attr('data-column', index);
+    });
+    
+    // Handle column search input
+    $('.column-search').on('keyup', function() {
+        table.draw();
+    });
+    
+    // Handle clear button click
+    $('.clear-search').on('click', function() {
+        var input = $(this).siblings('.column-search');
+        input.val('');
+        table.draw();
+    });
+    
+    // Update page length on dropdown change
+    $('#entriesSelect').on('change', function() {
+        var newLength = $(this).val();
+        table.page.len(newLength).draw();
+    });
+    
+    // Prevent event propagation
+    $('.column-search').on('click', function(e) {
+        e.stopPropagation();
+    });
+
+
+});
+</script>
+{% endblock %}

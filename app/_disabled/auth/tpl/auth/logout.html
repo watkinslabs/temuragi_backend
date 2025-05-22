@@ -1,0 +1,103 @@
+{% extends "public_base.html" %}
+
+{% block title %}Logging Out - {{ site_name }}{% endblock %}
+
+{% block custom_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .logout-container {
+        max-width: 400px;
+        width: 100%;
+        padding: 2rem;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+    
+    .card-body {
+        padding: 2.5rem;
+    }
+    
+    .logout-icon {
+        font-size: 3rem;
+        color: #0072ff;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card h3 {
+        margin-bottom: 1rem;
+        color: #333;
+        font-weight: 600;
+    }
+    
+    .card p {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-return {
+        background-color: #0072ff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s;
+    }
+    
+    .btn-return:hover {
+        background-color: #005ecf;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+    }
+    
+    .logout-progress {
+        height: 5px;
+        margin-top: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="logout-container">
+    <div class="card">
+        <div class="card-body">
+            <div class="logout-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h3>Logging You Out</h3>
+            <p>Please wait while we securely log you out of the system...</p>
+            <div class="progress logout-progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3 text-white">
+        <small>&copy; {{ current_year }} {{ site_name }} - All rights reserved.</small>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    // Redirect to login page after a delay
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            window.location.href = "{{ url_for('auth.login') }}";
+        }, 2000); // 2 second delay
+    });
+</script>
+{% endblock %}

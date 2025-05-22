@@ -1,0 +1,163 @@
+<!-- Account Activity Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Account Activity</h3>
+    </div>
+    <div class="component_content">
+        <div class="activity_highlight">Last Sale {{ customer.days_since_last_sale }} Day(s) Ago</div>
+        
+        <table class="data_table activity_table">
+            <tbody>
+                <tr>
+                    <td>Last Sale Date:</td>
+                    <td>{{ customer.last_sale_date|date:"m/d/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>Last Sales Visit:</td>
+                    <td>{{ customer.last_visit_date|date:"m/d/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>Last Call:</td>
+                    <td>{{ customer.last_call_date|date:"m/d/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>First Sale Date:</td>
+                    <td>{{ customer.first_sale_date|date:"m/d/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>Second Sale Date:</td>
+                    <td>{{ customer.second_sale_date|date:"m/d/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>First Call:</td>
+                    <td>{{ customer.first_call_date|date:"m/d/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>Total Sales Visits:</td>
+                    <td>{{ customer.total_sales_visits }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Account Settings Component -->
+<div class="component_container">
+    <div class="component_header">
+        <h3>Account Settings</h3>
+    </div>
+    <div class="component_content">
+        <table class="data_table settings_table">
+            <thead>
+                <tr>
+                    <th>Setting</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Class</td>
+                    <td>{{ customer.class_code }}</td>
+                </tr>
+                <tr>
+                    <td>Mail To ?</td>
+                    <td>{% if customer.mail_to %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>PO Required?</td>
+                    <td>{% if customer.po_required %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Sat Delivery?</td>
+                    <td>{% if customer.saturday_delivery %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Web Activated?</td>
+                    <td>{% if customer.web_activated %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Lucky 7 Active?</td>
+                    <td>{% if customer.lucky7_active %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Lucky 7 Points</td>
+                    <td>{{ customer.lucky7_points }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="component_actions">
+            <a href="#" id="edit_account_settings_btn" class="edit_link">Edit</a>
+        </div>
+    </div>
+</div>
+
+<!-- Account Settings Edit Modal -->
+<div id="account_settings_modal" class="edit_modal" style="display: none;">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h3>Edit Account Settings</h3>
+            <span class="close_modal">&times;</span>
+        </div>
+        <div class="modal_body">
+            <form id="account_settings_form" method="post" action="{% url 'save_account_settings' %}">
+                {% csrf_token %}
+                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                
+                <div class="form_group">
+                    <label for="class_code">Class</label>
+                    <select name="class_code" id="class_code" required>
+                        <option value="GP" {% if customer.class_code == 'GP' %}selected{% endif %}>GP</option>
+                        <option value="WD" {% if customer.class_code == 'WD' %}selected{% endif %}>WD</option>
+                        <option value="RT" {% if customer.class_code == 'RT' %}selected{% endif %}>RT</option>
+                        <option value="CP" {% if customer.class_code == 'CP' %}selected{% endif %}>CP</option>
+                    </select>
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="mail_to" id="mail_to" {% if customer.mail_to %}checked{% endif %}>
+                        Mail To ?
+                    </label>
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="po_required" id="po_required" {% if customer.po_required %}checked{% endif %}>
+                        PO Required?
+                    </label>
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="saturday_delivery" id="saturday_delivery" {% if customer.saturday_delivery %}checked{% endif %}>
+                        Sat Delivery?
+                    </label>
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="web_activated" id="web_activated" {% if customer.web_activated %}checked{% endif %}>
+                        Web Activated?
+                    </label>
+                </div>
+                
+                <div class="form_group checkbox_group">
+                    <label>
+                        <input type="checkbox" name="lucky7_active" id="lucky7_active" {% if customer.lucky7_active %}checked{% endif %}>
+                        Lucky 7 Active?
+                    </label>
+                </div>
+                
+                <div class="form_group">
+                    <label for="lucky7_points">Lucky 7 Points</label>
+                    <input type="number" name="lucky7_points" id="lucky7_points" value="{{ customer.lucky7_points }}" min="0">
+                </div>
+                
+                <div class="form_actions">
+                    <button type="submit" class="btn_save">Save</button>
+                    <button type="button" class="btn_cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
