@@ -35,7 +35,7 @@ def home():
     sess = g.session
     db_types = sess.query(DatabaseType).filter_by(active=True).all()
     db_types_tuples = [(dt.name, dt.display) for dt in db_types]
-
+    
     return render_template('connection/list.html', db_types=db_types_tuples)
 
 @bp.route('/data', methods=('POST',))

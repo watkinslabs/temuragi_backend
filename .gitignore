@@ -7,3 +7,8 @@
 *.flort.txt
 __pycache__
 venv
+*.lock
+*.sock
+dist
+build
+config.yaml

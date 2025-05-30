@@ -28,11 +28,25 @@ DROP DATABASE IF EXISTS $db_name;
 DROP ROLE IF EXISTS $web_user;
 DROP ROLE IF EXISTS $main_user;
 
+
+
+
 -- 1. Create roles and database
 CREATE ROLE $main_user WITH LOGIN PASSWORD '$password';
 CREATE ROLE $web_user WITH LOGIN PASSWORD '$password';
 CREATE DATABASE $db_name OWNER $main_user;
 GRANT ALL PRIVILEGES ON DATABASE $db_name TO $main_user;
+
+
+
+GRANT ALL PRIVILEGES ON DATABASE virtual_reports TO vr_web_user;
+GRANT CONNECT ON DATABASE virtual_reports TO vr_web_user;
+GRANT USAGE, CREATE ON SCHEMA public TO vr_web_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO vr_web_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO vr_web_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO vr_web_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO vr_web_user;
+
 
 -- 2. Switch into the new database
 \c $db_name
@@ -495,6 +509,22 @@ VALUES (
     10
 );
 
+-- 1. High priority allow rule for admin IP
+INSERT INTO firewall (
+    ip_pattern,
+    ip_type,
+    description,
+    active,
+    "order"
+)
+VALUES (
+    '10.6.0.0/24',
+    'allow',
+    'Lab Network',
+    TRUE,
+    10
+);
+
 
 -- 3. Low priority block all rule (applies if no other rules match)
 INSERT INTO firewall (
@@ -534,10 +564,6 @@ CREATE INDEX idx_reset_tokens_user ON reset_tokens(user_uuid);
 
 
 
--- Create the module_configs table to store configuration settings for system modules
--- Each row represents a single module's configuration with JSON-based settings
--- Used for centralized management of module features, parameters, and behavior
-COMMENT ON TABLE module_configs IS 'Stores configuration settings for system modules. Used to control module behavior and store module-specific parameters in JSON format.';
 
 CREATE TABLE module_configs (
     -- Primary key using UUID
@@ -567,6 +593,11 @@ CREATE TABLE module_configs (
     -- Ensure each module can only have one configuration entry
     CONSTRAINT unique_module_name UNIQUE (module_name)
 );
+
+-- Create the module_configs table to store configuration settings for system modules
+-- Each row represents a single module's configuration with JSON-based settings
+-- Used for centralized management of module features, parameters, and behavior
+COMMENT ON TABLE module_configs IS 'Stores configuration settings for system modules. Used to control module behavior and store module-specific parameters in JSON format.';
 
 -- Add comments on columns
 COMMENT ON COLUMN module_configs.uuid IS 'Primary key - unique identifier for each configuration record';

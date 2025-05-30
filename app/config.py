@@ -8,7 +8,7 @@ basedir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 config={
     'DATABASE_URI'      :  ("postgresql+psycopg2://vr_web_user:"
                             "stronk_password_%24314X"
-                            "@10.0.0.52:5432/virtual_reports"
+                            "@10.90.0.40:5432/virtual_reports"
                             ),
     #'CONNECTION_STRING' : 'DSN=mssql-dev;UID=webuser;PWD=!w21eb1;',
     'CIPHER_KEY'        :  b'u1tOOtBW2ECTWXSMS_pZ9wwdn4dEZzg_-ihYJfbYbd8=',

@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from flask import request, url_for, session, current_app
 import os
 import datetime
@@ -28,11 +29,20 @@ def register_template_processor(app):
     def inject_session():
         # Determine if user is logged in
         logged_in = 'user_id' in session
-
+        logged_in=True
+        thm=	SimpleNamespace(**{'dark_mode': False,
+                'default': False,
+                'description': 'Modern Style with traditional Mega Menu on the top of the '
+                                'page.',
+                'id': 5,
+                'menu_location': 'top',
+                'name': 'Modern Mega Menu',
+                'search': False,
+                'show_icons': False,
+                'system_id': 'default',
+                'wide': False})
+        print(thm.system_id)
                 
-
-
-        # Create context with session data at root level
         context = {
             # Session data
             'is_admin': session.get('is_admin', False),
@@ -40,7 +50,7 @@ def register_template_processor(app):
             'username': session.get('username', None),
             'home_loc': session.get('home_loc', None),
             'logged_in': logged_in,
-            'theme': session.get('theme',None),
+            'theme': session.get('theme',thm),
             'server_addr': request.host,
             'mail': {'unread': 0, 'read': 0},
             'current_year': datetime.datetime.now().year,
@@ -49,6 +59,7 @@ def register_template_processor(app):
             'javascripts': [],
             
         }
+        
 
         for key in app.config['site_template']:
             value=app.config['site_template'][key]
