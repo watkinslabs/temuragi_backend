@@ -6,9 +6,15 @@ from datetime import timedelta
 basedir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 config={
-    'DATABASE_URI'      :  ("postgresql+psycopg2://vr_web_user:"
+    'SYSTEM_SCAN_PATHS'    : ['_system','admin','user'],
+
+    'ADMIN_DATABASE_URI'      :  ("postgresql+psycopg2://louis:"
                             "stronk_password_%24314X"
                             "@10.90.0.40:5432/virtual_reports"
+                            ),
+    'DATABASE_URI'      :  ("postgresql+psycopg2://temuragi:"
+                            "stronk_password_%24314X"
+                            "@10.90.0.40:5432/temuragi"
                             ),
     #'CONNECTION_STRING' : 'DSN=mssql-dev;UID=webuser;PWD=!w21eb1;',
     'CIPHER_KEY'        :  b'u1tOOtBW2ECTWXSMS_pZ9wwdn4dEZzg_-ihYJfbYbd8=',

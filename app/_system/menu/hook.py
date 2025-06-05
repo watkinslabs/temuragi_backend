@@ -1,5 +1,5 @@
 import uuid
-from flask import url_for, render_template_string, g, current_app
+from flask import url_for, render_template_string, g, current_app, request
 from sqlalchemy import and_
 from typing import List, Dict, Optional, Union
 
@@ -27,9 +27,13 @@ def register_menu_injector(app):
                 g.menu_builder = MenuBuilder(db_session)
             return g.menu_builder
 
-        
+        if request.path.startswith(app.config['ADMIN_ROUTE_PREFIX']):
+            menu_tree="ADMIN"
+        else:
+            menu_tree="MAIN"
+
         return {
-            'get_menu': lambda menu_type="ADMIN", user_uuid=None: 
+            'get_menu': lambda menu_type=menu_tree, user_uuid=None: 
                 get_menu_builder().get_menu_structure(menu_type, user_uuid),
             'render_menu': lambda menu_structure, template_path=None, template_string=None, **kwargs:
                 get_menu_builder().render_menu(menu_structure, template_path, template_string, **kwargs),

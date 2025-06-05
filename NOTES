@@ -1,0 +1,6 @@
+x firewall cli to add remove IP's
+o firewall UI -> contact support (create/open)
+o firewall UI -> requested URL/Reference ID in template.
+x add makefile options for this.. or a main CLI that auto registers all CLI's and then creates submenus's for that cli....
+
+

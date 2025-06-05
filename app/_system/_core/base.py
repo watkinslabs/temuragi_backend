@@ -1,5 +1,5 @@
 import uuid
-import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Text, Boolean, JSON, DateTime, create_engine
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -15,16 +15,16 @@ class BaseModel(Base):
         primary_key=True,
         default=uuid.uuid4
     )
-    active = Column(Boolean, default=True, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(
         DateTime(timezone=True),
-        default=datetime.datetime.utcnow,
+        default=datetime.now(timezone.utc),
         nullable=False
     )
     updated_at = Column(
         DateTime(timezone=True),
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
         nullable=False
     )
 

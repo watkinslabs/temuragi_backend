@@ -39,3 +39,6 @@ restart_nginx:
 
 restart_uwsgi:
 	systemctl restart temuragi.service
+
+firewall:
+	@python -m app.admin.firewall.firewall_cli

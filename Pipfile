@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask>=3.1.1
+flask = ">=3.1.1"
 jinja2 = "*"
 pyopenssl = "*"
 werkzeug = "*"
@@ -13,9 +13,9 @@ flask-wtf = "*"
 cryptography = "*"
 pyodbc = "*"
 requests = "*"
-phpserialize = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
+tabulate = "*"
 
 [dev-packages]
 
