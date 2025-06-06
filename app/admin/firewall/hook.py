@@ -2,8 +2,7 @@ from flask import Blueprint, render_template, request, current_app, g
 import traceback
 import sys
 
-from .firewall_model import Firewall
-from .firewall_log_model import FirewallLog
+from app.models import Firewall, FirewallLog
 
 
 def get_client_ip():
@@ -38,7 +37,7 @@ def register_firewall_handlers(app):
             # This assumes you have a separate logging mechanism
             # If not, you can remove this part or implement it separately
             log_ip_request(db_session, ip, allowed, reason)
-            app.logger.error(f"Firewall:  {ip}, Allowed: {allowed}, Msg: {reason}")
+            app.logger.info(f"Firewall:  {ip}, Allowed: {allowed}, Msg: {reason}")
         except Exception as e:
             # Don't block requests due to logging errors
             app.logger.error(f"Error logging IP request: {str(e)}")

@@ -1,0 +1,29 @@
+<!-- Flash Messages Modal -->
+<div class="modal fade" id="flashModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="flashModalLabel">Notification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="flash-modal-content"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="app-footer">
+    <span>&copy; {{ current_year }} {{ site_name }}</span>
+    
+    <div class="footer-meta">
+        {% if page.view_count %}
+        <span>Views: {{ page.view_count }}</span>
+        {% endif %}
+        
+        {% if theme.theme_version %}
+        <span class="text-muted">{{ theme.display_name }} v{{ theme.theme_version }}</span>
+        {% endif %}
+    </div>
+</footer>

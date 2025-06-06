@@ -1,0 +1,19 @@
+<header class="app-header">
+    <a href="/" class="app-title">{{ site_name }}</a>
+    
+    <div class="header-actions">
+        {% if page.published %}
+        <span class="badge status-published">Published</span>
+        {% else %}
+        <span class="badge status-draft">Draft</span>
+        {% endif %}
+        
+        {% if page.requires_auth %}
+        <span class="badge status-auth-required">Protected</span>
+        {% endif %}
+        
+        {% if page.featured %}
+        <span class="badge bg-warning text-dark">Featured</span>
+        {% endif %}
+    </div>
+</header>

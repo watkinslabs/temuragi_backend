@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, g, json
 import html
 
-from app.admin.module_config.module_config_model import ModuleConfig
+from app.models import ModuleConfig
 
 bp = Blueprint('module_config', __name__, url_prefix="/module-config", template_folder="tpl")
 

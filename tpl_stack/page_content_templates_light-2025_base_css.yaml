@@ -1,0 +1,137 @@
+# Page Template Content for templates/light-2025/base.css (Template)
+# Template file - edit values before importing
+# Auto-generated for template: templates/light-2025/base.css, linked to page template: admin-dashboard
+# Exported from template CLI
+# Remove commented auto-generated fields before importing
+
+page_template_uuid: 69ea14c5-7968-46a2-819c-e22786cdf97c
+template_file_path: templates/light-2025/base.css
+compiled_file_path: compiled_templates/templates/light-2025/base.pyc
+content_type: text/css
+version_number: 1
+is_active: true
+template_source: "<style>\n/* Base Typography & Layout */\nbody, html {\n    height:\
+  \ 100%;\n    margin: 0;\n    font-family: {{ theme.font_family_primary }};\n   \
+  \ font-size: {{ theme.font_size_base }};\n    line-height: {{ theme.line_height_base\
+  \ }};\n    color: {{ theme.text_color }};\n    background-color: {{ theme.background_color\
+  \ }};\n}\n\n/* CSS Variables */\n:root {\n    --primary: {{ theme.primary_color\
+  \ }};\n    --secondary: {{ theme.secondary_color }};\n    --success: {{ theme.success_color\
+  \ }};\n    --info: {{ theme.info_color }};\n    --warning: {{ theme.warning_color\
+  \ }};\n    --danger: {{ theme.danger_color }};\n    --background: {{ theme.background_color\
+  \ }};\n    --surface: {{ theme.surface_color }};\n    --text: {{ theme.text_color\
+  \ }};\n    --text-muted: {{ theme.text_muted_color }};\n    --border: {{ theme.border_color\
+  \ }};\n    --border-radius: {{ theme.border_radius }};\n    --spacing: {{ theme.spacing_unit\
+  \ }};\n    --shadow-sm: {{ theme.shadow_sm }};\n    --shadow-md: {{ theme.shadow_md\
+  \ }};\n    --shadow-lg: {{ theme.shadow_lg }};\n    {% if theme.enable_transitions\
+  \ %}\n    --transition: {{ theme.transition_duration }} {{ theme.animation_easing\
+  \ }};\n    {% endif %}\n}\n\n/* Layout Structure */\n.app-container {\n    display:\
+  \ flex;\n    flex-direction: column;\n    min-height: 100vh;\n    max-width: {{\
+  \ theme.container_max_width }};\n    margin: 0 auto;\n    background-color: var(--background);\n\
+  \    box-shadow: var(--shadow-sm);\n}\n\n/* Header */\n.app-header {\n    background-color:\
+  \ var(--surface);\n    border-bottom: {{ theme.border_width }} solid var(--border);\n\
+  \    padding: calc(var(--spacing) / 2) var(--spacing);\n    height: {{ theme.navbar_height\
+  \ }};\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n\
+  \    {% if theme.enable_transitions %}\n    transition: var(--transition);\n   \
+  \ {% endif %}\n}\n\n.app-title {\n    font-size: 1.5rem;\n    font-weight: {{ theme.font_weight_bold\
+  \ }};\n    color: var(--primary);\n    text-decoration: none;\n    {% if theme.font_family_heading\
+  \ %}\n    font-family: {{ theme.font_family_heading }};\n    {% endif %}\n}\n\n\
+  .app-title:hover {\n    color: var(--primary);\n    text-decoration: none;\n}\n\n\
+  /* Main Content */\n.app-main {\n    flex: 1;\n    display: flex;\n    flex-direction:\
+  \ column;\n    background-color: var(--background);\n}\n\n.page-header {\n    background-color:\
+  \ var(--surface);\n    border-bottom: {{ theme.border_width }} solid var(--border);\n\
+  \    padding: var(--spacing);\n}\n\n.page-title {\n    margin: 0;\n    font-size:\
+  \ 1.75rem;\n    color: var(--text);\n    {% if theme.font_family_heading %}\n  \
+  \  font-family: {{ theme.font_family_heading }};\n    {% endif %}\n}\n\n.page-description\
+  \ {\n    margin: calc(var(--spacing) / 4) 0 0 0;\n    color: var(--text-muted);\n\
+  \    font-size: 0.9rem;\n}\n\n.page-content {\n    flex: 1;\n    padding: var(--spacing);\n\
+  \    overflow-y: auto;\n}\n\n/* Footer */\n.app-footer {\n    background-color:\
+  \ var(--surface);\n    border-top: {{ theme.border_width }} solid var(--border);\n\
+  \    padding: calc(var(--spacing) / 2) var(--spacing);\n    height: {{ theme.footer_height\
+  \ }};\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n\
+  \    font-size: 0.875rem;\n    color: var(--text-muted);\n}\n\n/* Components */\n\
+  .btn {\n    border-radius: var(--border-radius);\n    font-weight: {{ theme.font_weight_normal\
+  \ }};\n    {% if theme.enable_transitions %}\n    transition: var(--transition);\n\
+  \    {% endif %}\n}\n\n.card {\n    border-radius: var(--border-radius);\n    border:\
+  \ {{ theme.border_width }} solid var(--border);\n    box-shadow: var(--shadow-sm);\n\
+  }\n\n.form-control, .form-select {\n    border-radius: var(--border-radius);\n \
+  \   border: {{ theme.border_width }} solid var(--border);\n    {% if theme.enable_transitions\
+  \ %}\n    transition: var(--transition);\n    {% endif %}\n}\n\n.form-control:focus,\
+  \ .form-select:focus {\n    border-color: var(--primary);\n    box-shadow: 0 0 0\
+  \ {{ theme.focus_ring_width }} var(--primary);\n}\n\n/* Status Badges */\n.status-published\
+  \ {\n    background-color: var(--success);\n    color: white;\n}\n\n.status-draft\
+  \ {\n    background-color: var(--warning);\n    color: var(--text);\n}\n\n.status-auth-required\
+  \ {\n    background-color: var(--info);\n    color: white;\n}\n\n/* Modal Styling\
+  \ */\n.modal-content {\n    border-radius: var(--border-radius);\n    border: none;\n\
+  \    box-shadow: var(--shadow-lg);\n}\n\n.modal-header {\n    border-bottom: {{\
+  \ theme.border_width }} solid var(--border);\n    background-color: var(--surface);\n\
+  }\n\n.modal-footer {\n    border-top: {{ theme.border_width }} solid var(--border);\n\
+  \    background-color: var(--surface);\n}\n\n/* Alert Variants */\n.alert {\n  \
+  \  border-radius: var(--border-radius);\n    border: {{ theme.border_width }} solid;\n\
+  }\n\n.alert-success {\n    background-color: rgba({{ theme.success_color[1:] | hex_to_rgb\
+  \ }}, 0.1);\n    border-color: var(--success);\n    color: var(--success);\n}\n\n\
+  .alert-info {\n    background-color: rgba({{ theme.info_color[1:] | hex_to_rgb }},\
+  \ 0.1);\n    border-color: var(--info);\n    color: var(--info);\n}\n\n.alert-warning\
+  \ {\n    background-color: rgba({{ theme.warning_color[1:] | hex_to_rgb }}, 0.1);\n\
+  \    border-color: var(--warning);\n    color: var(--warning);\n}\n\n.alert-danger\
+  \ {\n    background-color: rgba({{ theme.danger_color[1:] | hex_to_rgb }}, 0.1);\n\
+  \    border-color: var(--danger);\n    color: var(--danger);\n}\n\n/* Responsive\
+  \ Design */\n@media (max-width: {{ theme.breakpoint_sm }}) {\n    .app-container\
+  \ {\n        margin: 0;\n    }\n    \n    .page-content {\n        padding: calc(var(--spacing)\
+  \ / 2);\n    }\n    \n    .app-header, .app-footer {\n        padding: calc(var(--spacing)\
+  \ / 2);\n    }\n}\n\n/* Utility Classes */\n.text-primary { color: var(--primary)\
+  \ !important; }\n.text-secondary { color: var(--secondary) !important; }\n.text-success\
+  \ { color: var(--success) !important; }\n.text-info { color: var(--info) !important;\
+  \ }\n.text-warning { color: var(--warning) !important; }\n.text-danger { color:\
+  \ var(--danger) !important; }\n.text-muted { color: var(--text-muted) !important;\
+  \ }\n\n.bg-primary { background-color: var(--primary) !important; }\n.bg-secondary\
+  \ { background-color: var(--secondary) !important; }\n.bg-surface { background-color:\
+  \ var(--surface) !important; }\n\n/* Navigation Styles */\n.app-navigation {\n \
+  \   background-color: var(--surface);\n    border-bottom: {{ theme.border_width\
+  \ }} solid var(--border);\n    padding: calc(var(--spacing) / 2) 0;\n}\n\n.nav-container\
+  \ {\n    max-width: {{ theme.container_max_width }};\n    margin: 0 auto;\n    padding:\
+  \ 0 var(--spacing);\n    display: flex;\n    align-items: center;\n    justify-content:\
+  \ space-between;\n    flex-wrap: wrap;\n    gap: var(--spacing);\n}\n\n/* Primary\
+  \ Menu */\n.nav-menu {\n    display: flex;\n    list-style: none;\n    margin: 0;\n\
+  \    padding: 0;\n    gap: calc(var(--spacing) / 2);\n}\n\n.nav-item {\n    position:\
+  \ relative;\n}\n\n.nav-link {\n    display: flex;\n    align-items: center;\n  \
+  \  gap: calc(var(--spacing) / 4);\n    padding: calc(var(--spacing) / 3) calc(var(--spacing)\
+  \ / 2);\n    color: var(--text);\n    text-decoration: none;\n    border-radius:\
+  \ var(--border-radius);\n    font-weight: {{ theme.font_weight_normal }};\n    {%\
+  \ if theme.enable_transitions %}\n    transition: var(--transition);\n    {% endif\
+  \ %}\n}\n\n.nav-link:hover {\n    background-color: rgba({{ theme.primary_color[1:]\
+  \ | hex_to_rgb }}, 0.1);\n    color: var(--primary);\n    text-decoration: none;\n\
+  }\n\n.nav-link.active {\n    background-color: var(--primary);\n    color: white;\n\
+  }\n\n.nav-link.disabled {\n    color: var(--text-muted);\n    pointer-events: none;\n\
+  }\n\n/* Dropdown Menu */\n.nav-submenu {\n    position: absolute;\n    top: 100%;\n\
+  \    left: 0;\n    background-color: var(--background);\n    border: {{ theme.border_width\
+  \ }} solid var(--border);\n    border-radius: var(--border-radius);\n    box-shadow:\
+  \ var(--shadow-md);\n    list-style: none;\n    margin: 0;\n    padding: calc(var(--spacing)\
+  \ / 4) 0;\n    min-width: 200px;\n    z-index: 1000;\n    display: none;\n}\n\n\
+  .nav-item:hover .nav-submenu {\n    display: block;\n}\n\n.nav-sublink {\n    display:\
+  \ block;\n    padding: calc(var(--spacing) / 3) calc(var(--spacing) / 2);\n    color:\
+  \ var(--text);\n    text-decoration: none;\n    {% if theme.enable_transitions %}\n\
+  \    transition: var(--transition);\n    {% endif %}\n}\n\n.nav-sublink:hover {\n\
+  \    background-color: var(--surface);\n    color: var(--primary);\n    text-decoration:\
+  \ none;\n}\n\n.nav-sublink.active {\n    background-color: var(--primary);\n   \
+  \ color: white;\n}\n\n/* Breadcrumbs */\n.breadcrumb-nav {\n    flex: 1;\n}\n\n\
+  .breadcrumb {\n    margin: 0;\n    background: none;\n    padding: 0;\n}\n\n.breadcrumb-item\
+  \ {\n    font-size: 0.9rem;\n}\n\n.breadcrumb-item a {\n    color: var(--text-muted);\n\
+  \    text-decoration: none;\n}\n\n.breadcrumb-item a:hover {\n    color: var(--primary);\n\
+  }\n\n.breadcrumb-item.active {\n    color: var(--text);\n}\n\n/* Page Actions */\n\
+  .page-actions {\n    display: flex;\n    gap: calc(var(--spacing) / 4);\n}\n\n/*\
+  \ Mobile Navigation */\n@media (max-width: {{ theme.breakpoint_md }}) {\n    .nav-container\
+  \ {\n        flex-direction: column;\n        align-items: stretch;\n    }\n   \
+  \ \n    .nav-menu {\n        flex-direction: column;\n        width: 100%;\n   \
+  \ }\n    \n    .nav-submenu {\n        position: static;\n        display: block;\n\
+  \        margin-left: var(--spacing);\n        box-shadow: none;\n        border:\
+  \ none;\n        background: none;\n    }\n    \n    .page-actions {\n        justify-content:\
+  \ center;\n        width: 100%;\n    }\n}\n\n/* Mobile Toggle Button */\n.nav-toggle\
+  \ {\n    display: none;\n    background: none;\n    border: none;\n    color: var(--text);\n\
+  \    font-size: 1.5rem;\n    cursor: pointer;\n}\n\n@media (max-width: {{ theme.breakpoint_md\
+  \ }}) {\n    .nav-toggle {\n        display: block;\n    }\n    \n    .nav-menu\
+  \ {\n        display: none;\n    }\n    \n    .nav-menu.show {\n        display:\
+  \ flex;\n    }\n}\n\n{% if theme.custom_css %}\n/* Custom Theme CSS */\n{{ theme.custom_css|safe\
+  \ }}\n{% endif %}\n</style>"
+template_hash: 45c4e7f7fbf65d16ce02d9911acee48189686b741c281c89cd43de312c85dd71
+cache_duration: 3600
+change_description: Initial template version for templates/light-2025/base.css

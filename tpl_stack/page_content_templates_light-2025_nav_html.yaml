@@ -1,0 +1,54 @@
+# Page Template Content for templates/light-2025/nav.html (Template)
+# Template file - edit values before importing
+# Auto-generated for template: templates/light-2025/nav.html, linked to page template: admin-dashboard
+# Exported from template CLI
+# Remove commented auto-generated fields before importing
+
+page_template_uuid: 69ea14c5-7968-46a2-819c-e22786cdf97c
+template_file_path: templates/light-2025/nav.html
+compiled_file_path: compiled_templates/templates/light-2025/nav.pyc
+content_type: text/html
+version_number: 1
+is_active: true
+template_source: "<nav class=\"app-navigation\">\n    <div class=\"nav-container\"\
+  >\n        <!-- Primary Navigation -->\n        {% if menu_items %}\n        <ul\
+  \ class=\"nav-menu\">\n            {% for item in menu_items %}\n            <li\
+  \ class=\"nav-item\">\n                <a href=\"{{ item.url }}\" \n           \
+  \        class=\"nav-link{% if item.active %} active{% endif %}{% if item.disabled\
+  \ %} disabled{% endif %}\"\n                   {% if item.target %}target=\"{{ item.target\
+  \ }}\"{% endif %}\n                   {% if item.disabled %}aria-disabled=\"true\"\
+  {% endif %}>\n                    {% if item.icon %}<i class=\"{{ item.icon }}\"\
+  ></i>{% endif %}\n                    {{ item.title }}\n                    {% if\
+  \ item.badge %}\n                    <span class=\"badge bg-{{ item.badge_type or\
+  \ 'primary' }}\">{{ item.badge }}</span>\n                    {% endif %}\n    \
+  \            </a>\n                \n                <!-- Dropdown Menu -->\n  \
+  \              {% if item.children %}\n                <ul class=\"nav-submenu\"\
+  >\n                    {% for child in item.children %}\n                    <li\
+  \ class=\"nav-subitem\">\n                        <a href=\"{{ child.url }}\" \n\
+  \                           class=\"nav-sublink{% if child.active %} active{% endif\
+  \ %}\"\n                           {% if child.target %}target=\"{{ child.target\
+  \ }}\"{% endif %}>\n                            {% if child.icon %}<i class=\"{{\
+  \ child.icon }}\"></i>{% endif %}\n                            {{ child.title }}\n\
+  \                        </a>\n                    </li>\n                    {%\
+  \ endfor %}\n                </ul>\n                {% endif %}\n            </li>\n\
+  \            {% endfor %}\n        </ul>\n        {% endif %}\n\n        <!-- Breadcrumb\
+  \ Navigation -->\n        {% if breadcrumbs %}\n        <nav class=\"breadcrumb-nav\"\
+  \ aria-label=\"breadcrumb\">\n            <ol class=\"breadcrumb\">\n          \
+  \      {% for crumb in breadcrumbs %}\n                <li class=\"breadcrumb-item{%\
+  \ if loop.last %} active{% endif %}\"\n                    {% if loop.last %}aria-current=\"\
+  page\"{% endif %}>\n                    {% if not loop.last %}\n               \
+  \     <a href=\"{{ crumb.url }}\">{{ crumb.title }}</a>\n                    {%\
+  \ else %}\n                    {{ crumb.title }}\n                    {% endif %}\n\
+  \                </li>\n                {% endfor %}\n            </ol>\n      \
+  \  </nav>\n        {% endif %}\n\n        <!-- Page Actions -->\n        {% if page_actions\
+  \ %}\n        <div class=\"page-actions\">\n            {% for action in page_actions\
+  \ %}\n            <a href=\"{{ action.url }}\" \n               class=\"btn btn-{{\
+  \ action.type or 'primary' }} btn-sm\"\n               {% if action.target %}target=\"\
+  {{ action.target }}\"{% endif %}\n               {% if action.confirm %}onclick=\"\
+  return confirm('{{ action.confirm }}')\"{% endif %}>\n                {% if action.icon\
+  \ %}<i class=\"{{ action.icon }}\"></i>{% endif %}\n                {{ action.title\
+  \ }}\n            </a>\n            {% endfor %}\n        </div>\n        {% endif\
+  \ %}\n    </div>\n</nav>\n"
+template_hash: 61d3c711419867fdb02c4bf75d36616be5026ba957accd5492799597b7315d17
+cache_duration: 3600
+change_description: Initial template version for templates/light-2025/nav.html

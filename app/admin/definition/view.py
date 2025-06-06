@@ -6,10 +6,7 @@ import uuid
 from datetime import datetime
 
 
-from app.admin.connection.connection_model import Connection
-from .definition_model import CrudDef
-from app.admin.data_type.data_type_model import DataType
-from app.admin.variable_type.variable_type_model import VariableType
+from app.models import VariableType,DataType,CrudDef,Connection
 
 
 bp = Blueprint(

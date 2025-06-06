@@ -84,7 +84,7 @@ class SampleItem(BaseModel):
 ### tpl/sample/home.html
 
 ```jinja
-{% extends 'site-themes/' + theme.system_id + '.html' %}
+{% extends active_page_path %}
 
 {% block page_title %}Sample Module{% endblock %}
 

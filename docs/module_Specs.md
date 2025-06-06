@@ -81,7 +81,7 @@ def register_firewall_handlers(app):
 * **Main pages**… Place full-page Jinja templates under `tpl/<module_name>/` and start every file with:
 
   ```jinja
-  {% extends 'site-themes/' + theme.system_id + '.html' %}
+  {% extends active_page_path %}
   ```
 
   This inherits the global layout that bundles Bootstrap 5 and Font Awesome, ensuring consistent styling.

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Master CLI - Recursive CLI Module Loader
+tmcli - Temuragi CLI Entry Point
 Automatically discovers and loads all *_cli.py modules from the project
-Usage: python -m app.cli <module_name> [args...]
+Usage: tmcli <module_name> [args...]
 """
 
 import os
@@ -37,12 +37,15 @@ class CLILoader:
         for dirpath, dirnames, filenames in os.walk(self.base_path):
             # Skip certain directories
             dirnames[:] = [d for d in dirnames if not d.startswith('.') 
-                          and d not in ['__pycache__', 'static', 'templates']]
+                          and d not in ['__pycache__', 'static', 'tpl']]
             
             # Look for CLI files
-            cli_files = [f for f in filenames if f.endswith('_cli.py')]
+            
+            cli_files = [f for f in filenames if f.endswith('_cli.py') ]
             
             for cli_file in cli_files:
+                if "base_cli.py" == cli_file: 
+                    continue
                 self._register_cli_module(dirpath, cli_file)
         
         print(f"✓ Found {len(self.discovered_clis)} CLI modules")
@@ -168,10 +171,9 @@ def create_dynamic_parser(loader):
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python -m app.cli list                    # List available CLI modules
-  python -m app.cli menu status             # Run menu CLI with 'status' command
-  python -m app.cli firewall list --all     # Run firewall CLI with arguments
-  python -m app.cli backup create daily     # Run backup CLI with multiple args
+  tmcli list                    # List available CLI modules
+  tmcli menu status             # Run menu CLI with 'status' command
+  tmcli firewall list --all     # Run firewall CLI with arguments
         """
     )
     

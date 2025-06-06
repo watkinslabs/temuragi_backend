@@ -1,0 +1,23 @@
+# Page Template Content for templates/light-2025/header.html (Template)
+# Template file - edit values before importing
+# Auto-generated for template: templates/light-2025/header.html, linked to page template: admin-dashboard
+# Exported from template CLI
+# Remove commented auto-generated fields before importing
+
+page_template_uuid: 69ea14c5-7968-46a2-819c-e22786cdf97c
+template_file_path: templates/light-2025/header.html
+compiled_file_path: compiled_templates/templates/light-2025/header.pyc
+content_type: text/html
+version_number: 1
+is_active: true
+template_source: "<header class=\"app-header\">\n    <a href=\"/\" class=\"app-title\"\
+  >{{ site_name }}</a>\n    \n    <div class=\"header-actions\">\n        {% if page.published\
+  \ %}\n        <span class=\"badge status-published\">Published</span>\n        {%\
+  \ else %}\n        <span class=\"badge status-draft\">Draft</span>\n        {% endif\
+  \ %}\n        \n        {% if page.requires_auth %}\n        <span class=\"badge\
+  \ status-auth-required\">Protected</span>\n        {% endif %}\n        \n     \
+  \   {% if page.featured %}\n        <span class=\"badge bg-warning text-dark\">Featured</span>\n\
+  \        {% endif %}\n    </div>\n</header>"
+template_hash: 0dbc3c2f8daa52ffcc31495e9c60e3b86be0c143a50d79ea64505ec1767ba01b
+cache_duration: 3600
+change_description: Initial template version for templates/light-2025/header.html

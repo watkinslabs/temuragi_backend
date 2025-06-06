@@ -1,0 +1,20 @@
+<main class="main-wrapper">
+    <!-- Render a sidebar menu for a specific section -->
+    <div class="module-container">
+        <div class="full-width-header">
+            <div class="menu_sub_title">
+                
+            </div>
+        </div>
+    
+        
+    
+        <!-- Main Content Area -->
+        <div class="main-content">
+            {% block subnav %} {% endblock %}
+            {{ content|safe }}
+            {% block content %}{% endblock %}
+
+        </div>
+    </div>
+</main>

@@ -16,6 +16,7 @@ requests = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
 tabulate = "*"
+pyaml = "*"
 
 [dev-packages]
 

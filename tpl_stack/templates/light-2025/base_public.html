@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ page.meta_description or page.description or SITE_DESCRIPTION }}">
+    {% if page.meta_keywords %}<meta name="keywords" content="{{ page.meta_keywords }}">{% endif %}
+    <meta name="author" content="{{ SITE_AUTHOR }}">
+    <meta name="robots" content="{% if page.published %}index, follow{% else %}noindex, nofollow{% endif %}">
+    
+    {% if page.canonical_url %}<link rel="canonical" href="{{ page.canonical_url }}">{% endif %}
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ page.og_title or page.title or SITE_TITLE }}">
+    <meta property="og:description" content="{{ page.og_description or page.description or SITE_DESCRIPTION }}">
+    {% if page.og_image %}<meta property="og:image" content="{{ page.og_image }}">{% endif %}
+    
+    <title>{% block title %}{{ page.title or SITE_TITLE }}{% endblock %}</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@{{ theme.css_version }}/dist/css/bootstrap.min.css" 
+          rel="stylesheet" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Public Theme Styles -->
+    <style>
+        :root {
+            --primary: {{ theme.primary_color }};
+            --secondary: {{ theme.secondary_color }};
+            --success: {{ theme.success_color }};
+            --info: {{ theme.info_color }};
+            --warning: {{ theme.warning_color }};
+            --danger: {{ theme.danger_color }};
+            --background: {{ theme.background_color }};
+            --surface: {{ theme.surface_color }};
+            --text: {{ theme.text_color }};
+            --text-muted: {{ theme.text_muted_color }};
+            --border-radius: {{ theme.border_radius }};
+            --spacing: {{ theme.spacing_unit }};
+            --font-family: {{ theme.font_family_primary }};
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background);
+            color: var(--text);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .card {
+            border-radius: var(--border-radius);
+            box-shadow: {{ theme.shadow_sm }};
+        }
+
+        {% if page.featured %}
+        .featured-banner {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: white;
+            padding: calc(var(--spacing) * 2);
+            text-align: center;
+            margin-bottom: var(--spacing);
+        }
+        {% endif %}
+    </style>
+
+    {% block custom_css %}{% endblock %}
+</head>
+<body>
+    {% if page.featured %}
+    <div class="featured-banner">
+        <h1>{{ page.title }}</h1>
+        {% if page.description %}
+        <p class="lead">{{ page.description }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@{{ theme.css_version }}/dist/js/bootstrap.bundle.min.js" 
+            crossorigin="anonymous"></script>
+
+    {% block custom_js %}{% endblock %}
+
+    {% if page.published %}
+    <!-- Page view tracking -->
+    <script>
+        if (typeof fetch !== 'undefined') {
+            fetch('/api/track-view', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    page_name: '{{ page.name }}',
+                    route: '{{ page.route }}'
+                })
+            }).catch(() => {}); // Silent fail
+        }
+    </script>
+    {% endif %}
+</body>
+</html>

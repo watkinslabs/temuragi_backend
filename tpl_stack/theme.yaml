@@ -1,0 +1,60 @@
+# Theme 'light-2025'
+# UUID: 56fee238-7a70-4411-9f05-4cdb08fbcf8f
+# Exported from template CLI
+
+name: light-2025
+display_name: Light 2025
+description: Clean, professional theme using Bootstrap 5 with default styling
+theme_version: 1.0.0
+css_framework: bootstrap
+css_version: 5.3.0
+mode: light
+primary_color: '#0d6efd'
+secondary_color: '#6c757d'
+success_color: '#198754'
+warning_color: '#ffc107'
+danger_color: '#dc3545'
+info_color: '#0dcaf0'
+background_color: '#ffffff'
+surface_color: '#f8f9fa'
+text_color: '#212529'
+text_muted_color: '#6c757d'
+font_family_primary: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+font_family_mono: '"SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace'
+font_size_base: 1rem
+font_weight_normal: 400
+font_weight_bold: 600
+line_height_base: '1.5'
+container_max_width: 1320px
+grid_columns: 12
+border_radius: 0.375rem
+spacing_unit: 1rem
+breakpoint_xs: 0px
+breakpoint_sm: 576px
+breakpoint_md: 768px
+breakpoint_lg: 992px
+breakpoint_xl: 1200px
+breakpoint_xxl: 1400px
+shadow_sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)
+shadow_md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15)
+shadow_lg: 0 1rem 3rem rgba(0, 0, 0, 0.175)
+border_width: 1px
+border_color: '#dee2e6'
+focus_ring_color: rgba(13, 110, 253, 0.25)
+focus_ring_width: 0.25rem
+transition_duration: 150ms
+animation_easing: ease-in-out
+enable_animations: true
+enable_transitions: true
+navbar_height: 56px
+sidebar_width: 280px
+footer_height: 60px
+is_default: true
+is_system_theme: true
+supports_dark_mode: false
+supports_high_contrast: false
+rtl_support: false
+uuid: 56fee238-7a70-4411-9f05-4cdb08fbcf8f
+is_active: true
+created_at: '2025-06-06T11:22:16.681918-04:00'
+updated_at: '2025-06-06T11:22:16.681954-04:00'

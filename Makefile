@@ -42,3 +42,28 @@ restart_uwsgi:
 
 firewall:
 	@python -m app.admin.firewall.firewall_cli
+
+preview-order:
+	@python -m app.cli database  preview-order
+
+list-tables:
+	@python -m app.cli database  list-tables
+
+create-db:
+	@python -m app.cli database  create temuragi
+
+drop-db:
+	@python -m app.cli database  drop temuragi
+
+create-tables:
+	
+	@python -m app.cli database  create-tables
+
+drop-tables:
+	@python -m app.cli database  drop-tables
+
+create-data:
+	@python -m app.cli database  create-initial-data
+
+
+rebuild-db: drop-tables create-tables create-data

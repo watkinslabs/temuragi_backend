@@ -1,7 +1,7 @@
 # routes/menu_routes.py
 from flask import session, request
 from .menu_builder import MenuBuilder
-from .model import Menu
+from app.models import  Menu
 
 # Context processor for Flask application
 def register_menu_context_processor(app):

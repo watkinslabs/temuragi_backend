@@ -29,3 +29,6 @@ class BaseModel(Base):
     )
 
 
+    def soft_delete(self):
+        """Mark record as inactive instead of deleting"""
+        self.is_active = False

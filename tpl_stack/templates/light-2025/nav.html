@@ -1,0 +1,72 @@
+<nav class="app-navigation">
+    <div class="nav-container">
+        <!-- Primary Navigation -->
+        {% if menu_items %}
+        <ul class="nav-menu">
+            {% for item in menu_items %}
+            <li class="nav-item">
+                <a href="{{ item.url }}" 
+                   class="nav-link{% if item.active %} active{% endif %}{% if item.disabled %} disabled{% endif %}"
+                   {% if item.target %}target="{{ item.target }}"{% endif %}
+                   {% if item.disabled %}aria-disabled="true"{% endif %}>
+                    {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %}
+                    {{ item.title }}
+                    {% if item.badge %}
+                    <span class="badge bg-{{ item.badge_type or 'primary' }}">{{ item.badge }}</span>
+                    {% endif %}
+                </a>
+                
+                <!-- Dropdown Menu -->
+                {% if item.children %}
+                <ul class="nav-submenu">
+                    {% for child in item.children %}
+                    <li class="nav-subitem">
+                        <a href="{{ child.url }}" 
+                           class="nav-sublink{% if child.active %} active{% endif %}"
+                           {% if child.target %}target="{{ child.target }}"{% endif %}>
+                            {% if child.icon %}<i class="{{ child.icon }}"></i>{% endif %}
+                            {{ child.title }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <!-- Breadcrumb Navigation -->
+        {% if breadcrumbs %}
+        <nav class="breadcrumb-nav" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                {% for crumb in breadcrumbs %}
+                <li class="breadcrumb-item{% if loop.last %} active{% endif %}"
+                    {% if loop.last %}aria-current="page"{% endif %}>
+                    {% if not loop.last %}
+                    <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                    {% else %}
+                    {{ crumb.title }}
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ol>
+        </nav>
+        {% endif %}
+
+        <!-- Page Actions -->
+        {% if page_actions %}
+        <div class="page-actions">
+            {% for action in page_actions %}
+            <a href="{{ action.url }}" 
+               class="btn btn-{{ action.type or 'primary' }} btn-sm"
+               {% if action.target %}target="{{ action.target }}"{% endif %}
+               {% if action.confirm %}onclick="return confirm('{{ action.confirm }}')"{% endif %}>
+                {% if action.icon %}<i class="{{ action.icon }}"></i>{% endif %}
+                {{ action.title }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</nav>
