@@ -1,0 +1,15 @@
+# Example Page Fragment Configuration
+# UUID: EXAMPLE-PAGE-FRAGMENT-UUID-REPLACE-ME
+# Edit values and replace UUIDs before importing
+# Exported from template CLI
+
+page_uuid: EXAMPLE-PAGE-UUID-REPLACE-ME
+fragment_key: main_content
+content_type: text/html
+version_number: 1
+is_active: true
+content_source: <p>Main page content goes here</p>
+content_hash: 96f3f26a6b5b2133f424686da0275a17a37f67927bb309f4dc593cf31ebfec8e
+cache_duration: 3600
+change_description: Initial page content
+uuid: EXAMPLE-PAGE-FRAGMENT-UUID-REPLACE-ME

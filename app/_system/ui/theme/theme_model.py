@@ -232,10 +232,10 @@ class Theme(BaseModel):
                         comment="Whether theme supports right-to-left languages")
 
     # Relationships
-    page_templates = relationship("PageTemplate", back_populates="theme")
+    templates = relationship("Template", back_populates="theme")
 
     # Relationships
-    page_templates = relationship("PageTemplate", back_populates="theme")
+    templates = relationship("Template", back_populates="theme")
 
     # Indexes
     __table_args__ = (

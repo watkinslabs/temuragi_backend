@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = ">=3.1.1"
 jinja2 = "*"
 pyopenssl = "*"
 werkzeug = "*"
@@ -17,6 +16,7 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 tabulate = "*"
 pyaml = "*"
+flask = "*"
 
 [dev-packages]
 

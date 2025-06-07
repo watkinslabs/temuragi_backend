@@ -10,12 +10,12 @@ from app._system._core.base import BaseModel
 class Page(BaseModel):
     """
     Page model for individual pages that use templates and themes.
-    
+
     Columns:
     - title: Page title for display and SEO
     - slug: URL-friendly identifier (unique)
-    - content: Main page content (HTML/Markdown)
-    - page_template_uuid: Foreign key to page_templates table
+    - content: Main page content (HTML/Markdown) - DEPRECATED: use page_fragments instead
+    - template_uuid: Foreign key to templates table
     - meta_description: SEO meta description
     - meta_keywords: SEO meta keywords (comma-separated)
     - og_title: Open Graph title for social sharing
@@ -31,7 +31,7 @@ class Page(BaseModel):
     - requires_auth: Whether page requires user authentication
     - cache_duration: How long to cache page in seconds (0 = no cache)
     """
-    __depends_on__ = ['PageTemplate']  # Depends on PageTemplate
+    __depends_on__ = ['Template']  
     __tablename__ = 'pages'
 
     name = Column(String(200), nullable=False,
@@ -41,11 +41,11 @@ class Page(BaseModel):
     slug = Column(String(100), unique=True, nullable=False,
                  comment="URL-friendly identifier")
     content = Column(Text, nullable=True,
-                    comment="Main page content (HTML/Markdown)")
-    page_template_uuid = Column(UUID(as_uuid=True),
-                               ForeignKey('page_templates.uuid', name='fk_pages_template'),
-                               nullable=False,
-                               comment="Foreign key to page_templates table")
+                    comment="Main page content (HTML/Markdown) - DEPRECATED: use page_fragments")
+    template_uuid = Column(UUID(as_uuid=True),  
+                          ForeignKey('templates.uuid', name='fk_pages_template'),  
+                          nullable=True,
+                          comment="Foreign key to templates table")  
     meta_description = Column(String(255), nullable=True,
                              comment="SEO meta description")
     meta_keywords = Column(String(500), nullable=True,
@@ -75,14 +75,15 @@ class Page(BaseModel):
     cache_duration = Column(Integer, default=300, nullable=False,
                            comment="Cache duration in seconds (0 = no cache)")
 
-    # Relationships
-    page_template = relationship("PageTemplate", back_populates="pages")
+    # Relationships - FIXED: Updated relationship names
+    template = relationship("Template", back_populates="pages")  # FIXED: Changed from page_template
+    page_fragments = relationship("PageFragments", back_populates="page", cascade="all, delete-orphan")  # NEW
 
-    # Indexes
+    # Indexes - FIXED: Updated index name
     __table_args__ = (
         Index('idx_pages_name', 'name'),
         Index('idx_pages_slug', 'slug'),
-        Index('idx_pages_template', 'page_template_uuid'),
+        Index('idx_pages_template', 'template_uuid'),  # FIXED: Updated field name
         Index('idx_pages_published', 'published'),
         Index('idx_pages_featured', 'featured'),
         Index('idx_pages_publish_date', 'publish_date'),
@@ -92,75 +93,9 @@ class Page(BaseModel):
         UniqueConstraint('slug', name='uq_pages_slug'),
     )
 
-    @classmethod
-    def create_initial_data(cls, session):
-        """Create initial page data"""
-        from app.models import PageTemplate
-        
-        # Get required foreign key values
-        ops_template = session.query(PageTemplate).filter_by(name='ops-default').first()
-        public_template = session.query(PageTemplate).filter_by(name='public-default').first()
-        admin_template = session.query(PageTemplate).filter_by(name='admin-default').first()
-
-        if not all([public_template, admin_template]):
-            print("Warning: Required page templates not found for page creation")
-            return
-
-        initial_pages = [
-            {
-                'name': 'ops-default',
-                'title': 'Welcome to the System',
-                'slug': 'home',
-                'content': '<h1>Welcome</h1><p>This is the home page of your application.</p>',
-                'page_template_uuid': public_template.uuid,
-                'meta_description': 'Welcome to our application home page',
-                'meta_keywords': 'home, welcome, application',
-                'published': True,
-                'featured': True,
-                'sort_order': 1,
-                'publish_date': datetime.datetime.now(datetime.timezone.utc),
-                'requires_auth': False,
-                'cache_duration': 3600
-            },
-            {
-                'name': 'public-default',
-                'title': 'Welcome to the System',
-                'slug': 'home',
-                'content': '<h1>Welcome</h1><p>This is the home page of your application.</p>',
-                'page_template_uuid': public_template.uuid,
-                'meta_description': 'Welcome to our application home page',
-                'meta_keywords': 'home, welcome, application',
-                'published': True,
-                'featured': True,
-                'sort_order': 1,
-                'publish_date': datetime.datetime.now(datetime.timezone.utc),
-                'requires_auth': False,
-                'cache_duration': 3600
-            },
-            {
-                'name': 'admin-default',
-                'title': 'Admin Dashboard',
-                'slug': 'admin-dashboard',
-                'content': '<h1>Admin Dashboard</h1><p>Administrative overview and controls.</p>',
-                'page_template_uuid': admin_template.uuid,
-                'meta_description': 'Administrative dashboard and system controls',
-                'meta_keywords': 'admin, dashboard, administration',
-                'published': True,
-                'featured': False,
-                'sort_order': 1,
-                'publish_date': datetime.datetime.now(datetime.timezone.utc),
-                'requires_auth': True,
-                'cache_duration': 0
-            }
-        ]
-
-        for page_data in initial_pages:
-            existing = session.query(cls).filter_by(slug=page_data['slug']).first()
-            if not existing:
-                page = cls(**page_data)
-                session.add(page)
-
+  
     def validate_template_exists(self, session):
         """Ensure referenced template exists"""
-        if not session.query(PageTemplate).filter_by(uuid=self.page_template_uuid).first():
-            raise ValueError("Referenced page template does not exist")                
+        from app.models import Template  # FIXED: Changed from PageTemplate
+        if not session.query(Template).filter_by(uuid=self.template_uuid).first():  # FIXED: field name
+            raise ValueError("Referenced template does not exist")

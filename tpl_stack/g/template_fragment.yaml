@@ -1,0 +1,23 @@
+# Example Template Fragment Configuration
+# UUID: EXAMPLE-TEMPLATE-FRAGMENT-UUID-REPLACE-ME
+# Edit values and replace UUIDs before importing
+# Exported from template CLI
+
+TemplateFragments:
+  meta:
+    tablename: !!python/object/apply:sqlalchemy.sql.elements.quoted_name
+    - template_fragments
+    - null
+    schema: public
+  data:
+    template_uuid: EXAMPLE-TEMPLATE-UUID-REPLACE-ME
+    template_file_path: templates/custom/my_template.html
+    compiled_file_path: compiled_templates/custom/my_template.pyc
+    content_type: text/html
+    version_number: 1
+    is_active: true
+    template_source: See templates/custom/my_template.html
+    template_hash: 4fc6f6872b44eb647dc0433a5b167f2aebece6bab8c442f18698e8a3f20f18e9
+    cache_duration: 3600
+    change_description: Initial template version
+    uuid: EXAMPLE-TEMPLATE-FRAGMENT-UUID-REPLACE-ME

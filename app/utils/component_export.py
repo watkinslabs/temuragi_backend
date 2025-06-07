@@ -44,6 +44,21 @@ class ComponentExporter:
         
         return None
     
+    def _get_model_meta(self, model_object):
+        """Extract metadata from model object"""
+        meta = OrderedDict()
+        
+        # Get table name
+        meta['tablename'] = model_object.__table__.name
+        
+        # Get schema if available
+        if hasattr(model_object.__table__, 'schema') and model_object.__table__.schema:
+            meta['schema'] = model_object.__table__.schema
+        else:
+            meta['schema'] = 'public'  # Default schema
+        
+        return meta
+    
     def _format_yaml_with_comments(self, data, template_mode=False):
         """Format YAML with comments for auto-generated fields in template mode"""
         if not template_mode:
@@ -57,7 +72,10 @@ class ComponentExporter:
         processed_lines = []
         
         for line in lines:
-            if ':' in line:
+            if ':' in line and 'data:' in line:
+                # We're entering the data section, check subsequent lines
+                processed_lines.append(line)
+            elif ':' in line:
                 # Extract field name (handle indentation)
                 stripped = line.lstrip()
                 if stripped and not stripped.startswith('#'):
@@ -80,7 +98,7 @@ class ComponentExporter:
     def export_model_object(self, model_object, output_file_path, foreign_key_mappings=None, 
                            header_title=None, header_description=None, template_mode=False):
         """
-        Export any model object to YAML file
+        Export any model object to YAML file with nested structure
         
         Args:
             model_object: The model instance to export
@@ -98,19 +116,29 @@ class ComponentExporter:
             if foreign_key_mappings is None:
                 foreign_key_mappings = {}
             
-            # Build ordered data from model object
-            data = OrderedDict()
+            # Build nested structure
+            model_name = model_object.__class__.__name__
+            root_data = OrderedDict()
+            
+            # Add model as top level key
+            model_data = OrderedDict()
+            
+            # Add meta section
+            model_data['meta'] = self._get_model_meta(model_object)
+            
+            # Build data section
+            data_section = OrderedDict()
             
             # First pass: add all column data in order
             for column in model_object.__table__.columns:
                 value = getattr(model_object, column.name)
                 converted_value = self._convert_value_to_exportable(value)
                 if converted_value is not None:
-                    data[column.name] = converted_value
+                    data_section[column.name] = converted_value
             
             # Second pass: insert foreign key names after their UUID fields
             if foreign_key_mappings:
-                items = list(data.items())
+                items = list(data_section.items())
                 new_items = []
                 
                 for key, val in items:
@@ -124,17 +152,22 @@ class ComponentExporter:
                             name_key = key.replace('_uuid', f'_{name_field}')
                             new_items.append((name_key, related_name))
                 
-                data = OrderedDict(new_items)
+                data_section = OrderedDict(new_items)
+            
+            # Add data section to model
+            model_data['data'] = data_section
+            
+            # Add model to root
+            root_data[model_name] = model_data
             
             # Configure YAML dumper for OrderedDict
             yaml.add_representer(OrderedDict, lambda dumper, data: dumper.represent_mapping('tag:yaml.org,2002:map', data.items()))
             
             # Format YAML with optional comments
-            yaml_content = self._format_yaml_with_comments(data, template_mode)
+            yaml_content = self._format_yaml_with_comments(root_data, template_mode)
             
             # Generate header
             if header_title is None:
-                model_name = model_object.__class__.__name__
                 object_name = getattr(model_object, 'name', str(model_object.uuid)[:8])
                 header_title = f"{model_name} '{object_name}'"
             

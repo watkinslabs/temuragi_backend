@@ -7,33 +7,33 @@ from sqlalchemy.orm import relationship
 from app._system._core.base import BaseModel
 
 
-class PageTemplateContent(BaseModel):
+class TemplateFragments(BaseModel):
     """
-    Page template content model for storing Jinja2 template file references.
-    
-    Supports multiple content pieces per template (fragments) with versioning per filename.
-    Only one version of each filename can be active at a time, but multiple different
-    filenames can be active simultaneously for a single template.
+    Template fragments model for storing Jinja2 template file references.
+
+    Supports multiple content pieces per template (fragments) with versioning per template_file_path.
+    Only one version of each template_file_path can be active at a time, but multiple different
+    template_file_paths can be active simultaneously for a single template.
 
     Columns:
-    - page_template_uuid: Foreign key to page_templates table
+    - template_uuid: Foreign key to templates table
     - template_file_path: Path to the actual Jinja2 template file
     - compiled_file_path: Path to the compiled template file (.pyc)
     - content_type: MIME type (text/html, text/plain, etc.)
-    - version_number: Version number for this specific filename
+    - version_number: Version number for this specific template_file_path
     - version_label: Optional human-readable version label
-    - is_active: Whether this version of this filename is active
+    - is_active: Whether this version of this template_file_path is active
     - template_hash: SHA256 hash of template content for change detection
     - cache_duration: How long to cache this template (seconds)
     - last_compiled: When the template was last compiled
     """
-    __depends_on__ = ['PageTemplate']  # Depends on PageTemplate
-    __tablename__ = 'page_template_contents'
+    __depends_on__ = ['Template']  # Depends on Template
+    __tablename__ = 'template_fragments'
 
-    page_template_uuid = Column(UUID(as_uuid=True),
-                               ForeignKey('page_templates.uuid', name='fk_page_template_contents_template'),
-                               nullable=False,
-                               comment="Foreign key to page_templates table")
+    template_uuid = Column(UUID(as_uuid=True),
+                          ForeignKey('templates.uuid', name='fk_template_fragments_template'),
+                          nullable=False,
+                          comment="Foreign key to templates table")
     template_file_path = Column(String(500), nullable=False,
                                comment="Path to the actual Jinja2 template file")
     compiled_file_path = Column(String(500), nullable=True,
@@ -41,13 +41,13 @@ class PageTemplateContent(BaseModel):
     content_type = Column(String(50), nullable=False, default='text/html',
                          comment="MIME type (text/html, text/plain, text/css)")
 
-    # Enhanced versioning - version per filename
+    # Enhanced versioning - version per template_file_path
     version_number = Column(Integer, nullable=False,
-                           comment="Auto-incremented version number for this specific filename")
+                           comment="Auto-incremented version number for this specific template_file_path")
     version_label = Column(String(20), nullable=True,
                           comment="Optional human-readable version label (e.g., 'v2.1', 'beta')")
     is_active = Column(Boolean, nullable=False, default=False,
-                      comment="Whether this version of this filename is currently active")
+                      comment="Whether this version of this template_file_path is currently active")
 
     # Store actual template content
     template_source = Column(Text, nullable=False,
@@ -66,22 +66,22 @@ class PageTemplateContent(BaseModel):
                                  comment="UUID of user who created this version")
 
     # Relationships
-    page_template = relationship("PageTemplate", back_populates="template_contents")
+    template = relationship("Template", back_populates="template_fragments")
 
     # Enhanced indexes and constraints
     __table_args__ = (
-        Index('idx_page_template_contents_template', 'page_template_uuid'),
-        Index('idx_page_template_contents_version_number', 'version_number'),
-        Index('idx_page_template_contents_file_path', 'template_file_path'),
-        Index('idx_page_template_contents_hash', 'template_hash'),
+        Index('idx_template_fragments_template', 'template_uuid'),
+        Index('idx_template_fragments_version_number', 'version_number'),
+        Index('idx_template_fragments_file_path', 'template_file_path'),
+        Index('idx_template_fragments_hash', 'template_hash'),
 
-        # New indexes for versioning per filename
-        Index('idx_active_template_content_by_file', 'page_template_uuid', 'template_file_path', 'is_active'),
-        Index('idx_template_file_version_lookup', 'page_template_uuid', 'template_file_path', 'version_number'),
+        # New indexes for versioning per template_file_path
+        Index('idx_active_template_fragment_by_file', 'template_uuid', 'template_file_path', 'is_active'),
+        Index('idx_template_file_version_lookup', 'template_uuid', 'template_file_path', 'version_number'),
 
-        # Ensure unique version numbers per template per filename
-        UniqueConstraint('page_template_uuid', 'template_file_path', 'version_number',
-                        name='uq_page_template_contents_template_file_version'),
+        # Ensure unique version numbers per template per template_file_path
+        UniqueConstraint('template_uuid', 'template_file_path', 'version_number',
+                        name='uq_template_fragments_template_file_version'),
     )
 
     def get_template_file_path(self):
@@ -135,65 +135,65 @@ class PageTemplateContent(BaseModel):
         return False
 
     @classmethod
-    def get_next_version_number(cls, session, page_template_uuid, template_file_path):
-        """Get the next version number for a given template and filename"""
+    def get_next_version_number(cls, session, template_uuid, template_file_path):
+        """Get the next version number for a given template and template_file_path"""
         from sqlalchemy import func
         max_version = session.query(func.max(cls.version_number))\
-                           .filter_by(page_template_uuid=page_template_uuid,
+                           .filter_by(template_uuid=template_uuid,
                                     template_file_path=template_file_path)\
                            .scalar()
         return (max_version or 0) + 1
 
     @classmethod
-    def get_active_version(cls, session, page_template_uuid, template_file_path):
-        """Get the currently active version for a specific template and filename"""
+    def get_active_version(cls, session, template_uuid, template_file_path):
+        """Get the currently active version for a specific template and template_file_path"""
         return session.query(cls)\
-                     .filter_by(page_template_uuid=page_template_uuid,
+                     .filter_by(template_uuid=template_uuid,
                                template_file_path=template_file_path,
                                is_active=True)\
                      .first()
 
     @classmethod
-    def get_all_active_for_template(cls, session, page_template_uuid):
-        """Get all active content pieces for a template (all active filenames)"""
+    def get_all_active_for_template(cls, session, template_uuid):
+        """Get all active content pieces for a template (all active template_file_paths)"""
         return session.query(cls)\
-                     .filter_by(page_template_uuid=page_template_uuid, is_active=True)\
+                     .filter_by(template_uuid=template_uuid, is_active=True)\
                      .all()
 
     @classmethod
-    def set_active_version(cls, session, content_uuid):
-        """Set a specific version as active (deactivates other versions of same filename)"""
-        content = session.query(cls).filter_by(uuid=content_uuid).first()
-        if not content:
-            raise ValueError(f"Content with UUID {content_uuid} not found")
+    def set_active_version(cls, session, fragment_uuid):
+        """Set a specific version as active (deactivates other versions of same template_file_path)"""
+        fragment = session.query(cls).filter_by(uuid=fragment_uuid).first()
+        if not fragment:
+            raise ValueError(f"Fragment with UUID {fragment_uuid} not found")
 
-        # Deactivate all other versions for this template and filename combination
+        # Deactivate all other versions for this template and template_file_path combination
         session.query(cls)\
-               .filter_by(page_template_uuid=content.page_template_uuid,
-                         template_file_path=content.template_file_path)\
+               .filter_by(template_uuid=fragment.template_uuid,
+                         template_file_path=fragment.template_file_path)\
                .update({'is_active': False})
 
         # Activate this version
-        content.is_active = True
+        fragment.is_active = True
         session.commit()
 
-        return content
+        return fragment
 
     @classmethod
-    def set_active_version_by_file_and_version(cls, session, page_template_uuid, 
+    def set_active_version_by_file_and_version(cls, session, template_uuid,
                                               template_file_path, version_number):
-        """Set active version by template, filename, and version number"""
-        content = session.query(cls)\
-                        .filter_by(page_template_uuid=page_template_uuid,
-                                  template_file_path=template_file_path,
-                                  version_number=version_number)\
-                        .first()
-        
-        if not content:
-            raise ValueError(f"Content not found for template {page_template_uuid}, "
+        """Set active version by template, template_file_path, and version number"""
+        fragment = session.query(cls)\
+                         .filter_by(template_uuid=template_uuid,
+                                   template_file_path=template_file_path,
+                                   version_number=version_number)\
+                         .first()
+
+        if not fragment:
+            raise ValueError(f"Fragment not found for template {template_uuid}, "
                            f"file {template_file_path}, version {version_number}")
-        
-        return cls.set_active_version(session, content.uuid)
+
+        return cls.set_active_version(session, fragment.uuid)
 
     def activate(self, session):
         """Activate this version (convenience method)"""
@@ -217,29 +217,30 @@ class PageTemplateContent(BaseModel):
         return os.path.basename(self.template_file_path)
 
     @classmethod
-    def get_file_version_history(cls, session, page_template_uuid, template_file_path):
-        """Get all versions for a specific template and filename, ordered by version"""
+    def get_file_version_history(cls, session, template_uuid, template_file_path):  
+        """Get all versions for a specific template and template_file_path, ordered by version"""
         return session.query(cls)\
-                     .filter_by(page_template_uuid=page_template_uuid,
-                               template_file_path=template_file_path)\
-                     .order_by(cls.version_number.desc())\
-                     .all()
+                    .filter_by(template_uuid=template_uuid,  
+                            template_file_path=template_file_path)\
+                    .order_by(cls.version_number.desc())\
+                    .all()
 
     @classmethod
-    def get_template_structure(cls, session, page_template_uuid):
+    def get_template_structure(cls, session, template_uuid):  
         """Get a summary of all files and their active versions for a template"""
         from sqlalchemy import func
-        
-        # Get all unique filenames with their active version info
+
+        # Get all unique template_file_paths with their active version info
         active_files = session.query(
             cls.template_file_path,
             cls.version_number,
             cls.version_label,
             cls.content_type,
-            cls.created_date
+            cls.created_at  
         ).filter_by(
-            page_template_uuid=page_template_uuid,
+            template_uuid=template_uuid,  
             is_active=True
         ).all()
-        
+
         return active_files
+         

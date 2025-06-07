@@ -1,0 +1,14 @@
+# Example Template Configuration
+# UUID: EXAMPLE-TEMPLATE-UUID-REPLACE-ME
+# Edit values and replace UUIDs before importing
+# Exported from template CLI
+
+name: my-template
+display_name: My Template
+description: Custom template for my application
+template_file: templates/custom/my_template.html
+theme_uuid: EXAMPLE-THEME-UUID-REPLACE-ME
+menu_type_uuid: EXAMPLE-MENU-UUID-REPLACE-ME
+layout_type: sidebar-left
+sidebar_enabled: true
+uuid: EXAMPLE-TEMPLATE-UUID-REPLACE-ME
