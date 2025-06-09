@@ -17,93 +17,142 @@ class CLILoader:
     def __init__(self, base_path=None):
         """Initialize CLI loader with base search path"""
         if base_path is None:
-            # Use the directory containing this file as base
             self.base_path = Path(__file__).parent
         else:
             self.base_path = Path(base_path)
         
         self.discovered_clis = {}
+        self.failed_modules = {}
         self.root_package = self._determine_root_package()
     
     def _determine_root_package(self):
         """Determine the root package name from the current module"""
-        # Get the package this module is in (e.g., 'app')
         return __package__.split('.')[0] if __package__ else 'app'
     
-    def discover_cli_modules(self):
+    def discover_cli_modules(self, verbose=False):
         """Recursively discover all *_cli.py modules"""
-        print(f"🔍 Discovering CLI modules in {self.base_path}...")
+        if verbose:
+            print(f"🔍 Discovering CLI modules in {self.base_path}...")
         
         for dirpath, dirnames, filenames in os.walk(self.base_path):
-            # Skip certain directories
             dirnames[:] = [d for d in dirnames if not d.startswith('.') 
                           and d not in ['__pycache__', 'static', 'tpl']]
             
-            # Look for CLI files
-            
-            cli_files = [f for f in filenames if f.endswith('_cli.py') ]
+            cli_files = [f for f in filenames if f.endswith('_cli.py')]
             
             for cli_file in cli_files:
-                if "base_cli.py" == cli_file: 
+                if cli_file == "base_cli.py": 
                     continue
-                self._register_cli_module(dirpath, cli_file)
+                self._register_cli_module(dirpath, cli_file, verbose)
         
-        print(f"✓ Found {len(self.discovered_clis)} CLI modules")
+        if verbose and self.failed_modules:
+            print(f"\n⚠️  Failed to load {len(self.failed_modules)} modules:")
+            for name, error in self.failed_modules.items():
+                print(f"  {name}: {error}")
+        
         return self.discovered_clis
     
-    def _register_cli_module(self, dirpath, cli_file):
+    def _register_cli_module(self, dirpath, cli_file, verbose=False):
         """Register a discovered CLI module"""
         try:
-            # Convert file path to module import path
             rel_path = os.path.relpath(dirpath, self.base_path.parent)
             path_parts = rel_path.split(os.sep)
             
-            # Build import path: app.admin.something.module_cli
-            module_name = cli_file[:-3]  # Remove .py extension
+            module_name = cli_file[:-3]
             import_path = '.'.join(filter(None, path_parts + [module_name]))
-            
-            # Extract CLI name from filename (remove _cli suffix)
             cli_name = module_name[:-4] if module_name.endswith('_cli') else module_name
             
-            # Store the CLI registration
             self.discovered_clis[cli_name] = {
                 'import_path': import_path,
                 'file_path': os.path.join(dirpath, cli_file),
                 'module_name': module_name
             }
             
-            print(f"  📝 {cli_name} -> {import_path}")
+            if verbose:
+                print(f"  📝 {cli_name} -> {import_path}")
             
         except Exception as e:
-            print(f"  ⚠️  Failed to register {cli_file}: {e}")
+            self.failed_modules[cli_file] = str(e)
+    
+    def _get_cli_description(self, cli_name):
+        """Dynamically get CLI description by introspecting the module"""
+        if cli_name not in self.discovered_clis:
+            return "Module not found"
+        
+        cli_info = self.discovered_clis[cli_name]
+        
+        try:
+            module = importlib.import_module(cli_info['import_path'])
+            
+            # Try multiple sources for description
+            description = None
+            
+            # 1. Look for CLI_DESCRIPTION constant
+            if hasattr(module, 'CLI_DESCRIPTION'):
+                description = module.CLI_DESCRIPTION
+            
+            # 2. Look for get_description() function
+            elif hasattr(module, 'get_description'):
+                try:
+                    description = module.get_description()
+                except:
+                    pass
+            
+            # 3. Check main function docstring
+            elif hasattr(module, 'main') and module.main.__doc__:
+                description = module.main.__doc__.strip().split('\n')[0]
+            
+            # 4. Check CLI class docstring
+            elif hasattr(module, 'CLI') and module.CLI.__doc__:
+                description = module.CLI.__doc__.strip().split('\n')[0]
+            
+            # 5. Fall back to module docstring
+            elif module.__doc__:
+                description = module.__doc__.strip().split('\n')[0]
+            
+            # 6. Try to get argparse description
+            else:
+                # Look for parser creation to extract description
+                for name, obj in inspect.getmembers(module):
+                    if inspect.isfunction(obj) and 'parser' in name.lower():
+                        try:
+                            parser = obj()
+                            if hasattr(parser, 'description') and parser.description:
+                                description = parser.description
+                                break
+                        except:
+                            continue
+            
+            return description or "No description available"
+            
+        except Exception as e:
+            return f"Failed to load: {e}"
     
     def load_cli_module(self, cli_name):
         """Load and return a specific CLI module"""
         if cli_name not in self.discovered_clis:
+            available = ', '.join(sorted(self.discovered_clis.keys()))
             print(f"❌ CLI module '{cli_name}' not found")
-            print(f"Available modules: {', '.join(self.discovered_clis.keys())}")
+            print(f"Available: {available}")
             return None
         
         cli_info = self.discovered_clis[cli_name]
         
         try:
-            # Import the module
             module = importlib.import_module(cli_info['import_path'])
             
-            # Look for main function or CLI class
             if hasattr(module, 'main'):
                 return module.main
             elif hasattr(module, 'CLI'):
                 return module.CLI
             else:
-                # Look for any callable that might be the CLI entry point
                 for name, obj in inspect.getmembers(module):
                     if (inspect.isfunction(obj) and 
                         name in ['cli', 'run', 'execute'] and 
                         not name.startswith('_')):
                         return obj
                 
-                print(f"❌ No main(), CLI class, or entry point found in {cli_name}")
+                print(f"❌ No entry point found in {cli_name}")
                 return None
                 
         except ImportError as e:
@@ -111,53 +160,39 @@ class CLILoader:
             return None
     
     def list_available_clis(self):
-        """List all available CLI modules"""
+        """List all available CLI modules with dynamic descriptions"""
         if not self.discovered_clis:
             print("No CLI modules found")
             return
         
-        print("\n📋 Available CLI Modules:")
-        print("=" * 50)
+        print("📋 Available CLI Modules:")
+        print("=" * 60)
         
-        for cli_name, cli_info in sorted(self.discovered_clis.items()):
-            # Try to get description from module docstring
-            try:
-                module = importlib.import_module(cli_info['import_path'])
-                description = (module.__doc__ or "").strip().split('\n')[0]
-                if not description:
-                    description = "No description available"
-            except:
-                description = "Import failed"
-            
+        for cli_name in sorted(self.discovered_clis.keys()):
+            description = self._get_cli_description(cli_name)
             print(f"  {cli_name:15} - {description}")
         
-        print("\n💡 Usage: python -m app.cli <module_name> [args...]")
+        print(f"\n💡 Usage: tmcli <module_name> [args...]")
     
     def run_cli(self, cli_name, args=None):
         """Run a specific CLI module"""
         if args is None:
             args = []
         
-        # Load the CLI module
         cli_func = self.load_cli_module(cli_name)
         if not cli_func:
             return 1
         
         try:
-            # Temporarily modify sys.argv for the CLI module
             original_argv = sys.argv[:]
             sys.argv = [f"{cli_name}_cli.py"] + args
             
-            # Run the CLI
             result = cli_func()
-            
-            # Restore original argv
             sys.argv = original_argv
             
             return result if result is not None else 0
             
         except SystemExit as e:
-            # Handle sys.exit() calls from the CLI
             return e.code if e.code is not None else 0
         except Exception as e:
             print(f"❌ Error running {cli_name}: {e}")
@@ -177,20 +212,24 @@ Examples:
         """
     )
     
-    # Discover CLI modules first
-    loader.discover_cli_modules()
+    # Discover CLI modules silently
+    loader.discover_cli_modules(verbose=False)
     
     subparsers = parser.add_subparsers(dest='cli_module', help='Available CLI modules')
     
-    # Add 'list' command to show available modules
-    list_parser = subparsers.add_parser('list', help='List all available CLI modules')
+    # Add 'list' command
+    subparsers.add_parser('list', help='List all available CLI modules')
+    
+    # Add 'debug' command for verbose discovery
+    subparsers.add_parser('debug', help='Show detailed module discovery info')
     
     # Add discovered CLI modules as subcommands
     for cli_name in loader.discovered_clis.keys():
+        description = loader._get_cli_description(cli_name)
         cli_parser = subparsers.add_parser(
             cli_name, 
-            help=f'Run {cli_name} CLI module',
-            add_help=False  # Let the actual CLI handle help
+            help=description,
+            add_help=False
         )
         cli_parser.add_argument('cli_args', nargs='*', help='Arguments for the CLI module')
     
@@ -199,32 +238,28 @@ Examples:
 
 def main():
     """Main entry point for master CLI"""
-    # Initialize loader
     loader = CLILoader()
-    
-    # Create dynamic parser
     parser = create_dynamic_parser(loader)
     
-    # Handle case where no arguments provided
     if len(sys.argv) == 1:
-        parser.print_help()
-        print("\n" + "="*50)
         loader.list_available_clis()
         return 0
     
-    # Parse arguments
     args = parser.parse_args()
     
     if not args.cli_module:
         parser.print_help()
         return 1
     
-    # Handle special 'list' command
     if args.cli_module == 'list':
         loader.list_available_clis()
         return 0
     
-    # Run the specified CLI module
+    if args.cli_module == 'debug':
+        print("🔧 Debug mode - verbose discovery:")
+        loader.discover_cli_modules(verbose=True)
+        return 0
+    
     cli_args = getattr(args, 'cli_args', [])
     return loader.run_cli(args.cli_module, cli_args)
 

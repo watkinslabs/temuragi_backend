@@ -23,6 +23,8 @@ except ImportError:
     print("Error: Could not import app.config")
     sys.exit(1)
 
+CLI_DESCRIPTION = "Database Init"
+
 
 class DatabaseCLI(BaseCLI):
     def __init__(self, verbose=False, show_icons=True, table_format=None, db_config=None):

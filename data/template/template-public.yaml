@@ -1,0 +1,25 @@
+# Public Template  
+# Clean public-facing template with top navigation
+
+Template:
+  meta:
+    tablename: templates
+    schema: public
+  data:
+    name: public_default
+    display_name: Public Site
+    description: Clean public-facing template with top navigation, optimized for content presentation
+    theme_uuid: 00000000-0000-0000-0000-000000000001
+    menu_type_uuid: null
+    layout_type: public_content
+    container_class: container
+    sidebar_enabled: false
+    header_type: public_header
+    footer_type: public_footer
+    breadcrumbs_enabled: false
+    module_uuid: null
+    is_system: true
+    is_admin_template: false
+    is_default_template: true
+    uuid: 00000000-0000-0000-0000-000000000003
+    is_active: true

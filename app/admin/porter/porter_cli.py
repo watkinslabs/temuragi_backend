@@ -14,6 +14,9 @@ from app.register_db import get_model
 from app.base_cli import BaseCLI
 from .exporter import ComponentExporter
 from .importer import ComponentImporter
+from .resolver import ImportDependencyResolver
+
+CLI_DESCRIPTION = "Manages import and export of data"
 
 
 class PorterCLI(BaseCLI):
@@ -34,6 +37,9 @@ class PorterCLI(BaseCLI):
             # Initialize exporter and importer
             self.exporter = ComponentExporter(self.session, self)
             self.importer = ComponentImporter(self.session, self, self.get_model)
+            
+            # Initialize dependency resolver
+            self.dependency_resolver = ImportDependencyResolver(self.session, self, self.get_model)
 
             self.log_info("Porter CLI initialized successfully")
 
@@ -44,7 +50,7 @@ class PorterCLI(BaseCLI):
     def explore_model(self, model_name):
         """Interactive explorer for a specific model"""
         self.log_info(f"Starting interactive exploration of {model_name}")
-        
+
         try:
             # Get model class
             model_class = self.get_model(model_name)
@@ -54,10 +60,16 @@ class PorterCLI(BaseCLI):
 
             self.output_success(f"Exploring model: {model_name}")
             self.output_info(f"Table: {model_class.__tablename__}")
-            
+
             # Show model info
             columns = [col.name for col in model_class.__table__.columns]
             self.output_info(f"Columns: {', '.join(columns)}")
+            
+            # Show dependencies if available
+            depends_on = getattr(model_class, '__depends_on__', [])
+            if depends_on:
+                self.output_info(f"Depends on: {', '.join(depends_on)}")
+            
             print()
 
             current_objects = None
@@ -69,7 +81,7 @@ class PorterCLI(BaseCLI):
                     if current_objects is None:
                         # Load first page
                         current_objects = self._load_objects_page(model_class, current_page, page_size)
-                    
+
                     # Display current objects
                     if current_objects:
                         self._display_objects_table(current_objects, model_class, current_page, page_size)
@@ -152,7 +164,7 @@ class PorterCLI(BaseCLI):
     def _search_objects(self, model_class, search_term, limit):
         """Search for objects matching term"""
         query = self.session.query(model_class)
-        
+
         if hasattr(model_class, 'name'):
             query = query.filter(model_class.name.ilike(f'%{search_term}%'))
         elif hasattr(model_class, 'title'):
@@ -163,7 +175,7 @@ class PorterCLI(BaseCLI):
                 if 'varchar' in str(column.type).lower() or 'text' in str(column.type).lower():
                     query = query.filter(getattr(model_class, column.name).ilike(f'%{search_term}%'))
                     break
-        
+
         return query.limit(limit).all()
 
     def _display_objects_table(self, objects, model_class, page, page_size):
@@ -181,7 +193,7 @@ class PorterCLI(BaseCLI):
             rows.append([str(i), uuid_short, identifier, status])
 
         self.output_table(rows, headers=headers)
-        
+
         start_num = page * page_size + 1
         end_num = start_num + len(objects) - 1
         self.output_info(f"Showing items {start_num}-{end_num} (page {page + 1})")
@@ -210,19 +222,19 @@ class PorterCLI(BaseCLI):
         """Interactive export process"""
         identifier = self._get_object_identifier(obj)
         default_filename = f"{model_name.lower()}_{identifier.replace(' ', '_')}.yaml"
-        
+
         print()
         self.output_info(f"Exporting {model_name}: {identifier}")
         self.output_info(f"UUID: {obj.uuid}")
-        
+
         filename = input(f"Output filename [{default_filename}]: ").strip()
         if not filename:
             filename = default_filename
-        
+
         # Ensure .yaml extension
         if not filename.endswith('.yaml') and not filename.endswith('.yml'):
             filename += '.yaml'
-        
+
         try:
             result = self.exporter.export_model_object(
                 model_object=obj,
@@ -231,7 +243,7 @@ class PorterCLI(BaseCLI):
             )
             if result == 0:
                 self.output_success(f"Exported to: {filename}")
-            
+
         except Exception as e:
             self.output_error(f"Export failed: {e}")
 
@@ -239,18 +251,18 @@ class PorterCLI(BaseCLI):
         """Interactive template export process"""
         identifier = self._get_object_identifier(obj)
         default_filename = f"{model_name.lower()}_template.yaml"
-        
+
         print()
         self.output_info(f"Creating template from {model_name}: {identifier}")
-        
+
         filename = input(f"Template filename [{default_filename}]: ").strip()
         if not filename:
             filename = default_filename
-        
+
         # Ensure .yaml extension
         if not filename.endswith('.yaml') and not filename.endswith('.yml'):
             filename += '.yaml'
-        
+
         try:
             result = self.exporter.export_model_object(
                 model_object=obj,
@@ -261,7 +273,7 @@ class PorterCLI(BaseCLI):
             )
             if result == 0:
                 self.output_success(f"Template created: {filename}")
-            
+
         except Exception as e:
             self.output_error(f"Template creation failed: {e}")
 
@@ -328,6 +340,58 @@ class PorterCLI(BaseCLI):
             self.output_error(f"Import failed: {e}")
             return 1
 
+    def import_directory(self, directory_path, dry_run=False, update_existing=False):
+        """Import all YAML files from directory in dependency order"""
+        self.log_info(f"Importing directory {directory_path} (dry_run={dry_run}, update={update_existing})")
+        
+        try:
+            return self.dependency_resolver.import_directory_ordered(
+                directory_path=directory_path,
+                dry_run=dry_run,
+                update_existing=update_existing
+            )
+        except Exception as e:
+            self.log_error(f"Error importing directory {directory_path}: {e}")
+            self.output_error(f"Directory import failed: {e}")
+            return 1
+
+    def analyze_dependencies(self, directory_path):
+        """Analyze dependencies in a directory of YAML files"""
+        self.log_info(f"Analyzing dependencies in {directory_path}")
+        
+        try:
+            return self.dependency_resolver.analyze_directory_dependencies(directory_path)
+        except Exception as e:
+            self.log_error(f"Error analyzing dependencies in {directory_path}: {e}")
+            self.output_error(f"Dependency analysis failed: {e}")
+            return 1
+
+    def resolve_import_order(self, directory_path):
+        """Show the resolved import order for directory"""
+        self.log_info(f"Resolving import order for {directory_path}")
+        
+        try:
+            ordered_files = self.dependency_resolver.resolve_import_order(directory_path)
+            
+            if not ordered_files:
+                self.output_error("No files found or dependency resolution failed")
+                return 1
+            
+            self.output_success(f"Import order for {len(ordered_files)} files:")
+            
+            for i, file_path in enumerate(ordered_files, 1):
+                model_name = self.dependency_resolver.get_model_from_file(file_path)
+                rel_path = file_path.relative_to(Path(directory_path))
+                display_name = f"{model_name} ({rel_path})" if model_name else str(rel_path)
+                self.output_info(f"  {i}. {display_name}")
+            
+            return 0
+            
+        except Exception as e:
+            self.log_error(f"Error resolving import order: {e}")
+            self.output_error(f"Order resolution failed: {e}")
+            return 1
+
     def list_models(self):
         """List available models"""
         self.log_info("Listing available models")
@@ -341,7 +405,7 @@ class PorterCLI(BaseCLI):
                 return 0
 
             # Get additional info for each model
-            headers = ['Model Name', 'Table Name', 'Module']
+            headers = ['Model Name', 'Table Name', 'Module', 'Dependencies']
             rows = []
 
             for model_name in sorted(models):
@@ -351,7 +415,9 @@ class PorterCLI(BaseCLI):
                     if model_name == model_class.__name__:
                         table_name = model_class.__tablename__
                         module = model_class.__module__.split('.')[-1]
-                        rows.append([model_name, table_name, module])
+                        depends_on = getattr(model_class, '__depends_on__', [])
+                        deps_str = ', '.join(depends_on) if depends_on else 'None'
+                        rows.append([model_name, table_name, module, deps_str])
 
             self.output_table(rows, headers=headers)
             return 0
@@ -485,7 +551,7 @@ def main():
 
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-    # Explore command (NEW!)
+    # Explore command
     explore_parser = subparsers.add_parser('explore', help='Interactive model explorer')
     explore_parser.add_argument('model', help='Model name to explore')
 
@@ -503,6 +569,20 @@ def main():
     import_parser.add_argument('file', help='YAML file path')
     import_parser.add_argument('--dry-run', action='store_true', help='Validate without importing')
     import_parser.add_argument('--update', action='store_true', help='Update existing records')
+
+    # Import directory command
+    import_dir_parser = subparsers.add_parser('import-dir', help='Import all YAML files from directory')
+    import_dir_parser.add_argument('directory', help='Directory containing YAML files')
+    import_dir_parser.add_argument('--dry-run', action='store_true', help='Validate without importing')
+    import_dir_parser.add_argument('--update', action='store_true', help='Update existing records')
+
+    # Analyze dependencies command
+    analyze_parser = subparsers.add_parser('analyze', help='Analyze dependencies in directory')
+    analyze_parser.add_argument('directory', help='Directory containing YAML files')
+
+    # Resolve order command
+    order_parser = subparsers.add_parser('order', help='Show resolved import order')
+    order_parser.add_argument('directory', help='Directory containing YAML files')
 
     # List command
     list_parser = subparsers.add_parser('list', help='List available models')
@@ -555,6 +635,15 @@ def main():
 
         elif args.command == 'import':
             return cli.import_yaml(args.file, args.dry_run, args.update)
+
+        elif args.command == 'import-dir':
+            return cli.import_directory(args.directory, args.dry_run, args.update)
+
+        elif args.command == 'analyze':
+            return cli.analyze_dependencies(args.directory)
+
+        elif args.command == 'order':
+            return cli.resolve_import_order(args.directory)
 
         elif args.command == 'list':
             return cli.list_models()

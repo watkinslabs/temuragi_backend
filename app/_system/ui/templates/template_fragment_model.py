@@ -1,13 +1,13 @@
 import uuid
 import datetime
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Text, Index, UniqueConstraint
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Text, Index, UniqueConstraint, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app._system._core.base import BaseModel
 
 
-class TemplateFragments(BaseModel):
+class TemplateFragment(BaseModel):
     """
     Template fragments model for storing Jinja2 template file references.
 
@@ -17,13 +17,29 @@ class TemplateFragments(BaseModel):
 
     Columns:
     - template_uuid: Foreign key to templates table
+    - fragment_type: Semantic type (base, header, footer, nav, loop, container, etc.)
+    - fragment_name: Human readable name for admin interface
+    - fragment_key: Unique programmatic identifier for code access
     - template_file_path: Path to the actual Jinja2 template file
     - compiled_file_path: Path to the compiled template file (.pyc)
     - content_type: MIME type (text/html, text/plain, etc.)
     - version_number: Version number for this specific template_file_path
     - version_label: Optional human-readable version label
     - is_active: Whether this version of this template_file_path is active
+    - template_source: Complete template source code content
     - template_hash: SHA256 hash of template content for change detection
+    - variables_schema: JSON schema of expected template variables
+    - sample_data: Example data for testing/preview
+    - required_context: Context variables this fragment needs
+    - dependencies: Other fragments this depends on
+    - css_dependencies: CSS files needed for this fragment
+    - js_dependencies: JavaScript files needed for this fragment
+    - description: What this fragment does
+    - usage_notes: Implementation notes for developers
+    - preview_template: How to render for preview/admin
+    - sort_order: Display order within fragment type
+    - is_partial: Can be included in other fragments
+    - cache_strategy: Fragment-specific caching rules
     - cache_duration: How long to cache this template (seconds)
     - last_compiled: When the template was last compiled
     """
@@ -34,6 +50,16 @@ class TemplateFragments(BaseModel):
                           ForeignKey('templates.uuid', name='fk_template_fragments_template'),
                           nullable=False,
                           comment="Foreign key to templates table")
+    
+    # Fragment identification
+    fragment_type = Column(String(50), nullable=False,
+                          comment="Semantic fragment type (base, header, footer, nav, loop, container, etc.)")
+    fragment_name = Column(String(100), nullable=False,
+                          comment="Human readable name for admin interface")
+    fragment_key = Column(String(100), nullable=False,
+                         comment="Unique programmatic identifier for code access")
+    
+    # Template file information
     template_file_path = Column(String(500), nullable=False,
                                comment="Path to the actual Jinja2 template file")
     compiled_file_path = Column(String(500), nullable=True,
@@ -54,6 +80,36 @@ class TemplateFragments(BaseModel):
                             comment="Complete template source code content")
     template_hash = Column(String(64), nullable=True,
                           comment="SHA256 hash of template content for change detection")
+    
+    # Template metadata and dependencies
+    variables_schema = Column(JSON, nullable=True,
+                             comment="JSON schema of expected template variables")
+    sample_data = Column(JSON, nullable=True,
+                        comment="Example data for testing/preview")
+    required_context = Column(JSON, nullable=True,
+                             comment="Context variables this fragment needs")
+    dependencies = Column(JSON, nullable=True,
+                         comment="Other fragments this depends on (array of fragment_keys)")
+    css_dependencies = Column(JSON, nullable=True,
+                             comment="CSS files needed for this fragment (array of paths)")
+    js_dependencies = Column(JSON, nullable=True,
+                            comment="JavaScript files needed for this fragment (array of paths)")
+    
+    # Documentation and usage
+    description = Column(Text, nullable=True,
+                        comment="What this fragment does and its purpose")
+    usage_notes = Column(Text, nullable=True,
+                        comment="Implementation notes and usage instructions for developers")
+    preview_template = Column(Text, nullable=True,
+                             comment="Template code for rendering previews in admin interface")
+    
+    # Ordering and behavior
+    sort_order = Column(Integer, nullable=False, default=0,
+                       comment="Display order within fragment type")
+    is_partial = Column(Boolean, nullable=False, default=True,
+                       comment="Can be included in other fragments")
+    cache_strategy = Column(String(50), nullable=False, default='standard',
+                           comment="Fragment-specific caching rules (standard, aggressive, none)")
     cache_duration = Column(Integer, nullable=False, default=3600,
                            comment="How long to cache this template (seconds)")
     last_compiled = Column(DateTime, nullable=True,
@@ -71,17 +127,24 @@ class TemplateFragments(BaseModel):
     # Enhanced indexes and constraints
     __table_args__ = (
         Index('idx_template_fragments_template', 'template_uuid'),
+        Index('idx_template_fragments_type', 'fragment_type'),
+        Index('idx_template_fragments_key', 'fragment_key'),
         Index('idx_template_fragments_version_number', 'version_number'),
         Index('idx_template_fragments_file_path', 'template_file_path'),
         Index('idx_template_fragments_hash', 'template_hash'),
+        Index('idx_template_fragments_sort_order', 'sort_order'),
 
         # New indexes for versioning per template_file_path
         Index('idx_active_template_fragment_by_file', 'template_uuid', 'template_file_path', 'is_active'),
         Index('idx_template_file_version_lookup', 'template_uuid', 'template_file_path', 'version_number'),
+        Index('idx_template_fragment_type_sort', 'template_uuid', 'fragment_type', 'sort_order'),
 
         # Ensure unique version numbers per template per template_file_path
         UniqueConstraint('template_uuid', 'template_file_path', 'version_number',
                         name='uq_template_fragments_template_file_version'),
+        # Ensure unique fragment keys per template
+        UniqueConstraint('template_uuid', 'fragment_key', 'is_active',
+                        name='uq_template_fragments_key_active'),
     )
 
     def get_template_file_path(self):
@@ -154,10 +217,30 @@ class TemplateFragments(BaseModel):
                      .first()
 
     @classmethod
+    def get_active_by_key(cls, session, template_uuid, fragment_key):
+        """Get active fragment by template and fragment_key"""
+        return session.query(cls)\
+                     .filter_by(template_uuid=template_uuid,
+                               fragment_key=fragment_key,
+                               is_active=True)\
+                     .first()
+
+    @classmethod
+    def get_fragments_by_type(cls, session, template_uuid, fragment_type):
+        """Get all active fragments of a specific type, ordered by sort_order"""
+        return session.query(cls)\
+                     .filter_by(template_uuid=template_uuid,
+                               fragment_type=fragment_type,
+                               is_active=True)\
+                     .order_by(cls.sort_order, cls.fragment_name)\
+                     .all()
+
+    @classmethod
     def get_all_active_for_template(cls, session, template_uuid):
         """Get all active content pieces for a template (all active template_file_paths)"""
         return session.query(cls)\
                      .filter_by(template_uuid=template_uuid, is_active=True)\
+                     .order_by(cls.fragment_type, cls.sort_order)\
                      .all()
 
     @classmethod
@@ -216,31 +299,54 @@ class TemplateFragments(BaseModel):
         import os
         return os.path.basename(self.template_file_path)
 
+    def get_dependencies_list(self):
+        """Get dependencies as a list, handling None values"""
+        return self.dependencies if self.dependencies else []
+
+    def get_css_dependencies_list(self):
+        """Get CSS dependencies as a list, handling None values"""
+        return self.css_dependencies if self.css_dependencies else []
+
+    def get_js_dependencies_list(self):
+        """Get JS dependencies as a list, handling None values"""
+        return self.js_dependencies if self.js_dependencies else []
+
+    def get_required_context_dict(self):
+        """Get required context as a dict, handling None values"""
+        return self.required_context if self.required_context else {}
+
+    def get_sample_data_dict(self):
+        """Get sample data as a dict, handling None values"""
+        return self.sample_data if self.sample_data else {}
+
     @classmethod
-    def get_file_version_history(cls, session, template_uuid, template_file_path):  
+    def get_file_version_history(cls, session, template_uuid, template_file_path):
         """Get all versions for a specific template and template_file_path, ordered by version"""
         return session.query(cls)\
-                    .filter_by(template_uuid=template_uuid,  
+                    .filter_by(template_uuid=template_uuid,
                             template_file_path=template_file_path)\
                     .order_by(cls.version_number.desc())\
                     .all()
 
     @classmethod
-    def get_template_structure(cls, session, template_uuid):  
+    def get_template_structure(cls, session, template_uuid):
         """Get a summary of all files and their active versions for a template"""
         from sqlalchemy import func
 
         # Get all unique template_file_paths with their active version info
         active_files = session.query(
             cls.template_file_path,
+            cls.fragment_type,
+            cls.fragment_key,
+            cls.fragment_name,
             cls.version_number,
             cls.version_label,
             cls.content_type,
-            cls.created_at  
+            cls.sort_order,
+            cls.created_at
         ).filter_by(
-            template_uuid=template_uuid,  
+            template_uuid=template_uuid,
             is_active=True
-        ).all()
+        ).order_by(cls.fragment_type, cls.sort_order).all()
 
         return active_files
-         

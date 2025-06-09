@@ -29,6 +29,5 @@ class MenuLink(BaseModel):
     endpoint = Column(String(255), nullable=True)  # Store the endpoint for tracking
 
     tier = relationship("MenuTier", foreign_keys=[tier_uuid], back_populates="links")
-    role_permissions = relationship("RoleMenuPermission", back_populates="link", cascade="all, delete-orphan")
     user_quick_links = relationship("UserQuickLink", back_populates="link", cascade="all, delete-orphan")
 

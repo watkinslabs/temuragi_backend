@@ -14,6 +14,8 @@ sys.path.append('/web/temuragi')
 from app.register_db import register_models_for_cli
 from app.base_cli import BaseCLI
 
+CLI_DESCRIPTION = "Get Route info"
+
 
 class RoutesCLI(BaseCLI):
     def __init__(self, verbose=False, show_icons=True, table_format=None):

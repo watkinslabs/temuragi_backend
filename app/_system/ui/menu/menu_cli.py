@@ -13,6 +13,7 @@ import uuid
 sys.path.append('/web/temuragi')
 from app.base_cli import BaseCLI
 
+CLI_DESCRIPTION = "Menu configuration"
 
 class MenuCLI(BaseCLI):
     def __init__(self, verbose=False, show_icons=True, table_format=None):

@@ -67,3 +67,11 @@ create-data:
 
 
 rebuild-db: drop-tables create-tables create-data
+
+
+templates:
+	@python -m app.cli porter template Theme tpl/theme.yaml
+	@python -m app.cli porter template Template tpl/template.yaml
+	@python -m app.cli porter template TemplateFragment  tpl/template-fragment.yaml
+	@python -m app.cli porter template Page tpl/page.yaml
+	@python -m app.cli porter template PageFragment tpl/page_fragment.yaml

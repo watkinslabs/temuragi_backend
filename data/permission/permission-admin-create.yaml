@@ -1,0 +1,16 @@
+# Permission 'admin:create'
+# UUID: 198151e6-bd90-40dc-954f-b93da45b7b48
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: admin:create
+    service: admin
+    action: create
+    uuid: 198151e6-bd90-40dc-954f-b93da45b7b48
+    is_active: true
+    created_at: '2025-06-08T19:00:09.194816-04:00'
+    updated_at: '2025-06-08T19:00:09.194853-04:00'

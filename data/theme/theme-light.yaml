@@ -1,0 +1,80 @@
+# Modern Light Theme
+# Default system theme with clean, professional styling
+
+Theme:
+  meta:
+    tablename: themes
+    schema: public
+  data:
+    name: modern_light
+    display_name: Modern Light
+    description: Clean, modern light theme with professional styling and Bootstrap 5 framework
+    theme_version: 1.0.0
+    css_framework: Bootstrap
+    css_version: 5.3.0
+    custom_css: |
+      :root {
+        --bs-body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --content-max-width: 1200px;
+      }
+      .navbar-brand { font-weight: 600; }
+      .card { box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    css_variables: |
+      {
+        "primary": "#0d6efd",
+        "secondary": "#6c757d", 
+        "accent": "#20c997",
+        "neutral": "#f8f9fa"
+      }
+    mode: light
+    primary_color: '#0d6efd'
+    secondary_color: '#6c757d'
+    success_color: '#198754'
+    warning_color: '#ffc107'
+    danger_color: '#dc3545'
+    info_color: '#0dcaf0'
+    background_color: '#ffffff'
+    surface_color: '#f8f9fa'
+    text_color: '#212529'
+    text_muted_color: '#6c757d'
+    font_family_primary: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+    font_family_heading: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
+    font_family_mono: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace'
+    font_size_base: 16px
+    font_weight_normal: 400
+    font_weight_bold: 600
+    line_height_base: 1.5
+    container_max_width: 1200px
+    grid_columns: 12
+    border_radius: 0.375rem
+    spacing_unit: 1rem
+    breakpoint_xs: 0
+    breakpoint_sm: 576px
+    breakpoint_md: 768px
+    breakpoint_lg: 992px
+    breakpoint_xl: 1200px
+    breakpoint_xxl: 1400px
+    shadow_sm: '0 1px 2px rgba(0,0,0,0.05)'
+    shadow_md: '0 4px 6px rgba(0,0,0,0.07)'
+    shadow_lg: '0 10px 15px rgba(0,0,0,0.1)'
+    border_width: 1px
+    border_color: '#dee2e6'
+    focus_ring_color: 'rgba(13, 110, 253, 0.25)'
+    focus_ring_width: 0.25rem
+    transition_duration: 0.15s
+    animation_easing: ease-in-out
+    enable_animations: true
+    enable_transitions: true
+    button_border_radius: 0.375rem
+    input_border_radius: 0.375rem
+    card_border_radius: 0.5rem
+    navbar_height: 64px
+    sidebar_width: 280px
+    footer_height: 80px
+    is_default: true
+    is_system_theme: true
+    supports_dark_mode: false
+    supports_high_contrast: true
+    rtl_support: true
+    uuid: 00000000-0000-0000-0000-000000000001
+    is_active: true

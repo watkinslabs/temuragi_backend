@@ -304,5 +304,6 @@
     "flort.maxDepth": 0,
     "flort.archive": "",
     "flort.directoryScanOptional": true,
-    "flort.currentProfile": "Cherry Pick"
+    "flort.currentProfile": "Cherry Pick",
+    "makefile.configureOnOpen": false
 }

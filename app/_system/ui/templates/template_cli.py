@@ -1,119 +1,97 @@
 #!/usr/bin/env python3
 """
-Template CLI - Create and manage themes, templates, and pages
-Creates template system components from YAML configuration files
+Template Render CLI - Manage and render templates
 """
 
 import sys
 import argparse
 import yaml
-import os
+import json
+import uuid
 from pathlib import Path
 
 # Add app path
 sys.path.append('/web/temuragi')
 from app.base_cli import BaseCLI
+from .template_renderer import TemplateRenderer
 
-class TemplateCLI(BaseCLI):
+CLI_DESCRIPTION = "Manage and render templates"
+
+class TemplateRenderCLI(BaseCLI):
     def __init__(self, verbose=False, show_icons=True, table_format=None):
-        """Initialize CLI with database connection and logging"""
-        # Initialize parent with logging and database
+        """Initialize CLI with database connection and renderer"""
         super().__init__(
-            name="template",
-            log_file="logs/template_cli.log",
+            name="template_render",
+            log_file="logs/template_render_cli.log",
             connect_db=True,
             verbose=verbose,
             show_icons=show_icons,
             table_format=table_format
         )
 
-        self.log_info("Starting template CLI initialization")
+        self.log_info("Starting template render CLI initialization")
 
         try:
-            self.menu_model = self.get_model('Menu')
-            self.page_model = self.get_model('Page')
-            self.page_fragments_model = self.get_model('PageFragments')  # NEW
-            self.template_fragments_model = self.get_model('TemplateFragments')
             self.template_model = self.get_model('Template')
-            self.theme_model = self.get_model('Theme')
+            self.template_fragment_model = self.get_model('TemplateFragment')
             
-            if not all([self.theme_model, self.template_model, self.page_model]):
-                self.log_error("Required template models not found in registry")
-                raise Exception("Required template models not found in registry")
-            self.log_info("Template models loaded successfully")
+            if not all([self.template_model, self.template_fragment_model]):
+                self.log_error("Required models not found in registry")
+                raise Exception("Required models not found in registry")
+            
+            # Initialize renderer
+            self.renderer = TemplateRenderer(
+                session=self.session,
+                cache_enabled=True,
+                logger=self.logger
+            )
+            
+            self.log_info("Template renderer initialized successfully")
 
         except Exception as e:
-            self.log_error(f"Failed to initialize template CLI: {e}")
+            self.log_error(f"Failed to initialize template render CLI: {e}")
             raise
 
-    def lookup_uuid_by_name(self, model_class, name):
-        """Generic function to lookup UUID by name"""
-        self.log_debug(f"Looking up UUID for {model_class.__name__} with name: {name}")
-        
-        obj = self.session.query(model_class).filter_by(name=name).first()
-        if not obj:
-            self.log_error(f"{model_class.__name__} with name '{name}' not found")
-            raise Exception(f"{model_class.__name__} with name '{name}' not found")
-        
-        self.log_debug(f"Found {model_class.__name__} '{name}' with UUID: {obj.uuid}")
-        return obj.uuid
-
-    def list_themes(self):
-        """List all themes"""
-        self.log_info("Listing themes")
-
-        try:
-            themes = self.session.query(self.theme_model).order_by(self.theme_model.name).all()
-            
-            if not themes:
-                self.output_warning("No themes found")
-                return 0
-            
-            headers = ["Name", "Display Name", "Framework", "Mode", "UUID"]
-            rows = []
-            
-            for theme in themes:
-                rows.append([
-                    theme.name,
-                    getattr(theme, 'display_name', ''),
-                    getattr(theme, 'css_framework', ''),
-                    getattr(theme, 'mode', ''),
-                    str(theme.uuid)
-                ])
-            
-            self.output_info("Available Themes:")
-            self.output_table(rows, headers=headers)
-            return 0
-
-        except Exception as e:
-            self.log_error(f"Error listing themes: {e}")
-            self.output_error(f"Error listing themes: {e}")
-            return 1
-
-    def list_templates(self):
+    def list_templates(self, module_name=None):
         """List all templates"""
         self.log_info("Listing templates")
 
         try:
-            templates = self.session.query(self.template_model).order_by(self.template_model.name).all()
+            query = self.session.query(self.template_model)
             
+            if module_name:
+                module_model = self.get_model('Module')
+                if module_model:
+                    module = self.session.query(module_model).filter_by(name=module_name).first()
+                    if module:
+                        query = query.filter_by(module_uuid=module.uuid)
+                    else:
+                        self.output_error(f"Module '{module_name}' not found")
+                        return 1
+            
+            templates = query.order_by(self.template_model.name).all()
+
             if not templates:
                 self.output_warning("No templates found")
                 return 0
-            
-            headers = ["Name", "Display Name", "Layout", "Sidebar", "Mode", "UUID"]
+
+            headers = ["Name", "Display Name", "Layout", "Module", "System", "UUID"]
             rows = []
-            
+
             for template in templates:
+                module_name = ""
+                if hasattr(template, 'module') and template.module:
+                    module_name = template.module.name
+
                 rows.append([
                     template.name,
-                    getattr(template, 'display_name', ''),
-                    getattr(template, 'layout_type', ''),
-                    "Yes" if getattr(template, 'sidebar_enabled', False) else "No",
-                    getattr(template, 'mode', ''),
+                    template.display_name or '',
+                    template.layout_type or '',
+                    module_name,
+                    "Yes" if template.is_system else "No",
                     str(template.uuid)
                 ])
-            
+
             self.output_info("Available Templates:")
             self.output_table(rows, headers=headers)
             return 0
@@ -122,43 +100,50 @@ class TemplateCLI(BaseCLI):
             self.log_error(f"Error listing templates: {e}")
             self.output_error(f"Error listing templates: {e}")
             return 1
- 
-    def list_template_fragments(self):
-        """List all template fragments with filename and version info"""
-        self.log_info("Listing template fragments")
+
+    def list_fragments(self, template_name=None):
+        """List template fragments"""
+        self.log_info(f"Listing template fragments for template: {template_name or 'all'}")
 
         try:
-            if not self.template_fragments_model:
-                self.output_warning("TemplateFragments model not available")
-                return 1
-
-            fragments = self.session.query(self.template_fragments_model)\
-                                .order_by(self.template_fragments_model.template_file_path,
-                                        self.template_fragments_model.version_number.desc())\
-                                .all()
+            query = self.session.query(self.template_fragment_model)
             
+            if template_name:
+                template = self.session.query(self.template_model).filter_by(name=template_name).first()
+                if not template:
+                    self.output_error(f"Template '{template_name}' not found")
+                    return 1
+                query = query.filter_by(template_uuid=template.uuid)
+            
+            fragments = query.order_by(
+                self.template_fragment_model.template_uuid,
+                self.template_fragment_model.fragment_type,
+                self.template_fragment_model.sort_order
+            ).all()
+
             if not fragments:
                 self.output_warning("No template fragments found")
                 return 0
-            
-            headers = ["Template File", "Version", "Active", "Content Type", "Template", "UUID"]
+
+            headers = ["Template", "Fragment Key", "Type", "Version", "Active", "File Path", "UUID"]
             rows = []
-            
+
             for fragment in fragments:
-                template_name = ''
+                template_name = ""
                 if hasattr(fragment, 'template') and fragment.template:
                     template_name = fragment.template.name
-                
+
                 rows.append([
-                    fragment.template_file_path,
+                    template_name,
+                    fragment.fragment_key,
+                    fragment.fragment_type,
                     fragment.get_display_version(),
                     "Yes" if fragment.is_active else "No",
-                    fragment.content_type,
-                    template_name,
+                    fragment.template_file_path,
                     str(fragment.uuid)
                 ])
-            
-            self.output_info("Available Template Fragments:")
+
+            self.output_info("Template Fragments:")
             self.output_table(rows, headers=headers)
             return 0
 
@@ -167,1128 +152,337 @@ class TemplateCLI(BaseCLI):
             self.output_error(f"Error listing template fragments: {e}")
             return 1
 
-    def list_page_fragments(self):
-        """List all page fragments with fragment key and version info"""
-        self.log_info("Listing page fragments")
+    def show_template(self, template_name):
+        """Show detailed template information"""
+        self.log_info(f"Showing template details: {template_name}")
 
         try:
-            if not self.page_fragments_model:
-                self.output_warning("PageFragments model not available")
+            template = self.session.query(self.template_model).filter_by(name=template_name).first()
+            if not template:
+                self.output_error(f"Template '{template_name}' not found")
                 return 1
 
-            fragments = self.session.query(self.page_fragments_model)\
-                                .order_by(self.page_fragments_model.fragment_key,
-                                        self.page_fragments_model.version_number.desc())\
-                                .all()
+            self.output_info(f"Template: {template.name}")
+            self.output_info(f"  UUID: {template.uuid}")
+            self.output_info(f"  Display Name: {template.display_name}")
+            self.output_info(f"  Description: {template.description or 'None'}")
+            self.output_info(f"  Layout Type: {template.layout_type}")
+            self.output_info(f"  System Template: {'Yes' if template.is_system else 'No'}")
             
-            if not fragments:
-                self.output_warning("No page fragments found")
-                return 0
+            if hasattr(template, 'module') and template.module:
+                self.output_info(f"  Module: {template.module.name}")
             
-            headers = ["Fragment Key", "Version", "Active", "Content Type", "Page", "UUID"]
-            rows = []
-            
-            for fragment in fragments:
-                page_name = ''
-                if hasattr(fragment, 'page') and fragment.page:
-                    page_name = fragment.page.name
-                
-                rows.append([
-                    fragment.fragment_key,
-                    fragment.get_display_version(),
-                    "Yes" if fragment.is_active else "No",
-                    fragment.content_type,
-                    page_name,
-                    str(fragment.uuid)
-                ])
-            
-            self.output_info("Available Page Fragments:")
-            self.output_table(rows, headers=headers)
-            return 0
-
-        except Exception as e:
-            self.log_error(f"Error listing page fragments: {e}")
-            self.output_error(f"Error listing page fragments: {e}")
-            return 1
- 
-    def list_pages(self):
-        """List all pages"""
-        self.log_info("Listing pages")
-
-        try:
-            pages = self.session.query(self.page_model).order_by(self.page_model.name).all()
-            
-            if not pages:
-                self.output_warning("No pages found")
-                return 0
-            
-            headers = ["Name", "Title", "Route", "Template", "Mode", "UUID"]
-            rows = []
-            
-            for page in pages:
-                template_name = ''
-                if hasattr(page, 'template') and page.template:  # UPDATED
-                    template_name = page.template.name
-                
-                rows.append([
-                    page.name,
-                    getattr(page, 'title', ''),
-                    getattr(page, 'route', ''),
-                    template_name,
-                    getattr(page, 'mode', ''),
-                    str(page.uuid)
-                ])
-            
-            self.output_info("Available Pages:")
-            self.output_table(rows, headers=headers)
-            return 0
-
-        except Exception as e:
-            self.log_error(f"Error listing pages: {e}")
-            self.output_error(f"Error listing pages: {e}")
-            return 1
-    
-    def create_full_stack(self, config_dir):
-        """Create full stack from directory of YAML files with multi-file support"""
-        self.log_info(f"Creating full stack from directory: {config_dir}")
-
-        try:
-            config_path = Path(config_dir)
-
-            if not config_path.exists():
-                self.output_error(f"Configuration directory '{config_dir}' not found")
-                return 1
-
-            # File patterns in dependency order
-            file_pattern_groups = [
-                (['theme.yaml', 'theme_*.yaml'], 'theme'),
-                (['template.yaml', 'template_*.yaml'], 'template'),
-                (['template_fragment.yaml', 'template_fragment_*.yaml'], 'template_fragment'),
-                (['page.yaml'], 'page'),
-                (['page_fragment.yaml', 'page_fragment_*.yaml'], 'page_fragment'),  # NEW
-            ]
-
-            created_uuids = {}
-            total_processed = 0
-            total_created = 0
-
-            for patterns, component_type in file_pattern_groups:
-                matching_files = []
-                for pattern in patterns:
-                    found_files = list(config_path.glob(pattern))
-                    if component_type == 'page':
-                        found_files = [f for f in found_files
-                            if not f.name.startswith('page_fragment_')]
-                    matching_files.extend(found_files)
-
-                matching_files = sorted(set(matching_files))
-
-                if not matching_files:
-                    pattern_list = "', '".join(patterns)
-                    self.output_warning(f"No files found matching patterns: '{pattern_list}'")
-                    continue
-
-                self.output_info(f"Processing {len(matching_files)} {component_type} file(s)...")
-
-                component_uuids = []
-                component_created = 0
-
-                for file_path in matching_files:
-                    self.output_info(f"  Processing {file_path.name}...")
-                    total_processed += 1
-
-                    try:
-                        uuid_val = None
-
-                        if component_type == 'theme':
-                            with open(file_path, 'r') as f:
-                                theme_data = yaml.safe_load(f)
-                            existing = self.session.query(self.theme_model).filter_by(name=theme_data['name']).first()
-                            was_created = existing is None
-                            uuid_val = self.create_theme_from_yaml(file_path, allow_update=True)
-
-                        elif component_type == 'template':
-                            with open(file_path, 'r') as f:
-                                template_data = yaml.safe_load(f)
-                            existing = self.session.query(self.template_model).filter_by(name=template_data['name']).first()
-                            was_created = existing is None
-                            uuid_val = self.create_template_from_yaml(file_path, allow_update=True)
-
-                        elif component_type == 'template_fragment':
-                            uuid_val = self.create_template_fragment_from_yaml(file_path, allow_update=True)
-                            was_created = True  # treat all processed as created for now (safe)
-
-                        elif component_type == 'page':
-                            with open(file_path, 'r') as f:
-                                page_data = yaml.safe_load(f)
-                            existing = self.session.query(self.page_model).filter_by(name=page_data['name']).first()
-                            was_created = existing is None
-                            uuid_val = self.create_page_from_yaml(file_path, allow_update=True)
-
-                        elif component_type == 'page_fragment':  # NEW
-                            uuid_val = self.create_page_fragment_from_yaml(file_path, allow_update=True)
-                            was_created = True  # treat all processed as created for now (safe)
-
-                        if uuid_val:
-                            component_uuids.append(uuid_val)
-                            if was_created:
-                                component_created += 1
-                                total_created += 1
-                                self.output_success(f"    ✓ CREATED {file_path.name} (UUID: {uuid_val})")
-                            else:
-                                self.output_success(f"    ✓ UPDATED {file_path.name} (UUID: {uuid_val})")
-                        else:
-                            self.output_warning(f"    ? {file_path.name} returned no UUID")
-
-                    except Exception as e:
-                        self.output_error(f"    ✗ Failed to process {file_path.name}: {e}")
-                        self.log_error(f"Error processing {file_path}: {e}")
-                        continue
-
-                # Store UUIDs for this component type
-                if component_uuids:
-                    if len(component_uuids) == 1:
-                        created_uuids[component_type] = component_uuids[0]
-                    else:
-                        created_uuids[component_type] = component_uuids
-
-                    self.output_info(f"  {component_type}: {component_created} created, {len(component_uuids) - component_created} updated")
-
-            # Summary
-            self.output_success("Stack creation complete!")
-            self.output_info(f"Total files processed: {total_processed}")
-            self.output_info(f"Total new items created: {total_created}")
-            self.output_info(f"Total items updated: {total_processed - total_created}")
-
-            if created_uuids:
-                self.output_info("\nComponent Summary:")
-                for component, uuid_vals in created_uuids.items():
-                    if isinstance(uuid_vals, list):
-                        self.output_info(f"   {component}: {len(uuid_vals)} items")
-                        for i, uuid_val in enumerate(uuid_vals, 1):
-                            self.output_info(f"     {i}. {uuid_val}")
-                    else:
-                        self.output_info(f"   {component}: {uuid_vals}")
-
-            return 0
-
-        except Exception as e:
-            self.log_error(f"Error creating full stack: {e}")
-            self.output_error(f"Error creating full stack: {e}")
-            return 1
-
-    def create_theme_from_yaml(self, yaml_file, allow_update=False):
-        """Create a theme from YAML file"""
-        self.log_info(f"Creating theme from YAML file: {yaml_file}")
-
-        try:
-            with open(yaml_file, 'r') as f:
-                theme_data = yaml.safe_load(f)
-            
-            # Check if theme already exists
-            existing = self.session.query(self.theme_model).filter_by(name=theme_data['name']).first()
-            if existing:
-                if allow_update:
-                    self.output_warning(f"Theme '{theme_data['name']}' already exists (UUID: {existing.uuid})")
-                    return existing.uuid
-                else:
-                    self.output_error(f"Theme '{theme_data['name']}' already exists (UUID: {existing.uuid})")
-                    raise Exception(f"Theme '{theme_data['name']}' already exists")
-            
-            # Create theme
-            theme = self.theme_model(**theme_data)
-            self.session.add(theme)
-            self.session.commit()
-            
-            self.output_success(f"Created theme: {theme.name} (UUID: {theme.uuid})")
-            return theme.uuid
-
-        except Exception as e:
-            self.log_error(f"Error creating theme from YAML: {e}")
-            self.output_error(f"Error creating theme: {e}")
-            self.session.rollback()
-            raise
-
-    def create_template_from_yaml(self, yaml_file, allow_update=False):
-        """Create a template from YAML file"""
-        self.log_info(f"Creating template from YAML file: {yaml_file}")
-
-        try:
-            with open(yaml_file, 'r') as f:
-                template_data = yaml.safe_load(f)
-            
-            # Lookup foreign key UUIDs
-            if 'theme_name' in template_data:
-                template_data['theme_uuid'] = self.lookup_uuid_by_name(
-                    self.theme_model, template_data.pop('theme_name')
-                )
-            
-            if 'menu_name' in template_data:
-                template_data['menu_type_uuid'] = self.lookup_uuid_by_name(
-                    self.menu_model, template_data.pop('menu_name')
-                )
-            
-            # Check if template already exists
-            existing = self.session.query(self.template_model).filter_by(name=template_data['name']).first()
-            if existing:
-                if allow_update:
-                    self.output_warning(f"Template '{template_data['name']}' already exists (UUID: {existing.uuid})")
-                    return existing.uuid
-                else:
-                    self.output_error(f"Template '{template_data['name']}' already exists (UUID: {existing.uuid})")
-                    raise Exception(f"Template '{template_data['name']}' already exists")
-            
-            # Create template
-            template = self.template_model(**template_data)
-            self.session.add(template)
-            self.session.commit()
-            
-            self.output_success(f"Created template: {template.name} (UUID: {template.uuid})")
-            return template.uuid
-
-        except Exception as e:
-            self.log_error(f"Error creating template from YAML: {e}")
-            self.output_error(f"Error creating template: {e}")
-            self.session.rollback()
-            raise
-
-    def create_template_fragment_from_yaml(self, yaml_file, allow_update=False):
-        """Create template fragment from YAML file with correct version handling"""
-        self.log_info(f"Creating template fragment from YAML file: {yaml_file}")
-
-        try:
-            if not self.template_fragments_model:
-                self.output_warning("TemplateFragments model not available")
-                return None
-
-            with open(yaml_file, 'r') as f:
-                content_data = yaml.safe_load(f)
-
-            # Set defaults for new fields
-            if 'content_type' not in content_data:
-                content_data['content_type'] = 'text/html'
-            if 'is_active' not in content_data:
-                content_data['is_active'] = False
-            if 'cache_duration' not in content_data:
-                content_data['cache_duration'] = 3600
-
-            # Lookup template UUID
-            if 'template_name' in content_data:
-                content_data['template_uuid'] = self.lookup_uuid_by_name(
-                    self.template_model, content_data.pop('template_name')
-                )
-
-            template_uuid = content_data['template_uuid']
-            template_file_path = content_data['template_file_path']
-
-            # If version_number not provided, get next version number
-            if 'version_number' not in content_data:
-                version_number = self.template_fragments_model.get_next_version_number(
-                    self.session, template_uuid, template_file_path
-                )
-                content_data['version_number'] = version_number
-            else:
-                version_number = content_data['version_number']
-
-            # Check if content already exists
-            existing = self.session.query(self.template_fragments_model).filter_by(
-                template_uuid=template_uuid,
-                template_file_path=template_file_path,
-                version_number=version_number
+            # Show base fragment
+            base_fragment = self.session.query(self.template_fragment_model).filter_by(
+                template_uuid=template.uuid,
+                fragment_type='base',
+                is_active=True
             ).first()
-
-            if existing:
-                if allow_update:
-                    self.output_warning(f"Template fragment {template_file_path} v{version_number} already exists (UUID: {existing.uuid})")
-                    return existing.uuid
-                else:
-                    self.output_error(f"Template fragment {template_file_path} v{version_number} already exists (UUID: {existing.uuid})")
-                    raise Exception(f"Template fragment {template_file_path} v{version_number} already exists")
-
-            # Handle template source and hash
-            if 'template_source' in content_data:
-                import hashlib
-                template_source = content_data['template_source']
-                if 'template_hash' not in content_data:
-                    content_data['template_hash'] = hashlib.sha256(template_source.encode('utf-8')).hexdigest()
-
-            # Create new template fragment
-            fragment = self.template_fragments_model(**content_data)
-            self.session.add(fragment)
-            self.session.flush()
-
-            # If active, deactivate other versions of same file
-            if fragment.is_active:
-                deactivated_count = self.session.query(self.template_fragments_model)\
-                    .filter_by(template_uuid=template_uuid,
-                              template_file_path=template_file_path)\
-                    .filter(self.template_fragments_model.uuid != fragment.uuid)\
-                    .update({'is_active': False})
-
-            self.session.commit()
-
-            version_display = fragment.get_display_version()
-            self.output_success(f"Created template fragment: {fragment.template_file_path} {version_display} (UUID: {fragment.uuid})")
-            return fragment.uuid
-
-        except Exception as e:
-            self.log_error(f"Error creating template fragment from YAML: {e}")
-            self.output_error(f"Error creating template fragment: {e}")
-            self.session.rollback()
-            raise
-
-    def create_page_fragment_from_yaml(self, yaml_file, allow_update=False):
-        """Create page fragment from YAML file with correct version handling"""
-        self.log_info(f"Creating page fragment from YAML file: {yaml_file}")
-
-        try:
-            if not self.page_fragments_model:
-                self.output_warning("PageFragments model not available")
-                return None
-
-            with open(yaml_file, 'r') as f:
-                content_data = yaml.safe_load(f)
-
-            # Set defaults for new fields
-            if 'content_type' not in content_data:
-                content_data['content_type'] = 'text/html'
-            if 'is_active' not in content_data:
-                content_data['is_active'] = False
-            if 'cache_duration' not in content_data:
-                content_data['cache_duration'] = 3600
-
-            # Lookup page UUID
-            if 'page_name' in content_data:
-                content_data['page_uuid'] = self.lookup_uuid_by_name(
-                    self.page_model, content_data.pop('page_name')
-                )
-
-            page_uuid = content_data['page_uuid']
-            fragment_key = content_data['fragment_key']
-
-            # If version_number not provided, get next version number
-            if 'version_number' not in content_data:
-                version_number = self.page_fragments_model.get_next_version_number(
-                    self.session, page_uuid, fragment_key
-                )
-                content_data['version_number'] = version_number
+            
+            if base_fragment:
+                self.output_info(f"  Base Fragment: {base_fragment.fragment_key}")
             else:
-                version_number = content_data['version_number']
-
-            # Check if content already exists
-            existing = self.session.query(self.page_fragments_model).filter_by(
-                page_uuid=page_uuid,
-                fragment_key=fragment_key,
-                version_number=version_number
-            ).first()
-
-            if existing:
-                if allow_update:
-                    self.output_warning(f"Page fragment {fragment_key} v{version_number} already exists (UUID: {existing.uuid})")
-                    return existing.uuid
-                else:
-                    self.output_error(f"Page fragment {fragment_key} v{version_number} already exists (UUID: {existing.uuid})")
-                    raise Exception(f"Page fragment {fragment_key} v{version_number} already exists")
-
-            # Handle content source and hash
-            if 'content_source' in content_data:
-                import hashlib
-                content_source = content_data['content_source']
-                if 'content_hash' not in content_data:
-                    content_data['content_hash'] = hashlib.sha256(content_source.encode('utf-8')).hexdigest()
-
-            # Create new page fragment
-            fragment = self.page_fragments_model(**content_data)
-            self.session.add(fragment)
-            self.session.flush()
-
-            # If active, deactivate other versions of same fragment_key
-            if fragment.is_active:
-                deactivated_count = self.session.query(self.page_fragments_model)\
-                    .filter_by(page_uuid=page_uuid,
-                              fragment_key=fragment_key)\
-                    .filter(self.page_fragments_model.uuid != fragment.uuid)\
-                    .update({'is_active': False})
-
-            self.session.commit()
-
-            version_display = fragment.get_display_version()
-            self.output_success(f"Created page fragment: {fragment.fragment_key} {version_display} (UUID: {fragment.uuid})")
-            return fragment.uuid
-
-        except Exception as e:
-            self.log_error(f"Error creating page fragment from YAML: {e}")
-            self.output_error(f"Error creating page fragment: {e}")
-            self.session.rollback()
-            raise
-
-    def create_page_from_yaml(self, yaml_file, allow_update=False):
-        """Create a page from YAML file"""
-        self.log_info(f"Creating page from YAML file: {yaml_file}")
-
-        try:
-            with open(yaml_file, 'r') as f:
-                page_data = yaml.safe_load(f)
+                self.output_warning("  Base Fragment: None found")
             
-            # Lookup template UUID
-            if 'template_name' in page_data:
-                page_data['template_uuid'] = self.lookup_uuid_by_name(
-                    self.template_model, page_data.pop('template_name')
-                )
+            # Show active fragments
+            fragments = self.template_fragment_model.get_all_active_for_template(
+                self.session, template.uuid
+            )
             
-            # Check if page already exists
-            existing = self.session.query(self.page_model).filter_by(name=page_data['name']).first()
-            if existing:
-                if allow_update:
-                    self.output_warning(f"Page '{page_data['name']}' already exists (UUID: {existing.uuid})")
-                    return existing.uuid
-                else:
-                    self.output_error(f"Page '{page_data['name']}' already exists (UUID: {existing.uuid})")
-                    raise Exception(f"Page '{page_data['name']}' already exists")
-            
-            # Create page
-            page = self.page_model(**page_data)
-            self.session.add(page)
-            self.session.commit()
-            
-            self.output_success(f"Created page: {page.name} (UUID: {page.uuid})")
-            return page.uuid
-
-        except Exception as e:
-            self.log_error(f"Error creating page from YAML: {e}")
-            self.output_error(f"Error creating page: {e}")
-            self.session.rollback()
-            raise
-
-    def update_templates(self, config_dir):
-        """Update template directory by creating template-fragment files for template files found"""
-        self.log_info(f"Updating templates in directory: {config_dir}")
-
-        try:
-            config_path = Path(config_dir)
-
-            if not config_path.exists():
-                self.output_error(f"Configuration directory '{config_dir}' not found")
-                return 1
-
-            files_created = []
-
-            # Find existing template YAML files to get UUIDs
-            template_files = []
-            template_files.extend(config_path.glob('template.yaml'))
-            template_files.extend(config_path.glob('template_*.yaml'))
-
-            if not template_files:
-                self.output_warning("No template YAML files found - cannot create fragment files")
-                return 1
-
-            # Extract UUIDs and names from template files
-            template_info = {}
-            for template_file in template_files:
-                try:
-                    with open(template_file, 'r') as f:
-                        template_data = yaml.safe_load(f)
-                        template_name = template_data.get('name')
-                        template_uuid = template_data.get('uuid')
-
-                        if template_name and template_uuid:
-                            template_info[template_name] = template_uuid
-                            self.output_info(f"Found template '{template_name}' with UUID: {template_uuid}")
-                        else:
-                            self.output_warning(f"Template file {template_file.name} missing name or uuid")
-
-                except Exception as e:
-                    self.output_error(f"Error reading template file {template_file.name}: {e}")
-                    continue
-
-            if not template_info:
-                self.output_error("No valid template files with name/uuid found")
-                return 1
-
-            # Find all template files in templates/ subdirectory
-            templates_dir = config_path / "templates"
-            if not templates_dir.exists():
-                self.output_warning("No templates/ directory found")
-                return 0
-
-            # Content type mapping based on file extensions
-            content_type_map = {
-                '.html': 'text/html',
-                '.htm': 'text/html',
-                '.css': 'text/css',
-                '.js': 'application/javascript',
-                '.txt': 'text/plain',
-                '.xml': 'text/xml',
-                '.json': 'application/json',
-                '.jinja': 'text/html',
-                '.j2': 'text/html'
-            }
-
-            # Find all template files recursively
-            template_extensions = list(content_type_map.keys())
-            html_template_files = []
-            for ext in template_extensions:
-                html_template_files.extend(templates_dir.rglob(f"*{ext}"))
-
-            if not html_template_files:
-                self.output_warning(f"No template files found in templates/ directory with extensions: {', '.join(template_extensions)}")
-                return 0
-
-            self.output_info(f"Found {len(html_template_files)} template file(s)")
-
-            # For each template file, create a template-fragment file if it doesn't exist
-            for html_template_file in html_template_files:
-                # Generate relative path from config directory
-                relative_path = html_template_file.relative_to(config_path)
-
-                # Generate fragment filename based on template path
-                safe_filename = str(relative_path).replace('/', '_').replace('.', '_')
-                fragment_filename = f"template_fragment_{safe_filename}.yaml"
-                fragment_file = config_path / fragment_filename
-
-                if fragment_file.exists():
-                    self.output_info(f"Skipping {fragment_filename} - already exists")
-                    continue
-
-                # Determine which template to use (for now, use the first one)
-                template_name = list(template_info.keys())[0]
-                template_uuid = template_info[template_name]
-
-                if not self.template_fragments_model:
-                    self.output_warning("TemplateFragments model not available")
-                    continue
-
-                # Determine content type from file extension
-                file_extension = html_template_file.suffix.lower()
-                content_type = content_type_map.get(file_extension, 'text/plain')
-
-                # Read the template file content
-                try:
-                    with open(html_template_file, 'r', encoding='utf-8') as f:
-                        template_source = f.read()
-                except Exception as e:
-                    self.log_warning(f"Could not read template file {html_template_file}: {e}")
-                    template_source = f"# Could not read template source from {relative_path}"
-
-                # Calculate template hash for change detection
-                import hashlib
-                template_hash = hashlib.sha256(template_source.encode('utf-8')).hexdigest()
-
-                # Get next version number for this template
-                next_version = self.template_fragments_model.get_next_version_number(
-                    self.session, template_uuid, str(relative_path)
-                )
-
-                # Create dummy template fragment object with all necessary fields
-                fragment_dummy = self.template_fragments_model()
-                fragment_dummy.template_uuid = template_uuid
-                fragment_dummy.template_file_path = str(relative_path)
-                fragment_dummy.content_type = content_type
-
-                # Use versioning system
-                fragment_dummy.version_number = next_version
-                fragment_dummy.version_label = None  # No label for initial template
-                fragment_dummy.is_active = True  # Template versions default to active
-
-                fragment_dummy.cache_duration = 3600
-                fragment_dummy.template_hash = template_hash
-                fragment_dummy.template_source = template_source  # Always store content
-                fragment_dummy.change_description = f"Initial template version for {relative_path}"
-
-                # Set compiled file path
-                compiled_path = str(relative_path).replace(file_extension, '.pyc')
-                fragment_dummy.compiled_file_path = f"compiled_templates/{compiled_path}"
-
-                # Set relationship attribute
-                fragment_dummy.template_name = template_name
-
-                fragment_mappings = {
-                    'template_uuid': 'name'
-                }
-
-                self.exporter.export_model_object(
-                    fragment_dummy,
-                    fragment_file,
-                    fragment_mappings,
-                    header_title=f"Template Fragment for {relative_path}",
-                    header_description=f"Auto-generated for template: {relative_path}, linked to template: {template_name}",
-                    template_mode=True
-                )
-
-                files_created.append(str(fragment_file))
-                self.output_success(f"Created: {fragment_filename}")
-
-            if files_created:
-                self.output_success(f"Created {len(files_created)} template fragment file(s)")
-                self.output_info("Files created:")
-                for file_path in files_created:
-                    self.output_info(f"   {Path(file_path).name}")
+            if fragments:
+                self.output_info(f"  Active Fragments ({len(fragments)}):")
+                for fragment in fragments:
+                    self.output_info(f"    - {fragment.fragment_key} ({fragment.fragment_type})")
             else:
-                self.output_info("No new template fragment files needed")
+                self.output_info("  Active Fragments: None")
 
             return 0
 
         except Exception as e:
-            self.log_error(f"Error updating templates: {e}")
-            self.output_error(f"Error updating templates: {e}")
+            self.log_error(f"Error showing template: {e}")
+            self.output_error(f"Error showing template: {e}")
             return 1
 
-    def generate_yaml_templates(self, output_dir):
-        """Generate example YAML template files using ComponentExporter"""
-        self.log_info(f"Generating YAML templates in: {output_dir}")
+    def render_template(self, template_name, data_file=None, output_file=None, force_refresh=False):
+        """Render a template"""
+        self.log_info(f"Rendering template: {template_name}")
 
         try:
-            output_path = Path(output_dir)
-            output_path.mkdir(parents=True, exist_ok=True)
+            template = self.session.query(self.template_model).filter_by(name=template_name).first()
+            if not template:
+                self.output_error(f"Template '{template_name}' not found")
+                return 1
 
-            files_created = []
+            # Load data if provided
+            data = {}
+            if data_file:
+                data_path = Path(data_file)
+                if data_path.exists():
+                    data = data_path
+                    self.output_info(f"Using data file: {data_file}")
+                else:
+                    self.output_error(f"Data file not found: {data_file}")
+                    return 1
 
-            # Create dummy theme object
-            theme_dummy = self.theme_model()
-            theme_dummy.name = 'my-custom-theme'
-            theme_dummy.display_name = 'My Custom Theme'
-            theme_dummy.description = 'A custom theme for my application'
-            theme_dummy.uuid = 'EXAMPLE-THEME-UUID-REPLACE-ME'
-
-            # Set other likely fields with example values
-            if hasattr(theme_dummy, 'css_framework'):
-                theme_dummy.css_framework = 'bootstrap'
-            if hasattr(theme_dummy, 'mode'):
-                theme_dummy.mode = 'light'
-            if hasattr(theme_dummy, 'version'):
-                theme_dummy.version = '1.0.0'
-
-            theme_file = output_path / "theme.yaml"
-            self.exporter.export_model_object(
-                theme_dummy,
-                theme_file,
-                header_title="Example Theme Configuration",
-                header_description="Edit values and replace UUIDs before importing"
+            # Render template
+            result = self.renderer.render_template_by_uuid(
+                template.uuid, 
+                data=data,
+                force_refresh=force_refresh
             )
-            files_created.append(str(theme_file))
 
-            # Create dummy template object
-            template_dummy = self.template_model()
-            template_dummy.name = 'my-template'
-            template_dummy.display_name = 'My Template'
-            template_dummy.description = 'Custom template for my application'
-            template_dummy.uuid = 'EXAMPLE-TEMPLATE-UUID-REPLACE-ME'
-            template_dummy.theme_uuid = 'EXAMPLE-THEME-UUID-REPLACE-ME'
+            if result.errors:
+                self.output_error("Template rendering failed:")
+                for error in result.errors:
+                    self.output_error(f"  - {error}")
+                return 1
 
-            # Set other likely fields
-            if hasattr(template_dummy, 'layout_type'):
-                template_dummy.layout_type = 'sidebar-left'
-            if hasattr(template_dummy, 'sidebar_enabled'):
-                template_dummy.sidebar_enabled = True
-            if hasattr(template_dummy, 'template_file'):
-                template_dummy.template_file = 'templates/custom/my_template.html'
-            if hasattr(template_dummy, 'menu_type_uuid'):
-                template_dummy.menu_type_uuid = 'EXAMPLE-MENU-UUID-REPLACE-ME'
+            # Output results
+            self.output_success(f"Template '{template_name}' rendered successfully")
+            self.output_info(f"  Render time: {result.render_time_ms:.2f}ms")
+            self.output_info(f"  Cache hit: {'Yes' if result.cache_hit else 'No'}")
+            self.output_info(f"  Content length: {len(result.content)} characters")
+            
+            if result.fragments_rendered:
+                self.output_info(f"  Fragments rendered: {', '.join(result.fragments_rendered)}")
 
-            # Set relationship attributes directly on the model
-            template_dummy.theme_name = 'my-custom-theme'
-            template_dummy.menu_type_name = 'MAIN'
+            if result.warnings:
+                self.output_warning("Warnings:")
+                for warning in result.warnings:
+                    self.output_warning(f"  - {warning}")
 
-            foreign_key_mappings = {
-                'theme_uuid': 'name',
-                'menu_type_uuid': 'name'
-            }
+            # Save to file if specified
+            if output_file:
+                output_path = Path(output_file)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(result.content)
+                self.output_success(f"Rendered content saved to: {output_file}")
+            else:
+                # Output first 500 characters of content
+                preview = result.content[:500]
+                if len(result.content) > 500:
+                    preview += "..."
+                self.output_info("Rendered content preview:")
+                print(preview)
 
-            template_file = output_path / "template.yaml"
-            self.exporter.export_model_object(
-                template_dummy,
-                template_file,
-                foreign_key_mappings,
-                header_title="Example Template Configuration",
-                header_description="Edit values and replace UUIDs before importing"
-            )
-            files_created.append(str(template_file))
-
-            # Create dummy template fragment if model exists
-            if self.template_fragments_model:
-                fragment_dummy = self.template_fragments_model()
-                fragment_dummy.template_uuid = 'EXAMPLE-TEMPLATE-UUID-REPLACE-ME'
-                fragment_dummy.template_file_path = 'templates/custom/my_template.html'
-                fragment_dummy.compiled_file_path = 'compiled_templates/custom/my_template.pyc'
-                fragment_dummy.uuid = 'EXAMPLE-TEMPLATE-FRAGMENT-UUID-REPLACE-ME'
-
-                # Set versioning fields
-                fragment_dummy.version_number = 1
-                fragment_dummy.version_label = None
-                fragment_dummy.is_active = True
-
-                # Set content type and template source
-                fragment_dummy.content_type = 'text/html'
-                fragment_dummy.template_source = 'See templates/custom/my_template.html'
-                fragment_dummy.cache_duration = 3600
-                fragment_dummy.change_description = 'Initial template version'
-
-                # Calculate hash for example content
-                import hashlib
-                fragment_dummy.template_hash = hashlib.sha256(
-                    fragment_dummy.template_source.encode('utf-8')
-                ).hexdigest()
-
-                # Set relationship attribute directly
-                fragment_dummy.template_name = 'my-template'
-
-                fragment_mappings = {
-                    'template_uuid': 'name'
-                }
-
-                fragment_file = output_path / "template_fragment.yaml"
-                self.exporter.export_model_object(
-                    fragment_dummy,
-                    fragment_file,
-                    fragment_mappings,
-                    header_title="Example Template Fragment Configuration",
-                    header_description="Edit values and replace UUIDs before importing"
-                )
-                files_created.append(str(fragment_file))
-
-            # Create dummy page object
-            page_dummy = self.page_model()
-            page_dummy.name = 'my-custom-page'
-            page_dummy.title = 'My Custom Page'
-            page_dummy.description = 'A custom page in my application'
-            page_dummy.route = '/my-page'
-            page_dummy.template_uuid = 'EXAMPLE-TEMPLATE-UUID-REPLACE-ME'  # UPDATED
-            page_dummy.uuid = 'EXAMPLE-PAGE-UUID-REPLACE-ME'
-
-            # Set other likely fields
-            if hasattr(page_dummy, 'meta_description'):
-                page_dummy.meta_description = 'SEO description for my custom page'
-            if hasattr(page_dummy, 'published'):
-                page_dummy.published = True
-
-            # Set relationship attribute directly
-            page_dummy.template_name = 'my-template'
-
-            page_mappings = {
-                'template_uuid': 'name'  # UPDATED
-            }
-
-            page_file = output_path / "page.yaml"
-            self.exporter.export_model_object(
-                page_dummy,
-                page_file,
-                page_mappings,
-                header_title="Example Page Configuration",
-                header_description="Edit values and replace UUIDs before importing"
-            )
-            files_created.append(str(page_file))
-
-            # Create dummy page fragment if model exists
-            if self.page_fragments_model:
-                page_fragment_dummy = self.page_fragments_model()
-                page_fragment_dummy.page_uuid = 'EXAMPLE-PAGE-UUID-REPLACE-ME'
-                page_fragment_dummy.fragment_key = 'main_content'
-                page_fragment_dummy.uuid = 'EXAMPLE-PAGE-FRAGMENT-UUID-REPLACE-ME'
-
-                # Set versioning fields
-                page_fragment_dummy.version_number = 1
-                page_fragment_dummy.version_label = None
-                page_fragment_dummy.is_active = True
-
-                # Set content type and source
-                page_fragment_dummy.content_type = 'text/html'
-                page_fragment_dummy.content_source = '<p>Main page content goes here</p>'
-                page_fragment_dummy.cache_duration = 3600
-                page_fragment_dummy.change_description = 'Initial page content'
-
-                # Calculate hash for example content
-                import hashlib
-                page_fragment_dummy.content_hash = hashlib.sha256(
-                    page_fragment_dummy.content_source.encode('utf-8')
-                ).hexdigest()
-
-                # Set relationship attribute directly
-                page_fragment_dummy.page_name = 'my-custom-page'
-
-                page_fragment_mappings = {
-                    'page_uuid': 'name'
-                }
-
-                page_fragment_file = output_path / "page_fragment.yaml"
-                self.exporter.export_model_object(
-                    page_fragment_dummy,
-                    page_fragment_file,
-                    page_fragment_mappings,
-                    header_title="Example Page Fragment Configuration",
-                    header_description="Edit values and replace UUIDs before importing"
-                )
-                files_created.append(str(page_fragment_file))
-
-            # Create template directory and sample file
-            template_dir = output_path / "templates" / "custom"
-            template_dir.mkdir(parents=True, exist_ok=True)
-
-            sample_template = """{% extends "base-layout" %}
-
-{% block title %}{{ page.title }} - {{ super() }}{% endblock %}
-
-{% block page_content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h1>{{ page.title or 'Custom Page' }}</h1>
-            {% if page.description %}
-            <p class="lead">{{ page.description }}</p>
-            {% endif %}
-            {# Page fragments will be rendered here #}
-            {% for fragment in page.page_fragments if fragment.is_active %}
-            <div class="page-fragment" data-fragment="{{ fragment.fragment_key }}">
-                {{ fragment.content_source|safe }}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-{% endblock %}
-"""
-
-            template_html_file = template_dir / "my_template.html"
-            with open(template_html_file, 'w') as f:
-                f.write(sample_template)
-            files_created.append(str(template_html_file))
-
-            self.output_success(f"Generated template files in: {output_path}")
-            self.output_info("Files created:")
-            for file_path in files_created:
-                self.output_info(f"   {file_path}")
-
-            return files_created
+            return 0
 
         except Exception as e:
-            self.log_error(f"Error generating YAML templates: {e}")
-            self.output_error(f"Error generating YAML templates: {e}")
+            self.log_error(f"Error rendering template: {e}")
+            self.output_error(f"Error rendering template: {e}")
             return 1
-    
+
+    def render_base_template(self, template_name, data_file=None, output_file=None):
+        """Render template using base fragment"""
+        self.log_info(f"Rendering base template: {template_name}")
+
+        try:
+            template = self.session.query(self.template_model).filter_by(name=template_name).first()
+            if not template:
+                self.output_error(f"Template '{template_name}' not found")
+                return 1
+
+            # Load data if provided
+            data = {}
+            if data_file:
+                data_path = Path(data_file)
+                if data_path.exists():
+                    data = data_path
+                else:
+                    self.output_error(f"Data file not found: {data_file}")
+                    return 1
+
+            # Render base template
+            result = self.renderer.render_base_template(template.uuid, data=data)
+
+            self.output_success(f"Base template '{template_name}' rendered successfully")
+            self.output_info(f"  Content length: {len(result.content)} characters")
+
+            # Save to file if specified
+            if output_file:
+                output_path = Path(output_file)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(result.content)
+                self.output_success(f"Rendered content saved to: {output_file}")
+            else:
+                # Output first 500 characters of content
+                preview = result.content[:500]
+                if len(result.content) > 500:
+                    preview += "..."
+                self.output_info("Rendered content preview:")
+                print(preview)
+
+            return 0
+
+        except Exception as e:
+            self.log_error(f"Error rendering base template: {e}")
+            self.output_error(f"Error rendering base template: {e}")
+            return 1
+
+    def render_fragment(self, template_name, fragment_key, data_file=None, output_file=None):
+        """Render a specific fragment"""
+        self.log_info(f"Rendering fragment: {fragment_key} from template: {template_name}")
+
+        try:
+            template = self.session.query(self.template_model).filter_by(name=template_name).first()
+            if not template:
+                self.output_error(f"Template '{template_name}' not found")
+                return 1
+
+            # Load data if provided
+            data = {}
+            if data_file:
+                data_path = Path(data_file)
+                if data_path.exists():
+                    if data_path.suffix.lower() in ['.yaml', '.yml']:
+                        with open(data_path, 'r') as f:
+                            data = yaml.safe_load(f) or {}
+                    elif data_path.suffix.lower() == '.json':
+                        with open(data_path, 'r') as f:
+                            data = json.load(f)
+                else:
+                    self.output_error(f"Data file not found: {data_file}")
+                    return 1
+
+            # Render fragment
+            content = self.renderer.render_fragment_by_key(
+                fragment_key, template.uuid, data
+            )
+
+            if content.startswith('<!--'):
+                self.output_error(f"Fragment rendering failed: {content}")
+                return 1
+
+            self.output_success(f"Fragment '{fragment_key}' rendered successfully")
+            self.output_info(f"  Content length: {len(content)} characters")
+
+            # Save to file if specified
+            if output_file:
+                output_path = Path(output_file)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_path, 'w', encoding='utf-8') as f:
+                    f.write(content)
+                self.output_success(f"Rendered content saved to: {output_file}")
+            else:
+                # Output content
+                self.output_info("Rendered fragment content:")
+                print(content)
+
+            return 0
+
+        except Exception as e:
+            self.log_error(f"Error rendering fragment: {e}")
+            self.output_error(f"Error rendering fragment: {e}")
+            return 1
+
+    def cache_stats(self):
+        """Show cache statistics"""
+        self.log_info("Getting cache statistics")
+
+        try:
+            stats = self.renderer.get_cache_stats()
+            
+            self.output_info("Cache Statistics:")
+            self.output_info(f"  Template cache entries: {stats['template_cache_size']}")
+            self.output_info(f"  Content cache entries: {stats['content_cache_size']}")
+            self.output_info(f"  Environment cache entries: {stats['environment_cache_size']}")
+
+            return 0
+
+        except Exception as e:
+            self.log_error(f"Error getting cache stats: {e}")
+            self.output_error(f"Error getting cache stats: {e}")
+            return 1
+
+    def clear_cache(self, template_name=None):
+        """Clear template cache"""
+        self.log_info(f"Clearing cache for template: {template_name or 'all'}")
+
+        try:
+            if template_name:
+                template = self.session.query(self.template_model).filter_by(name=template_name).first()
+                if not template:
+                    self.output_error(f"Template '{template_name}' not found")
+                    return 1
+                
+                self.renderer.invalidate_cache(template_uuid=template.uuid)
+                self.output_success(f"Cache cleared for template: {template_name}")
+            else:
+                self.renderer.clear_cache()
+                self.output_success("All caches cleared")
+
+            return 0
+
+        except Exception as e:
+            self.log_error(f"Error clearing cache: {e}")
+            self.output_error(f"Error clearing cache: {e}")
+            return 1
+
     def close(self):
-        """Clean up database session"""
-        self.log_debug("Closing template CLI")
+        """Clean up resources"""
+        self.log_debug("Closing template render CLI")
         super().close()
 
-    def export_theme_by_uuid(self, theme_uuid, output_path):
-        """Export a specific theme by UUID"""
-        self.log_info(f"Exporting theme by UUID: {theme_uuid}")
-        
-        # Find the theme
-        theme = self.session.query(self.theme_model).filter_by(uuid=theme_uuid).first()
-        if not theme:
-            self.output_error(f"Theme with UUID {theme_uuid} not found")
-            return 1
-        
-        # Determine if output_path is a file or directory
-        output_path_obj = Path(output_path)
-        if output_path_obj.suffix in ['.yaml', '.yml']:
-            # It's a filename
-            output_file = output_path_obj
-        else:
-            # It's a directory, generate filename
-            filename = f"theme_{theme.name}.yaml"
-            output_file = output_path_obj / filename
-        
-        return self.exporter.export_model_object(
-            theme, 
-            output_file,
-            header_title=f"Theme '{theme.name}'"
-        )
-
-    def export_template_by_uuid(self, template_uuid, output_path):  
-        """Export a specific template by UUID"""
-        self.log_info(f"Exporting template by UUID: {template_uuid}")
-        
-        template = self.session.query(self.template_model).filter_by(uuid=template_uuid).first()
-        if not template:
-            self.output_error(f"Template with UUID {template_uuid} not found")
-            return 1
-        
-        # Define foreign key mappings for templates
-        foreign_key_mappings = {
-            'theme_uuid': 'name',
-            'menu_type_uuid': 'name'
-        }
-        
-        # Determine output file
-        output_path_obj = Path(output_path)
-        if output_path_obj.suffix in ['.yaml', '.yml']:
-            output_file = output_path_obj
-        else:
-            filename = f"template_{template.name}.yaml"
-            output_file = output_path_obj / filename
-        
-        return self.exporter.export_model_object(
-            template,
-            output_file,
-            foreign_key_mappings,
-            header_title=f"Template '{template.name}'"
-        )
-
-    def export_template_fragment_by_uuid(self, fragment_uuid, output_path):  
-        """Export specific template fragment by UUID"""
-        self.log_info(f"Exporting template fragment by UUID: {fragment_uuid}")
-        
-        if not self.template_fragments_model:
-            self.output_warning("TemplateFragments model not available")
-            return 1
-        
-        fragment = self.session.query(self.template_fragments_model).filter_by(uuid=fragment_uuid).first()
-        if not fragment:
-            self.output_error(f"Template fragment with UUID {fragment_uuid} not found")
-            return 1
-        
-        foreign_key_mappings = {
-            'template_uuid': 'name'
-        }
-        
-        output_path_obj = Path(output_path)
-        if output_path_obj.suffix in ['.yaml', '.yml']:
-            output_file = output_path_obj
-        else:
-            safe_filename = fragment.template_file_path.replace('/', '_').replace('.', '_')
-            filename = f"template_fragment_{safe_filename}.yaml"
-            output_file = output_path_obj / filename
-        
-        return self.exporter.export_model_object(
-            fragment,
-            output_file,
-            foreign_key_mappings,
-            header_title="Template Fragment",
-            header_description=f"Template: {fragment.template_file_path}"
-        )
-
-    def export_page_fragment_by_uuid(self, fragment_uuid, output_path):  
-        """Export specific page fragment by UUID"""
-        self.log_info(f"Exporting page fragment by UUID: {fragment_uuid}")
-        
-        if not self.page_fragments_model:
-            self.output_warning("PageFragments model not available")
-            return 1
-        
-        fragment = self.session.query(self.page_fragments_model).filter_by(uuid=fragment_uuid).first()
-        if not fragment:
-            self.output_error(f"Page fragment with UUID {fragment_uuid} not found")
-            return 1
-        
-        foreign_key_mappings = {
-            'page_uuid': 'name'
-        }
-        
-        output_path_obj = Path(output_path)
-        if output_path_obj.suffix in ['.yaml', '.yml']:
-            output_file = output_path_obj
-        else:
-            safe_fragment_key = fragment.fragment_key.replace('/', '_').replace('.', '_')
-            filename = f"page_fragment_{safe_fragment_key}.yaml"
-            output_file = output_path_obj / filename
-        
-        return self.exporter.export_model_object(
-            fragment,
-            output_file,
-            foreign_key_mappings,
-            header_title="Page Fragment",
-            header_description=f"Fragment: {fragment.fragment_key}"
-        )
-
-    def export_page_by_uuid(self, page_uuid, output_path):
-        """Export a specific page by UUID"""
-        self.log_info(f"Exporting page by UUID: {page_uuid}")
-        
-        # Find the page
-        page = self.session.query(self.page_model).filter_by(uuid=page_uuid).first()
-        if not page:
-            self.output_error(f"Page with UUID {page_uuid} not found")
-            return 1
-        
-        # Define foreign key mappings for pages
-        foreign_key_mappings = {
-            'template_uuid': 'name'  # UPDATED
-        }
-        
-        # Determine if output_path is a file or directory
-        output_path_obj = Path(output_path)
-        if output_path_obj.suffix in ['.yaml', '.yml']:
-            # It's a filename
-            output_file = output_path_obj
-        else:
-            # It's a directory, generate filename
-            filename = f"page_{page.name}.yaml"
-            output_file = output_path_obj / filename
-        
-        return self.exporter.export_model_object(
-            page,
-            output_file,
-            foreign_key_mappings,
-            header_title=f"Page '{page.name}'"
-        )
 
 def main():
     """Main CLI entry point"""
     parser = argparse.ArgumentParser(
-        description="Create and manage template system components",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=""" """
+        description="Manage and render templates",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    
-    parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging (debug level)')
+
+    parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging')
     parser.add_argument('--no-icons', action='store_true', help='Disable icons in output')
-    parser.add_argument('--table-format', choices=['simple', 'grid', 'pipe', 'orgtbl', 'rst', 'mediawiki', 'html', 'latex'],
-                       help='Override table format (default from config)')
+    parser.add_argument('--table-format', choices=['simple', 'grid', 'pipe', 'orgtbl', 'rst'],
+                       help='Override table format')
 
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-    # Create commands
-    create_parser = subparsers.add_parser('create', help='Create components from YAML (fails if exists)')
-    create_parser.add_argument('component', choices=['theme', 'template', 'template_fragment', 'page', 'page_fragment', 'stack'],
-                              help='Component type to create')
-    create_parser.add_argument('file_or_dir', help='YAML file or directory path')
-
     # List commands
-    list_parser = subparsers.add_parser('list', help='List components')
-    list_parser.add_argument('component', choices=['themes', 'templates', 'fragments', 'pages', 'page_fragments'],
-                            help='Component type to list')
-
-    # Export commands with subparsers
-    export_parser = subparsers.add_parser('export', help='Export individual components by UUID')
-    export_subparsers = export_parser.add_subparsers(dest='export_component', help='Component type to export')
+    list_parser = subparsers.add_parser('list', help='List templates or fragments')
+    list_subparsers = list_parser.add_subparsers(dest='list_type', help='What to list')
     
-    # Export theme
-    export_theme_parser = export_subparsers.add_parser('theme', help='Export theme by UUID')
-    export_theme_parser.add_argument('uuid', help='UUID of theme to export')
-    export_theme_parser.add_argument('output_path', help='Output filename (with .yaml/.yml extension) or directory')
+    templates_parser = list_subparsers.add_parser('templates', help='List templates')
+    templates_parser.add_argument('--module', help='Filter by module name')
     
-    # Export template  
-    export_template_parser = export_subparsers.add_parser('template', help='Export template by UUID')
-    export_template_parser.add_argument('uuid', help='UUID of template to export')
-    export_template_parser.add_argument('output_path', help='Output filename (with .yaml/.yml extension) or directory')
+    fragments_parser = list_subparsers.add_parser('fragments', help='List template fragments')
+    fragments_parser.add_argument('--template', help='Filter by template name')
+
+    # Show command
+    show_parser = subparsers.add_parser('show', help='Show template details')
+    show_parser.add_argument('template_name', help='Template name to show')
+
+    # Render commands
+    render_parser = subparsers.add_parser('render', help='Render templates or fragments')
+    render_subparsers = render_parser.add_subparsers(dest='render_type', help='What to render')
     
-    # Export page
-    export_page_parser = export_subparsers.add_parser('page', help='Export page by UUID')
-    export_page_parser.add_argument('uuid', help='UUID of page to export')
-    export_page_parser.add_argument('output_path', help='Output filename (with .yaml/.yml extension) or directory')
+    template_render_parser = render_subparsers.add_parser('template', help='Render template')
+    template_render_parser.add_argument('template_name', help='Template name to render')
+    template_render_parser.add_argument('--data', help='YAML/JSON data file')
+    template_render_parser.add_argument('--output', help='Output file')
+    template_render_parser.add_argument('--force-refresh', action='store_true', help='Force cache refresh')
     
-    # Export template fragment
-    export_fragment_parser = export_subparsers.add_parser('template_fragment', help='Export template fragment by UUID')
-    export_fragment_parser.add_argument('uuid', help='UUID of template fragment to export')
-    export_fragment_parser.add_argument('output_path', help='Output filename (with .yaml/.yml extension) or directory')
+    base_render_parser = render_subparsers.add_parser('base', help='Render base fragment')
+    base_render_parser.add_argument('template_name', help='Template name to render')
+    base_render_parser.add_argument('--data', help='YAML/JSON data file')
+    base_render_parser.add_argument('--output', help='Output file')
+    
+    fragment_render_parser = render_subparsers.add_parser('fragment', help='Render specific fragment')
+    fragment_render_parser.add_argument('template_name', help='Template name')
+    fragment_render_parser.add_argument('fragment_key', help='Fragment key to render')
+    fragment_render_parser.add_argument('--data', help='YAML/JSON data file')
+    fragment_render_parser.add_argument('--output', help='Output file')
 
-    # Export page fragment
-    export_page_fragment_parser = export_subparsers.add_parser('page_fragment', help='Export page fragment by UUID')
-    export_page_fragment_parser.add_argument('uuid', help='UUID of page fragment to export')
-    export_page_fragment_parser.add_argument('output_path', help='Output filename (with .yaml/.yml extension) or directory')
-
-    # Generate commands
-    generate_parser = subparsers.add_parser('generate', help='Generate template files')
-    generate_parser.add_argument('component', choices=['templates'], 
-                                help='templates - Generate example YAML configuration files for all template components')
-    generate_parser.add_argument('output_dir', help='Directory where template files will be created')
-
-    # Update commands
-    update_parser = subparsers.add_parser('update', help='Update template directories')
-    update_parser.add_argument('component', choices=['templates'], 
-                              help='templates - Create template-fragment files for HTML templates found in directory')
-    update_parser.add_argument('config_dir', help='Directory containing YAML files and templates/ subdirectory')
+    # Cache commands
+    cache_parser = subparsers.add_parser('cache', help='Cache management')
+    cache_subparsers = cache_parser.add_subparsers(dest='cache_action', help='Cache action')
+    
+    cache_subparsers.add_parser('stats', help='Show cache statistics')
+    
+    clear_parser = cache_subparsers.add_parser('clear', help='Clear cache')
+    clear_parser.add_argument('--template', help='Template name (clear all if not specified)')
 
     args = parser.parse_args()
 
@@ -1299,7 +493,7 @@ def main():
     # Initialize CLI
     cli = None
     try:
-        cli = TemplateCLI(
+        cli = TemplateRenderCLI(
             verbose=args.verbose,
             show_icons=not args.no_icons,
             table_format=args.table_format
@@ -1310,59 +504,51 @@ def main():
 
     # Execute commands
     try:
-        if args.command == 'create':
-            if args.component == 'theme':
-                cli.create_theme_from_yaml(args.file_or_dir)
-                return 0
-            elif args.component == 'template':
-                cli.create_template_from_yaml(args.file_or_dir)
-                return 0
-            elif args.component == 'template_fragment':
-                cli.create_template_fragment_from_yaml(args.file_or_dir)
-                return 0
-            elif args.component == 'page':
-                cli.create_page_from_yaml(args.file_or_dir)
-                return 0
-            elif args.component == 'page_fragment':
-                cli.create_page_fragment_from_yaml(args.file_or_dir)
-                return 0
-            elif args.component == 'stack':
-                return cli.create_full_stack(args.file_or_dir)
-
-        elif args.command == 'list':
-            if args.component == 'themes':
-                return cli.list_themes()
-            elif args.component == 'templates':
-                return cli.list_templates()
-            elif args.component == 'fragments':
-                return cli.list_template_fragments()
-            elif args.component == 'pages':
-                return cli.list_pages()
-            elif args.component == 'page_fragments':
-                return cli.list_page_fragments()
-
-        elif args.command == 'export':
-            if args.export_component == 'theme':
-                return cli.export_theme_by_uuid(args.uuid, args.output_path)
-            elif args.export_component == 'template':
-                return cli.export_template_by_uuid(args.uuid, args.output_path)
-            elif args.export_component == 'page':
-                return cli.export_page_by_uuid(args.uuid, args.output_path)
-            elif args.export_component == 'template_fragment':
-                return cli.export_template_fragment_by_uuid(args.uuid, args.output_path)
-            elif args.export_component == 'page_fragment':
-                return cli.export_page_fragment_by_uuid(args.uuid, args.output_path)
+        if args.command == 'list':
+            if args.list_type == 'templates':
+                return cli.list_templates(module_name=getattr(args, 'module', None))
+            elif args.list_type == 'fragments':
+                return cli.list_fragments(template_name=getattr(args, 'template', None))
             else:
-                export_parser.print_help()
+                list_parser.print_help()
                 return 1
 
-        elif args.command == 'generate':
-            if args.component == 'templates':
-                return cli.generate_yaml_templates(args.output_dir)
+        elif args.command == 'show':
+            return cli.show_template(args.template_name)
 
-        elif args.command == 'update':
-            if args.component == 'templates':
-                return cli.update_templates(args.config_dir)
+        elif args.command == 'render':
+            if args.render_type == 'template':
+                return cli.render_template(
+                    args.template_name,
+                    data_file=getattr(args, 'data', None),
+                    output_file=getattr(args, 'output', None),
+                    force_refresh=getattr(args, 'force_refresh', False)
+                )
+            elif args.render_type == 'base':
+                return cli.render_base_template(
+                    args.template_name,
+                    data_file=getattr(args, 'data', None),
+                    output_file=getattr(args, 'output', None)
+                )
+            elif args.render_type == 'fragment':
+                return cli.render_fragment(
+                    args.template_name,
+                    args.fragment_key,
+                    data_file=getattr(args, 'data', None),
+                    output_file=getattr(args, 'output', None)
+                )
+            else:
+                render_parser.print_help()
+                return 1
+
+        elif args.command == 'cache':
+            if args.cache_action == 'stats':
+                return cli.cache_stats()
+            elif args.cache_action == 'clear':
+                return cli.clear_cache(template_name=getattr(args, 'template', None))
+            else:
+                cache_parser.print_help()
+                return 1
 
         else:
             parser.print_help()
@@ -1375,15 +561,15 @@ def main():
         return 1
     except Exception as e:
         if cli:
-            cli.log_error(f"Unexpected error during command execution: {e}")
+            cli.log_error(f"Unexpected error: {e}")
         print(f"Error: {e}")
         return 1
     finally:
-        # Clean up session
         if cli:
             cli.close()
 
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())

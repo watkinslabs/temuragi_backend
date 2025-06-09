@@ -12,7 +12,7 @@ from app._system.menu.menu_type_model import MenuType
 from app._system.menu.menu_tier_model import MenuTier
 from app._system.menu.menu_link_model import MenuLink
 from app._system.menu.menu_quick_link_model import UserQuickLink
-from app._system.role.role_menu_permission_model import RoleMenuPermission
+from app._system.role.role_permission_model import RoleMenuPermission
 from app._system.role.role_model import Role
 from app._system.user.user_model import User
 

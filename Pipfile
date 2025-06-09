@@ -14,9 +14,9 @@ pyodbc = "*"
 requests = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
-tabulate = "*"
 pyaml = "*"
 flask = "*"
+tabulate = "*"
 
 [dev-packages]
 

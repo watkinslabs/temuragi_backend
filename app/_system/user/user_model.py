@@ -20,7 +20,7 @@ class User(BaseModel):
     role_uuid = Column(
         UUID(as_uuid=True),
         ForeignKey('roles.uuid', name='fk_users_role'),
-        nullable=False
+        nullable=True
     )
     password_hash = Column(String, nullable=False)
     salt = Column(String, nullable=False)

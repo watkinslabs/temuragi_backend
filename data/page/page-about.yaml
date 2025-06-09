@@ -1,0 +1,27 @@
+# About Page
+Page:
+  meta:
+    tablename: pages
+    schema: public
+  data:
+    name: about
+    title: About Us
+    slug: about
+    template_uuid: 00000000-0000-0000-0000-000000000003
+    meta_description: Learn about our company, mission, and values.
+    meta_keywords: about, company, mission, values, team
+    og_title: About Us
+    og_description: Learn about our company, mission, and values.
+    og_image: /assets/images/og-about.jpg
+    canonical_url: /about
+    published: true
+    featured: false
+    sort_order: 2
+    publish_date: null
+    expire_date: null
+    view_count: 0
+    requires_auth: false
+    cache_duration: 7200
+    uuid: 00000000-0000-0000-0000-000000000021
+    is_active: true
+

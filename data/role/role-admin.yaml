@@ -1,0 +1,16 @@
+# Role 'admin'
+# UUID: 6d25b46e-9322-4114-ba15-00bbd044d774
+# Exported from template CLI
+
+Role:
+  meta:
+    tablename: roles
+    schema: public
+  data:
+    name: admin
+    display: Admin
+    is_admin: false
+    uuid: 6d25b46e-9322-4114-ba15-00bbd044d774
+    is_active: true
+    created_at: '2025-06-08T19:03:20.358281-04:00'
+    updated_at: '2025-06-08T19:03:20.358346-04:00'

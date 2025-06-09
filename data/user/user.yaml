@@ -1,0 +1,19 @@
+# User 'b3e5a602'
+# UUID: b3e5a602-499b-4c46-ad5f-675aecb701ca
+# Exported from template CLI
+
+User:
+  meta:
+    tablename: users
+    schema: public
+  data:
+    username: chris
+    email: chris@watkinslabs
+    password_hash: 7d4b472911945bab8842373697ca869b9ebd84e741029ad812c888552c78a081
+    salt: 48c15a1f39b9aa5ecebd1543f85bc917
+    failed_login_attempts: 0
+    is_locked: false
+    uuid: b3e5a602-499b-4c46-ad5f-675aecb701ca
+    is_active: true
+    created_at: '2025-06-08T18:14:45.247210-04:00'
+    updated_at: '2025-06-08T18:14:45.247248-04:00'
