@@ -1,10 +1,8 @@
-import uuid
-import datetime
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Text, Index, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app._system._core.base import BaseModel
+from app.base.model import BaseModel
 
 
 class RolePermission(BaseModel):
@@ -38,7 +36,7 @@ class RolePermission(BaseModel):
     @classmethod
     def grant_permission(cls, session, role_uuid, permission_name):
         """Grant a permission to a role"""
-        from app.register_db import get_model
+        from app.register.database import get_model
         
         # Get Permission model from registry
         permission_model = get_model('Permission')
@@ -73,7 +71,7 @@ class RolePermission(BaseModel):
     @classmethod
     def revoke_permission(cls, session, role_uuid, permission_name):
         """Revoke a permission from a role"""
-        from app.register_db import get_model
+        from app.register.database import get_model
         
         # Get Permission model from registry
         permission_model = get_model('Permission')
@@ -102,7 +100,7 @@ class RolePermission(BaseModel):
     @classmethod
     def user_has_permission(cls, session, user_uuid, permission_name):
         """Check if a user has a specific permission through their role"""
-        from app.register_db import get_model
+        from app.register.database import get_model
         
         # Get models from registry
         user_model = get_model('User')
@@ -132,7 +130,7 @@ class RolePermission(BaseModel):
     @classmethod
     def get_user_permissions(cls, session, user_uuid):
         """Get all permissions for a user through their role"""
-        from app.register_db import get_model
+        from app.register.database import get_model
         
         # Get models from registry
         user_model = get_model('User')

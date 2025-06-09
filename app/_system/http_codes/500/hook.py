@@ -1,7 +1,4 @@
 from flask import render_template
-import traceback
-import sys
-
 
 
 def register_broken_code_error_handlers(app):

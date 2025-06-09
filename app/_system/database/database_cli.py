@@ -5,17 +5,13 @@ Database Management CLI Tool
 
 import argparse
 import sys
-import os
-import re
-import importlib
 import inspect
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from tabulate import tabulate
 
 # Add app path
 sys.path.append('/web/temuragi')
-from app.base_cli import BaseCLI
+from app.base.cli import BaseCLI
 
 try:
     from app.config import config
@@ -63,7 +59,7 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Discovering models with initial data methods")
 
         try:
-            from app.register_db import discover_and_import_models, get_all_models
+            from app.register.database import discover_and_import_models, get_all_models
             
             self.output_info("Discovering and importing models...")
             
@@ -315,7 +311,7 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Creating database tables")
 
         try:
-            from app.register_db import discover_and_import_models, create_all_tables
+            from app.register.database import discover_and_import_models, create_all_tables
             
             # Mock app for logging
             class MockApp:
@@ -502,7 +498,7 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Previewing model loading order")
 
         try:
-            from app.register_db import preview_model_registry, discover_and_import_models
+            from app.register.database import preview_model_registry, discover_and_import_models
             
             self.output_info("Loading models and previewing registry...")
             
@@ -846,6 +842,170 @@ class DatabaseCLI(BaseCLI):
         self.log_debug("Closing database CLI")
         super().close()
 
+    def list_models(self):
+        """List all discovered models and their details"""
+        self.log_info("Listing discovered models")
+
+        try:
+            from app.register.database import discover_and_import_models, get_all_models
+
+            self.output_info("Discovering and importing models...")
+
+            # Use the register_db discovery system
+            discover_and_import_models()
+
+            # Get all models from the registry
+            all_models = get_all_models()
+
+            if not all_models:
+                self.output_warning("No models found in registry")
+                return 0
+
+            self.output_info(f"Found {len(all_models)} entries in model registry:")
+
+            # Separate actual model classes from table name aliases
+            model_classes = {}
+            table_aliases = {}
+
+            for name, model_class in all_models.items():
+                if hasattr(model_class, '__tablename__') and hasattr(model_class, '__name__'):
+                    if name == model_class.__name__:
+                        # This is the actual class name
+                        model_classes[name] = model_class
+                    elif name == model_class.__tablename__:
+                        # This is a table name alias
+                        table_aliases[name] = model_class
+
+            # Display model classes
+            if model_classes:
+                headers = ['Class Name', 'Table Name', 'Module', 'Dependencies', 'Methods']
+                rows = []
+
+                for name, model_class in sorted(model_classes.items()):
+                    table_name = model_class.__tablename__
+                    module = model_class.__module__
+                    
+                    # Get dependencies
+                    deps = getattr(model_class, '__depends_on__', None)
+                    deps_str = str(deps) if deps else 'None'
+                    
+                    # Check for common methods
+                    methods = []
+                    if hasattr(model_class, 'create_initial_data'):
+                        methods.append('initial_data')
+                    if hasattr(model_class, '__str__'):
+                        methods.append('__str__')
+                    if hasattr(model_class, '__repr__'):
+                        methods.append('__repr__')
+                    
+                    methods_str = ', '.join(methods) if methods else 'None'
+
+                    rows.append([name, table_name, module, deps_str, methods_str])
+
+                self.output_info("Model Classes:")
+                self.output_table(rows, headers=headers)
+
+            # Display summary
+            self.output_info(f"Summary:")
+            self.output_info(f"  Model Classes: {len(model_classes)}")
+            self.output_info(f"  Table Aliases: {len(table_aliases)}")
+            self.output_info(f"  Total Registry: {len(all_models)} entries")
+
+            # Show table aliases if any
+            if table_aliases:
+                self.output_info(f"Table Name Aliases: {', '.join(sorted(table_aliases.keys()))}")
+
+            return 0
+
+        except Exception as e:
+            self.log_error(f"Error listing models: {e}")
+            self.output_error(f"Error listing models: {e}")
+            import traceback
+            traceback.print_exc()
+            return 1
+
+    def debug_model_discovery(self):
+        """Debug model discovery process"""
+        self.log_info("Debugging model discovery process")
+
+        try:
+            self.output_info("=== DEBUG MODEL DISCOVERY ===")
+            
+            # Check config
+            try:
+                from app.config import config
+                scan_paths = config['SYSTEM_SCAN_PATHS']
+                self.output_success(f"✓ SYSTEM_SCAN_PATHS found: {scan_paths}")
+            except KeyError:
+                self.output_error("✗ SYSTEM_SCAN_PATHS not found in config")
+                return 1
+            except Exception as e:
+                self.output_error(f"✗ Error importing config: {e}")
+                return 1
+            
+            # Check current working directory and __package__
+            import os
+            from app.register import database as db_module
+            
+            self.output_info(f"Current working directory: {os.getcwd()}")
+            self.output_info(f"Database module __package__: {db_module.__package__}")
+            self.output_info(f"Database module __file__: {db_module.__file__}")
+            
+            # Check each scan path
+            root_pkg = db_module.__package__
+            base_dir_relative_to_register = os.path.dirname(db_module.__file__)
+            
+            for scan_path in scan_paths:
+                self.output_info(f"\n--- Checking scan path: {scan_path} ---")
+                base_dir = os.path.join(base_dir_relative_to_register, scan_path)
+                abs_path = os.path.abspath(base_dir)
+                self.output_info(f"Relative path: {base_dir}")
+                self.output_info(f"Absolute path: {abs_path}")
+                self.output_info(f"Path exists: {os.path.exists(abs_path)}")
+                
+                if os.path.exists(abs_path):
+                    self.output_info("Contents:")
+                    model_count = 0
+                    for root, dirs, files in os.walk(abs_path):
+                        model_files = [f for f in files if f.endswith('_model.py')]
+                        if model_files:
+                            rel_root = os.path.relpath(root, abs_path)
+                            display_path = rel_root if rel_root != '.' else '/'
+                            self.output_info(f"  {display_path}: {model_files}")
+                            model_count += len(model_files)
+                    
+                    if model_count == 0:
+                        self.output_warning(f"  No *_model.py files found in {scan_path}")
+                else:
+                    self.output_warning(f"  Path does not exist: {abs_path}")
+            
+            # Check current registry state before discovery
+            from app.register.database import _model_registry
+            self.output_info(f"\n--- Registry State (before discovery) ---")
+            self.output_info(f"_model_registry size: {len(_model_registry)}")
+            
+            # Try discovery
+            self.output_info(f"\n--- Running Discovery ---")
+            from app.register.database import discover_and_import_models
+            discover_and_import_models()
+            
+            # Check registry state after discovery
+            self.output_info(f"\n--- Registry State (after discovery) ---")
+            self.output_info(f"_model_registry size: {len(_model_registry)}")
+            if _model_registry:
+                self.output_info("Registry contents:")
+                for name, cls in _model_registry.items():
+                    self.output_info(f"  {name}: {cls} (from {cls.__module__})")
+            
+            self.output_info("=== END DEBUG ===")
+            return 0
+
+        except Exception as e:
+            self.log_error(f"Error during debug: {e}")
+            self.output_error(f"Error during debug: {e}")
+            import traceback
+            traceback.print_exc()
+            return 1
 
 def main():
     """CLI entry point"""
@@ -871,6 +1031,11 @@ def main():
 
     # List tables
     subparsers.add_parser('list-tables', help='List all current database tables with row counts')
+
+    # List Models
+    subparsers.add_parser('list-models', help='List all loaded python model classes')
+
+    subparsers.add_parser('debug-discovery', help='Debug the model discovery process')
 
     # Preview model order
     subparsers.add_parser('preview-order', help='Preview model loading order')
@@ -932,7 +1097,12 @@ def main():
 
         elif args.command == 'list-tables':
             return cli.list_tables()
-
+        elif args.command == 'list-models':
+            return cli.list_models()
+        
+        elif args.command == 'debug-discovery':
+            return cli.debug_model_discovery()
+        
         elif args.command == 'preview-order':
             return cli.preview_model_order()
 

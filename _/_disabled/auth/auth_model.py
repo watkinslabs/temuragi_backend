@@ -8,7 +8,7 @@ from sqlalchemy import Column, String, Boolean, DateTime, Integer, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import relationship
 
-from app._system._core.base import BaseModel
+from app.base.model import BaseModel
 
 class Auth(BaseModel):
     """User model"""

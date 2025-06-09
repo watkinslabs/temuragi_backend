@@ -1,10 +1,8 @@
-import uuid
-import datetime
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Text, Index, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app._system._core.base import BaseModel
+from app.base.model import BaseModel
 
 
 class Role(BaseModel):

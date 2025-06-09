@@ -1,10 +1,8 @@
-import uuid
-import datetime
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Text, Index, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app._system._core.base import BaseModel
+from app.base.model import BaseModel
 
 
 class Permission(BaseModel):
@@ -31,7 +29,7 @@ class Permission(BaseModel):
 
     @classmethod
     def create_permission(cls, session, service, action, resource=None, description=None):
-        """Create a new permission with AWS-style naming"""
+        """Create a new permission name"""
         if resource:
             name = f"{service}:{action}:{resource}"
         else:

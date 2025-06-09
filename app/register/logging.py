@@ -1,0 +1,42 @@
+import os
+import logging
+from logging.handlers import RotatingFileHandler
+
+def register_logger(app):
+    """
+    Initialize and configure application logger
+    
+    Args:
+        app: Flask app instance
+    """
+    log_level = app.config['LOG_LEVEL']
+    log_file = app.config['LOG_FILE']
+    max_bytes = 10485760
+    backup_count = 5
+
+    # Configure logging format
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
+    )
+    
+    # Configure file handler with rotation
+    log_dir = os.path.dirname(log_file) if os.path.dirname(log_file) else '.'
+    os.makedirs(log_dir, exist_ok=True)
+    
+    file_handler = RotatingFileHandler(
+        log_file, 
+        maxBytes=max_bytes,
+        backupCount=backup_count
+    )
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(log_level)
+    
+    # Clear existing handlers and set up new configuration
+    app.logger.handlers.clear()
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(log_level)
+    
+    # Ensure propagation to root logger is disabled to avoid duplicate logs
+    app.logger.propagate = False
+    
+    app.logger.info(f"Flask application '{app.name}' initialized with logger")

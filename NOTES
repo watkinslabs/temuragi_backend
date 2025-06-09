@@ -5,3 +5,6 @@ x add makefile options for this.. or a main CLI that auto registers all CLI's an
 x changed active to is_active
 x added db init frfom cli
 x added db data from cli
+x add templates
+x export import data
+o render templates

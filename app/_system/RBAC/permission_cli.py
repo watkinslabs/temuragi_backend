@@ -6,13 +6,12 @@ Manage  permissions (service:action format) from command line
 
 import argparse
 import sys
-import os
 from tabulate import tabulate
 
 # Add your app path to import the model and config
 sys.path.append('/web/temuragi')
-from app.register_db import register_models_for_cli, get_model
-from app.base_cli import BaseCLI
+
+from app.base.cli import BaseCLI
 
 CLI_DESCRIPTION = "Manages  permissions (service:action format)"
 

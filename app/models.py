@@ -5,7 +5,7 @@ Usage: from app.models import get_model, Theme, PageTemplate
 """
 
 # Import the functions from the register system
-from .register_db import get_model, list_models, get_all_models, _model_registry
+from register.database import get_model, list_models, get_all_models, _model_registry
 
 # Make functions available directly
 __all__ = ['get_model', 'list_models', 'get_all_models']

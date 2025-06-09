@@ -2,9 +2,8 @@ import json
 from sqlalchemy import Column, String, Boolean, Text, func, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import uuid
 
-from app._system._core.base import BaseModel
+from app.base.model import BaseModel
 
 class Module(BaseModel):
     """Model for storing module configurations"""

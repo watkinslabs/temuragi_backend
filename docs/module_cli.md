@@ -15,7 +15,7 @@ Description of what your CLI does
 
 import argparse
 import sys
-from app.base_cli import BaseCLI
+from app.base.cli import BaseCLI
 
 CLI_DESCRIPTION = "Brief description for auto-discovery"
 

@@ -1,6 +1,5 @@
 # module_config/view.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, g, json
-import html
 
 from app.models import ModuleConfig
 

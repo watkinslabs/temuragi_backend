@@ -1,18 +1,9 @@
-import os
-import importlib
-import inspect
-from flask import Flask, g , session 
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, scoped_session, relationship
-
+from flask import Flask
 from .config import config 
-from .utils.route_collector import collect_blueprint_routes
-from .utils.logger import register_logger
-
-from .register_blueprints import register_blueprints
-from .register_hooks import register_hooks
-from .register_db import register_db
-
+from .register.logging import register_logger
+from .register.blueprints import register_blueprints
+from .register.template_hooks import register_hooks
+from .register.database import register_db
 
 
 def create_app():
@@ -35,8 +26,6 @@ def create_app():
     register_hooks("_system",app)
     register_hooks("admin",app)
     register_hooks("_user",app)
-
-    collect_blueprint_routes(app)
 
     return app
 

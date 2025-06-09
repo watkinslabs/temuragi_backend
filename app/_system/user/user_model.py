@@ -8,11 +8,11 @@ from sqlalchemy import Column, String, Boolean, DateTime, Integer, ForeignKey, I
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
-from app._system._core.base import BaseModel
+from app.base.model import BaseModel
 
 class User(BaseModel):
     """User model"""
-    __depends_on__ = ['Role']  # Depends on Role
+    __depends_on__ = ['Role'] 
     __tablename__ = 'users'
 
     username = Column(String(100), unique=True, nullable=False)

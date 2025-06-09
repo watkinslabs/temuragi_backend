@@ -6,15 +6,14 @@ Manage roles and permissions from command line
 
 import argparse
 import sys
-import os
 from tabulate import tabulate
 
 # Add your app path to import the model and config
 sys.path.append('/web/temuragi')
-from app.register_db import register_models_for_cli, get_model
-from app.base_cli import BaseCLI
 
-CLI_DESCRIPTION = "Manages roles (use permission CLI for AWS-style permissions)"
+from app.base.cli import BaseCLI
+
+CLI_DESCRIPTION = "Manages roles (use permission CLI for permissions)"
 
 class RoleCLI(BaseCLI):
     def __init__(self, verbose=False, show_icons=True, table_format=None):
