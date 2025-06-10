@@ -61,37 +61,46 @@ def register_models_for_cli():
     return session_factory()
 
 
+
 def register_db(app: Flask):
     """Initialize database and register all models with dependency-aware ordering"""
+
     # Clear registry for fresh start
     global _model_registry
+    print(f"Model registry size before clear: {len(_model_registry)}")
     _model_registry.clear()
-    
+
     # Create database engine and session
     config_engine = create_engine(app.config['DATABASE_URI'])
     app.db_session = scoped_session(sessionmaker(bind=config_engine))
-    
+
     # Discover and import all models with dependency resolution
     discover_and_import_models(app)
-    
+
     # Create all tables
     create_all_tables(app, config_engine)
-    
+
     # Setup session cleanup
     @app.teardown_appcontext
     def cleanup_sessions(exc=None):
         app.db_session.remove()
-    
+
     # Make session available in request context
     @app.before_request
     def setup_request_context():
         if not hasattr(g, 'session'):
             g.session = app.db_session
-    
+
     # Make model registry available on app
     app.models = _model_registry
     app.get_model = get_model
 
+    import app.models as models_module
+    for name, model in _model_registry.items():
+        if not name.islower():
+            setattr(models_module, name, model)
+            if name not in models_module.__all__:
+                models_module.__all__.append(name)    
 
 def discover_and_import_models(app=None):
     """Discover all model files and import them with dependency resolution"""
@@ -227,8 +236,8 @@ def build_dependency_graph(models, app=None):
         for dep_module in module_dependencies:
             reverse_graph[dep_module].add(module_name)
         
-        if app:
-            app.logger.debug(f"  {module_name}: depends on {module_dependencies or 'none'}")
+        #if app:
+        #    app.logger.debug(f"  {module_name}: depends on {module_dependencies or 'none'}")
     
     return dependency_graph, reverse_graph, module_map
 
@@ -273,10 +282,12 @@ def import_models_with_dependencies(models, app=None):
     """Import models respecting dependency declarations"""
     global _model_registry
     
+    processed_modules = set()  # Track what we've already processed
+
     try:
         # Build dependency graph
         dependency_graph, reverse_graph, module_map = build_dependency_graph(models, app)
-        
+
         if not dependency_graph:
             if app:
                 app.logger.info("No dependencies found, importing all models")
@@ -284,15 +295,17 @@ def import_models_with_dependencies(models, app=None):
                 print("No dependencies found, importing all models")
             # Fall back to simple import
             for model_info in models:
-                import_single_model(model_info, app)
+                if model_info['import_path'] not in processed_modules:
+                    import_single_model(model_info, app)
+                    processed_modules.add(model_info['import_path'])
             return
-        
+
         # Sort models by dependencies
         sorted_model_names = topological_sort(dependency_graph)
-        
+
         if app:
             app.logger.info(f"Importing {len(sorted_model_names)} models in dependency order:")
-        
+
         # Import in dependency order
         imported = set()
         for module_name in sorted_model_names:
@@ -300,23 +313,28 @@ def import_models_with_dependencies(models, app=None):
                 model_data = module_map[module_name]
                 module = model_data['module']
                 model_info = model_data['info']
-                
-                # Register model classes from this module
-                register_model_classes_from_module(module, app)
-                imported.add(module_name)
-                
-                if app:
-                    app.logger.info(f"  ✓ {model_info['display']}")
-        
+
+                # Only process if we haven't already
+                if model_info['import_path'] not in processed_modules:
+                    # Register model classes from this module
+                    register_model_classes_from_module(module, app)
+                    imported.add(module_name)
+                    processed_modules.add(model_info['import_path'])
+
+                    if app:
+                        app.logger.info(f"  ✓ {model_info['display']}")
+
         # Import any remaining models that weren't in the dependency graph
         for model_info in models:
             module_name = model_info['module_name']
-            if module_name not in [m['info']['module_name'] for m in module_map.values()]:
+            if (module_name not in [m['info']['module_name'] for m in module_map.values()] and
+                model_info['import_path'] not in processed_modules):
                 import_single_model(model_info, app)
-        
+                processed_modules.add(model_info['import_path'])
+
         if app:
             app.logger.info(f"Successfully imported {len(imported)} models with dependencies")
-        
+
     except Exception as e:
         if app:
             app.logger.error(f"Dependency resolution failed: {e}")
@@ -324,10 +342,12 @@ def import_models_with_dependencies(models, app=None):
         else:
             print(f"Error: Dependency resolution failed: {e}")
             print("Falling back to simple import order")
-        
+
         # Fall back to simple import
         for model_info in models:
-            import_single_model(model_info, app)
+            if model_info['import_path'] not in processed_modules:
+                import_single_model(model_info, app)
+                processed_modules.add(model_info['import_path'])
 
 
 def import_single_model(model_info, app=None):
@@ -359,13 +379,9 @@ def register_model_classes_from_module(module, app=None):
             # Register by class name
             _model_registry[name] = obj
             tables_found.append(obj.__tablename__)
-            
-            # Also register by table name for convenience
-            if hasattr(obj, '__tablename__'):
-                _model_registry[obj.__tablename__] = obj
     
-    if tables_found and app:
-        app.logger.debug(f"    Registered: {', '.join(tables_found)}")
+#    if tables_found and app:
+#        app.logger.debug(f"    Registered: {', '.join(tables_found)}")
 
 def preview_model_registry():
     """Preview what's in the model registry - for CLI/debugging"""

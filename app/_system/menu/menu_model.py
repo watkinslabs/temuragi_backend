@@ -13,7 +13,7 @@ class Menu(BaseModel):
     display = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
 
-    tiers = relationship("MenuTier", back_populates="menu_type", cascade="all, delete-orphan")
+    tiers = relationship("MenuTier", back_populates="menu", cascade="all, delete-orphan")
 
     @classmethod
     def create_initial_data(cls, session):

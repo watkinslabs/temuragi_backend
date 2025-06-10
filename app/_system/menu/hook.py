@@ -1,9 +1,8 @@
-import uuid
 from flask import url_for, render_template_string, g, current_app, request
-from sqlalchemy import and_
-from typing import List, Dict, Optional, Union
 
-from app.models import MenuTemplates, MenuBuilder
+
+#from .menu_templates import MenuTemplates
+#from .menu_service import MenuBuilder
 
 def register_menu_injector(app):
     """
@@ -17,20 +16,20 @@ def register_menu_injector(app):
     # Add template globals
     @app.context_processor
     def inject_menu_functions():
-        MenuBuilder
         
 
         def get_menu_builder():
             db_session = g.session if hasattr(g, 'session') else current_app.db_session
-            if not hasattr(g, 'menu_builder'):
-                g.menu_builder = MenuBuilder(db_session)
-            return g.menu_builder
+            #if not hasattr(g, 'menu_builder'):
+            #    g.menu_builder = MenuBuilder(db_session)
+            #return g.menu_builder
+            return None
 
         if request.path.startswith(app.config['ADMIN_ROUTE_PREFIX']):
             menu_tree="ADMIN"
         else:
             menu_tree="MAIN"
-
+        """
         return {
             'get_menu': lambda menu_type=menu_tree, user_uuid=None: 
                 get_menu_builder().get_menu_structure(menu_type, user_uuid),
@@ -42,4 +41,7 @@ def register_menu_injector(app):
                 get_menu_builder().render_user_quick_links(user_uuid, template_path, template_string, **kwargs),
             'menu_templates': MenuTemplates
         }
-    
+        """
+        return {
+             
+        }

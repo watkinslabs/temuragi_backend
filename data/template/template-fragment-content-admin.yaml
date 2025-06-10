@@ -1,0 +1,76 @@
+# Admin Module Template Fragments
+TemplateFragment:
+
+    meta:
+      tablename: template_fragments
+      schema: public
+    data:
+      template_uuid: 00000000-0000-0000-0000-000000000002
+      fragment_type: content
+      fragment_name: Admin Main Content Area
+      fragment_key: content
+      template_file_path: admin/fragments/main_content.html
+      compiled_file_path: compiled/admin/fragments/main_content.html
+      content_type: text/html
+      version_number: 1
+      version_label: v1.0.0
+      is_active: true
+      template_source: |
+        <main class="content">
+                <h1>CLI Reference</h1>
+                <h2>Documentation Version 3.11</h2>
+                <p><strong>Abstract:</strong> This CLI reference provides comprehensive documentation for command line interface operations and management.</p>
+                
+                <h3>Table of Contents</h3>
+                <ul>
+                    <li><a href="#" class="breadcrumb_link">Getting Started with the CLI</a></li>
+                    <li><a href="#" class="breadcrumb_link">Basic CLI Operations</a></li>
+                    <li><a href="#" class="breadcrumb_link">Advanced CLI Commands</a></li>
+                    <li><a href="#" class="breadcrumb_link">Troubleshooting</a></li>
+                </ul>
+                
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>Scroll down to see the topbar disappear...</p>
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>The header will stick at the top once the topbar scrolls away.</p>
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>This is a generic documentation layout template.</p>
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>Everything scrolls with one scrollbar.</p>
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>More content to demonstrate the scrolling behavior...</p>
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>Keep scrolling to reach the footer...</p>
+          </main>
+      template_hash: null
+      variables_schema: |
+        {
+          "type": "object",
+          "properties": {
+            "page_title": {"type": "string"},
+            "page_actions": {"type": "string"}
+          }
+        }
+      sample_data: |
+        {
+          "page_title": "Dashboard",
+          "page_actions": "<button class='pf-c-button pf-m-primary'>New Item</button>"
+        }
+      required_context: null
+      dependencies: |
+        ["render_breadcrumbs", "get_flashed_messages"]
+      css_dependencies: |
+        ["/static/css/bootstrap.min.css", "/static/css/admin-content.css"]
+      js_dependencies: |
+        ["/static/js/admin-content.js"]
+      description: Main content area for admin pages with breadcrumbs and flash messages
+      usage_notes: Includes content block for page-specific content and page_actions block for action buttons
+      preview_template: admin/previews/main_content.html
+      sort_order: 4
+      is_partial: true
+      cache_strategy: none
+      cache_duration: 0
+      last_compiled: null
+      change_description: Initial admin main content fragment
+      created_by_user_uuid: null
+

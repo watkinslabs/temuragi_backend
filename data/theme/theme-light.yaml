@@ -1,24 +1,273 @@
-# Modern Light Theme
-# Default system theme with clean, professional styling
+# Modern Purple Documentation Theme
+# Professional documentation theme with purple/blue gradient styling
 
 Theme:
   meta:
     tablename: themes
     schema: public
   data:
-    name: modern_light
-    display_name: Modern Light
-    description: Clean, modern light theme with professional styling and Bootstrap 5 framework
+    name: modern_purple_docs
+    display_name: Modern Purple Documentation
+    description: Professional documentation theme with purple/blue gradients and clean typography
     theme_version: 1.0.0
     css_framework: Bootstrap
     css_version: 5.3.0
     custom_css: |
       :root {
-        --bs-body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        --content-max-width: 1200px;
+        --bs-body-font-family: var(--theme-font-primary);
+        --content-max-width: var(--theme-container-max-width);
       }
-      .navbar-brand { font-weight: 600; }
-      .card { box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+      .navbar-brand { font-weight: var(--theme-font-weight-bold); }
+      .card { box-shadow: var(--theme-shadow-sm); }
+      .topbar { 
+        background: linear-gradient(135deg, var(--theme-primary) 0%, var(--accent) 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 calc(var(--theme-spacing-unit) * 1.5);
+        font-size: 13px;
+        height: 30px;
+        font-weight: 500;
+      }
+      .header { 
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 calc(var(--theme-spacing-unit) * 1.5);
+        border-bottom: 3px solid var(--theme-primary);
+        height: var(--theme-navbar-height);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: var(--theme-shadow-md);
+      }
+      .header h1 {
+        font-weight: var(--theme-font-weight-bold);
+        font-size: 20px;
+        letter-spacing: -0.5px;
+        margin: 0;
+        font-family: var(--theme-font-heading);
+      }
+      .breadcrumbs {
+        background-color: var(--theme-surface);
+        padding: var(--theme-spacing-unit) calc(var(--theme-spacing-unit) * 1.5);
+        border-bottom: var(--theme-border-width) solid var(--theme-border-color);
+        font-size: 14px;
+        color: var(--theme-text-muted);
+        font-weight: 500;
+      }
+      .content_area {
+        display: grid;
+        grid-template-columns: var(--theme-sidebar-width) 1fr;
+        min-height: calc(100vh - 94px - var(--theme-footer-height));
+        position: relative;
+      }
+      .sidebar_container {
+        position: relative;
+        transition: transform var(--theme-transition-duration) var(--theme-animation-easing);
+      }
+      .content_area.collapsed .sidebar_container {
+        transform: translateX(-235px);
+      }
+      .sidebar {
+        background-color: var(--theme-background);
+        border-right: 4px solid var(--theme-border-color);
+        padding: calc(var(--theme-spacing-unit) * 1.5);
+        width: var(--theme-sidebar-width);
+        height: 100%;
+        position: relative;
+        box-shadow: var(--theme-shadow-sm);
+      }
+      .sidebar h3 {
+        color: var(--theme-text);
+        font-weight: var(--theme-font-weight-bold);
+        font-size: 16px;
+        margin-bottom: var(--theme-spacing-unit);
+        letter-spacing: -0.25px;
+        font-family: var(--theme-font-heading);
+      }
+      .sidebar_content {
+        transition: opacity var(--theme-transition-duration) var(--theme-animation-easing);
+      }
+      .content_area.collapsed .sidebar_content {
+        opacity: 0;
+      }
+      .sidebar_toggle { 
+        position: absolute;
+        top: 16px;
+        right: -20px;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--theme-primary) 0%, var(--accent) 100%);
+        border: 2px solid var(--theme-background);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px;
+        color: white;
+        transition: all var(--theme-transition-duration) var(--theme-animation-easing);
+        z-index: 101;
+        box-shadow: var(--theme-shadow-md);
+      }
+      .sidebar_toggle:hover {
+        transform: scale(1.1);
+        box-shadow: var(--theme-shadow-lg);
+      }
+      .nav_item {
+        padding: 6px 12px;
+        border-bottom: var(--theme-border-width) solid var(--theme-surface);
+        border-left: 4px solid transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 1px;
+        font-weight: 500;
+        color: var(--theme-text);
+        transition: all var(--theme-transition-duration) var(--theme-animation-easing);
+        overflow: hidden;
+        white-space: nowrap;
+        border-radius: var(--theme-border-radius);
+      }
+      .nav_item .nav_icon {
+        margin-left: auto;
+      }
+      .nav_item.has_children {
+        font-weight: var(--theme-font-weight-bold);
+      }
+      .nav_item.child {
+        padding-left: 28px;
+        font-weight: var(--theme-font-weight-normal);
+        border-bottom: none;
+        background-color: var(--theme-background);
+        color: var(--theme-text-muted);
+        border-left: 4px solid transparent;
+      }
+      .nav_item.grandchild {
+        padding-left: 40px;
+        font-weight: var(--theme-font-weight-normal);
+        border-bottom: none;
+        background-color: var(--theme-background);
+        font-size: 14px;
+        color: var(--theme-text-muted);
+        border-left: 4px solid transparent;
+      }
+      .nav_item:hover {
+        background-color: var(--theme-surface);
+        color: var(--theme-text);
+        border-left: 4px solid var(--theme-secondary);
+      }
+      .nav_item.active {
+        background-color: var(--theme-primary);
+        color: white;
+        border-left: 4px solid var(--theme-secondary);
+      }
+      .nav_icon {
+        font-size: 12px;
+        color: var(--theme-text-muted);
+        transition: transform var(--theme-transition-duration) var(--theme-animation-easing);
+      }
+      .nav_item.expanded .nav_icon {
+        transform: rotate(90deg);
+      }
+      .nav_children {
+        display: none;
+      }
+      .nav_item.expanded + .nav_children {
+        display: block;
+      }
+      .main_content {
+        background-color: var(--theme-background);
+        transition: margin-left var(--theme-transition-duration) var(--theme-animation-easing);
+      }
+      .content_area.collapsed .main_content {
+        margin-left: -235px;
+      }
+      .content {
+        padding: calc(var(--theme-spacing-unit) * 2);
+        max-width: var(--theme-container-max-width);
+      }
+      .content h1 {
+        color: var(--theme-text);
+        font-weight: 700;
+        font-size: 32px;
+        margin-bottom: 8px;
+        letter-spacing: -0.75px;
+        font-family: var(--theme-font-heading);
+      }
+      .content h2 {
+        color: var(--theme-text);
+        font-weight: var(--theme-font-weight-bold);
+        font-size: 24px;
+        margin: calc(var(--theme-spacing-unit) * 2) 0 var(--theme-spacing-unit) 0;
+        letter-spacing: -0.25px;
+        font-family: var(--theme-font-heading);
+      }
+      .content h3 {
+        color: var(--theme-text);
+        font-weight: var(--theme-font-weight-bold);
+        font-size: 20px;
+        margin: calc(var(--theme-spacing-unit) * 1.5) 0 var(--theme-spacing-unit) 0;
+        letter-spacing: -0.25px;
+        font-family: var(--theme-font-heading);
+      }
+      .content p {
+        color: var(--theme-text);
+        font-size: var(--theme-font-size-base);
+        margin-bottom: var(--theme-spacing-unit);
+        line-height: var(--theme-line-height-base);
+      }
+      .content code {
+        font-family: var(--theme-font-mono);
+        background-color: var(--theme-surface);
+        padding: 2px 4px;
+        border-radius: var(--theme-border-radius);
+        font-size: 0.875em;
+      }
+      .content pre {
+        background-color: var(--theme-surface);
+        padding: var(--theme-spacing-unit);
+        border-radius: var(--theme-border-radius);
+        border: var(--theme-border-width) solid var(--theme-border-color);
+        overflow-x: auto;
+      }
+      .footer {
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        color: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--theme-footer-height);
+        border-top: 3px solid var(--theme-primary);
+        margin-top: 0;
+        font-weight: 500;
+      }
+      .breadcrumb_link {
+        color: var(--theme-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color var(--theme-transition-duration) var(--theme-animation-easing);
+      }
+      .breadcrumb_link:hover {
+        color: var(--accent);
+        text-decoration: underline;
+      }
+      .card {
+        box-shadow: var(--theme-shadow-sm);
+        border-radius: var(--theme-card-border-radius);
+        border: var(--theme-border-width) solid var(--theme-border-color);
+      }
+      .alert {
+        border-radius: var(--theme-border-radius);
+      }
+      .btn {
+        border-radius: var(--theme-button-border-radius);
+        font-weight: 500;
+        transition: all var(--theme-transition-duration) var(--theme-animation-easing);
+      }
     css_variables: |
       {
         "primary": "#0d6efd",
@@ -26,7 +275,7 @@ Theme:
         "accent": "#20c997",
         "neutral": "#f8f9fa"
       }
-    mode: light
+    mode: auto
     primary_color: '#0d6efd'
     secondary_color: '#6c757d'
     success_color: '#198754'
@@ -37,6 +286,21 @@ Theme:
     surface_color: '#f8f9fa'
     text_color: '#212529'
     text_muted_color: '#6c757d'
+    border_color: '#dee2e6'
+
+    # Dark mode colors (keeping original Set A dark colors)
+    primary_color_dark: '#7c3aed'
+    secondary_color_dark: '#6b7280'
+    success_color_dark: '#22c55e'
+    warning_color_dark: '#f59e0b'
+    danger_color_dark: '#ef4444'
+    info_color_dark: '#06b6d4'
+    background_color_dark: '#0f172a'
+    surface_color_dark: '#1e293b'
+    text_color_dark: '#f1f5f9'
+    text_muted_color_dark: '#94a3b8'
+    border_color_dark: '#334155'
+
     font_family_primary: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     font_family_heading: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     font_family_mono: 'SFMono-Regular, Menlo, Monaco, Consolas, monospace'
@@ -58,7 +322,6 @@ Theme:
     shadow_md: '0 4px 6px rgba(0,0,0,0.07)'
     shadow_lg: '0 10px 15px rgba(0,0,0,0.1)'
     border_width: 1px
-    border_color: '#dee2e6'
     focus_ring_color: 'rgba(13, 110, 253, 0.25)'
     focus_ring_width: 0.25rem
     transition_duration: 0.15s
@@ -71,9 +334,9 @@ Theme:
     navbar_height: 64px
     sidebar_width: 280px
     footer_height: 80px
-    is_default: true
-    is_system_theme: true
-    supports_dark_mode: false
+    is_default: false
+    is_system_theme: false
+    supports_dark_mode: true
     supports_high_contrast: true
     rtl_support: true
     uuid: 00000000-0000-0000-0000-000000000001

@@ -3,7 +3,8 @@ from flask import url_for, render_template_string
 from sqlalchemy import and_
 from typing import List, Dict, Optional, Union
 
-from app.models import MenuType, MenuTier, MenuLink, UserQuickLink, RoleMenuPermission, Role, User
+
+from app.models import  Menu, MenuTier, MenuLink, UserQuickLink, RoleMenuPermission, Permission, Role, User
 
 class MenuBuilder:
     def __init__(self, db_session):
@@ -14,7 +15,7 @@ class MenuBuilder:
             db_session: SQLAlchemy session object
         """
         self.db_session = db_session
-        
+
     def get_menu_type(self, menu_type_name: str = "MAIN"):
         """
         Get a menu type by name.
@@ -25,8 +26,9 @@ class MenuBuilder:
         Returns:
             MenuType object or None
         """
-        return self.db_session.query(MenuType).filter_by(name=menu_type_name).first()
-    
+#        return self.db_session.query(MenuType).filter_by(name=menu_type_name).first()
+        return None
+
     def get_menu_structure(self, menu_type_name="ADMIN", user_uuid=None):
         """
         Build a complete menu structure from the database.

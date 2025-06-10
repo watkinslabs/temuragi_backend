@@ -5,10 +5,17 @@ Usage: from app.models import get_model, Theme, PageTemplate
 """
 
 # Import the functions from the register system
-from register.database import get_model, list_models, get_all_models, _model_registry
+from .register.database import get_model, list_models, get_all_models, _model_registry
 
 # Make functions available directly
 __all__ = ['get_model', 'list_models', 'get_all_models']
+
+# Populate globals for static imports
+for name, model in _model_registry.items():
+    if not name.islower():  # skip aliases
+        globals()[name] = model
+        __all__.append(name)
+
 
 # Dynamic attribute access for clean imports
 def __getattr__(name):

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, current_app, g
+from flask import  render_template, request, current_app, g
 
 from app.models import Firewall, FirewallLog
 

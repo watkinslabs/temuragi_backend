@@ -10,7 +10,7 @@ Permission:
     name: admin:update
     service: admin
     action: update
-    uuid: 4ae32a3a-f1a4-479e-8381-4e1637753482
+    uuid: 00000000-0000-0000-0000-000000000003
     is_active: true
     created_at: '2025-06-08T19:00:13.396614-04:00'
     updated_at: '2025-06-08T19:00:13.396652-04:00'

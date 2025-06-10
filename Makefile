@@ -66,7 +66,8 @@ create-data:
 	@python -m app.cli database  create-initial-data
 
 
-rebuild-db: drop-tables create-tables create-data
+rebuild-db: drop-tables create-tables 
+	@python -m app.cli porter import-dir ./data
 
 
 templates:

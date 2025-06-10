@@ -31,7 +31,7 @@ class Theme(BaseModel):
     css_variables = Column(Text, nullable=True,
                           comment="JSON object of CSS custom properties")
     
-    # Core Colors (Light/Dark Aware)
+    # Core Colors (Light Mode)
     mode = Column(String(50), nullable=False, default='light',
                  comment="Theme mode (light, dark, auto)")
     primary_color = Column(String(50), nullable=False, default='#0d6efd',
@@ -54,6 +54,30 @@ class Theme(BaseModel):
                        comment="Primary text color (hex)")
     text_muted_color = Column(String(50), nullable=False, default='#6c757d',
                              comment="Secondary text color (hex)")
+    
+    # Dark Mode Colors
+    primary_color_dark = Column(String(50), nullable=True, default='#0d6efd',
+                               comment="Dark mode main brand color (hex)")
+    secondary_color_dark = Column(String(50), nullable=True, default='#6c757d', 
+                                 comment="Dark mode secondary accent color (hex)")
+    success_color_dark = Column(String(50), nullable=True, default='#198754',
+                               comment="Dark mode success state color (hex)")
+    warning_color_dark = Column(String(50), nullable=True, default='#ffc107',
+                               comment="Dark mode warning state color (hex)")
+    danger_color_dark = Column(String(50), nullable=True, default='#dc3545',
+                              comment="Dark mode error/danger state color (hex)")
+    info_color_dark = Column(String(50), nullable=True, default='#0dcaf0',
+                            comment="Dark mode information state color (hex)")
+    background_color_dark = Column(String(50), nullable=True, default='#121212',
+                                  comment="Dark mode main background color (hex)")
+    surface_color_dark = Column(String(50), nullable=True, default='#1e1e1e',
+                               comment="Dark mode card/panel background color (hex)")
+    text_color_dark = Column(String(50), nullable=True, default='#ffffff',
+                            comment="Dark mode primary text color (hex)")
+    text_muted_color_dark = Column(String(50), nullable=True, default='#b0b0b0',
+                                  comment="Dark mode secondary text color (hex)")
+    border_color_dark = Column(String(50), nullable=True, default='#333333',
+                              comment="Dark mode border color (hex)")
     
     # Typography
     font_family_primary = Column(String(500), nullable=False, 

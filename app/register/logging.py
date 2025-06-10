@@ -2,6 +2,8 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
+loger=None
+
 def register_logger(app):
     """
     Initialize and configure application logger
@@ -13,6 +15,17 @@ def register_logger(app):
     log_file = app.config['LOG_FILE']
     max_bytes = 10485760
     backup_count = 5
+
+    
+    # Add process identifier to log file
+    if os.environ.get('WERKZEUG_RUN_MAIN'):
+        # Reloader process (main app)
+        log_file = log_file.replace('.log', '_app.log')
+    else:
+        # Main process
+        log_file = log_file.replace('.log', '_main.log')
+    
+    # Rest of setup with modified log_file...
 
     # Configure logging format
     formatter = logging.Formatter(

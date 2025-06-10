@@ -17,7 +17,7 @@ class MenuTier(BaseModel):
         ForeignKey('menu_tiers.uuid', name='fk_menu_tiers_parent', ondelete='CASCADE'),
         nullable=True)
         
-    menu_type_uuid = Column(UUID(as_uuid=True), 
+    menu_uuid = Column(UUID(as_uuid=True), 
         ForeignKey('menu.uuid', name='fk_menu_tiers_menu', ondelete='CASCADE'), 
         nullable=False)
                             
@@ -27,7 +27,7 @@ class MenuTier(BaseModel):
     development = Column(Boolean, default=False, nullable=False)
     search_terms = Column(Text, nullable=True)
 
-    menu_type = relationship("Menu", back_populates="tiers")
+    menu = relationship("Menu", back_populates="tiers")
     links = relationship("MenuLink", foreign_keys="MenuLink.tier_uuid", back_populates="tier", cascade="all, delete-orphan")
     
     parent = relationship("MenuTier", 
@@ -36,6 +36,6 @@ class MenuTier(BaseModel):
     
     # Create index for uniqueness
     __table_args__ = (
-        Index('idx_menu_tiers_unique', 'slug', 'menu_type_uuid', 
+        Index('idx_menu_tiers_unique', 'slug', 'menu_uuid', 
             'parent_uuid', unique=True),
     )

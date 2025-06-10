@@ -1,0 +1,66 @@
+# Admin Module Template Fragments
+
+TemplateFragment:
+    meta:
+      tablename: template_fragments
+      schema: public
+    data:
+      template_uuid: 00000000-0000-0000-0000-000000000002
+      fragment_type: header
+      fragment_name: Admin Header Bar
+      fragment_key: header
+      template_file_path: admin/fragments/header.html
+      compiled_file_path: compiled/admin/fragments/header.html
+      content_type: text/html
+      version_number: 1
+      version_label: v1.0.0
+      is_active: true
+      template_source: |
+        <div class="topbar">
+            <span>Documentation Portal | Latest Updates | Support</span>
+        </div>
+        <header class="header">
+            <h1>Documentation Site</h1>
+        </header>
+      template_hash: null
+      variables_schema: |
+        {
+          "type": "object",
+          "properties": {
+            "current_user": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "avatar_url": {"type": "string"}
+              },
+              "required": ["name"]
+            },
+            "app_name": {"type": "string"}
+          },
+          "required": ["current_user", "app_name"]
+        }
+      sample_data: |
+        {
+          "current_user": {
+            "name": "Admin User",
+            "avatar_url": "/static/img/admin-avatar.jpg"
+          },
+          "app_name": "System"
+        }
+      required_context: |
+        ["current_user", "app_name"]
+      dependencies: null
+      css_dependencies: |
+        ["/static/css/bootstrap.min.css"]
+      js_dependencies: |
+        ["/static/js/admin-header.js"]
+      description: Admin interface header with navigation toggle and user menu
+      usage_notes: Sticky header bar for admin interface
+      preview_template: admin/previews/header.html
+      sort_order: 2
+      is_partial: true
+      cache_strategy: dynamic
+      cache_duration: 300
+      last_compiled: null
+      change_description: Initial admin header fragment
+      created_by_user_uuid: null

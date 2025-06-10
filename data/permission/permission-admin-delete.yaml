@@ -10,7 +10,7 @@ Permission:
     name: admin:delete
     service: admin
     action: delete
-    uuid: b317f565-01dd-4524-a857-4bcb100d7921
+    uuid: 00000000-0000-0000-0000-000000000004
     is_active: true
     created_at: '2025-06-08T19:00:17.500693-04:00'
     updated_at: '2025-06-08T19:00:17.500757-04:00'

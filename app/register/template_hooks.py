@@ -1,33 +1,34 @@
 import os
 import importlib
 import inspect
+import sys
+from app.config import config
 
 
 def register_hooks(path, app):
-    """Recursively discover and register hooks from hook.py only, skip "templates" and "static" dirs.
-    Classify a directory as a module if it contains any files besides __init__.py; modules may contain any files.
-    For module dirs: if hook.py exists, import and register its register_* functions, then stop recursion.
-    Categorization dirs (only __init__.py or empty) are recursed into without error."""
+    """Recursively discover and register hooks from hook.py only, skip 'templates' and 'static' dirs.
+    Treat a dir as a module if it has files other than __init__.py.
+    Stop recursion once a module is found. Categorization dirs are recursed."""
 
-    base_dir = os.path.join(os.path.dirname(__file__), path)
-    os.makedirs(base_dir, exist_ok=True)
+    base_dir = os.path.join(config['BASE_DIR'], path)
+    base_pkg = 'app.' + path.replace(os.sep, '.').strip('.')
 
-    root_pkg = __package__
-    pkg_root = path.replace(os.sep, '.')
+    # Add BASE_DIR to sys.path once, so imports work cleanly
+    if config['BASE_DIR'] not in sys.path:
+        sys.path.insert(0, config['BASE_DIR'])
 
     for dirpath, dirnames, filenames in os.walk(base_dir, topdown=True):
         # Skip unwanted dirs
-        dirnames[:] = [d for d in dirnames]
+        dirnames[:] = [d for d in dirnames if d not in ('templates', 'static')]
 
-        # Determine if this is a module: any files besides __init__.py
+        # Determine if it's a module dir
         module_files = [f for f in filenames if f != '__init__.py']
         if module_files:
-            # This is a module directory
-            rel = os.path.relpath(dirpath, base_dir)
-            parts = [] if rel == '.' else rel.split(os.sep)
-            hook_path = os.path.join(dirpath, 'hook.py')
+            rel_path = os.path.relpath(dirpath, base_dir)
+            module_parts = [] if rel_path == '.' else rel_path.split(os.sep)
+
             if 'hook.py' in filenames:
-                import_path = '.'.join(filter(None, [root_pkg, pkg_root] + parts + ['hook']))
+                import_path = '.'.join([base_pkg] + module_parts + ['hook'])
                 try:
                     hook_module = importlib.import_module(import_path)
                     for name, func in inspect.getmembers(hook_module, inspect.isfunction):
@@ -38,9 +39,7 @@ def register_hooks(path, app):
                             except Exception as exc:
                                 app.logger.error(f"Error in {name} from {import_path}: {exc}")
                 except ImportError as e:
-                    app.logger.warning(f"Could not import hook at {import_path}... {e}")
+                    app.logger.warning(f"Failed to import {import_path}: {e}")
 
-            # Stop recursion into module directories
+            # Stop recursion into module dirs
             dirnames[:] = []
-        # else: categorization dir -> continue recursion
-

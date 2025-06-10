@@ -310,6 +310,19 @@ Examples:
             """
         )
 
+        # Add global log level argument
+        parser.add_argument(
+            '--log-level', 
+            choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+            help='Set logging level'
+        )
+        
+        parser.add_argument(
+            '--debug', '-v',
+            action='store_true',
+            help='Enable debug logging (same as --log-level DEBUG)'
+        )
+
         # Discover CLI modules silently
         self.discover_modules(verbose=False)
 
@@ -335,6 +348,23 @@ Examples:
 
     def execute(self):
         """Execute the master CLI command"""
+        # Pre-parse for log level arguments to set logging early
+        debug_mode = False
+        log_level_override = None
+        
+        # Quick scan for log level args before full parsing
+        for i, arg in enumerate(sys.argv):
+            if arg == '--debug' or arg == '-v':
+                debug_mode = True
+                break
+            elif arg == '--log-level' and i + 1 < len(sys.argv):
+                log_level_override = sys.argv[i + 1].upper()
+                break
+
+        # Re-setup logger if needed with new level
+        if debug_mode or log_level_override:
+            self._apply_log_level(debug_mode, log_level_override)
+
         self.parser = self.create_dynamic_parser()
 
         if len(sys.argv) == 1:
@@ -342,6 +372,10 @@ Examples:
             return 0
 
         args = self.parser.parse_args()
+
+        # Handle log level setting (redundant check but ensures it's set)
+        if args.debug or args.log_level:
+            self._apply_log_level(args.debug, args.log_level)
 
         if not args.cli_module:
             self.parser.print_help()
@@ -359,7 +393,25 @@ Examples:
         cli_args = getattr(args, 'cli_args', [])
         return self.run_cli_module(args.cli_module, cli_args)
 
-
+    def _apply_log_level(self, debug_mode, log_level_name):
+        """Apply log level using BaseCLI's logging infrastructure"""
+        if debug_mode:
+            # Re-setup logger with debug mode
+            self._setup_logger(log_level=10)  # DEBUG level
+            self.verbose = True
+        elif log_level_name:
+            level_map = {
+                'DEBUG': 10,
+                'INFO': 20,
+                'WARNING': 30,
+                'ERROR': 40,
+                'CRITICAL': 50
+            }
+            if log_level_name in level_map:
+                self._setup_logger(log_level=level_map[log_level_name])
+                if log_level_name == 'DEBUG':
+                    self.verbose = True
+                    
 def create_master_cli(**kwargs):
     """Factory function to create master CLI instance"""
     return TMasterCLI(**kwargs)
@@ -368,19 +420,14 @@ def create_master_cli(**kwargs):
 def main():
     """Main entry point for master CLI"""
     try:
-        master_cli = create_master_cli(
-            verbose='--debug' in sys.argv or '-v' in sys.argv,
-            console_logging='--debug' in sys.argv
-        )
-        
+        master_cli = create_master_cli()
         result = master_cli.execute()
         master_cli.close()
         return result
-        
+
     except Exception as e:
         print(f"Critical error in master CLI: {e}")
         return 1
-
 
 if __name__ == '__main__':
     sys.exit(main())

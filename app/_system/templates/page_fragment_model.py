@@ -1,8 +1,10 @@
 import datetime
+import logging
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Text, Index, UniqueConstraint, JSON
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
+from flask import current_app, has_app_context
 
 from app.base.model import BaseModel
 
@@ -130,17 +132,28 @@ class PageFragment(BaseModel):
                         name='uq_page_fragments_key_active'),
     )
 
+    @staticmethod
+    def _get_logger():
+        """Get logger from Flask app context or create fallback"""
+        if has_app_context():
+            return current_app.logger
+        else:
+            return logging.getLogger('page_fragment')
+
     def is_visible(self):
         """Check if fragment should be visible based on publish/expire dates"""
         now = datetime.datetime.now(datetime.timezone.utc)
         
         if not self.is_published:
+            self._get_logger().debug(f"Fragment {self.fragment_key} not published")
             return False
             
         if self.publish_date and self.publish_date > now:
+            self._get_logger().debug(f"Fragment {self.fragment_key} not yet published (publish date: {self.publish_date})")
             return False
             
         if self.expire_date and self.expire_date <= now:
+            self._get_logger().debug(f"Fragment {self.fragment_key} expired (expire date: {self.expire_date})")
             return False
             
         return True
@@ -148,38 +161,67 @@ class PageFragment(BaseModel):
     @classmethod
     def get_next_version_number(cls, session, page_uuid, fragment_key):
         """Get the next version number for a given page and fragment_key"""
+        logger = cls._get_logger()
+        logger.debug(f"Getting next version number for page {page_uuid}, fragment {fragment_key}")
+        
         from sqlalchemy import func
         max_version = session.query(func.max(cls.version_number))\
                            .filter_by(page_uuid=page_uuid,
                                     fragment_key=fragment_key)\
                            .scalar()
-        return (max_version or 0) + 1
+        
+        next_version = (max_version or 0) + 1
+        logger.debug(f"Next version number for {fragment_key}: {next_version}")
+        return next_version
 
     @classmethod
     def get_active_version(cls, session, page_uuid, fragment_key):
         """Get the currently active version for a specific page and fragment_key"""
-        return session.query(cls)\
-                     .filter_by(page_uuid=page_uuid,
-                               fragment_key=fragment_key,
-                               is_active=True)\
-                     .first()
-
-    @classmethod
-    def get_active_by_key(cls, session, page_uuid, fragment_key):
-        """Get active fragment by page and fragment_key (includes visibility check)"""
+        logger = cls._get_logger()
+        logger.debug(f"Getting active version for page {page_uuid}, fragment {fragment_key}")
+        
         fragment = session.query(cls)\
                          .filter_by(page_uuid=page_uuid,
                                    fragment_key=fragment_key,
                                    is_active=True)\
                          .first()
         
-        if fragment and fragment.is_visible():
-            return fragment
-        return None
+        if fragment:
+            logger.debug(f"Found active version {fragment.version_number} for {fragment_key}")
+        else:
+            logger.warning(f"No active version found for page {page_uuid}, fragment {fragment_key}")
+        
+        return fragment
+
+    @classmethod
+    def get_active_by_key(cls, session, page_uuid, fragment_key):
+        """Get active fragment by page and fragment_key (includes visibility check)"""
+        logger = cls._get_logger()
+        logger.debug(f"Getting active fragment by key: page {page_uuid}, fragment {fragment_key}")
+        
+        fragment = session.query(cls)\
+                         .filter_by(page_uuid=page_uuid,
+                                   fragment_key=fragment_key,
+                                   is_active=True)\
+                         .first()
+        
+        if not fragment:
+            logger.warning(f"No active fragment found for page {page_uuid}, fragment {fragment_key}")
+            return None
+        
+        if not fragment.is_visible():
+            logger.info(f"Fragment {fragment_key} found but not visible (published: {fragment.is_published})")
+            return None
+            
+        logger.debug(f"Successfully retrieved visible fragment {fragment_key}")
+        return fragment
 
     @classmethod
     def get_fragments_by_type(cls, session, page_uuid, fragment_type, include_hidden=False):
         """Get all active fragments of a specific type, ordered by sort_order"""
+        logger = cls._get_logger()
+        logger.debug(f"Getting fragments by type '{fragment_type}' for page {page_uuid}, include_hidden={include_hidden}")
+        
         fragments = session.query(cls)\
                           .filter_by(page_uuid=page_uuid,
                                     fragment_type=fragment_type,
@@ -188,46 +230,65 @@ class PageFragment(BaseModel):
                           .all()
         
         if not include_hidden:
-            fragments = [f for f in fragments if f.is_visible()]
-            
+            visible_fragments = [f for f in fragments if f.is_visible()]
+            logger.debug(f"Found {len(visible_fragments)} visible fragments of type '{fragment_type}' (total: {len(fragments)})")
+            return visible_fragments
+        
+        logger.debug(f"Found {len(fragments)} fragments of type '{fragment_type}'")
         return fragments
 
     @classmethod
     def get_all_active_for_page(cls, session, page_uuid, include_hidden=False):
         """Get all active content pieces for a page (all active fragment_keys)"""
+        logger = cls._get_logger()
+        logger.debug(f"Getting all active fragments for page {page_uuid}, include_hidden={include_hidden}")
+        
         fragments = session.query(cls)\
                           .filter_by(page_uuid=page_uuid, is_active=True)\
                           .order_by(cls.fragment_type, cls.sort_order)\
                           .all()
         
         if not include_hidden:
-            fragments = [f for f in fragments if f.is_visible()]
-            
+            visible_fragments = [f for f in fragments if f.is_visible()]
+            logger.info(f"Retrieved {len(visible_fragments)} visible fragments for page {page_uuid} (total: {len(fragments)})")
+            return visible_fragments
+        
+        logger.info(f"Retrieved {len(fragments)} fragments for page {page_uuid}")
         return fragments
 
     @classmethod
     def set_active_version(cls, session, fragment_uuid):
         """Set a specific version as active (deactivates other versions of same fragment_key)"""
+        logger = cls._get_logger()
+        logger.info(f"Setting active version for fragment UUID {fragment_uuid}")
+        
         fragment = session.query(cls).filter_by(uuid=fragment_uuid).first()
         if not fragment:
+            logger.error(f"Fragment with UUID {fragment_uuid} not found")
             raise ValueError(f"Fragment with UUID {fragment_uuid} not found")
 
         # Deactivate all other versions for this page and fragment_key combination
-        session.query(cls)\
-               .filter_by(page_uuid=fragment.page_uuid,
-                         fragment_key=fragment.fragment_key)\
-               .update({'is_active': False})
+        updated_count = session.query(cls)\
+                              .filter_by(page_uuid=fragment.page_uuid,
+                                        fragment_key=fragment.fragment_key)\
+                              .update({'is_active': False})
+        
+        logger.debug(f"Deactivated {updated_count} versions of fragment {fragment.fragment_key}")
 
         # Activate this version
         fragment.is_active = True
         session.commit()
-
+        
+        logger.info(f"Activated version {fragment.version_number} of fragment {fragment.fragment_key}")
         return fragment
 
     @classmethod
     def set_active_version_by_fragment_and_version(cls, session, page_uuid,
                                                   fragment_key, version_number):
         """Set active version by page, fragment_key, and version number"""
+        logger = cls._get_logger()
+        logger.info(f"Setting active version: page {page_uuid}, fragment {fragment_key}, version {version_number}")
+        
         fragment = session.query(cls)\
                          .filter_by(page_uuid=page_uuid,
                                    fragment_key=fragment_key,
@@ -235,6 +296,7 @@ class PageFragment(BaseModel):
                          .first()
 
         if not fragment:
+            logger.error(f"Fragment not found for page {page_uuid}, fragment_key {fragment_key}, version {version_number}")
             raise ValueError(f"Fragment not found for page {page_uuid}, "
                            f"fragment_key {fragment_key}, version {version_number}")
 
@@ -242,13 +304,21 @@ class PageFragment(BaseModel):
 
     def activate(self, session):
         """Activate this version (convenience method)"""
+        logger = self._get_logger()
+        logger.info(f"Activating fragment {self.fragment_key} version {self.version_number}")
         return self.__class__.set_active_version(session, self.uuid)
 
     def update_content_and_hash(self, new_content):
         """Update content source and recalculate hash"""
+        logger = self._get_logger()
+        logger.debug(f"Updating content for fragment {self.fragment_key} (new length: {len(new_content)})")
+        
         import hashlib
+        old_hash = self.content_hash
         self.content_source = new_content
         self.content_hash = hashlib.sha256(new_content.encode('utf-8')).hexdigest()
+        
+        logger.info(f"Updated content hash for fragment {self.fragment_key}: {old_hash} -> {self.content_hash}")
 
     def get_display_version(self):
         """Get human-readable version string"""
@@ -263,15 +333,24 @@ class PageFragment(BaseModel):
     @classmethod
     def get_fragment_version_history(cls, session, page_uuid, fragment_key):
         """Get all versions for a specific page and fragment_key, ordered by version"""
-        return session.query(cls)\
-                     .filter_by(page_uuid=page_uuid,
-                               fragment_key=fragment_key)\
-                     .order_by(cls.version_number.desc())\
-                     .all()
+        logger = cls._get_logger()
+        logger.debug(f"Getting version history for page {page_uuid}, fragment {fragment_key}")
+        
+        versions = session.query(cls)\
+                         .filter_by(page_uuid=page_uuid,
+                                   fragment_key=fragment_key)\
+                         .order_by(cls.version_number.desc())\
+                         .all()
+        
+        logger.debug(f"Found {len(versions)} versions of fragment {fragment_key}")
+        return versions
 
     @classmethod
     def get_page_fragment_structure(cls, session, page_uuid, include_hidden=False):
         """Get a summary of all fragment_keys and their active versions for a page"""
+        logger = cls._get_logger()
+        logger.debug(f"Getting fragment structure for page {page_uuid}, include_hidden={include_hidden}")
+        
         fragments = session.query(
             cls.fragment_key,
             cls.fragment_type,
@@ -297,6 +376,9 @@ class PageFragment(BaseModel):
                     (not f.publish_date or f.publish_date <= now) and 
                     (not f.expire_date or f.expire_date > now)):
                     visible_fragments.append(f)
+            
+            logger.debug(f"Page structure: {len(visible_fragments)} visible fragments (total: {len(fragments)})")
             return visible_fragments
 
+        logger.debug(f"Page structure: {len(fragments)} fragments")
         return fragments

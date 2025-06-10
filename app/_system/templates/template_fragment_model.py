@@ -1,6 +1,11 @@
+import os
+import hashlib
+import logging
+import datetime
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, Text, Index, UniqueConstraint, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
+from flask import current_app, has_app_context
 
 from app.base.model import BaseModel
 
@@ -145,6 +150,14 @@ class TemplateFragment(BaseModel):
                         name='uq_template_fragments_key_active'),
     )
 
+    @staticmethod
+    def _get_logger():
+        """Get logger from Flask app context or create fallback"""
+        if has_app_context():
+            return current_app.logger
+        else:
+            return logging.getLogger('template_fragment')
+
     def get_template_file_path(self):
         """Get the full path to the template file"""
         return self.template_file_path
@@ -155,27 +168,32 @@ class TemplateFragment(BaseModel):
 
     def needs_compilation(self):
         """Check if template needs to be compiled or recompiled"""
-        import os
-        import hashlib
+        logger = self._get_logger()
+        logger.debug(f"Checking compilation status for fragment '{self.fragment_key}'")
 
         # No compiled file path set
         if not self.compiled_file_path:
+            logger.debug(f"Fragment '{self.fragment_key}' needs compilation: no compiled path set")
             return True
 
         # Compiled file doesn't exist
         if not os.path.exists(self.compiled_file_path):
+            logger.debug(f"Fragment '{self.fragment_key}' needs compilation: compiled file missing")
             return True
 
         # If we have template_source, check against that instead of file
         if self.template_source:
             current_hash = hashlib.sha256(self.template_source.encode('utf-8')).hexdigest()
             if current_hash != self.template_hash:
+                logger.info(f"Fragment '{self.fragment_key}' needs compilation: hash mismatch")
                 return True
+            logger.debug(f"Fragment '{self.fragment_key}' compilation up to date")
             return False
 
         # Fallback to file-based checking
         # Source file doesn't exist
         if not os.path.exists(self.template_file_path):
+            logger.warning(f"Fragment '{self.fragment_key}' source file missing: {self.template_file_path}")
             return False
 
         # Check if source is newer than compiled
@@ -183,6 +201,7 @@ class TemplateFragment(BaseModel):
         compiled_mtime = os.path.getmtime(self.compiled_file_path)
 
         if source_mtime > compiled_mtime:
+            logger.info(f"Fragment '{self.fragment_key}' needs compilation: source newer than compiled")
             return True
 
         # Check hash if available
@@ -191,79 +210,136 @@ class TemplateFragment(BaseModel):
                 content = f.read()
             current_hash = hashlib.sha256(content.encode('utf-8')).hexdigest()
             if current_hash != self.template_hash:
+                logger.info(f"Fragment '{self.fragment_key}' needs compilation: file hash changed")
                 return True
 
+        logger.debug(f"Fragment '{self.fragment_key}' compilation up to date")
         return False
 
     @classmethod
     def get_next_version_number(cls, session, template_uuid, template_file_path):
         """Get the next version number for a given template and template_file_path"""
+        logger = cls._get_logger()
+        logger.debug(f"Getting next version number for template {template_uuid}, file {template_file_path}")
+        
         from sqlalchemy import func
         max_version = session.query(func.max(cls.version_number))\
                            .filter_by(template_uuid=template_uuid,
                                     template_file_path=template_file_path)\
                            .scalar()
-        return (max_version or 0) + 1
+        
+        next_version = (max_version or 0) + 1
+        logger.debug(f"Next version number for {template_file_path}: {next_version}")
+        return next_version
 
     @classmethod
     def get_active_version(cls, session, template_uuid, template_file_path):
         """Get the currently active version for a specific template and template_file_path"""
-        return session.query(cls)\
-                     .filter_by(template_uuid=template_uuid,
-                               template_file_path=template_file_path,
-                               is_active=True)\
-                     .first()
+        logger = cls._get_logger()
+        logger.debug(f"Getting active version for template {template_uuid}, file {template_file_path}")
+        
+        fragment = session.query(cls)\
+                         .filter_by(template_uuid=template_uuid,
+                                   template_file_path=template_file_path,
+                                   is_active=True)\
+                         .first()
+        
+        if fragment:
+            logger.debug(f"Found active version {fragment.version_number} for {template_file_path}")
+        else:
+            logger.warning(f"No active version found for template {template_uuid}, file {template_file_path}")
+        
+        return fragment
 
     @classmethod
     def get_active_by_key(cls, session, template_uuid, fragment_key):
         """Get active fragment by template and fragment_key"""
-        return session.query(cls)\
-                     .filter_by(template_uuid=template_uuid,
-                               fragment_key=fragment_key,
-                               is_active=True)\
-                     .first()
+        logger = cls._get_logger()
+        logger.debug(f"Getting active fragment by key: template {template_uuid}, fragment {fragment_key}")
+        
+        fragment = session.query(cls)\
+                         .filter_by(template_uuid=template_uuid,
+                                   fragment_key=fragment_key,
+                                   is_active=True)\
+                         .first()
+        
+        if fragment:
+            logger.debug(f"Found active fragment '{fragment_key}' version {fragment.version_number}")
+        else:
+            logger.warning(f"No active fragment found for template {template_uuid}, key {fragment_key}")
+        
+        return fragment
 
     @classmethod
     def get_fragments_by_type(cls, session, template_uuid, fragment_type):
         """Get all active fragments of a specific type, ordered by sort_order"""
-        return session.query(cls)\
-                     .filter_by(template_uuid=template_uuid,
-                               fragment_type=fragment_type,
-                               is_active=True)\
-                     .order_by(cls.sort_order, cls.fragment_name)\
-                     .all()
+        logger = cls._get_logger()
+        logger.debug(f"Getting fragments by type '{fragment_type}' for template {template_uuid}")
+        
+        fragments = session.query(cls)\
+                          .filter_by(template_uuid=template_uuid,
+                                    fragment_type=fragment_type,
+                                    is_active=True)\
+                          .order_by(cls.sort_order, cls.fragment_name)\
+                          .all()
+        
+        logger.debug(f"Found {len(fragments)} active fragments of type '{fragment_type}'")
+        return fragments
 
     @classmethod
     def get_all_active_for_template(cls, session, template_uuid):
         """Get all active content pieces for a template (all active template_file_paths)"""
-        return session.query(cls)\
-                     .filter_by(template_uuid=template_uuid, is_active=True)\
-                     .order_by(cls.fragment_type, cls.sort_order)\
-                     .all()
+        logger = cls._get_logger()
+        logger.debug(f"Getting all active fragments for template {template_uuid}")
+        
+        fragments = session.query(cls)\
+                          .filter_by(template_uuid=template_uuid, is_active=True)\
+                          .order_by(cls.fragment_type, cls.sort_order)\
+                          .all()
+        
+        fragment_types = {}
+        for fragment in fragments:
+            if fragment.fragment_type not in fragment_types:
+                fragment_types[fragment.fragment_type] = 0
+            fragment_types[fragment.fragment_type] += 1
+        
+        logger.info(f"Retrieved {len(fragments)} active fragments for template {template_uuid}: {fragment_types}")
+        return fragments
 
     @classmethod
     def set_active_version(cls, session, fragment_uuid):
         """Set a specific version as active (deactivates other versions of same template_file_path)"""
+        logger = cls._get_logger()
+        logger.info(f"Setting active version for fragment UUID {fragment_uuid}")
+        
         fragment = session.query(cls).filter_by(uuid=fragment_uuid).first()
         if not fragment:
+            logger.error(f"Fragment with UUID {fragment_uuid} not found")
             raise ValueError(f"Fragment with UUID {fragment_uuid} not found")
 
         # Deactivate all other versions for this template and template_file_path combination
-        session.query(cls)\
-               .filter_by(template_uuid=fragment.template_uuid,
-                         template_file_path=fragment.template_file_path)\
-               .update({'is_active': False})
+        updated_count = session.query(cls)\
+                              .filter_by(template_uuid=fragment.template_uuid,
+                                        template_file_path=fragment.template_file_path)\
+                              .update({'is_active': False})
+        
+        logger.debug(f"Deactivated {updated_count} versions of file {fragment.template_file_path}")
 
         # Activate this version
         fragment.is_active = True
+        fragment.last_compiled = datetime.datetime.now(datetime.timezone.utc)
         session.commit()
-
+        
+        logger.info(f"Activated fragment '{fragment.fragment_key}' version {fragment.version_number}")
         return fragment
 
     @classmethod
     def set_active_version_by_file_and_version(cls, session, template_uuid,
                                               template_file_path, version_number):
         """Set active version by template, template_file_path, and version number"""
+        logger = cls._get_logger()
+        logger.info(f"Setting active version: template {template_uuid}, file {template_file_path}, version {version_number}")
+        
         fragment = session.query(cls)\
                          .filter_by(template_uuid=template_uuid,
                                    template_file_path=template_file_path,
@@ -271,6 +347,7 @@ class TemplateFragment(BaseModel):
                          .first()
 
         if not fragment:
+            logger.error(f"Fragment not found for template {template_uuid}, file {template_file_path}, version {version_number}")
             raise ValueError(f"Fragment not found for template {template_uuid}, "
                            f"file {template_file_path}, version {version_number}")
 
@@ -278,13 +355,20 @@ class TemplateFragment(BaseModel):
 
     def activate(self, session):
         """Activate this version (convenience method)"""
+        logger = self._get_logger()
+        logger.info(f"Activating fragment '{self.fragment_key}' version {self.version_number}")
         return self.__class__.set_active_version(session, self.uuid)
 
     def update_content_and_hash(self, new_content):
         """Update template source and recalculate hash"""
-        import hashlib
+        logger = self._get_logger()
+        logger.debug(f"Updating content for fragment '{self.fragment_key}' (new length: {len(new_content)})")
+        
+        old_hash = self.template_hash
         self.template_source = new_content
         self.template_hash = hashlib.sha256(new_content.encode('utf-8')).hexdigest()
+        
+        logger.info(f"Updated content hash for fragment '{self.fragment_key}': {old_hash} -> {self.template_hash}")
 
     def get_display_version(self):
         """Get human-readable version string"""
@@ -294,12 +378,15 @@ class TemplateFragment(BaseModel):
 
     def get_filename_only(self):
         """Extract just the filename from template_file_path"""
-        import os
         return os.path.basename(self.template_file_path)
 
     def get_dependencies_list(self):
         """Get dependencies as a list, handling None values"""
-        return self.dependencies if self.dependencies else []
+        deps = self.dependencies if self.dependencies else []
+        if deps:
+            logger = self._get_logger()
+            logger.debug(f"Fragment '{self.fragment_key}' has {len(deps)} dependencies: {deps}")
+        return deps
 
     def get_css_dependencies_list(self):
         """Get CSS dependencies as a list, handling None values"""
@@ -317,20 +404,51 @@ class TemplateFragment(BaseModel):
         """Get sample data as a dict, handling None values"""
         return self.sample_data if self.sample_data else {}
 
+    def validate_dependencies(self, session):
+        """Validate that all declared dependencies exist"""
+        logger = self._get_logger()
+        dependencies = self.get_dependencies_list()
+        
+        if not dependencies:
+            logger.debug(f"Fragment '{self.fragment_key}' has no dependencies to validate")
+            return True
+        
+        logger.debug(f"Validating {len(dependencies)} dependencies for fragment '{self.fragment_key}'")
+        
+        missing_deps = []
+        for dep_key in dependencies:
+            dep_fragment = self.__class__.get_active_by_key(session, self.template_uuid, dep_key)
+            if not dep_fragment:
+                missing_deps.append(dep_key)
+        
+        if missing_deps:
+            logger.warning(f"Fragment '{self.fragment_key}' has missing dependencies: {missing_deps}")
+            return False
+        
+        logger.debug(f"All dependencies validated for fragment '{self.fragment_key}'")
+        return True
+
     @classmethod
     def get_file_version_history(cls, session, template_uuid, template_file_path):
         """Get all versions for a specific template and template_file_path, ordered by version"""
-        return session.query(cls)\
-                    .filter_by(template_uuid=template_uuid,
-                            template_file_path=template_file_path)\
-                    .order_by(cls.version_number.desc())\
-                    .all()
+        logger = cls._get_logger()
+        logger.debug(f"Getting version history for template {template_uuid}, file {template_file_path}")
+        
+        versions = session.query(cls)\
+                         .filter_by(template_uuid=template_uuid,
+                                   template_file_path=template_file_path)\
+                         .order_by(cls.version_number.desc())\
+                         .all()
+        
+        logger.debug(f"Found {len(versions)} versions of file {template_file_path}")
+        return versions
 
     @classmethod
     def get_template_structure(cls, session, template_uuid):
         """Get a summary of all files and their active versions for a template"""
-        from sqlalchemy import func
-
+        logger = cls._get_logger()
+        logger.debug(f"Getting template structure for template {template_uuid}")
+        
         # Get all unique template_file_paths with their active version info
         active_files = session.query(
             cls.template_file_path,
@@ -347,4 +465,83 @@ class TemplateFragment(BaseModel):
             is_active=True
         ).order_by(cls.fragment_type, cls.sort_order).all()
 
+        # Log structure summary
+        structure_summary = {}
+        for file_info in active_files:
+            if file_info.fragment_type not in structure_summary:
+                structure_summary[file_info.fragment_type] = 0
+            structure_summary[file_info.fragment_type] += 1
+        
+        logger.debug(f"Template structure for {template_uuid}: {len(active_files)} active files, types: {structure_summary}")
         return active_files
+
+    @classmethod
+    def find_circular_dependencies(cls, session, template_uuid):
+        """Check for circular dependencies within template fragments"""
+        logger = cls._get_logger()
+        logger.debug(f"Checking for circular dependencies in template {template_uuid}")
+        
+        fragments = cls.get_all_active_for_template(session, template_uuid)
+        
+        # Build dependency graph
+        dependency_graph = {}
+        for fragment in fragments:
+            dependencies = fragment.get_dependencies_list()
+            dependency_graph[fragment.fragment_key] = dependencies
+        
+        # Check for cycles using DFS
+        visited = set()
+        rec_stack = set()
+        
+        def has_cycle(node, path):
+            if node in rec_stack:
+                cycle_path = path[path.index(node):] + [node]
+                logger.warning(f"Circular dependency detected in template {template_uuid}: {' -> '.join(cycle_path)}")
+                return True
+            
+            if node in visited:
+                return False
+            
+            visited.add(node)
+            rec_stack.add(node)
+            path.append(node)
+            
+            for neighbor in dependency_graph.get(node, []):
+                if has_cycle(neighbor, path):
+                    return True
+            
+            rec_stack.remove(node)
+            path.pop()
+            return False
+        
+        cycles_found = []
+        for fragment_key in dependency_graph:
+            if fragment_key not in visited:
+                if has_cycle(fragment_key, []):
+                    cycles_found.append(fragment_key)
+        
+        if cycles_found:
+            logger.error(f"Circular dependencies found in template {template_uuid}: {cycles_found}")
+        else:
+            logger.debug(f"No circular dependencies found in template {template_uuid}")
+        
+        return len(cycles_found) == 0
+
+    def get_compilation_info(self):
+        """Get compilation status information"""
+        logger = self._get_logger()
+        
+        info = {
+            'needs_compilation': self.needs_compilation(),
+            'has_compiled_path': bool(self.compiled_file_path),
+            'compiled_file_exists': bool(self.compiled_file_path and os.path.exists(self.compiled_file_path)),
+            'template_hash': self.template_hash,
+            'last_compiled': self.last_compiled,
+            'source_length': len(self.template_source) if self.template_source else 0
+        }
+        
+        logger.debug(f"Compilation info for fragment '{self.fragment_key}': {info}")
+        return info
+
+    def __repr__(self):
+        return f"<TemplateFragment(key='{self.fragment_key}', type='{self.fragment_type}', version={self.version_number}, active={self.is_active})>"

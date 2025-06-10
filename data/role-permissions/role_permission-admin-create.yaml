@@ -7,8 +7,8 @@ RolePermission:
     tablename: role_permissions
     schema: public
   data:
-    role_uuid: 6d25b46e-9322-4114-ba15-00bbd044d774
-    permission_uuid: 198151e6-bd90-40dc-954f-b93da45b7b48
+    role_uuid: 00000000-0000-0000-0000-000000000111
+    permission_uuid: 00000000-0000-0000-0000-000000000001
     uuid: 49615dd1-708c-458d-9efb-6564c3970e67
     is_active: true
     created_at: '2025-06-08T19:09:19.954703-04:00'

@@ -14,27 +14,28 @@ PageFragment:
     tablename: page_fragments
     schema: public
   data:
-    page_uuid: 00000000-0000-0000-0000-000000000020
+    page_uuid: 00000000-0000-0000-0000-000000000022
     # NOTE: page_uuid must reference existing record UUID
-    fragment_type: example_value
-    fragment_name: example_value
-    fragment_key: example_value
-    content_type: example_value
+    fragment_type: text/html
+    fragment_name: Main SUB Frag
+    fragment_key: home_subfrag
+    content_type: text/html
     version_number: 1
-    version_label: example_value
+    version_label: v1.0
     is_active: true
-    content_source: example_value
-    content_hash: example_value
+    content_source: |
+      YO IM THE SUB FRAGMENT
+    content_hash: null
     variables_data: null
-    template_fragment_key: example_value
-    description: Example description
-    sort_order: 1
+    template_fragment_key: null
+    description: SUB Fragment Test
+    sort_order: 2
     is_published: true
     publish_date: null
     expire_date: null
-    cache_duration: 1
+    cache_duration: 3600
     last_rendered: null
-    change_description: example_value
+    change_description: Initial content fragment for page
     created_by_user_uuid: null
     # NOTE: created_by_user_uuid must reference existing record UUID
     # uuid: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided

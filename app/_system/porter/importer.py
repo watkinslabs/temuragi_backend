@@ -22,28 +22,82 @@ class ComponentImporter:
         try:
             with open(file_path, 'r') as f:
                 content = f.read()
-            
+
             # Remove comment lines for cleaner parsing
             lines = content.split('\n')
             cleaned_lines = []
+            in_multiline_string = False
+            string_delimiter = None
+            
             for line in lines:
+                # Skip full comment lines
                 if line.strip().startswith('#'):
                     continue
-                # Remove inline comments but preserve YAML structure
-                if ' #' in line and ':' in line:
-                    # Only remove comments after field values
-                    parts = line.split(' #', 1)
-                    cleaned_lines.append(parts[0].rstrip())
+                    
+                # Track if we're inside a multi-line string (literal | or folded >)
+                stripped_line = line.strip()
+                if not in_multiline_string:
+                    # Check for start of multi-line string
+                    if ':' in line and ('|' in line or '>' in line):
+                        # This starts a multi-line string block
+                        yaml_key_part = line[:line.find(':')]
+                        if '|' in line.split(':')[1] or '>' in line.split(':')[1]:
+                            in_multiline_string = True
+                            cleaned_lines.append(line)
+                            continue
+                    
+                    # Check for quoted strings that might contain #
+                    if ':' in line:
+                        value_part = line[line.find(':')+1:].strip()
+                        if (value_part.startswith('"') and not value_part.endswith('"')) or \
+                        (value_part.startswith("'") and not value_part.endswith("'")):
+                            # Start of quoted multi-line string
+                            string_delimiter = value_part[0]
+                            in_multiline_string = True
+                            cleaned_lines.append(line)
+                            continue
+                    
+                    # Normal line processing - remove inline comments carefully
+                    if ' #' in line and ':' in line:
+                        # Check if # appears in a value context (after colon)
+                        colon_pos = line.find(':')
+                        comment_pos = line.find(' #')
+                        
+                        if comment_pos > colon_pos:
+                            value_part = line[colon_pos+1:comment_pos].strip()
+                            # If the value contains # without space (like #0066cc), keep it
+                            if '#' in value_part and ' #' not in value_part:
+                                cleaned_lines.append(line)
+                            elif value_part:  # Normal value with comment
+                                cleaned_lines.append(line[:comment_pos].rstrip())
+                            else:
+                                cleaned_lines.append(line)
+                        else:
+                            cleaned_lines.append(line)
+                    else:
+                        cleaned_lines.append(line)
                 else:
+                    # We're inside a multi-line string
+                    if string_delimiter:
+                        # Check for end of quoted string
+                        if line.rstrip().endswith(string_delimiter):
+                            in_multiline_string = False
+                            string_delimiter = None
+                    else:
+                        # Check for end of literal/folded block (dedent)
+                        if stripped_line and not line.startswith(' ') and not line.startswith('\t'):
+                            in_multiline_string = False
+                    
+                    # Always preserve content inside multi-line strings
                     cleaned_lines.append(line)
-            
+
             cleaned_content = '\n'.join(cleaned_lines)
             return yaml.safe_load(cleaned_content)
-            
+
         except Exception as e:
             self.output_manager.log_error(f"Error loading YAML file {file_path}: {e}")
             raise
-    
+        
     def _convert_import_value(self, value, column_type=None):
         """Convert imported values to appropriate database types"""
         if value is None:
