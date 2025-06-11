@@ -532,7 +532,7 @@ class TemplateRenderer:
         env.globals['render_block'] = safe_render_block
         env.globals['get_flashed_messages'] = safe_get_flashed_messages
 
-    def theme_css(self,session, theme_uuid_or_name=None):
+    def theme_css(self, session, theme_uuid_or_name=None):
         """
         Generate complete CSS for a theme including variables and custom styles.
         Can be called in templates like {{ theme_css() }}
@@ -547,11 +547,11 @@ class TemplateRenderer:
         try:
             from app.models import Theme
             from sqlalchemy import or_
+            from markupsafe import Markup
             
             # Get the theme
             theme = None
             if theme_uuid_or_name:
-                # Try to find by UUID first, then by name
                 theme = session.query(Theme).filter(
                     or_(
                         Theme.uuid == theme_uuid_or_name,
@@ -559,11 +559,9 @@ class TemplateRenderer:
                     )
                 ).first()
             
-            # Fall back to default theme if not found
             if not theme:
                 theme = session.query(Theme).filter_by(is_default=True).first()
                 
-            # Ultimate fallback - get any theme
             if not theme:
                 theme = session.query(Theme).first()
                 
@@ -573,7 +571,7 @@ class TemplateRenderer:
             # Build CSS variables section
             css_vars = []
             
-            # Core color variables
+            # Core color variables (light theme)
             css_vars.extend([
                 f"--theme-primary: {theme.primary_color};",
                 f"--theme-secondary: {theme.secondary_color};",
@@ -584,8 +582,25 @@ class TemplateRenderer:
                 f"--theme-background: {theme.background_color};",
                 f"--theme-surface: {theme.surface_color};",
                 f"--theme-text: {theme.text_color};",
-                f"--theme-text-muted: {theme.text_muted_color};"
+                f"--theme-text-muted: {theme.text_muted_color};",
+                f"--theme-border-color: {theme.border_color};"
             ])
+            
+            # Dark mode color variables
+            if theme.supports_dark_mode:
+                css_vars.extend([
+                    f"--theme-primary-dark: {theme.primary_color_dark or theme.primary_color};",
+                    f"--theme-secondary-dark: {theme.secondary_color_dark or theme.secondary_color};",
+                    f"--theme-success-dark: {theme.success_color_dark or theme.success_color};",
+                    f"--theme-warning-dark: {theme.warning_color_dark or theme.warning_color};",
+                    f"--theme-danger-dark: {theme.danger_color_dark or theme.danger_color};",
+                    f"--theme-info-dark: {theme.info_color_dark or theme.info_color};",
+                    f"--theme-background-dark: {theme.background_color_dark or theme.background_color};",
+                    f"--theme-surface-dark: {theme.surface_color_dark or theme.surface_color};",
+                    f"--theme-text-dark: {theme.text_color_dark or theme.text_color};",
+                    f"--theme-text-muted-dark: {theme.text_muted_color_dark or theme.text_muted_color};",
+                    f"--theme-border-color-dark: {theme.border_color_dark or theme.border_color};"
+                ])
             
             # Typography variables
             css_vars.extend([
@@ -622,7 +637,6 @@ class TemplateRenderer:
                 f"--theme-shadow-md: {theme.shadow_md};",
                 f"--theme-shadow-lg: {theme.shadow_lg};",
                 f"--theme-border-width: {theme.border_width};",
-                f"--theme-border-color: {theme.border_color};",
                 f"--theme-focus-ring-color: {theme.focus_ring_color};",
                 f"--theme-focus-ring-width: {theme.focus_ring_width};"
             ])
@@ -649,7 +663,6 @@ class TemplateRenderer:
                 try:
                     custom_vars = json.loads(theme.css_variables)
                     for key, value in custom_vars.items():
-                        # Ensure key starts with --
                         if not key.startswith('--'):
                             key = f"--{key}"
                         css_vars.append(f"{key}: {value};")
@@ -687,73 +700,6 @@ class TemplateRenderer:
                 "}"
             ])
             
-            # Framework-specific overrides
-            if theme.css_framework == 'bootstrap':
-                css_output.extend([
-                    "",
-                    "/* Bootstrap theme overrides */",
-                    ".btn-primary {",
-                    "  background-color: var(--theme-primary);",
-                    "  border-color: var(--theme-primary);",
-                    "  border-radius: var(--theme-button-border-radius);",
-                    "}",
-                    "",
-                    ".btn-secondary {",
-                    "  background-color: var(--theme-secondary);",
-                    "  border-color: var(--theme-secondary);",
-                    "  border-radius: var(--theme-button-border-radius);",
-                    "}",
-                    "",
-                    ".card {",
-                    "  background-color: var(--theme-surface);",
-                    "  border-radius: var(--theme-card-border-radius);",
-                    "  border-color: var(--theme-border-color);",
-                    "}",
-                    "",
-                    ".form-control {",
-                    "  border-radius: var(--theme-input-border-radius);",
-                    "  border-color: var(--theme-border-color);",
-                    "}",
-                    "",
-                    ".navbar {",
-                    "  min-height: var(--theme-navbar-height);",
-                    "}"
-                ])
-            elif theme.css_framework == 'tailwind':
-                css_output.extend([
-                    "",
-                    "/* Tailwind theme utilities */",
-                    ".bg-theme-primary { background-color: var(--theme-primary); }",
-                    ".bg-theme-secondary { background-color: var(--theme-secondary); }",
-                    ".bg-theme-surface { background-color: var(--theme-surface); }",
-                    ".text-theme-primary { color: var(--theme-primary); }",
-                    ".text-theme-secondary { color: var(--theme-secondary); }",
-                    ".text-theme-text { color: var(--theme-text); }",
-                    ".border-theme-color { border-color: var(--theme-border-color); }",
-                    ".rounded-theme { border-radius: var(--theme-border-radius); }"
-                ])
-            
-            # Animation controls
-            if not theme.enable_animations:
-                css_output.extend([
-                    "",
-                    "/* Disable animations */",
-                    "*, *::before, *::after {",
-                    "  animation-duration: 0s !important;",
-                    "  animation-delay: 0s !important;",
-                    "}"
-                ])
-                
-            if not theme.enable_transitions:
-                css_output.extend([
-                    "",
-                    "/* Disable transitions */", 
-                    "*, *::before, *::after {",
-                    "  transition-duration: 0s !important;",
-                    "  transition-delay: 0s !important;",
-                    "}"
-                ])
-            
             # RTL support
             if theme.rtl_support:
                 css_output.extend([
@@ -788,9 +734,8 @@ class TemplateRenderer:
                     "}"
                 ])
             
-            # Dark mode support with actual colors
+            # Dark mode support
             if theme.supports_dark_mode:
-                # Determine how to apply dark mode
                 if theme.mode == 'dark':
                     # Force dark mode - override root variables
                     css_output.extend([
@@ -811,11 +756,12 @@ class TemplateRenderer:
                         "}"
                     ])
                 elif theme.mode == 'auto':
-                    # Auto mode - use media query
+                    # Auto mode with manual override support
                     css_output.extend([
                         "",
+                        "/* Auto dark mode (only when no manual theme is set) */",
                         "@media (prefers-color-scheme: dark) {",
-                        "  :root {",
+                        "  :root:not([data-theme]) {",
                         f"    --theme-primary: {theme.primary_color_dark or theme.primary_color};",
                         f"    --theme-secondary: {theme.secondary_color_dark or theme.secondary_color};",
                         f"    --theme-success: {theme.success_color_dark or theme.success_color};",
@@ -828,9 +774,59 @@ class TemplateRenderer:
                         f"    --theme-text-muted: {theme.text_muted_color_dark or theme.text_muted_color};",
                         f"    --theme-border-color: {theme.border_color_dark or theme.border_color};",
                         "  }",
+                        "}",
+                        "",
+                        "/* Manual dark theme override */",
+                        ":root[data-theme=\"dark\"] {",
+                        f"  --theme-primary: {theme.primary_color_dark or theme.primary_color};",
+                        f"  --theme-secondary: {theme.secondary_color_dark or theme.secondary_color};",
+                        f"  --theme-success: {theme.success_color_dark or theme.success_color};",
+                        f"  --theme-warning: {theme.warning_color_dark or theme.warning_color};",
+                        f"  --theme-danger: {theme.danger_color_dark or theme.danger_color};",
+                        f"  --theme-info: {theme.info_color_dark or theme.info_color};",
+                        f"  --theme-background: {theme.background_color_dark or theme.background_color};",
+                        f"  --theme-surface: {theme.surface_color_dark or theme.surface_color};",
+                        f"  --theme-text: {theme.text_color_dark or theme.text_color};",
+                        f"  --theme-text-muted: {theme.text_muted_color_dark or theme.text_muted_color};",
+                        f"  --theme-border-color: {theme.border_color_dark or theme.border_color};",
+                        "}",
+                        "",
+                        "/* Manual light theme override */",
+                        ":root[data-theme=\"light\"] {",
+                        f"  --theme-primary: {theme.primary_color};",
+                        f"  --theme-secondary: {theme.secondary_color};",
+                        f"  --theme-success: {theme.success_color};",
+                        f"  --theme-warning: {theme.warning_color};",
+                        f"  --theme-danger: {theme.danger_color};",
+                        f"  --theme-info: {theme.info_color};",
+                        f"  --theme-background: {theme.background_color};",
+                        f"  --theme-surface: {theme.surface_color};",
+                        f"  --theme-text: {theme.text_color};",
+                        f"  --theme-text-muted: {theme.text_muted_color};",
+                        f"  --theme-border-color: {theme.border_color};",
                         "}"
                     ])
-                # If mode is 'light', dark colors are available but not applied automatically
+            
+            # Animation controls
+            if not theme.enable_animations:
+                css_output.extend([
+                    "",
+                    "/* Disable animations */",
+                    "*, *::before, *::after {",
+                    "  animation-duration: 0s !important;",
+                    "  animation-delay: 0s !important;",
+                    "}"
+                ])
+                
+            if not theme.enable_transitions:
+                css_output.extend([
+                    "",
+                    "/* Disable transitions */", 
+                    "*, *::before, *::after {",
+                    "  transition-duration: 0s !important;",
+                    "  transition-delay: 0s !important;",
+                    "}"
+                ])
             
             # Add custom CSS if present
             if theme.custom_css:
@@ -840,8 +836,7 @@ class TemplateRenderer:
                     theme.custom_css.strip()
                 ])
             
-            return "\n".join(css_output)
+            return Markup("\n".join(css_output))
             
         except Exception as e:
             return f"/* Error generating theme CSS: {e} */"
-

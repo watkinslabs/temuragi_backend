@@ -40,7 +40,7 @@ class Template(BaseModel):
                        ForeignKey('themes.uuid', name='fk_templates_theme'),
                        nullable=True,
                        comment="Foreign key to themes table")
-    menu_type_uuid = Column(UUID(as_uuid=True),
+    menu_uuid = Column(UUID(as_uuid=True),
                            ForeignKey('menu.uuid', name='fk_templates_menu'),
                            nullable=True,
                            comment="Foreign key to menu table")
@@ -71,7 +71,7 @@ class Template(BaseModel):
 
     # Relationships - FIXED
     theme = relationship("Theme", back_populates="templates")
-    menu_type = relationship("Menu", foreign_keys=[menu_type_uuid])
+    menu = relationship("Menu", foreign_keys=[menu_uuid])
     pages = relationship("Page", back_populates="template")
     template_fragments = relationship("TemplateFragment", back_populates="template", cascade="all, delete-orphan")
     module = relationship("Module", back_populates="templates")
@@ -80,7 +80,7 @@ class Template(BaseModel):
     __table_args__ = (
         Index('idx_templates_name', 'name'),
         Index('idx_templates_theme', 'theme_uuid'),
-        Index('idx_templates_menu', 'menu_type_uuid'),
+        Index('idx_templates_menu', 'menu_uuid'),
         Index('idx_templates_admin', 'is_admin_template'),
         Index('idx_templates_default', 'is_default_template'),
         Index('idx_templates_layout', 'layout_type'),

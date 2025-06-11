@@ -7,7 +7,7 @@ Page:
     name: about
     title: About Us
     slug: about
-    template_uuid: 00000000-0000-0000-0000-000000000003
+    template_uuid: 00000000-0000-0000-0000-000000000001
     meta_description: Learn about our company, mission, and values.
     meta_keywords: about, company, mission, values, team
     og_title: About Us

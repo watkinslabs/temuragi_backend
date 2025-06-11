@@ -379,9 +379,65 @@ def register_model_classes_from_module(module, app=None):
             # Register by class name
             _model_registry[name] = obj
             tables_found.append(obj.__tablename__)
+            create_model_api_permissions(obj, app)
+
     
-#    if tables_found and app:
-#        app.logger.debug(f"    Registered: {', '.join(tables_found)}")
+
+def create_model_api_permissions(model_class, app=None):
+    """Auto-create API permissions for a model"""
+    try:
+        # Get Permission model from registry
+        permission_model = get_model('Permission')
+        if not permission_model:
+            if app:
+                app.logger.warning("Permission model not available for auto-permission creation")
+            return
+
+        # Get session - use app.db_session if available, otherwise create one
+        if app and hasattr(app, 'db_session'):
+            session = app.db_session()
+        else:
+            # Fallback for CLI usage
+            from sqlalchemy.orm import sessionmaker
+            engine = create_engine(config['DATABASE_URI'])
+            session_factory = sessionmaker(bind=engine)
+            session = session_factory()
+
+        table_name = model_class.__tablename__
+        model_name = model_class.__name__
+        api_actions = ['read', 'write', 'update', 'delete']
+
+        created_count = 0
+        for action in api_actions:
+            permission_name = f"{table_name}:{action}"
+            
+            # Check if permission already exists
+            existing = permission_model.find_by_name(session, permission_name)
+            if not existing:
+                success, result = permission_model.create_permission(
+                    session, 
+                    service="api",
+                    action=action,
+                    resource=model_name,
+                    description=f"API {action} access for {model_name}"
+                )
+                if success:
+                    created_count += 1
+                    if app:
+                        app.logger.debug(f"Created permission: {permission_name}")
+
+        if created_count > 0 and app:
+            app.logger.info(f"Created {created_count} API permissions for {table_name}")
+
+        # Close session if we created it
+        if not (app and hasattr(app, 'db_session')):
+            session.close()
+
+    except Exception as e:
+        if app:
+            app.logger.warning(f"Failed to create API permissions for {model_class.__tablename__}: {e}")
+        else:
+            print(f"Warning: Failed to create API permissions for {model_class.__tablename__}: {e}")
 
 def preview_model_registry():
     """Preview what's in the model registry - for CLI/debugging"""

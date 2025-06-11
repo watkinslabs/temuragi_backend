@@ -21,5 +21,5 @@ Template:
     is_system: true
     is_admin_template: false
     is_default_template: true
-    uuid: 00000000-0000-0000-0000-000000000003
+    uuid: 00000000-0000-0000-0000-000000000001
     is_active: true

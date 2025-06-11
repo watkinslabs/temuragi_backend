@@ -26,51 +26,6 @@ class CLIDiscovery:
         self.root_package = self._determine_root_package()
         self.logger = logger
 
-    def discover_cli_modules(self, verbose=False):
-        """Recursively discover *_cli.py modules under allowed scan dirs"""
-        from app.config import config
-
-        allowed_dirs = set(config.get('SYSTEM_SCAN_PATHS', []))
-        self._log(f"Discovering CLI modules in {self.base_path}", 'info')
-
-        if verbose:
-            if hasattr(self.logger, 'output_info'):
-                self.logger.output_info(f"Discovering CLI modules in {self.base_path}...")
-            else:
-                print(f"Discovering CLI modules in {self.base_path}...")
-
-        for dirpath, dirnames, filenames in os.walk(self.base_path):
-            dirnames[:] = [
-                d for d in dirnames
-                if (d in allowed_dirs or dirpath == str(self.base_path))
-                and not d.startswith('.')
-                and d not in ['__pycache__', 'static', 'tpl']
-            ]
-
-            cli_files = [f for f in filenames if f.endswith('_cli.py')]
-
-            for cli_file in cli_files:
-                if cli_file == "base_cli.py":
-                    continue
-                self._register_cli_module(dirpath, cli_file, verbose)
-
-        if verbose and self.failed_modules:
-            if hasattr(self.logger, 'output_warning'):
-                self.logger.output_warning(f"Failed to load {len(self.failed_modules)} modules:")
-                for name, error in self.failed_modules.items():
-                    self.logger.output_error(f"  {name}: {error}")
-            else:
-                print(f"Failed to load {len(self.failed_modules)} modules:")
-                for name, error in self.failed_modules.items():
-                    print(f"  {name}: {error}")
-
-        self._log(
-            f"Discovery complete: {len(self.discovered_clis)} modules found, "
-            f"{len(self.failed_modules)} failed",
-            'info'
-        )
-        return self.discovered_clis
-
     def _determine_root_package(self):
         """Determine the root package name from the current module"""
         return __package__.split('.')[0] if __package__ else 'app'
@@ -270,6 +225,8 @@ class TMasterCLI(BaseCLI):
             args = []
 
         self.log_operation_start(f"Running CLI module: {cli_name}")
+        self.output_info(f"Original sys.argv: {sys.argv}")
+        self.output_info(f"Passing args to {cli_name}: {args}")
 
         cli_func = self.discovery.load_cli_module(cli_name)
         if not cli_func:
@@ -342,7 +299,6 @@ Examples:
                 help=description,
                 add_help=False
             )
-            cli_parser.add_argument('cli_args', nargs='*', help='Arguments for the CLI module')
 
         return parser
 
@@ -371,9 +327,8 @@ Examples:
             self.list_available_clis()
             return 0
 
-        args = self.parser.parse_args()
+        args, unknown_args = self.parser.parse_known_args()
 
-        # Handle log level setting (redundant check but ensures it's set)
         if args.debug or args.log_level:
             self._apply_log_level(args.debug, args.log_level)
 
@@ -390,8 +345,8 @@ Examples:
             self.discover_modules(verbose=True)
             return 0
 
-        cli_args = getattr(args, 'cli_args', [])
-        return self.run_cli_module(args.cli_module, cli_args)
+        return self.run_cli_module(args.cli_module, unknown_args)
+
 
     def _apply_log_level(self, debug_mode, log_level_name):
         """Apply log level using BaseCLI's logging infrastructure"""

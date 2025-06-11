@@ -17,30 +17,7 @@ TemplateFragment:
       is_active: true
       template_source: |
         <main class="content">
-                <h1>CLI Reference</h1>
-                <h2>Documentation Version 3.11</h2>
-                <p><strong>Abstract:</strong> This CLI reference provides comprehensive documentation for command line interface operations and management.</p>
-                
-                <h3>Table of Contents</h3>
-                <ul>
-                    <li><a href="#" class="breadcrumb_link">Getting Started with the CLI</a></li>
-                    <li><a href="#" class="breadcrumb_link">Basic CLI Operations</a></li>
-                    <li><a href="#" class="breadcrumb_link">Advanced CLI Commands</a></li>
-                    <li><a href="#" class="breadcrumb_link">Troubleshooting</a></li>
-                </ul>
-                
-                <br><br><br><br><br><br><br><br><br><br>
-                <p>Scroll down to see the topbar disappear...</p>
-                <br><br><br><br><br><br><br><br><br><br>
-                <p>The header will stick at the top once the topbar scrolls away.</p>
-                <br><br><br><br><br><br><br><br><br><br>
-                <p>This is a generic documentation layout template.</p>
-                <br><br><br><br><br><br><br><br><br><br>
-                <p>Everything scrolls with one scrollbar.</p>
-                <br><br><br><br><br><br><br><br><br><br>
-                <p>More content to demonstrate the scrolling behavior...</p>
-                <br><br><br><br><br><br><br><br><br><br>
-                <p>Keep scrolling to reach the footer...</p>
+               
           </main>
       template_hash: null
       variables_schema: |
