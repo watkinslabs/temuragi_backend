@@ -17,6 +17,7 @@ psycopg2-binary = "*"
 pyaml = "*"
 flask = "*"
 tabulate = "*"
+pyjwt = "*"
 
 [dev-packages]
 

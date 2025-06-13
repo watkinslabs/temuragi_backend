@@ -1,0 +1,18 @@
+# Permission 'api:delete:DatabaseType'
+# UUID: 134497de-5c10-4f59-848e-f52ac5de914c
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:delete:DatabaseType
+    service: api
+    action: delete
+    resource: DatabaseType
+    description: API delete access for DatabaseType
+    uuid: 134497de-5c10-4f59-848e-f52ac5de914c
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

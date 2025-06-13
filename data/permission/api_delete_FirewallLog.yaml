@@ -1,0 +1,18 @@
+# Permission 'api:delete:FirewallLog'
+# UUID: 5daac6b8-8872-413b-9adf-dcc31eb261de
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:delete:FirewallLog
+    service: api
+    action: delete
+    resource: FirewallLog
+    description: API delete access for FirewallLog
+    uuid: 5daac6b8-8872-413b-9adf-dcc31eb261de
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

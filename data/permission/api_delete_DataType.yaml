@@ -1,0 +1,18 @@
+# Permission 'api:delete:DataType'
+# UUID: 924b7cfa-f0d0-485d-97e6-2845bc5ca8aa
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:delete:DataType
+    service: api
+    action: delete
+    resource: DataType
+    description: API delete access for DataType
+    uuid: 924b7cfa-f0d0-485d-97e6-2845bc5ca8aa
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

@@ -1,0 +1,18 @@
+# Permission 'api:delete:TemplateFragment'
+# UUID: cb904d48-2836-41f8-8047-a34cdc33286d
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:delete:TemplateFragment
+    service: api
+    action: delete
+    resource: TemplateFragment
+    description: API delete access for TemplateFragment
+    uuid: cb904d48-2836-41f8-8047-a34cdc33286d
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

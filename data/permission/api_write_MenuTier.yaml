@@ -1,0 +1,18 @@
+# Permission 'api:write:MenuTier'
+# UUID: fcc462dc-9400-4d30-9e59-00b06d13a37f
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:write:MenuTier
+    service: api
+    action: write
+    resource: MenuTier
+    description: API write access for MenuTier
+    uuid: fcc462dc-9400-4d30-9e59-00b06d13a37f
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

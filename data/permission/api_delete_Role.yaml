@@ -1,0 +1,18 @@
+# Permission 'api:delete:Role'
+# UUID: 04f80401-b1c3-4a03-befb-f3cd8f7ff4bb
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:delete:Role
+    service: api
+    action: delete
+    resource: Role
+    description: API delete access for Role
+    uuid: 04f80401-b1c3-4a03-befb-f3cd8f7ff4bb
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

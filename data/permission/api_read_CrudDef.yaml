@@ -1,0 +1,18 @@
+# Permission 'api:read:CrudDef'
+# UUID: f9b603b1-b6eb-4d03-8c0f-8dc38ec1d76e
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:read:CrudDef
+    service: api
+    action: read
+    resource: CrudDef
+    description: API read access for CrudDef
+    uuid: f9b603b1-b6eb-4d03-8c0f-8dc38ec1d76e
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

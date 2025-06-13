@@ -1,0 +1,18 @@
+# Permission 'api:update:UserQuickLink'
+# UUID: 46b7e637-bb76-40bd-a908-231c8d7095fc
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:update:UserQuickLink
+    service: api
+    action: update
+    resource: UserQuickLink
+    description: API update access for UserQuickLink
+    uuid: 46b7e637-bb76-40bd-a908-231c8d7095fc
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

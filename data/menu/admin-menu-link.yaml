@@ -1,0 +1,186 @@
+MenuLink:
+ meta:
+   tablename: menu_links
+   schema: public
+ data:
+   # Content & Pages
+   - uuid: 00000000-0000-0000-0000-000000002100
+     name: pages
+     display: Pages
+     url_for: page.index
+     tier_uuid: 00000000-0000-0000-0000-000000002000
+     icon: fa-file
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000002200
+     name: templates
+     display: Templates
+     url_for: template.index
+     tier_uuid: 00000000-0000-0000-0000-000000002000
+     icon: fa-code
+     position: 2
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000002300
+     name: themes
+     display: Themes
+     url_for: theme.index
+     tier_uuid: 00000000-0000-0000-0000-000000002000
+     icon: fa-paint-brush
+     position: 3
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000002400
+     name: menus
+     display: Menus
+     url_for: menu.index
+     tier_uuid: 00000000-0000-0000-0000-000000002000
+     icon: fa-bars
+     position: 4
+     visible: true
+     development: false
+     is_active: true
+
+   # Users & Security
+   - uuid: 00000000-0000-0000-0000-000000003100
+     name: users
+     display: Users
+     url_for: user.index
+     tier_uuid: 00000000-0000-0000-0000-000000003000
+     icon: fa-users
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000003200
+     name: roles
+     display: Roles
+     url_for: rbac.role_index
+     tier_uuid: 00000000-0000-0000-0000-000000003000
+     icon: fa-user-tag
+     position: 2
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000003300
+     name: permissions
+     display: Permissions
+     url_for: rbac.permission_index
+     tier_uuid: 00000000-0000-0000-0000-000000003000
+     icon: fa-key
+     position: 3
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000003400
+     name: firewall
+     display: Firewall
+     url_for: firewall.index
+     tier_uuid: 00000000-0000-0000-0000-000000003000
+     icon: fa-fire
+     position: 4
+     visible: true
+     development: false
+     has_submenu: true
+     is_active: true
+
+   # Firewall submenu links
+   - uuid: 00000000-0000-0000-0000-000000003411
+     name: firewall_rules
+     display: Firewall Rules
+     url_for: firewall.rules_index
+     tier_uuid: 00000000-0000-0000-0000-000000003410
+     icon: fa-shield-alt
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000003412
+     name: firewall_logs
+     display: Firewall Logs
+     url_for: firewall.logs_index
+     tier_uuid: 00000000-0000-0000-0000-000000003410
+     icon: fa-file-alt
+     position: 2
+     visible: true
+     development: false
+     is_active: true
+
+   # Integrations
+   - uuid: 00000000-0000-0000-0000-000000004100
+     name: connections
+     display: Connections
+     url_for: connection.index
+     tier_uuid: 00000000-0000-0000-0000-000000004000
+     icon: fa-link
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000004200
+     name: crud_definitions
+     display: CRUD Definitions
+     url_for: crud_def.index
+     tier_uuid: 00000000-0000-0000-0000-000000004000
+     icon: fa-database
+     position: 2
+     visible: true
+     development: false
+     is_active: true
+
+   # System
+   - uuid: 00000000-0000-0000-0000-000000005100
+     name: modules
+     display: Modules
+     url_for: system.module_index
+     tier_uuid: 00000000-0000-0000-0000-000000005000
+     icon: fa-puzzle-piece
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000005200
+     name: data_types
+     display: Data Types
+     url_for: system.data_type_index
+     tier_uuid: 00000000-0000-0000-0000-000000005000
+     icon: fa-tags
+     position: 2
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000005300
+     name: variable_types
+     display: Variable Types
+     url_for: system.variable_type_index
+     tier_uuid: 00000000-0000-0000-0000-000000005000
+     icon: fa-sliders
+     position: 3
+     visible: true
+     development: false
+     is_active: true
+
+   - uuid: 00000000-0000-0000-0000-000000005400
+     name: database_types
+     display: Database Types
+     url_for: system.database_type_index
+     tier_uuid: 00000000-0000-0000-0000-000000005000
+     icon: fa-server
+     position: 4
+     visible: true
+     development: false
+     is_active: true

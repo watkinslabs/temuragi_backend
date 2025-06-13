@@ -15,7 +15,7 @@ _model_registry = {}
 class Engines:
     """Holds your engines.  One for config DB, and lazily-created ones for each target DSN."""
     def __init__(self, config_uri):
-        # single engine to your Postgres “config server”
+        # single engine to your Postgres "config server"
         self.config_engine = create_engine(config_uri, pool_size=5, max_overflow=10)
         # session factory for config DB
         self.ConfigSession = sessionmaker(bind=self.config_engine)
@@ -77,8 +77,11 @@ def register_db(app: Flask):
     # Discover and import all models with dependency resolution
     discover_and_import_models(app)
 
-    # Create all tables
+    # Create all tables BEFORE creating permissions
     create_all_tables(app, config_engine)
+
+    # NOW create API permissions after tables exist
+    create_api_permissions_for_all_models(app)
 
     # Setup session cleanup
     @app.teardown_appcontext
@@ -379,9 +382,39 @@ def register_model_classes_from_module(module, app=None):
             # Register by class name
             _model_registry[name] = obj
             tables_found.append(obj.__tablename__)
-            create_model_api_permissions(obj, app)
 
     
+
+def create_api_permissions_for_all_models(app):
+    """Create API permissions for all registered models after tables exist"""
+    if app:
+        app.logger.info("Creating API permissions for all models...")
+    
+    created_total = 0
+    
+    # Get unique model classes (avoid duplicates from table name aliases)
+    model_classes = []
+    seen_tables = set()
+    
+    for name, model_class in _model_registry.items():
+        if (hasattr(model_class, '__tablename__') and
+            hasattr(model_class, '__name__') and
+            name == model_class.__name__ and  # Only actual class names
+            model_class.__tablename__ not in seen_tables):
+            model_classes.append(model_class)
+            seen_tables.add(model_class.__tablename__)
+    
+    for model_class in model_classes:
+        try:
+            created_count = create_model_api_permissions(model_class, app)
+            created_total += created_count
+        except Exception as e:
+            if app:
+                app.logger.warning(f"Failed to create permissions for {model_class.__tablename__}: {e}")
+    
+    if app:
+        app.logger.info(f"Created {created_total} total API permissions")
+
 
 def create_model_api_permissions(model_class, app=None):
     """Auto-create API permissions for a model"""
@@ -390,8 +423,8 @@ def create_model_api_permissions(model_class, app=None):
         permission_model = get_model('Permission')
         if not permission_model:
             if app:
-                app.logger.warning("Permission model not available for auto-permission creation")
-            return
+                app.logger.debug("Permission model not available for auto-permission creation")
+            return 0
 
         # Get session - use app.db_session if available, otherwise create one
         if app and hasattr(app, 'db_session'):
@@ -427,17 +460,20 @@ def create_model_api_permissions(model_class, app=None):
                         app.logger.debug(f"Created permission: {permission_name}")
 
         if created_count > 0 and app:
-            app.logger.info(f"Created {created_count} API permissions for {table_name}")
+            app.logger.debug(f"Created {created_count} API permissions for {table_name}")
 
         # Close session if we created it
         if not (app and hasattr(app, 'db_session')):
             session.close()
+
+        return created_count
 
     except Exception as e:
         if app:
             app.logger.warning(f"Failed to create API permissions for {model_class.__tablename__}: {e}")
         else:
             print(f"Warning: Failed to create API permissions for {model_class.__tablename__}: {e}")
+        return 0
 
 def preview_model_registry():
     """Preview what's in the model registry - for CLI/debugging"""

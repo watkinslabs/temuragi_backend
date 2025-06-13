@@ -1,0 +1,18 @@
+# Permission 'api:read:MenuLink'
+# UUID: 911b8243-6fe2-4328-8746-58b27dacad2a
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:read:MenuLink
+    service: api
+    action: read
+    resource: MenuLink
+    description: API read access for MenuLink
+    uuid: 911b8243-6fe2-4328-8746-58b27dacad2a
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

@@ -76,7 +76,8 @@ class DbLoader(BaseLoader):
 
 class TemplateRenderer:
     """Dynamic template render engine for Flask"""
-    
+    __depends_on__ = ['Page', 'Template', 'Theme', 'PageFragment', 'TemplateFragment']
+
     def __init__(self, session):
         self.session = session
         self._logger = self._get_logger()
@@ -108,9 +109,39 @@ class TemplateRenderer:
             self._jinja_env.globals['include_page_fragment'] = self._include_fragment
             self._jinja_env.globals['include_template_fragment'] = self._include_template_fragment
             self._jinja_env.globals['theme_css'] = lambda theme_uuid_or_name=None: self.theme_css(self.session, theme_uuid_or_name)
-        
+            self._jinja_env.globals['get_flashed_messages'] = self._get_flashed_messages
+            self._jinja_env.globals['url_for'] = self._url_for
+            self._jinja_env.globals['render_menu'] = self._render_menu
+
         return self._jinja_env
+
+    def _url_for(self, endpoint, **values):
+        """
+        Generate URL for the given endpoint with the method provided.
+        Wrapper around Flask's url_for.
+        """
+        from flask import url_for
+        return url_for(endpoint, **values)
     
+    def _get_flashed_messages(self, with_categories=False, category_filter=()):
+            """
+            Get flashed messages from Flask session.
+            Mimics Flask's get_flashed_messages functionality.
+            """
+            from flask import session
+            
+            flashes = session.pop('_flashes', [])
+            
+            if category_filter:
+                # Filter by categories if specified
+                flashes = [f for f in flashes if f[0] in category_filter]
+            
+            if with_categories:
+                # Return tuples of (category, message)
+                return flashes
+            else:
+                # Return just the messages
+                return [f[1] for f in flashes]    
     def _context_include(self, fragment_key, **kwargs):
         for i in range(0,100):
             print("CONTEXT")
@@ -711,6 +742,69 @@ class TemplateRenderer:
             
         except Exception as e:
             return f"/* Error generating theme CSS: {e} */"
+        
+
+    # Then add this method to the TemplateRenderer class:
+    def _render_menu(self, menu_name='ADMIN', user_uuid=None, **kwargs):
+        """
+        Render menu directly in templates using {{ render_menu('ADMIN') }}
+        
+        Args:
+            menu_name: Name of the menu to render (default: 'ADMIN')
+            user_uuid: Optional user UUID for permission filtering
+            **kwargs: Additional context variables
+        
+        Returns:
+            Rendered menu HTML
+        """
+        from app.classes import MenuBuilder
+        from app.models import Template, TemplateFragment
+        
+        try:
+            # Get menu structure
+            menu_builder = MenuBuilder(self.session)
+            menu_structure = menu_builder.get_menu_structure(menu_name, user_uuid)
+            
+            if not menu_structure:
+                return f"<!-- Menu '{menu_name}' not found -->"
+            
+            # Try to find a template for this menu type
+            template_name = f"menu_{menu_name.lower()}"  # e.g., menu_admin, menu_main
+            template = self.session.query(Template).filter_by(name=template_name).first()
+            
+            # Fallback to generic sidebar_menu template
+            if not template:
+                template = self.session.query(Template).filter_by(name='sidebar_menu').first()
+            
+            if template:
+                # Get base fragment
+                base_fragment = TemplateFragment.get_active_by_key(
+                    self.session, template.uuid, 'base'
+                )
+                
+                if base_fragment:
+                    # Render the fragment with menu structure
+                    context = {
+                        'menu': menu_structure,
+                        'template_uuid': str(template.uuid),
+                        **kwargs
+                    }
+                    
+                    # Push template context
+                    self._push_context('template', template.uuid)
+                    
+                    try:
+                        template_obj = self.jinja_env.from_string(base_fragment.template_source)
+                        return template_obj.render(**context)
+                    finally:
+                        self._pop_context()
+            
+            # Fallback to simple rendering
+            return menu_builder.render_menu(menu_structure, **kwargs)
+            
+        except Exception as e:
+            self._logger.error(f"Error rendering menu '{menu_name}': {e}")
+            return f"<!-- Error rendering menu: {e} -->"        
 
 def render_template(page_uuid, **data):
     """Convenience function for rendering templates"""

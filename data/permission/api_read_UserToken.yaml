@@ -1,0 +1,18 @@
+# Permission 'api:read:UserToken'
+# UUID: 6be7212a-a532-42f0-b944-14bd139d89cb
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:read:UserToken
+    service: api
+    action: read
+    resource: UserToken
+    description: API read access for UserToken
+    uuid: 6be7212a-a532-42f0-b944-14bd139d89cb
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

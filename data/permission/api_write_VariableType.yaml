@@ -1,0 +1,18 @@
+# Permission 'api:write:VariableType'
+# UUID: dfef6604-2f87-4f51-8707-a508bbf7a974
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:write:VariableType
+    service: api
+    action: write
+    resource: VariableType
+    description: API write access for VariableType
+    uuid: dfef6604-2f87-4f51-8707-a508bbf7a974
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

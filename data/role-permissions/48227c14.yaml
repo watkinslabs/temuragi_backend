@@ -1,0 +1,15 @@
+# RolePermission '48227c14'
+# UUID: 48227c14-df94-4f2c-86d0-394821404a8c
+# Exported from template CLI
+
+RolePermission:
+  meta:
+    tablename: role_permissions
+    schema: public
+  data:
+    role_uuid: 00000000-0000-0000-0000-000000000111
+    permission_uuid: 54377229-668e-47ec-8590-17dd0c892f81
+    uuid: 48227c14-df94-4f2c-86d0-394821404a8c
+    is_active: true
+    created_at: '2025-06-12T12:53:59.431856-04:00'
+    updated_at: '2025-06-12T12:53:59.431892-04:00'

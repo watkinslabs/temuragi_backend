@@ -1,0 +1,18 @@
+# Permission 'api:write:PageFragment'
+# UUID: 30b4075f-da6f-477c-ac35-f615ac6cefaa
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:write:PageFragment
+    service: api
+    action: write
+    resource: PageFragment
+    description: API write access for PageFragment
+    uuid: 30b4075f-da6f-477c-ac35-f615ac6cefaa
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

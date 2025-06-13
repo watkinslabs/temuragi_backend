@@ -1,0 +1,18 @@
+# Permission 'api:read:User'
+# UUID: b340b75e-85e1-45b1-8c4c-f260f3883c3e
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:read:User
+    service: api
+    action: read
+    resource: User
+    description: API read access for User
+    uuid: b340b75e-85e1-45b1-8c4c-f260f3883c3e
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

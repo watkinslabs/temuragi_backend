@@ -1,0 +1,18 @@
+# Permission 'api:update:RbacAuditLog'
+# UUID: e079b834-cab3-4d4b-9850-524c57517604
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:update:RbacAuditLog
+    service: api
+    action: update
+    resource: RbacAuditLog
+    description: API update access for RbacAuditLog
+    uuid: e079b834-cab3-4d4b-9850-524c57517604
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

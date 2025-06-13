@@ -1,0 +1,25 @@
+# Sidebar Menu Template
+# Template for rendering sidebar menus
+
+Template:
+  meta:
+    tablename: templates
+    schema: public
+  data:
+    name: sidebar_menu
+    display_name: Sidebar Menu
+    description: Template for rendering sidebar navigation menus
+    theme_uuid: 00000000-0000-0000-0000-000000000001
+    menu_uuid: null
+    layout_type: sidebar-left
+    container_class: sidebar-menu-container
+    sidebar_enabled: true
+    header_type: none
+    footer_type: none
+    breadcrumbs_enabled: false
+    module_uuid: null
+    is_system: true
+    is_admin_template: false
+    is_default_template: false
+    uuid: 00000000-0000-0000-0001-000000000001
+    is_active: true

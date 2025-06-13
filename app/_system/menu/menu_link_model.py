@@ -10,7 +10,8 @@ class MenuLink(BaseModel):
 
     name = Column(String(100), nullable=False)
     display = Column(String(100), nullable=False)
-    url = Column(String(255), nullable=False)
+    url = Column(String(255), nullable=True)
+    url_for = Column(String(255), nullable=False)
     tier_uuid = Column(UUID(as_uuid=True),
                     ForeignKey('menu_tiers.uuid', name='fk_menu_links_tier', ondelete='CASCADE'),
                     nullable=True)

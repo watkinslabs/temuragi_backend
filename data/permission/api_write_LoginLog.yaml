@@ -1,0 +1,18 @@
+# Permission 'api:write:LoginLog'
+# UUID: 545e03ee-8d53-4609-81f4-191acd257738
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+    name: api:write:LoginLog
+    service: api
+    action: write
+    resource: LoginLog
+    description: API write access for LoginLog
+    uuid: 545e03ee-8d53-4609-81f4-191acd257738
+    is_active: true
+    created_at: '2025-06-12T12:33:14.303572-04:00'
+    updated_at: '2025-06-12T12:33:14.303609-04:00'

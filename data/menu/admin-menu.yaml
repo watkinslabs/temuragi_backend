@@ -1,0 +1,11 @@
+# admin-menu.yaml
+Menu:
+ meta:
+   tablename: menu
+   schema: public
+ data:
+   name: admin_menu
+   display: Admin Menu
+   description: Main administrative menu
+   uuid: 00000000-0000-0000-0000-000000001000
+   is_active: true
