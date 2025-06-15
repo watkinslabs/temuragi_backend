@@ -326,6 +326,81 @@ class TokenCLI(BaseCLI):
             self.output_error(f"Error showing token details: {e}")
             return 1
 
+    def cleanup_expired(self, days_old=7, dry_run=False):
+        """Clean up expired tokens older than specified days"""
+        self.log_info(f"Cleaning up expired tokens older than {days_old} days (dry_run={dry_run})")
+
+        try:
+            from datetime import datetime, timedelta
+            cutoff_date = datetime.utcnow() - timedelta(days=days_old)
+            
+            # Find expired tokens to clean up
+            expired_query = self.session.query(self.user_token_model).filter(
+                self.user_token_model.expires_at < cutoff_date,
+                self.user_token_model.ignore_expiration == False
+            )
+            
+            # Find soft-deleted tokens to clean up
+            deleted_query = self.session.query(self.user_token_model).filter(
+                self.user_token_model.is_active == False,
+                self.user_token_model.updated_at < cutoff_date
+            )
+            
+            expired_count = expired_query.count()
+            deleted_count = deleted_query.count()
+            total_count = expired_count + deleted_count
+            
+            if dry_run:
+                self.output_info(f"Would delete {expired_count} expired tokens")
+                self.output_info(f"Would delete {deleted_count} soft-deleted tokens")
+                self.output_info(f"Total: {total_count} tokens")
+                
+                if self.verbose and total_count > 0:
+                    # Show sample of tokens that would be deleted
+                    sample_tokens = expired_query.limit(10).all()
+                    if sample_tokens:
+                        headers = ['UUID', 'User', 'Type', 'Application', 'Expired At']
+                        rows = []
+                        
+                        for token in sample_tokens:
+                            user_name = token.user.username if token.user else 'N/A'
+                            rows.append([
+                                str(token.uuid)[:8] + '...',
+                                user_name,
+                                token.token_type,
+                                token.application or 'N/A',
+                                token.expires_at.strftime('%Y-%m-%d %H:%M')
+                            ])
+                        
+                        self.output_info("\nSample of tokens to be deleted:")
+                        self.output_table(rows, headers=headers)
+                        if expired_count > 10:
+                            self.output_info(f"... and {expired_count - 10} more expired tokens")
+                
+                return 0
+            
+            # Perform actual cleanup
+            self.log_info(f"Deleting {total_count} tokens")
+            
+            # Delete expired tokens
+            expired_query.delete(synchronize_session=False)
+            
+            # Delete soft-deleted tokens
+            deleted_query.delete(synchronize_session=False)
+            
+            self.session.commit()
+            
+            self.log_info(f"Successfully cleaned up {total_count} tokens")
+            self.output_success(f"Cleaned up {total_count} tokens ({expired_count} expired, {deleted_count} soft-deleted)")
+            return 0
+
+        except Exception as e:
+            self.session.rollback()
+            self.log_error(f"Error during cleanup: {e}")
+            self.output_error(f"Error during cleanup: {e}")
+            return 1
+        
+
     def validate_token(self, token_value, token_type=None):
         self.log_info("Validating token")
 
@@ -418,6 +493,11 @@ def main():
     validate_parser.add_argument('token', help='Token value to validate')
     validate_parser.add_argument('--type', choices=['access', 'refresh'], help='Expected token type')
 
+    cleanup_parser = subparsers.add_parser('cleanup', help='Clean up expired tokens')
+    cleanup_parser.add_argument('--days', type=int, default=7, help='Delete tokens expired more than N days ago (default: 7)')
+    cleanup_parser.add_argument('--dry-run', action='store_true', help='Show what would be deleted without actually deleting')
+
+
     args = parser.parse_args()
 
     if not args.command:
@@ -467,7 +547,10 @@ def main():
         elif args.command == 'validate':
             return cli.validate_token(args.token, args.type)
 
+        elif args.command == 'cleanup':
+            return cli.cleanup_expired(days_old=args.days, dry_run=args.dry_run)
     except KeyboardInterrupt:
+
         if cli:
             cli.log_info("Operation cancelled by user")
         print("\nOperation cancelled")

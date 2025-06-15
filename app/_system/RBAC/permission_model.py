@@ -29,28 +29,28 @@ class Permission(BaseModel):
 
     @classmethod
     def create_permission(cls, session, service, action, resource=None, description=None):
-        """Create a new permission name"""
-        if resource:
-            name = f"{service}:{action}:{resource}"
-        else:
-            name = f"{service}:{action}"
+        """Create a new permission with 3-position name format"""
+        if not resource:
+            return False, "Resource is required for 3-position permission format"
         
-        # Check if permission already exists
+        # Permission name is always lowercase, but individual fields preserve case
+        name = f"{service.lower()}:{resource.lower()}:{action.lower()}"
+
         existing = session.query(cls).filter(cls.name == name).first()
         if existing:
             return False, f"Permission already exists: {name}"
-        
+
         permission = cls(
             name=name,
-            service=service,
-            action=action,
+            service=service,  
+            action=action,    
             resource=resource,
             description=description
         )
-        
+
         session.add(permission)
         session.commit()
-        
+
         return True, permission
 
     @classmethod

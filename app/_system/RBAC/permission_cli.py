@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Permission CLI Management Tool
-Manage  permissions (service:action format) from command line
+Manage permissions in service:resource:action format from command line
 """
 
 import argparse
@@ -13,7 +13,7 @@ sys.path.append('/web/temuragi')
 
 from app.base.cli import BaseCLI
 
-CLI_DESCRIPTION = "Manages  permissions (service:action format)"
+CLI_DESCRIPTION = "Manages permissions in service:resource:action format"
 
 class PermissionCLI(BaseCLI):
     def __init__(self, verbose=False, show_icons=True, table_format=None):
@@ -48,23 +48,24 @@ class PermissionCLI(BaseCLI):
                 self.log_error("RolePermission model not found in registry")
                 raise Exception("RolePermission model not found in registry")
 
-            # MenuLink is optional since we moved to  permissions
-            self.menu_link_model = self.get_model('MenuLink')
-            if not self.menu_link_model:
-                self.log_info("MenuLink model not available - using  permissions only")
-
             self.log_info("Permission models loaded successfully")
 
         except Exception as e:
             self.log_error(f"Failed to initialize permission CLI: {e}")
             raise
 
-    def list_permissions(self, service_filter=None, show_inactive=False):
-        """List all  permissions"""
+    def list_permissions(self, service_filter=None, resource_filter=None, action_filter=None, show_inactive=False):
+        """List all permissions in service:resource:action format"""
+        filters = []
         if service_filter:
-            self.log_info(f"Listing permissions for service: {service_filter}")
-        else:
-            self.log_info("Listing all permissions")
+            filters.append(f"service={service_filter}")
+        if resource_filter:
+            filters.append(f"resource={resource_filter}")
+        if action_filter:
+            filters.append(f"action={action_filter}")
+        
+        filter_str = ", ".join(filters) if filters else "all"
+        self.log_info(f"Listing permissions: {filter_str}")
 
         try:
             query = self.session.query(self.permission_model)
@@ -76,8 +77,20 @@ class PermissionCLI(BaseCLI):
             if service_filter:
                 query = query.filter(self.permission_model.service == service_filter)
                 self.log_debug(f"Filtering for service: {service_filter}")
+            
+            if resource_filter:
+                query = query.filter(self.permission_model.resource == resource_filter)
+                self.log_debug(f"Filtering for resource: {resource_filter}")
+            
+            if action_filter:
+                query = query.filter(self.permission_model.action == action_filter)
+                self.log_debug(f"Filtering for action: {action_filter}")
 
-            permissions = query.order_by(self.permission_model.service, self.permission_model.action).all()
+            permissions = query.order_by(
+                self.permission_model.service,
+                self.permission_model.resource,
+                self.permission_model.action
+            ).all()
 
             self.log_info(f"Found {len(permissions)} permissions")
 
@@ -85,17 +98,17 @@ class PermissionCLI(BaseCLI):
                 self.output_info("No permissions found")
                 return 0
 
-            headers = ['UUID', 'Permission Name', 'Service', 'Action', 'Resource', 'Description', 'Active']
+            headers = ['UUID', 'Permission Name', 'Service', 'Resource', 'Action', 'Description', 'Active']
             rows = []
 
             for perm in permissions:
-                description = (perm.description or '')[:50] + ('...' if perm.description and len(perm.description) > 50 else '')
+                description = (perm.description or '')[:40] + ('...' if perm.description and len(perm.description) > 40 else '')
                 rows.append([
                     str(perm.uuid),
                     perm.name,
                     perm.service,
+                    perm.resource,
                     perm.action,
-                    perm.resource or '',
                     description,
                     'Yes' if perm.is_active else 'No'
                 ])
@@ -108,26 +121,39 @@ class PermissionCLI(BaseCLI):
             self.output_error(f"Error listing permissions: {e}")
             return 1
 
-
-    def add_permission(self, service, action, resource=None, description=None):
-        """Add a new  permission"""
-        self.log_info(f"Adding permission: {service}:{action}" + (f":{resource}" if resource else ""))
+    def add_permission(self, service, resource, action, description=None):
+        """Add a new permission in service:resource:action format"""
+        # Permission name is lowercase, but individual fields preserve case
+        permission_name = f"{service.lower()}:{resource.lower()}:{action.lower()}"
+        self.log_info(f"Adding permission: {permission_name}")
 
         try:
-            success, result = self.permission_model.create_permission(
-                self.session, service, action, resource, description
+            # Check if permission already exists
+            existing = self.permission_model.find_by_name(self.session, permission_name)
+            if existing:
+                self.log_warning(f"Permission already exists: {permission_name}")
+                self.output_error(f"Permission already exists: {permission_name}")
+                return 1
+
+            # Create new permission - name is lowercase, but fields preserve original case
+            permission = self.permission_model(
+                name=permission_name,
+                service=service,
+                resource=resource,
+                action=action,
+                description=description
             )
 
-            if success:
-                permission = result
-                self.log_info(f"Permission added successfully: {permission.name} (UUID: {permission.uuid})")
-                self.output_success(f"Permission created: {permission.name}")
-                self.output_info(f"UUID: {permission.uuid}")
-                return 0
-            else:
-                self.log_warning(f"Failed to add permission: {result}")
-                self.output_error(f"{result}")
-                return 1
+            self.session.add(permission)
+            self.session.commit()
+
+            self.log_info(f"Permission added successfully: {permission_name} (UUID: {permission.uuid})")
+            self.output_success(f"Permission created: {permission_name}")
+            self.output_info(f"UUID: {permission.uuid}")
+            self.output_info(f"Service: {service}")
+            self.output_info(f"Resource: {resource}")
+            self.output_info(f"Action: {action}")
+            return 0
 
         except Exception as e:
             self.session.rollback()
@@ -135,9 +161,10 @@ class PermissionCLI(BaseCLI):
             self.output_error(f"Error adding permission: {e}")
             return 1
 
-    
     def delete_permission(self, permission_name, hard_delete=False):
-        """Delete an  permission"""
+        """Delete a permission"""
+        # Auto-lowercase the permission name
+        permission_name = permission_name.lower()
         delete_type = "hard" if hard_delete else "soft"
         self.log_info(f"Deleting permission {permission_name} ({delete_type} delete)")
 
@@ -176,7 +203,9 @@ class PermissionCLI(BaseCLI):
             return 1
 
     def show_permission_details(self, permission_name):
-        """Show detailed  permission information"""
+        """Show detailed permission information"""
+        # Auto-lowercase the permission name
+        permission_name = permission_name.lower()
         self.log_info(f"Showing details for permission {permission_name}")
 
         try:
@@ -193,8 +222,8 @@ class PermissionCLI(BaseCLI):
                 ['UUID', str(permission.uuid)],
                 ['Permission Name', permission.name],
                 ['Service', permission.service],
+                ['Resource', permission.resource],
                 ['Action', permission.action],
-                ['Resource', permission.resource or 'None'],
                 ['Description', permission.description or 'None'],
                 ['Active', 'Yes' if permission.is_active else 'No'],
                 ['Assigned to Roles', str(role_count)],
@@ -231,7 +260,9 @@ class PermissionCLI(BaseCLI):
         self.log_info("Listing services with permissions")
 
         try:
-            services = self.session.query(self.permission_model.service).distinct().order_by(self.permission_model.service).all()
+            services = self.session.query(
+                self.permission_model.service
+            ).distinct().order_by(self.permission_model.service).all()
 
             if not services:
                 self.output_info("No services found")
@@ -244,7 +275,17 @@ class PermissionCLI(BaseCLI):
                     self.permission_model.service == service_name,
                     self.permission_model.is_active == True
                 ).count()
-                self.output_info(f"  {service_name} ({perm_count} permissions)")
+                
+                # Get unique resources for this service
+                resources = self.session.query(
+                    self.permission_model.resource
+                ).filter(
+                    self.permission_model.service == service_name,
+                    self.permission_model.is_active == True
+                ).distinct().all()
+                
+                resource_list = ", ".join([r[0] for r in resources])
+                self.output_info(f"  {service_name} ({perm_count} permissions) - Resources: {resource_list}")
 
             return 0
 
@@ -253,8 +294,57 @@ class PermissionCLI(BaseCLI):
             self.output_error(f"Error listing services: {e}")
             return 1
 
+    def list_resources(self, service_filter=None):
+        """List all resources that have permissions"""
+        self.log_info(f"Listing resources" + (f" for service {service_filter}" if service_filter else ""))
+
+        try:
+            query = self.session.query(
+                self.permission_model.resource,
+                self.permission_model.service
+            ).distinct()
+
+            if service_filter:
+                query = query.filter(self.permission_model.service == service_filter)
+
+            resources = query.order_by(
+                self.permission_model.service,
+                self.permission_model.resource
+            ).all()
+
+            if not resources:
+                self.output_info("No resources found")
+                return 0
+
+            # Group by service
+            service_resources = {}
+            for resource, service in resources:
+                if service not in service_resources:
+                    service_resources[service] = []
+                service_resources[service].append(resource)
+
+            self.output_info("Resources with permissions:")
+            for service, res_list in sorted(service_resources.items()):
+                self.output_info(f"\n{service}:")
+                for resource in sorted(res_list):
+                    perm_count = self.session.query(self.permission_model).filter(
+                        self.permission_model.service == service,
+                        self.permission_model.resource == resource,
+                        self.permission_model.is_active == True
+                    ).count()
+                    self.output_info(f"  {resource} ({perm_count} permissions)")
+
+            return 0
+
+        except Exception as e:
+            self.log_error(f"Error listing resources: {e}")
+            self.output_error(f"Error listing resources: {e}")
+            return 1
+
     def grant_permission(self, role_name, permission_name):
-        """Grant an  permission to a role"""
+        """Grant a permission to a role"""
+        # Auto-lowercase the permission name
+        permission_name = permission_name.lower()
         self.log_info(f"Granting permission {permission_name} to role {role_name}")
 
         try:
@@ -274,6 +364,14 @@ class PermissionCLI(BaseCLI):
                 self.log_info(f"Permission granted successfully: {permission_name} to {role_name} (RolePermission UUID: {role_permission.uuid})")
                 self.output_success(f"Permission granted to role: {role_name}")
                 self.output_info(f"Permission: {permission_name}")
+                
+                # Parse and display the permission components
+                parts = permission_name.split(':')
+                if len(parts) == 3:
+                    self.output_info(f"  Service: {parts[0]}")
+                    self.output_info(f"  Resource: {parts[1]}")
+                    self.output_info(f"  Action: {parts[2]}")
+                
                 self.output_info(f"RolePermission UUID: {role_permission.uuid}")
                 return 0
             else:
@@ -288,7 +386,9 @@ class PermissionCLI(BaseCLI):
             return 1
 
     def revoke_permission(self, role_name, permission_name):
-        """Revoke an  permission from a role"""
+        """Revoke a permission from a role"""
+        # Auto-lowercase the permission name
+        permission_name = permission_name.lower()
         self.log_info(f"Revoking permission {permission_name} from role {role_name}")
 
         try:
@@ -320,7 +420,7 @@ class PermissionCLI(BaseCLI):
             return 1
 
     def list_role_permissions(self, role_name):
-        """List all  permissions for a specific role"""
+        """List all permissions for a specific role"""
         self.log_info(f"Listing permissions for role: {role_name}")
 
         try:
@@ -338,16 +438,16 @@ class PermissionCLI(BaseCLI):
 
             self.output_info(f"Permissions for role '{role_name}' ({len(permissions)}):")
 
-            headers = ['Permission Name', 'Service', 'Action', 'Resource', 'Description']
+            headers = ['Permission Name', 'Service', 'Resource', 'Action', 'Description']
             rows = []
 
             for perm in permissions:
-                description = (perm.description or '')[:50] + ('...' if perm.description and len(perm.description) > 50 else '')
+                description = (perm.description or '')[:40] + ('...' if perm.description and len(perm.description) > 40 else '')
                 rows.append([
                     perm.name,
                     perm.service,
+                    perm.resource,
                     perm.action,
-                    perm.resource or '',
                     description
                 ])
 
@@ -360,7 +460,9 @@ class PermissionCLI(BaseCLI):
             return 1
 
     def check_user_permission(self, user_identity, permission_name):
-        """Check if a user has a specific  permission"""
+        """Check if a user has a specific permission"""
+        # Auto-lowercase the permission name
+        permission_name = permission_name.lower()
         self.log_info(f"Checking permission {permission_name} for user {user_identity}")
 
         try:
@@ -389,6 +491,14 @@ class PermissionCLI(BaseCLI):
             self.output_info(f"User: {user.username}")
             self.output_info(f"Role: {role_name}")
             self.output_info(f"Permission: {permission_name}")
+            
+            # Parse and display the permission components
+            parts = permission_name.split(':')
+            if len(parts) == 3:
+                self.output_info(f"  Service: {parts[0]}")
+                self.output_info(f"  Resource: {parts[1]}")
+                self.output_info(f"  Action: {parts[2]}")
+            
             self.output_info(f"Status: {status}")
 
             return 0
@@ -406,7 +516,7 @@ class PermissionCLI(BaseCLI):
 
 def main():
     """Entry point for permission CLI"""
-    parser = argparse.ArgumentParser(description=' Permission CLI Management Tool')
+    parser = argparse.ArgumentParser(description='Permission CLI Management Tool (service:resource:action format)')
     parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging')
     parser.add_argument('--no-icons', action='store_true', help='Disable icons in output')
     parser.add_argument('--table-format', choices=['simple', 'grid', 'pipe', 'orgtbl', 'rst', 'mediawiki', 'html', 'latex'],
@@ -414,47 +524,53 @@ def main():
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
     # List permissions command
-    list_parser = subparsers.add_parser('list', help='List  permissions')
+    list_parser = subparsers.add_parser('list', help='List permissions')
     list_parser.add_argument('--service', help='Filter by service name')
+    list_parser.add_argument('--resource', help='Filter by resource name')
+    list_parser.add_argument('--action', help='Filter by action name')
     list_parser.add_argument('--all', action='store_true', help='Show inactive permissions too')
 
     # Add permission command
-    add_parser = subparsers.add_parser('add', help='Add new  permission (service:action)')
-    add_parser.add_argument('service', help='Service name (e.g., accounting, customer)')
-    add_parser.add_argument('action', help='Action name (e.g., read, write, create, delete)')
-    add_parser.add_argument('--resource', help='Optional resource specifier')
+    add_parser = subparsers.add_parser('add', help='Add new permission (service:resource:action)')
+    add_parser.add_argument('service', help='Service name (e.g., api, accounting, customer)')
+    add_parser.add_argument('resource', help='Resource name (e.g., model, invoice, report)')
+    add_parser.add_argument('action', help='Action name (e.g., read, write, create, delete, metadata)')
     add_parser.add_argument('--description', help='Permission description')
 
     # Delete permission command
-    delete_parser = subparsers.add_parser('delete', help='Delete  permission')
-    delete_parser.add_argument('permission_name', help='Permission name (e.g., accounting:read)')
+    delete_parser = subparsers.add_parser('delete', help='Delete permission')
+    delete_parser.add_argument('permission_name', help='Permission name (e.g., api:model:read)')
     delete_parser.add_argument('--hard', action='store_true', help='Permanently delete (default: deactivate)')
 
     # Show permission details command
-    show_parser = subparsers.add_parser('show', help='Show  permission details')
-    show_parser.add_argument('permission_name', help='Permission name (e.g., accounting:read)')
+    show_parser = subparsers.add_parser('show', help='Show permission details')
+    show_parser.add_argument('permission_name', help='Permission name (e.g., api:model:metadata)')
 
     # List services command
     services_parser = subparsers.add_parser('services', help='List all services with permissions')
 
+    # List resources command
+    resources_parser = subparsers.add_parser('resources', help='List all resources with permissions')
+    resources_parser.add_argument('--service', help='Filter by service name')
+
     # Grant permission to role command
-    grant_parser = subparsers.add_parser('grant', help='Grant  permission to role')
+    grant_parser = subparsers.add_parser('grant', help='Grant permission to role')
     grant_parser.add_argument('role_name', help='Role name')
-    grant_parser.add_argument('permission_name', help='Permission name (e.g., accounting:read)')
+    grant_parser.add_argument('permission_name', help='Permission name (e.g., accounting:invoice:approve)')
 
     # Revoke permission from role command
-    revoke_parser = subparsers.add_parser('revoke', help='Revoke  permission from role')
+    revoke_parser = subparsers.add_parser('revoke', help='Revoke permission from role')
     revoke_parser.add_argument('role_name', help='Role name')
-    revoke_parser.add_argument('permission_name', help='Permission name (e.g., accounting:read)')
+    revoke_parser.add_argument('permission_name', help='Permission name (e.g., customer:profile:delete)')
 
     # List role permissions command
-    role_perms_parser = subparsers.add_parser('role-permissions', help='List  permissions for a role')
+    role_perms_parser = subparsers.add_parser('role-permissions', help='List permissions for a role')
     role_perms_parser.add_argument('role_name', help='Role name')
 
     # Check user permission command
-    check_parser = subparsers.add_parser('check-user', help='Check if user has  permission')
+    check_parser = subparsers.add_parser('check-user', help='Check if user has permission')
     check_parser.add_argument('user', help='Username or email')
-    check_parser.add_argument('permission_name', help='Permission name (e.g., accounting:read)')
+    check_parser.add_argument('permission_name', help='Permission name (e.g., api:model:write)')
 
     args = parser.parse_args()
 
@@ -477,11 +593,15 @@ def main():
     # Execute command
     try:
         if args.command == 'list':
-            return cli.list_permissions(service_filter=args.service, show_inactive=args.all)
+            return cli.list_permissions(
+                service_filter=args.service,
+                resource_filter=args.resource,
+                action_filter=args.action,
+                show_inactive=args.all
+            )
 
         elif args.command == 'add':
-            return cli.add_permission(args.service, args.action, args.resource, args.description)
-
+            return cli.add_permission(args.service, args.resource, args.action, args.description)
 
         elif args.command == 'delete':
             return cli.delete_permission(args.permission_name, args.hard)
@@ -491,6 +611,9 @@ def main():
 
         elif args.command == 'services':
             return cli.list_services()
+
+        elif args.command == 'resources':
+            return cli.list_resources(args.service if hasattr(args, 'service') else None)
 
         elif args.command == 'grant':
             return cli.grant_permission(args.role_name, args.permission_name)

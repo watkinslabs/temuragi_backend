@@ -6,7 +6,7 @@ Template:
     tablename: templates
     schema: public
   data:
-    name: admin_default
+    name: ADMIN
     display_name: Admin Dashboard
     description: Full-featured admin template with sidebar navigation, header controls, and comprehensive layout
     theme_uuid: 00000000-0000-0000-0000-000000000001

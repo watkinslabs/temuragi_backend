@@ -5,7 +5,7 @@ from app.classes import TemplateRenderer
 bp = Blueprint('theme', __name__, url_prefix='/theme')
 
 @bp.route('/')
-def test_page():
+def index():
     """Simple test route that renders a page using the TemplateRenderer"""
     try:
         # Get database session from Flask g context

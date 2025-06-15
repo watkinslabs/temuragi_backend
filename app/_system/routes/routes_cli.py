@@ -42,6 +42,31 @@ class RoutesCLI(BaseCLI):
             self.log_error(f"Failed to initialize routes CLI: {e}")
             raise
 
+    def _generate_url_for_syntax(self, route):
+        """Generate url_for syntax for a route"""
+        endpoint = route['endpoint']
+        rule = route['rule']
+        
+        # Parse route parameters
+        import re
+        param_pattern = r'<(?:([^:>]+):)?([^>]+)>'
+        params = re.findall(param_pattern, rule)
+        
+        if not params:
+            # No parameters
+            return f"url_for('{endpoint}')"
+        
+        # Build parameter list
+        param_list = []
+        for converter, param_name in params:
+            if converter:
+                param_list.append(f"{param_name}=<{converter}:{param_name}>")
+            else:
+                param_list.append(f"{param_name}=<{param_name}>")
+        
+        param_str = ', '.join(param_list)
+        return f"url_for('{endpoint}', {param_str})"
+    
     def format_route_table(self, routes_by_blueprint, show_details=False):
         """Format routes into a readable table"""
         self.log_debug(f"Formatting route table with {len(routes_by_blueprint)} blueprints")
@@ -65,7 +90,8 @@ class RoutesCLI(BaseCLI):
                 if show_details:
                     # More compact detailed view
                     func_name = route['function_name'].split('.')[-1]  # Just function name
-                    output.append(f"  {route['rule']:<30} [{methods:<10}] {route['endpoint']} -> {func_name}")
+                    url_for_syntax = self._generate_url_for_syntax(route)
+                    output.append(f"  {route['rule']:<30} [{methods:<10}] {route['endpoint']:<25} -> {func_name:<20} {url_for_syntax}")
                 else:
                     # Simple view
                     output.append(f"  {route['rule']:<30} [{methods}]")
@@ -282,18 +308,18 @@ class RoutesCLI(BaseCLI):
                 self.log_info(f"Found {len(found_routes)} matching routes")
 
                 # Display found routes in table format
-                headers = ['Blueprint', 'Rule', 'Methods', 'Endpoint', 'Function']
+                headers = ['Blueprint', 'Rule', 'Methods', 'Endpoint', 'url_for Syntax']
                 rows = []
 
                 for blueprint_name, route in found_routes:
                     methods = ', '.join(sorted(route['methods'] - {'OPTIONS', 'HEAD'}))
-                    func_name = route['function_name'].split('.')[-1]
+                    url_for_syntax = self._generate_url_for_syntax(route)
                     rows.append([
                         blueprint_name,
                         route['rule'],
                         methods,
                         route['endpoint'],
-                        func_name
+                        url_for_syntax
                     ])
 
                 self.output_info(f"Routes matching '{search_term}':")
@@ -305,7 +331,7 @@ class RoutesCLI(BaseCLI):
             self.log_error(f"Error finding route {search_term}: {e}")
             self.output_error(f"Error finding route: {e}")
             return 1
-
+            
     def show_route_details(self, endpoint):
         """Show detailed information about a specific route"""
         self.log_info(f"Showing details for endpoint: {endpoint}")
@@ -329,6 +355,16 @@ class RoutesCLI(BaseCLI):
 
                         # Format methods
                         methods = ', '.join(sorted(rule.methods - {'OPTIONS', 'HEAD'}))
+                        
+                        # Generate url_for syntax
+                        route_info = {
+                            'rule': rule.rule,
+                            'endpoint': rule.endpoint,
+                            'methods': rule.methods,
+                            'function_name': f"{func_module}.{func_name}",
+                            'blueprint': endpoint.split('.')[0] if '.' in endpoint else 'main'
+                        }
+                        url_for_syntax = self._generate_url_for_syntax(route_info)
 
                         # Create detail table
                         headers = ['Property', 'Value']
@@ -338,6 +374,7 @@ class RoutesCLI(BaseCLI):
                             ['Methods', methods],
                             ['Function Module', func_module],
                             ['Function Name', func_name],
+                            ['url_for Syntax', url_for_syntax],
                             ['Documentation', func_doc[:100] + '...' if len(func_doc) > 100 else func_doc]
                         ]
 

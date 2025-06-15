@@ -4,7 +4,7 @@ Menu:
    tablename: menu
    schema: public
  data:
-   name: admin_menu
+   name: ADMIN
    display: Admin Menu
    description: Main administrative menu
    uuid: 00000000-0000-0000-0000-000000001000

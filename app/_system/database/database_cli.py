@@ -59,12 +59,12 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Discovering models with initial data methods")
 
         try:
-            from app.register.database import discover_and_import_models, get_all_models
+            from app.register.database import discover_and_import, get_all_models
             
             self.output_info("Discovering and importing models...")
             
             # Use the register_db discovery system
-            discover_and_import_models()
+            discover_and_import()
             
             # Get all models from the registry
             all_models = get_all_models()
@@ -311,7 +311,7 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Creating database tables")
 
         try:
-            from app.register.database import discover_and_import_models, create_all_tables
+            from app.register.database import discover_and_import, create_all_tables
             
             # Mock app for logging
             class MockApp:
@@ -327,7 +327,7 @@ class DatabaseCLI(BaseCLI):
             app = MockApp()
             
             self.output_info("Discovering and importing models...")
-            discover_and_import_models()
+            discover_and_import()
             
             self.output_info("Creating database tables...")
             create_all_tables(app, self.engine)
@@ -498,12 +498,12 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Previewing model loading order")
 
         try:
-            from app.register.database import preview_model_registry, discover_and_import_models
+            from app.register.database import preview_model_registry, discover_and_import
             
             self.output_info("Loading models and previewing registry...")
             
             # Discover and import models to populate registry
-            discover_and_import_models()
+            discover_and_import()
             
             # Preview the registry
             registry = preview_model_registry()
@@ -847,12 +847,12 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Listing discovered models")
 
         try:
-            from app.register.database import discover_and_import_models, get_all_models
+            from app.register.database import discover_and_import, get_all_models
 
             self.output_info("Discovering and importing models...")
 
             # Use the register_db discovery system
-            discover_and_import_models()
+            discover_and_import(None)
 
             # Get all models from the registry
             all_models = get_all_models()
@@ -986,8 +986,8 @@ class DatabaseCLI(BaseCLI):
             
             # Try discovery
             self.output_info(f"\n--- Running Discovery ---")
-            from app.register.database import discover_and_import_models
-            discover_and_import_models()
+            from app.register.database import discover_and_import
+            discover_and_import()
             
             # Check registry state after discovery
             self.output_info(f"\n--- Registry State (after discovery) ---")

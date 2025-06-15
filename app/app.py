@@ -31,14 +31,14 @@ def create_app():
     register_classes(app)
 
         
-    for path in config['SYSTEM_SCAN_PATHS']:
-        register_blueprints(config['ROUTE_PREFIX'],path, app)
-    
+
     # Register hooks for all scan paths
     for path in config['SYSTEM_SCAN_PATHS']:
         register_hooks(path, app)
     
-
+    for path in config['SYSTEM_SCAN_PATHS']:
+        register_blueprints(config['ROUTE_PREFIX'],path, app)
+    
 
     return app
 

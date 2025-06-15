@@ -1,9 +1,5 @@
 from flask import url_for, render_template_string, g, current_app, request
 
-
-#from .menu_templates import MenuTemplates
-#from .menu_service import MenuBuilder
-
 def register_menu_injector(app):
     """
     Initialize the extension with a Flask application.

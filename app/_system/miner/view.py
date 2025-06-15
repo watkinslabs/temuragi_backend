@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 
 from app.classes import Miner
 
@@ -6,7 +6,7 @@ from app.classes import Miner
 bp = Blueprint('miner', __name__, url_prefix='/api')
 
 @bp.route('/data', methods=['POST'])
-def data_endpoint():
+def data():
     """Route handler that delegates to Miner service"""
-    miner = Miner()
+    miner = Miner(current_app)
     return miner.data_endpoint()

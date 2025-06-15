@@ -4,7 +4,7 @@ import yaml
 
 
 class ImportDependencyResolver:
-    """Resolves import order based on model __depends_on__ attributes"""
+    __depends_on__ = ['ComponentImporter']
 
     def __init__(self, session, output_manager, model_registry_getter):
         self.session = session

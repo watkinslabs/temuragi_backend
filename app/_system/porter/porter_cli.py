@@ -539,6 +539,41 @@ class PorterCLI(BaseCLI):
             self.output_error(f"Template generation failed: {e}")
             return 1
 
+    def export_all(self, model_name, output_file, template_mode=False,
+                    filter_field=None, filter_value=None, order_by=None, 
+                    limit=None, header_title=None, header_description=None):
+            """Export all model objects to a single YAML file"""
+            self.log_info(f"Exporting all {model_name} objects to {output_file}")
+            
+            try:
+                # Get model class
+                model_class = self.get_model(model_name)
+                if not model_class:
+                    self.output_error(f"Model '{model_name}' not found")
+                    return 1
+                
+                # Build filter conditions if provided
+                filter_conditions = None
+                if filter_field and filter_value:
+                    filter_conditions = {filter_field: filter_value}
+                    self.log_info(f"Applying filter: {filter_field}={filter_value}")
+                
+                # Export all objects
+                return self.exporter.export_all_model_objects(
+                    model_class=model_class,
+                    output_file_path=output_file,
+                    header_title=header_title,
+                    header_description=header_description,
+                    template_mode=template_mode,
+                    filter_conditions=filter_conditions,
+                    order_by=order_by,
+                    limit=limit
+                )
+                
+            except Exception as e:
+                self.log_error(f"Error exporting all {model_name}: {e}")
+                self.output_error(f"Export failed: {e}")
+                return 1
 
 def main():
     """Entry point for Porter CLI"""
@@ -601,6 +636,17 @@ def main():
     template_parser.add_argument('model', help='Model name')
     template_parser.add_argument('output', help='Output template file path')
 
+    # Export all command
+    export_all_parser = subparsers.add_parser('export-all', help='Export all model objects to single YAML')
+    export_all_parser.add_argument('model', help='Model name')
+    export_all_parser.add_argument('output', help='Output YAML file path')
+    export_all_parser.add_argument('--template', action='store_true', help='Generate as template')
+    export_all_parser.add_argument('--filter-field', help='Field name to filter by')
+    export_all_parser.add_argument('--filter-value', help='Value to filter by')
+    export_all_parser.add_argument('--order-by', help='Field to order results by')
+    export_all_parser.add_argument('--limit', type=int, help='Limit number of records')
+    export_all_parser.add_argument('--title', help='Custom header title')
+    export_all_parser.add_argument('--description', help='Custom header description')
     args = parser.parse_args()
 
     if not args.command:
@@ -655,7 +701,18 @@ def main():
 
         elif args.command == 'template':
             return cli.generate_template(args.model, args.output)
-
+        elif args.command == 'export-all':
+                    return cli.export_all(
+                        args.model, 
+                        args.output,
+                        template_mode=args.template,
+                        filter_field=args.filter_field,
+                        filter_value=args.filter_value,
+                        order_by=args.order_by,
+                        limit=args.limit,
+                        header_title=args.title,
+                        header_description=args.description
+                    )
     except KeyboardInterrupt:
         if cli:
             cli.log_info("Operation cancelled by user")

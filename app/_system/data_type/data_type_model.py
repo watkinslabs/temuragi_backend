@@ -26,7 +26,20 @@ class DataType(BaseModel):
             ('time', 'Time', True),
             ('json', 'JSON', True),
             ('array', 'Array', True),
-            ('money', 'Money', True)
+            ('money', 'Money', True),
+            # New types specifically useful for reports
+            ('decimal', 'Decimal', True),
+            ('percentage', 'Percentage', True),
+            ('email', 'Email', True),
+            ('url', 'URL', True),
+            ('uuid', 'UUID', True),
+            ('ip_address', 'IP Address', True),
+            ('color', 'Color', True),
+            ('file', 'File', True),
+            ('image', 'Image', True),
+            ('markdown', 'Markdown', True),
+            ('html', 'HTML', True),
+            ('code', 'Code', True)
         ]
         
         for name, display, active in initial_types:

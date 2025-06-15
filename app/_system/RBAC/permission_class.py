@@ -210,6 +210,7 @@ class RbacMiddleware:
     Middleware to automatically inject RBAC checker into request context
     """
     
+    __depends_on__ = ['RbacPermissionChecker']
     def __init__(self, app=None):
         self.app = app
         if app:

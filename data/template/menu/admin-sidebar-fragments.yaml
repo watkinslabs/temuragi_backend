@@ -1,284 +1,331 @@
 TemplateFragment:
-  meta:
-    tablename: template_fragments
-    schema: public
-  data:
-  - template_uuid: 00000000-0000-0000-0001-000000000001
-    fragment_type: base
-    fragment_name: Sidebar Menu Base
-    fragment_key: base
-    template_file_path: menu/sidebar/base.j2
-    compiled_file_path: null
-    content_type: text/html
-    version_number: 1
-    version_label: v1.0.0
-    is_active: true
-    template_source: |
-      {# Sidebar Menu Base - Includes CSS and Navigation #}
-      {{ include('sidebar_css') }}
-      {{ include('sidebar_nav') }}
-      {{ include('sidebar_js') }}
-    template_hash: null
-    variables_schema: |
-      {
-        "type": "object",
-        "properties": {
-          "menu": {"type": "object", "description": "Menu structure from MenuBuilder"}
-        },
-        "required": ["menu"]
-      }
-    sample_data: null
-    required_context: |
-      ["menu"]
-    dependencies: |
-      ["sidebar_css", "sidebar_nav", "sidebar_js"]
-    css_dependencies: null
-    js_dependencies: null
-    description: Base container that includes CSS, navigation, and JS
-    usage_notes: Entry point for sidebar menu rendering
-    preview_template: null
-    sort_order: 0
-    is_partial: false
-    cache_strategy: standard
-    cache_duration: 3600
-    last_compiled: null
-    change_description: Initial sidebar menu base fragment
-    created_by_user_uuid: null
+ meta:
+   tablename: template_fragments
+   schema: public
+ data:
+ - template_uuid: 00000000-0000-0000-0001-000000000001
+   fragment_type: base
+   fragment_name: Sidebar Menu Base
+   fragment_key: base
+   template_file_path: menu/sidebar/base.j2
+   compiled_file_path: null
+   content_type: text/html
+   version_number: 1
+   version_label: v1.0.0
+   is_active: true
+   template_source: |
+     {# Sidebar Menu Base - Includes CSS and Navigation #}
+     {% include 'sidebar_css' %}
+     {% include 'sidebar_nav' %}
+     {% include 'sidebar_js' %}
+   template_hash: null
+   variables_schema: |
+     {
+       "type": "object",
+       "properties": {
+         "menu": {"type": "object", "description": "Menu structure from MenuBuilder"}
+       },
+       "required": ["menu"]
+     }
+   sample_data: null
+   required_context: |
+     ["menu"]
+   dependencies: |
+     ["sidebar_css", "sidebar_nav", "sidebar_js"]
+   css_dependencies: null
+   js_dependencies: null
+   description: Base container that includes CSS, navigation, and JS
+   usage_notes: Entry point for sidebar menu rendering
+   preview_template: null
+   sort_order: 0
+   is_partial: false
+   cache_strategy: standard
+   cache_duration: 3600
+   last_compiled: null
+   change_description: Initial sidebar menu base fragment
+   created_by_user_uuid: null
 
-  - template_uuid: 00000000-0000-0000-0001-000000000001
-    fragment_type: nav
-    fragment_name: Sidebar Navigation
-    fragment_key: sidebar_nav
-    template_file_path: menu/sidebar/navigation.j2
-    compiled_file_path: null
-    content_type: text/html
-    version_number: 1
-    version_label: v1.0.0
-    is_active: true
-    template_source: |
-      <nav class="sidebar-menu">
-          {% for tier in menu.tiers %}
-              <div class="menu-section">
-                  <h3 class="menu-section-title">
-                      {% if tier.icon %}<i class="icon {{ tier.icon }}"></i>{% endif %}
-                      {{ tier.display }}
-                  </h3>
-                  {% if tier.links %}
-                      <ul class="menu-items">
-                          {% for link in tier.links %}
-                              <li class="menu-item {% if link.has_submenu %}has-submenu{% endif %}">
-                                  <a href="{{ link.url }}" class="menu-link" {% if link.new_tab %}target="_blank"{% endif %}>
-                                      {% if link.icon %}<i class="icon {{ link.icon }}"></i>{% endif %}
-                                      <span>{{ link.display }}</span>
-                                  </a>
-                              </li>
-                          {% endfor %}
-                      </ul>
-                  {% endif %}
+ - template_uuid: 00000000-0000-0000-0001-000000000001
+   fragment_type: nav
+   fragment_name: Sidebar Navigation
+   fragment_key: sidebar_nav
+   template_file_path: menu/sidebar/navigation.j2
+   compiled_file_path: null
+   content_type: text/html
+   version_number: 1
+   version_label: v1.0.0
+   is_active: true
+   template_source: |
+     <aside class="sidebar" id="sidebar">
+        <div class="sidebar_toggle" onclick="toggle_sidebar()">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="sidebar_content">
+            {% for item in menu['items'] %}
+                {% include 'menu_item' %}
+            {% endfor %}
+        </div>
+     </aside>
+   variables_schema: |
+     {
+       "type": "object",
+       "properties": {
+         "menu": {"type": "object", "description": "Menu structure from MenuBuilder"}
+       },
+       "required": ["menu"]
+     }
+   sample_data: null
+   required_context: |
+     ["menu"]
+   dependencies: null
+   css_dependencies: null
+   js_dependencies: null
+   description: Sidebar navigation menu structure
+   usage_notes: Renders the hierarchical menu structure with tiers and links
+   preview_template: null
+   sort_order: 1
+   is_partial: true
+   cache_strategy: dynamic
+   cache_duration: 600
+   last_compiled: null
+   change_description: Initial sidebar navigation fragment
+   created_by_user_uuid: null
 
-                  {% if tier.children %}
-                      {% for child in tier.children %}
-                          <div class="submenu-section">
-                              <h4 class="submenu-title">
-                                  {% if child.icon %}<i class="icon {{ child.icon }}"></i>{% endif %}
-                                  {{ child.display }}
-                              </h4>
-                              {% if child.links %}
-                                  <ul class="submenu-items">
-                                      {% for link in child.links %}
-                                          <li class="menu-item">
-                                              <a href="{{ link.url }}" class="menu-link" {% if link.new_tab %}target="_blank"{% endif %}>
-                                                  {% if link.icon %}<i class="icon {{ link.icon }}"></i>{% endif %}
-                                                  <span>{{ link.display }}</span>
-                                              </a>
-                                          </li>
-                                      {% endfor %}
-                                  </ul>
-                              {% endif %}
-                          </div>
-                      {% endfor %}
-                  {% endif %}
+
+
+ - template_uuid: 00000000-0000-0000-0001-000000000001
+   fragment_type: nav_item
+   fragment_name: Menu Item
+   fragment_key: menu_item
+   template_file_path: menu/sidebar/menuitem.j2
+   compiled_file_path: null
+   content_type: text/html
+   version_number: 1
+   version_label: v1.0.0
+   is_active: true
+   template_source: |
+      {% if item.type == 'tier' %}
+          {% if item.items %}
+              <div class="nav_item has_children" data-section="{{ item.name }}" onclick="toggle_nav_item(this)">
+                  <span>
+                      {% if item.icon %}<i class="fas {{ item.icon }} me-2"></i>{% endif %}
+                      {{ item.display }}
+                  </span>
+                  <i class="fas fa-chevron-right nav_icon"></i>
               </div>
-          {% endfor %}
-      </nav>
-    template_hash: null
-    variables_schema: |
-      {
-        "type": "object",
-        "properties": {
-          "menu": {"type": "object", "description": "Menu structure from MenuBuilder"}
-        },
-        "required": ["menu"]
-      }
-    sample_data: null
-    required_context: |
-      ["menu"]
-    dependencies: null
-    css_dependencies: null
-    js_dependencies: null
-    description: Sidebar navigation menu structure
-    usage_notes: Renders the hierarchical menu structure with tiers and links
-    preview_template: null
-    sort_order: 1
-    is_partial: true
-    cache_strategy: dynamic
-    cache_duration: 600
-    last_compiled: null
-    change_description: Initial sidebar navigation fragment
-    created_by_user_uuid: null
-
-  - template_uuid: 00000000-0000-0000-0001-000000000001
-    fragment_type: style
-    fragment_name: Sidebar CSS
-    fragment_key: sidebar_css
-    template_file_path: menu/sidebar/styles.j2
-    compiled_file_path: null
-    content_type: text/css
-    version_number: 1
-    version_label: v1.0.0
-    is_active: true
-    template_source: |
-      <style>
-      .sidebar-menu {
-          width: 260px;
-          background: var(--bs-body-bg);
-          padding: 1rem 0;
-          height: 100%;
-          overflow-y: auto;
-          border-right: 1px solid var(--bs-border-color);
-      }
-
-      .menu-section {
-          margin-bottom: 1.5rem;
-          padding: 0 1rem;
-      }
-
-      .menu-section-title {
-          font-size: 0.875rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          color: var(--bs-secondary);
-          margin-bottom: 0.5rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-      }
-
-      .menu-section-title .icon {
-          font-size: 1rem;
-      }
-
-      .menu-items,
-      .submenu-items {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-      }
-
-      .menu-item {
-          margin-bottom: 0.25rem;
-      }
-
-      .menu-link {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.5rem 0.75rem;
-          color: var(--bs-body-color);
-          text-decoration: none;
-          border-radius: 0.375rem;
-          transition: all 0.2s ease;
-      }
-
-      .menu-link:hover {
-          background: rgba(var(--bs-primary-rgb), 0.1);
-          color: var(--bs-primary);
-      }
-
-      .menu-link .icon {
-          width: 1.25rem;
-          text-align: center;
-      }
-
-      .submenu-section {
-          margin-top: 0.75rem;
-          margin-left: 1rem;
-      }
-
-      .submenu-title {
-          font-size: 0.8125rem;
-          font-weight: 500;
-          color: var(--bs-secondary);
-          margin-bottom: 0.375rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-      }
-
-      .submenu-items .menu-link {
-          font-size: 0.875rem;
-          padding: 0.375rem 0.75rem;
-      }
-      </style>
-    template_hash: null
-    variables_schema: null
-    sample_data: null
-    required_context: null
-    dependencies: null
-    css_dependencies: null
-    js_dependencies: null
-    description: CSS styles for sidebar menu
-    usage_notes: Provides all styling for the sidebar menu component
-    preview_template: null
-    sort_order: 10
-    is_partial: true
-    cache_strategy: static
-    cache_duration: 86400
-    last_compiled: null
-    change_description: Initial sidebar CSS fragment
-    created_by_user_uuid: null
-
-  - template_uuid: 00000000-0000-0000-0001-000000000001
-    fragment_type: script
-    fragment_name: Sidebar JavaScript
-    fragment_key: sidebar_js
-    template_file_path: menu/sidebar/scripts.j2
-    compiled_file_path: null
-    content_type: text/javascript
-    version_number: 1
-    version_label: v1.0.0
-    is_active: true
-    template_source: |
-      <script>
-      // Optional: Add active state based on current URL
-      document.addEventListener('DOMContentLoaded', function() {
-          const currentPath = window.location.pathname;
-          const menuLinks = document.querySelectorAll('.sidebar-menu .menu-link');
+              <div class="nav_children">
+                  {% for child_item in item['items'] %}
+                      {% with item=child_item %}
+                          {% include 'menu_item' with context %}
+                      {% endwith %}
+                  {% endfor %}
+              </div>
+          {% else %}
+              <div class="nav_item">
+                  {% if item.icon %}<i class="fas {{ item.icon }} me-2"></i>{% endif %}
+                  {{ item.display }}
+              </div>
+          {% endif %}
+      {% elif item.type == 'link' %}
+          {# Determine the actual URL to use #}
+          {% set actual_url = item.url or (url_for(item.url_for) if item.url_for else '#') %}
           
-          menuLinks.forEach(link => {
-              if (link.getAttribute('href') === currentPath) {
-                  link.classList.add('active');
-                  link.style.background = 'rgba(var(--bs-primary-rgb), 0.15)';
-                  link.style.color = 'var(--bs-primary)';
-                  link.style.fontWeight = '500';
-              }
-          });
-      });
-      </script>
-    template_hash: null
-    variables_schema: null
-    sample_data: null
-    required_context: null
-    dependencies: null
-    css_dependencies: null
-    js_dependencies: null
-    description: JavaScript for sidebar menu active state
-    usage_notes: Simple script to highlight current page in menu
-    preview_template: null
-    sort_order: 20
-    is_partial: true
-    cache_strategy: static
-    cache_duration: 86400
-    last_compiled: null
-    change_description: Initial sidebar JavaScript fragment
-    created_by_user_uuid: null
+          {% if actual_url and (actual_url.startswith('http') or actual_url.startswith('//')) %}
+              <!-- External link - normal navigation -->
+              <a href="{{ actual_url }}" class="nav_item child" target="_blank">
+                  {% if item.icon %}<i class="fas {{ item.icon }} me-2"></i>{% endif %}
+                  {{ item.display }}
+                  <i class="fas fa-external-link-alt ms-1 small"></i>
+              </a>
+          {% else %}
+              <!-- Internal link - use htmx -->
+              <a href="{{ actual_url }}" 
+                class="nav_item child"
+                hx-get="{{ actual_url }}" 
+                hx-target="#main-content" 
+                hx-push-url="true"
+                hx-indicator=".htmx-indicator">
+                  {% if item.icon %}<i class="fas {{ item.icon }} me-2"></i>{% endif %}
+                  {{ item.display }}
+              </a>
+          {% endif %}
+      {% endif %}
+   variables_schema: |
+     {
+       "type": "object",
+       "properties": {
+         "menu": {"type": "object", "description": "Menu structure from MenuBuilder"}
+       },
+       "required": ["menu"]
+     }
+   sample_data: null
+   required_context: |
+     ["menu"]
+   dependencies: null
+   css_dependencies: null
+   js_dependencies: null
+   description: Sidebar navigation menu structure
+   usage_notes: Renders the hierarchical menu structure with tiers and links
+   preview_template: null
+   sort_order: 1
+   is_partial: true
+   cache_strategy: dynamic
+   cache_duration: 600
+   last_compiled: null
+   change_description: Initial sidebar navigation fragment
+   created_by_user_uuid: null
+
+
+ - template_uuid: 00000000-0000-0000-0001-000000000001
+   fragment_type: style
+   fragment_name: Sidebar CSS
+   fragment_key: sidebar_css
+   template_file_path: menu/sidebar/styles.j2
+   compiled_file_path: null
+   content_type: text/css
+   version_number: 1
+   version_label: v1.0.0
+   is_active: true
+   template_source: |
+     <style>
+        </style>
+
+   template_hash: null
+   variables_schema: null
+   sample_data: null
+   required_context: null
+   dependencies: null
+   css_dependencies: null
+   js_dependencies: null
+   description: CSS styles for sidebar menu
+   usage_notes: Provides all styling for the sidebar menu component
+   preview_template: null
+   sort_order: 10
+   is_partial: true
+   cache_strategy: static
+   cache_duration: 86400
+   last_compiled: null
+   change_description: Initial sidebar CSS fragment
+   created_by_user_uuid: null
+
+ - template_uuid: 00000000-0000-0000-0001-000000000001
+   fragment_type: script
+   fragment_name: Sidebar JavaScript
+   fragment_key: sidebar_js
+   template_file_path: menu/sidebar/scripts.j2
+   compiled_file_path: null
+   content_type: text/javascript
+   version_number: 1
+   version_label: v1.0.0
+   is_active: true
+   template_source: |
+     <script>
+     // Sidebar state management
+     const SIDEBAR_STATE_KEY = 'sidebar_state';
+     const SIDEBAR_SECTIONS_KEY = 'sidebar_expanded_sections';
+
+     function toggle_sidebar() {
+          const content_area = document.querySelector('.content_area');
+          const sidebar_toggle = document.querySelector('.sidebar_toggle i');
+          
+          content_area.classList.toggle('collapsed');
+          
+          // Update the icon direction
+          if (content_area.classList.contains('collapsed')) {
+              sidebar_toggle.className = 'fas fa-chevron-right';
+          } else {
+              sidebar_toggle.className = 'fas fa-chevron-left';
+          }
+          
+          // Save state
+          localStorage.setItem(SIDEBAR_STATE_KEY, content_area.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+      }
+
+     function toggle_nav_item(element) {
+         if (!element.classList.contains('has_children')) {
+             return;
+         }
+         
+         event.stopPropagation();
+         element.classList.toggle('expanded');
+         
+         // Save expanded sections state
+         save_sidebar_sections();
+     }
+
+     function save_sidebar_sections() {
+         const expandedSections = [];
+         document.querySelectorAll('.nav_item.expanded[data-section]').forEach(item => {
+             const section = item.getAttribute('data-section');
+             if (section) {
+                 expandedSections.push(section);
+             }
+         });
+         localStorage.setItem(SIDEBAR_SECTIONS_KEY, JSON.stringify(expandedSections));
+     }
+
+     function restore_sidebar_state() {
+        // Restore sidebar collapsed state
+        const sidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
+        if (sidebarState === 'collapsed') {
+            document.querySelector('.content_area').classList.add('collapsed');
+            // Also update the icon
+            const sidebar_toggle = document.querySelector('.sidebar_toggle i');
+            if (sidebar_toggle) {
+                sidebar_toggle.className = 'fas fa-chevron-right';
+            }
+        }
+        
+        // Restore expanded sections
+        const expandedSections = JSON.parse(localStorage.getItem(SIDEBAR_SECTIONS_KEY) || '[]');
+        expandedSections.forEach(section => {
+            const element = document.querySelector(`.nav_item[data-section="${section}"]`);
+            if (element) {
+                element.classList.add('expanded');
+            }
+        });
+        
+        // Set active item based on current URL
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav_item').forEach(item => {
+            const onclick = item.getAttribute('onclick');
+            if (onclick && onclick.includes('window.location.href') && onclick.includes(currentPath)) {
+                item.classList.add('active');
+                
+                // Expand parent sections
+                let parent = item.closest('.nav_children');
+                while (parent) {
+                    const parentItem = parent.previousElementSibling;
+                    if (parentItem && parentItem.classList.contains('has_children')) {
+                        parentItem.classList.add('expanded');
+                    }
+                    parent = parent.parentElement.closest('.nav_children');
+                }
+            }
+        });
+        
+        // Save state after setting active items
+        save_sidebar_sections();
+      }
+          
+     // Initialize on page load
+     document.addEventListener('DOMContentLoaded', restore_sidebar_state);
+     </script>
+
+   template_hash: null
+   variables_schema: null
+   sample_data: null
+   required_context: null
+   dependencies: null
+   css_dependencies: null
+   js_dependencies: null
+   description: JavaScript for sidebar menu active state
+   usage_notes: Simple script to highlight current page in menu
+   preview_template: null
+   sort_order: 20
+   is_partial: true
+   cache_strategy: static
+   cache_duration: 86400
+   last_compiled: null
+   change_description: Initial sidebar JavaScript fragment
+   created_by_user_uuid: null

@@ -16,7 +16,7 @@ config={
     'SECRET_KEY'        : 'your_secret_key_here',
     'SESSION_LIFETIME'  :  timedelta(days=30),
     'DEBUG'             :  True ,
-    'LOG_LEVEL'         : logging.ERROR,
+    'LOG_LEVEL'         : logging.DEBUG,
     'ROUTE_PREFIX'      : '/v2',
     'ADMIN_ROUTE_PREFIX': '/v2/admin',
     'APP_NAME'          : 'app1',

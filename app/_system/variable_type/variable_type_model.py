@@ -28,7 +28,21 @@ class VariableType(BaseModel):
             ('date', 'Date Picker', True),
             ('datetime', 'DateTime Picker', True),
             ('hidden', 'Hidden Field', True),
-            ('money', 'Money Input', True)
+            ('money', 'Money Input', True),
+            # New types specifically useful for reports
+            ('textarea', 'Text Area', True),
+            ('daterange', 'Date Range Picker', True),
+            ('timerange', 'Time Range Picker', True),
+            ('slider', 'Slider', True),
+            ('toggle', 'Toggle Switch', True),
+            ('color', 'Color Picker', True),
+            ('file', 'File Upload', True),
+            ('tags', 'Tag Input', True),
+            ('autocomplete', 'Autocomplete', True),
+            ('cascading_select', 'Cascading Dropdown', True),
+            ('user_select', 'User Selector', True),
+            ('sql_editor', 'SQL Editor', True),
+            ('json_editor', 'JSON Editor', True)
         ]
         
         for name, display, active in initial_types:

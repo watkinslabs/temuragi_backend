@@ -58,19 +58,7 @@ class BaseCLI:
         except Exception as e:
             self.initialization_errors.append(f"Logger setup failed: {e}")
             print(f"ERROR: Failed to setup logger: {e}")
-
-        # Setup class registry
-        try:
-            self._setup_class_registry()
-            if self.class_registry:
-                self.log_info("Class registry initialized successfully")
-        except Exception as e:
-            self.initialization_errors.append(f"Class registry setup failed: {e}")
-            self.log_warning(f"Class registry setup failed: {e}")
-            if not self.console_logging:
-                print(f"WARNING: Class registry setup failed: {e}")
-
-        # Setup database connection if requested
+     # Setup database connection if requested
         if connect_db:
             try:
                 self._setup_database()
@@ -84,6 +72,20 @@ class BaseCLI:
                     print(f"CRITICAL: Database setup failed: {e}")
                 raise
 
+
+        # Setup class registry
+        try:
+            self._setup_class_registry()
+            if self.class_registry:
+                self.log_info("Class registry initialized successfully")
+        except Exception as e:
+            self.initialization_errors.append(f"Class registry setup failed: {e}")
+            self.log_warning(f"Class registry setup failed: {e}")
+            if not self.console_logging:
+                print(f"WARNING: Class registry setup failed: {e}")
+
+   
+   
         if self.initialization_errors:
             self.log_warning(f"CLI initialized with {len(self.initialization_errors)} errors")
             for error in self.initialization_errors:

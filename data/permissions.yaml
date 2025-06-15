@@ -1,0 +1,1297 @@
+# Permission - All Records
+# Total records: 161
+# Exported from template CLI
+
+Permission:
+  meta:
+    tablename: permissions
+    schema: public
+  data:
+  - name: api:databasetype:update
+    service: api
+    action: update
+    resource: DatabaseType
+    uuid: 004716fa-fd0c-4d47-a1bc-f08decf87e98
+    is_active: true
+    created_at: '2025-06-15T10:58:04.954148-04:00'
+    updated_at: '2025-06-15T10:58:04.954192-04:00'
+  - name: api:userquicklink:list
+    service: api
+    action: list
+    resource: UserQuickLink
+    uuid: 0397e099-8ea5-41a9-a63e-0b4515f5fc52
+    is_active: true
+    created_at: '2025-06-15T10:55:32.569837-04:00'
+    updated_at: '2025-06-15T10:55:32.569880-04:00'
+  - name: api:user:metadata
+    service: api
+    action: metadata
+    resource: User
+    uuid: 044adb02-a7d0-4909-a83a-ec4fa3de4641
+    is_active: true
+    created_at: '2025-06-15T10:56:05.946662-04:00'
+    updated_at: '2025-06-15T10:56:05.946703-04:00'
+  - name: api:firewall:read
+    service: api
+    action: read
+    resource: Firewall
+    uuid: 04da2ba2-dc39-4485-883f-310a6f3c8377
+    is_active: true
+    created_at: '2025-06-15T11:00:02.756230-04:00'
+    updated_at: '2025-06-15T11:00:02.756271-04:00'
+  - name: api:datatype:delete
+    service: api
+    action: delete
+    resource: DataType
+    uuid: 06c1db0b-0daa-459e-9a8a-6dd9f8f50d75
+    is_active: true
+    created_at: '2025-06-15T10:57:12.219574-04:00'
+    updated_at: '2025-06-15T10:57:12.219615-04:00'
+  - name: api:rbacauditlog:update
+    service: api
+    action: update
+    resource: RbacAuditLog
+    uuid: 08511ee1-162f-4cb0-be51-daffa3a46376
+    is_active: true
+    created_at: '2025-06-15T10:58:18.706180-04:00'
+    updated_at: '2025-06-15T10:58:18.706223-04:00'
+  - name: api:menutier:count
+    service: api
+    action: count
+    resource: MenuTier
+    uuid: 0b68b20e-1add-4b57-a9a9-8acd501b6c41
+    is_active: true
+    created_at: '2025-06-15T10:56:44.492423-04:00'
+    updated_at: '2025-06-15T10:56:44.492464-04:00'
+  - name: api:cruddef:delete
+    service: api
+    action: delete
+    resource: CrudDef
+    uuid: 0c4c4e5f-012d-4e82-9ad9-8b329852356d
+    is_active: true
+    created_at: '2025-06-15T10:57:10.866211-04:00'
+    updated_at: '2025-06-15T10:57:10.866252-04:00'
+  - name: api:datatype:metadata
+    service: api
+    action: metadata
+    resource: DataType
+    uuid: 0cccf2fe-0675-4fdb-94ce-0b3248687db0
+    is_active: true
+    created_at: '2025-06-15T10:55:42.629858-04:00'
+    updated_at: '2025-06-15T10:55:42.629899-04:00'
+  - name: api:firewall:count
+    service: api
+    action: count
+    resource: Firewall
+    uuid: 0d7117e5-1828-4289-95b8-a3cb0d2b63e4
+    is_active: true
+    created_at: '2025-06-15T10:56:39.004719-04:00'
+    updated_at: '2025-06-15T10:56:39.004759-04:00'
+  - name: api:connection:metadata
+    service: api
+    action: metadata
+    resource: Connection
+    uuid: 0e006f17-86ed-4f9b-a9b5-4d1ca2ec4e39
+    is_active: true
+    created_at: '2025-06-15T10:55:39.896925-04:00'
+    updated_at: '2025-06-15T10:55:39.896967-04:00'
+  - name: api:role:update
+    service: api
+    action: update
+    resource: Role
+    uuid: 0eea9ea5-b39d-49c9-bd0d-84df5760646b
+    is_active: true
+    created_at: '2025-06-15T10:58:20.085063-04:00'
+    updated_at: '2025-06-15T10:58:20.085103-04:00'
+  - name: api:cruddef:count
+    service: api
+    action: count
+    resource: CrudDef
+    uuid: 1169ea00-74e9-4b64-8d56-e8f813dcce95
+    is_active: true
+    created_at: '2025-06-15T10:56:34.875337-04:00'
+    updated_at: '2025-06-15T10:56:34.875382-04:00'
+  - name: api:rbacauditlog:metadata
+    service: api
+    action: metadata
+    resource: RbacAuditLog
+    uuid: 1349cf0c-855e-4b53-b0f5-a6d4d73a2563
+    is_active: true
+    created_at: '2025-06-15T10:55:57.695953-04:00'
+    updated_at: '2025-06-15T10:55:57.695996-04:00'
+  - name: api:user:count
+    service: api
+    action: count
+    resource: User
+    uuid: 15ec176e-3a55-4a98-89ae-7f714a0cafdf
+    is_active: true
+    created_at: '2025-06-15T10:56:59.578134-04:00'
+    updated_at: '2025-06-15T10:56:59.578186-04:00'
+  - name: api:rolepermission:count
+    service: api
+    action: count
+    resource: RolePermission
+    uuid: 169f7d49-4fff-41d1-8713-d0fee79c5654
+    is_active: true
+    created_at: '2025-06-15T10:56:54.070937-04:00'
+    updated_at: '2025-06-15T10:56:54.070978-04:00'
+  - name: api:usertoken:metadata
+    service: api
+    action: metadata
+    resource: UserToken
+    uuid: 16d32e12-03d4-400f-9506-7e446bf6f112
+    is_active: true
+    created_at: '2025-06-15T10:56:08.684734-04:00'
+    updated_at: '2025-06-15T10:56:08.684775-04:00'
+  - name: api:rolepermission:delete
+    service: api
+    action: delete
+    resource: RolePermission
+    uuid: 175b713e-b644-4e61-9d0c-9ec69c598d64
+    is_active: true
+    created_at: '2025-06-15T10:57:30.016876-04:00'
+    updated_at: '2025-06-15T10:57:30.016917-04:00'
+  - name: api:connection:list
+    service: api
+    action: list
+    resource: Connection
+    uuid: 17fef53c-7734-4207-99b5-ae23022a5173
+    is_active: true
+    created_at: '2025-06-15T10:55:05.060534-04:00'
+    updated_at: '2025-06-15T10:55:05.060576-04:00'
+  - name: api:menulink:write
+    service: api
+    action: write
+    resource: MenuLink
+    uuid: 1e55a60e-063c-47fc-bc5e-a560c252ddf2
+    is_active: true
+    created_at: '2025-06-15T10:59:21.134757-04:00'
+    updated_at: '2025-06-15T10:59:21.134803-04:00'
+  - name: api:menulink:list
+    service: api
+    action: list
+    resource: MenuLink
+    uuid: 1eea001e-6d7b-48fd-8357-0e5e3fedb4d0
+    is_active: true
+    created_at: '2025-06-15T10:55:14.687981-04:00'
+    updated_at: '2025-06-15T10:55:14.688022-04:00'
+  - name: api:pagefragment:read
+    service: api
+    action: read
+    resource: PageFragment
+    uuid: 20a2d9df-1567-4674-bd80-b7f83c5ee45e
+    is_active: true
+    created_at: '2025-06-15T11:00:12.344999-04:00'
+    updated_at: '2025-06-15T11:00:12.345042-04:00'
+  - name: api:templatefragment:update
+    service: api
+    action: update
+    resource: TemplateFragment
+    uuid: 20a3e71e-d08a-46a5-8a35-b1bcddd6b2b0
+    is_active: true
+    created_at: '2025-06-15T10:58:24.192676-04:00'
+    updated_at: '2025-06-15T10:58:24.192719-04:00'
+  - name: api:userquicklink:delete
+    service: api
+    action: delete
+    resource: UserQuickLink
+    uuid: 2187f3dc-ef30-4aa2-a3d7-2f58ffe30fb0
+    is_active: true
+    created_at: '2025-06-15T10:57:36.907673-04:00'
+    updated_at: '2025-06-15T10:57:36.907714-04:00'
+  - name: api:menutier:delete
+    service: api
+    action: delete
+    resource: MenuTier
+    uuid: 24664feb-21ad-4215-a191-99080c347db6
+    is_active: true
+    created_at: '2025-06-15T10:57:20.454194-04:00'
+    updated_at: '2025-06-15T10:57:20.454235-04:00'
+  - name: api:connection:update
+    service: api
+    action: update
+    resource: Connection
+    uuid: 24d2bb77-0fec-4401-8e66-3c0428d8384c
+    is_active: true
+    created_at: '2025-06-15T10:58:00.821606-04:00'
+    updated_at: '2025-06-15T10:58:00.821649-04:00'
+  - name: api:rolepermission:list
+    service: api
+    action: list
+    resource: RolePermission
+    uuid: 298f10d2-a21d-467d-9b19-1763f051973b
+    is_active: true
+    created_at: '2025-06-15T10:55:25.717594-04:00'
+    updated_at: '2025-06-15T10:55:25.717640-04:00'
+  - name: api:permission:count
+    service: api
+    action: count
+    resource: Permission
+    uuid: 29c80f80-d0c1-4ed9-b5b3-dc53b85978bf
+    is_active: true
+    created_at: '2025-06-15T10:56:49.964737-04:00'
+    updated_at: '2025-06-15T10:56:49.964779-04:00'
+  - name: api:connection:count
+    service: api
+    action: count
+    resource: Connection
+    uuid: 2ad6f0d4-6808-424e-9a67-645c730df6b0
+    is_active: true
+    created_at: '2025-06-15T10:56:33.486060-04:00'
+    updated_at: '2025-06-15T10:56:33.486104-04:00'
+  - name: api:cruddef:list
+    service: api
+    action: list
+    resource: CrudDef
+    uuid: 2ada3dec-b651-4cb1-be71-64390ff36d91
+    is_active: true
+    created_at: '2025-06-15T10:55:06.432204-04:00'
+    updated_at: '2025-06-15T10:55:06.432248-04:00'
+  - name: api:permission:write
+    service: api
+    action: write
+    resource: Permission
+    uuid: 2c93b9b8-5758-40ea-a180-4ba304cc5c44
+    is_active: true
+    created_at: '2025-06-15T10:59:27.998789-04:00'
+    updated_at: '2025-06-15T10:59:27.998830-04:00'
+  - name: api:menu:delete
+    service: api
+    action: delete
+    resource: Menu
+    uuid: 2d424812-2431-4f6a-ac03-8b6075a2af7b
+    is_active: true
+    created_at: '2025-06-15T10:57:17.693745-04:00'
+    updated_at: '2025-06-15T10:57:17.693788-04:00'
+  - name: api:rbacauditlog:delete
+    service: api
+    action: delete
+    resource: RbacAuditLog
+    uuid: 2de95535-ca6b-4ddc-8720-2414a2fbb1c4
+    is_active: true
+    created_at: '2025-06-15T10:57:27.279460-04:00'
+    updated_at: '2025-06-15T10:57:27.279505-04:00'
+  - name: api:page:delete
+    service: api
+    action: delete
+    resource: Page
+    uuid: 34b7b878-38f7-4881-aaf5-d545282ca625
+    is_active: true
+    created_at: '2025-06-15T10:57:23.173460-04:00'
+    updated_at: '2025-06-15T10:57:23.173504-04:00'
+  - name: api:variabletype:read
+    service: api
+    action: read
+    resource: VariableType
+    uuid: 355131ec-5298-4760-94d8-bbbfd0be0ec5
+    is_active: true
+    created_at: '2025-06-15T11:00:27.434258-04:00'
+    updated_at: '2025-06-15T11:00:27.434299-04:00'
+  - name: api:user:read
+    service: api
+    action: read
+    resource: User
+    uuid: 35cdcd70-738d-479f-bf85-bc7262273cdc
+    is_active: true
+    created_at: '2025-06-15T11:00:23.329515-04:00'
+    updated_at: '2025-06-15T11:00:23.329557-04:00'
+  - name: api:menulink:read
+    service: api
+    action: read
+    resource: MenuLink
+    uuid: 3754e421-f912-44c3-9405-826f3ad42c94
+    is_active: true
+    created_at: '2025-06-15T11:00:06.871284-04:00'
+    updated_at: '2025-06-15T11:00:06.871437-04:00'
+  - name: api:firewalllog:update
+    service: api
+    action: update
+    resource: FirewallLog
+    uuid: 37cdeef4-8adf-40b2-906d-5f76c60fa20a
+    is_active: true
+    created_at: '2025-06-15T10:58:07.708421-04:00'
+    updated_at: '2025-06-15T10:58:07.708468-04:00'
+  - name: api:permission:read
+    service: api
+    action: read
+    resource: Permission
+    uuid: 3a55a1be-fda2-4533-bac5-50efd307ba2a
+    is_active: true
+    created_at: '2025-06-15T11:00:13.710289-04:00'
+    updated_at: '2025-06-15T11:00:13.710427-04:00'
+  - name: api:cruddef:metadata
+    service: api
+    action: metadata
+    resource: CrudDef
+    uuid: 3ac11c6e-dd18-4df7-b7c1-8434fe14b7fa
+    is_active: true
+    created_at: '2025-06-15T10:55:41.260185-04:00'
+    updated_at: '2025-06-15T10:55:41.260225-04:00'
+  - name: api:theme:read
+    service: api
+    action: read
+    resource: Theme
+    uuid: 3af6437b-2cdf-4c62-b750-6e44e6ce7262
+    is_active: true
+    created_at: '2025-06-15T11:00:21.951769-04:00'
+    updated_at: '2025-06-15T11:00:21.951810-04:00'
+  - name: api:template:list
+    service: api
+    action: list
+    resource: Template
+    uuid: 3affd1d2-69ec-4e13-b294-6033a80e6947
+    is_active: true
+    created_at: '2025-06-15T10:55:27.090432-04:00'
+    updated_at: '2025-06-15T10:55:27.090477-04:00'
+  - name: api:datatype:write
+    service: api
+    action: write
+    resource: DataType
+    uuid: 3b88f2a1-cd2a-4abf-bd72-7ee2ec9e9bec
+    is_active: true
+    created_at: '2025-06-15T10:59:14.257728-04:00'
+    updated_at: '2025-06-15T10:59:14.257771-04:00'
+  - name: api:menu:count
+    service: api
+    action: count
+    resource: Menu
+    uuid: 3b9df423-b487-4f17-ba32-8b630017f6db
+    is_active: true
+    created_at: '2025-06-15T10:56:41.753025-04:00'
+    updated_at: '2025-06-15T10:56:41.753071-04:00'
+  - name: api:role:list
+    service: api
+    action: list
+    resource: Role
+    uuid: 3e783897-111c-42b4-bce1-756104b5c1a2
+    is_active: true
+    created_at: '2025-06-15T10:55:24.351094-04:00'
+    updated_at: '2025-06-15T10:55:24.351135-04:00'
+  - name: api:templatefragment:delete
+    service: api
+    action: delete
+    resource: TemplateFragment
+    uuid: 43a02a3f-74b0-430a-9d73-72edd3937261
+    is_active: true
+    created_at: '2025-06-15T10:57:32.759870-04:00'
+    updated_at: '2025-06-15T10:57:32.759911-04:00'
+  - name: api:usertoken:update
+    service: api
+    action: update
+    resource: UserToken
+    uuid: 43a7a949-0cf8-4b29-99e8-2443ccfda559
+    is_active: true
+    created_at: '2025-06-15T10:58:29.659733-04:00'
+    updated_at: '2025-06-15T10:58:29.659774-04:00'
+  - name: api:variabletype:list
+    service: api
+    action: list
+    resource: VariableType
+    uuid: 458a26d8-f066-41b0-b1ec-4636cd5d467a
+    is_active: true
+    created_at: '2025-06-15T10:55:35.303975-04:00'
+    updated_at: '2025-06-15T10:55:35.304016-04:00'
+  - name: api:menutier:update
+    service: api
+    action: update
+    resource: MenuTier
+    uuid: 45d34c9c-8171-45ca-8822-7e8939e08df8
+    is_active: true
+    created_at: '2025-06-15T10:58:11.832983-04:00'
+    updated_at: '2025-06-15T10:58:11.833027-04:00'
+  - name: api:menulink:metadata
+    service: api
+    action: metadata
+    resource: MenuLink
+    uuid: 46f873a1-bfb5-4eea-a54a-dc9ddcaab071
+    is_active: true
+    created_at: '2025-06-15T10:55:49.479206-04:00'
+    updated_at: '2025-06-15T10:55:49.479248-04:00'
+  - name: api:firewall:write
+    service: api
+    action: write
+    resource: Firewall
+    uuid: 49eb045c-76b2-4289-a962-d1c7182d4a38
+    is_active: true
+    created_at: '2025-06-15T10:59:17.012315-04:00'
+    updated_at: '2025-06-15T10:59:17.012448-04:00'
+  - name: api:userquicklink:write
+    service: api
+    action: write
+    resource: UserQuickLink
+    uuid: 49f819f3-ac12-4aa4-add3-47fb065921e1
+    is_active: true
+    created_at: '2025-06-15T10:59:39.005777-04:00'
+    updated_at: '2025-06-15T10:59:39.005820-04:00'
+  - name: api:databasetype:write
+    service: api
+    action: write
+    resource: DatabaseType
+    uuid: 4b85273a-2aad-46bb-bc46-86e869eb4f2b
+    is_active: true
+    created_at: '2025-06-15T10:59:15.637568-04:00'
+    updated_at: '2025-06-15T10:59:15.637610-04:00'
+  - name: api:firewall:delete
+    service: api
+    action: delete
+    resource: Firewall
+    uuid: 4edb0dd5-0d97-428c-80fc-2ffb21a522fe
+    is_active: true
+    created_at: '2025-06-15T10:57:14.950217-04:00'
+    updated_at: '2025-06-15T10:57:14.950259-04:00'
+  - name: api:firewall:update
+    service: api
+    action: update
+    resource: Firewall
+    uuid: 5172b1fe-a072-477c-a9a6-12c6799d8b29
+    is_active: true
+    created_at: '2025-06-15T10:58:06.325725-04:00'
+    updated_at: '2025-06-15T10:58:06.325768-04:00'
+  - name: api:page:metadata
+    service: api
+    action: metadata
+    resource: Page
+    uuid: 5296ac8a-6a95-4457-9c4e-334196dbf039
+    is_active: true
+    created_at: '2025-06-15T10:55:53.578949-04:00'
+    updated_at: '2025-06-15T10:55:53.578990-04:00'
+  - name: api:usertoken:delete
+    service: api
+    action: delete
+    resource: UserToken
+    uuid: 53dd5561-bd7f-4dde-b518-a133f4811e65
+    is_active: true
+    created_at: '2025-06-15T10:57:38.283172-04:00'
+    updated_at: '2025-06-15T10:57:38.283213-04:00'
+  - name: api:cruddef:update
+    service: api
+    action: update
+    resource: CrudDef
+    uuid: 53de28ef-0dc8-4a04-aeeb-16189b1a89c2
+    is_active: true
+    created_at: '2025-06-15T10:58:02.199470-04:00'
+    updated_at: '2025-06-15T10:58:02.199512-04:00'
+  - name: api:module:metadata
+    service: api
+    action: metadata
+    resource: Module
+    uuid: 54eb5598-e0b8-414e-836a-fd824af6dc7f
+    is_active: true
+    created_at: '2025-06-15T10:55:52.218728-04:00'
+    updated_at: '2025-06-15T10:55:52.218769-04:00'
+  - name: api:usertoken:count
+    service: api
+    action: count
+    resource: UserToken
+    uuid: 55018a57-7c44-444e-9a04-5a9239c5cf05
+    is_active: true
+    created_at: '2025-06-15T10:57:02.334148-04:00'
+    updated_at: '2025-06-15T10:57:02.334191-04:00'
+  - name: api:user:write
+    service: api
+    action: write
+    resource: User
+    uuid: 5a7aec9f-6f69-4059-aca6-8e04e5dde92a
+    is_active: true
+    created_at: '2025-06-15T10:59:37.630270-04:00'
+    updated_at: '2025-06-15T10:59:37.630313-04:00'
+  - name: api:connection:read
+    service: api
+    action: read
+    resource: Connection
+    uuid: 5ba69ac3-09c8-4c80-802a-b53d62ff6718
+    is_active: true
+    created_at: '2025-06-15T10:59:57.259717-04:00'
+    updated_at: '2025-06-15T10:59:57.259758-04:00'
+  - name: api:datatype:read
+    service: api
+    action: read
+    resource: DataType
+    uuid: 5d6476f1-ee08-4b51-a997-5446d4cd5649
+    is_active: true
+    created_at: '2025-06-15T11:00:00.007068-04:00'
+    updated_at: '2025-06-15T11:00:00.007112-04:00'
+  - name: api:menutier:write
+    service: api
+    action: write
+    resource: MenuTier
+    uuid: 611ff8a3-de40-4685-af2a-3935cb6de421
+    is_active: true
+    created_at: '2025-06-15T10:59:22.508032-04:00'
+    updated_at: '2025-06-15T10:59:22.508072-04:00'
+  - name: api:databasetype:read
+    service: api
+    action: read
+    resource: DatabaseType
+    uuid: 61af13d6-55f5-4c0a-8634-0a30ca4267d6
+    is_active: true
+    created_at: '2025-06-15T11:00:01.386300-04:00'
+    updated_at: '2025-06-15T11:00:01.386433-04:00'
+  - name: api:module:update
+    service: api
+    action: update
+    resource: Module
+    uuid: 627692eb-6c85-484c-9529-36d3649455f6
+    is_active: true
+    created_at: '2025-06-15T10:58:13.204047-04:00'
+    updated_at: '2025-06-15T10:58:13.204088-04:00'
+  - name: api:menu:list
+    service: api
+    action: list
+    resource: Menu
+    uuid: 6972ff99-070a-42f3-a960-7318453a4997
+    is_active: true
+    created_at: '2025-06-15T10:55:13.313750-04:00'
+    updated_at: '2025-06-15T10:55:13.313793-04:00'
+  - name: api:page:count
+    service: api
+    action: count
+    resource: Page
+    uuid: 6cac6d3f-df85-4c4c-a4e7-6ec1b13b9af7
+    is_active: true
+    created_at: '2025-06-15T10:56:47.226402-04:00'
+    updated_at: '2025-06-15T10:56:47.226446-04:00'
+  - name: api:role:read
+    service: api
+    action: read
+    resource: Role
+    uuid: 70aa6b91-3dbb-4d02-a3c9-9b422605c576
+    is_active: true
+    created_at: '2025-06-15T11:00:16.463533-04:00'
+    updated_at: '2025-06-15T11:00:16.463576-04:00'
+  - name: api:rolepermission:metadata
+    service: api
+    action: metadata
+    resource: RolePermission
+    uuid: 741eda99-ee7a-4ca0-b12b-b4ac43c14f9d
+    is_active: true
+    created_at: '2025-06-15T10:56:00.450889-04:00'
+    updated_at: '2025-06-15T10:56:00.450932-04:00'
+  - name: api:firewall:list
+    service: api
+    action: list
+    resource: Firewall
+    uuid: 74e8f61a-286c-4fa5-b241-6360cc6c46ba
+    is_active: true
+    created_at: '2025-06-15T10:55:10.549856-04:00'
+    updated_at: '2025-06-15T10:55:10.549899-04:00'
+  - name: api:firewalllog:delete
+    service: api
+    action: delete
+    resource: FirewallLog
+    uuid: 772207fd-d532-42e9-96cb-4d716b465004
+    is_active: true
+    created_at: '2025-06-15T10:57:16.315353-04:00'
+    updated_at: '2025-06-15T10:57:16.315396-04:00'
+  - name: api:module:write
+    service: api
+    action: write
+    resource: Module
+    uuid: 799ed557-57fa-48ba-bbf4-1062e5d34f35
+    is_active: true
+    created_at: '2025-06-15T10:59:23.887225-04:00'
+    updated_at: '2025-06-15T10:59:23.887268-04:00'
+  - name: api:userquicklink:update
+    service: api
+    action: update
+    resource: UserQuickLink
+    uuid: 79d402fc-7e9f-4c1a-9f5f-b791065ab82a
+    is_active: true
+    created_at: '2025-06-15T10:58:28.284720-04:00'
+    updated_at: '2025-06-15T10:58:28.284761-04:00'
+  - name: api:templatefragment:write
+    service: api
+    action: write
+    resource: TemplateFragment
+    uuid: 7aa20ff3-1d99-474e-b860-4e42b261f215
+    is_active: true
+    created_at: '2025-06-15T10:59:34.881592-04:00'
+    updated_at: '2025-06-15T10:59:34.881633-04:00'
+  - name: api:template:write
+    service: api
+    action: write
+    resource: Template
+    uuid: 7abf4895-e136-45e8-81d6-23de9f92d295
+    is_active: true
+    created_at: '2025-06-15T10:59:33.513249-04:00'
+    updated_at: '2025-06-15T10:59:33.513291-04:00'
+  - name: api:theme:write
+    service: api
+    action: write
+    resource: Theme
+    uuid: 7c7c0f86-03bf-4c04-b811-ede2dab78654
+    is_active: true
+    created_at: '2025-06-15T10:59:36.250202-04:00'
+    updated_at: '2025-06-15T10:59:36.250243-04:00'
+  - name: api:menu:write
+    service: api
+    action: write
+    resource: Menu
+    uuid: 7d26757e-a670-4d0d-a09d-f29397af796e
+    is_active: true
+    created_at: '2025-06-15T10:59:19.773384-04:00'
+    updated_at: '2025-06-15T10:59:19.773428-04:00'
+  - name: api:menu:metadata
+    service: api
+    action: metadata
+    resource: Menu
+    uuid: 7d46abfc-1be8-4067-bbc6-483c7eea5ca7
+    is_active: true
+    created_at: '2025-06-15T10:55:48.098063-04:00'
+    updated_at: '2025-06-15T10:55:48.098105-04:00'
+  - name: api:databasetype:delete
+    service: api
+    action: delete
+    resource: DatabaseType
+    uuid: 7f14a518-6d9c-4495-96fa-db7babe6a486
+    is_active: true
+    created_at: '2025-06-15T10:57:13.583911-04:00'
+    updated_at: '2025-06-15T10:57:13.583952-04:00'
+  - name: api:rbacauditlog:list
+    service: api
+    action: list
+    resource: RbacAuditLog
+    uuid: 80700710-f40b-4f74-ab78-58f5387f5a41
+    is_active: true
+    created_at: '2025-06-15T10:55:22.971580-04:00'
+    updated_at: '2025-06-15T10:55:22.971625-04:00'
+  - name: api:page:list
+    service: api
+    action: list
+    resource: Page
+    uuid: 820f0ca0-8a97-4441-844f-ebb897347a80
+    is_active: true
+    created_at: '2025-06-15T10:55:18.825018-04:00'
+    updated_at: '2025-06-15T10:55:18.825060-04:00'
+  - name: api:permission:metadata
+    service: api
+    action: metadata
+    resource: Permission
+    uuid: 83a82a1b-f42f-4142-b217-28a298fe1126
+    is_active: true
+    created_at: '2025-06-15T10:55:56.319446-04:00'
+    updated_at: '2025-06-15T10:55:56.319489-04:00'
+  - name: api:usertoken:read
+    service: api
+    action: read
+    resource: UserToken
+    uuid: 843bcc1c-a438-4001-a534-22596aa35d30
+    is_active: true
+    created_at: '2025-06-15T11:00:26.059724-04:00'
+    updated_at: '2025-06-15T11:00:26.059766-04:00'
+  - name: api:user:update
+    service: api
+    action: update
+    resource: User
+    uuid: 8588299e-2b61-4022-aa26-1e3b152daeff
+    is_active: true
+    created_at: '2025-06-15T10:58:26.930924-04:00'
+    updated_at: '2025-06-15T10:58:26.930963-04:00'
+  - name: api:module:delete
+    service: api
+    action: delete
+    resource: Module
+    uuid: 85a8101d-fd44-4d92-8509-74dd8692656d
+    is_active: true
+    created_at: '2025-06-15T10:57:21.818486-04:00'
+    updated_at: '2025-06-15T10:57:21.818529-04:00'
+  - name: api:menu:update
+    service: api
+    action: update
+    resource: Menu
+    uuid: 86a04615-8808-4d11-a99e-6c0d98c70a92
+    is_active: true
+    created_at: '2025-06-15T10:58:09.084844-04:00'
+    updated_at: '2025-06-15T10:58:09.084886-04:00'
+  - name: api:menutier:list
+    service: api
+    action: list
+    resource: MenuTier
+    uuid: 86d640d8-72df-4a6b-8106-0fbaac8ba13d
+    is_active: true
+    created_at: '2025-06-15T10:55:16.072246-04:00'
+    updated_at: '2025-06-15T10:55:16.072286-04:00'
+  - name: api:pagefragment:count
+    service: api
+    action: count
+    resource: PageFragment
+    uuid: 87cef054-278c-48e3-b626-2be331e6e614
+    is_active: true
+    created_at: '2025-06-15T10:56:48.586578-04:00'
+    updated_at: '2025-06-15T10:56:48.586621-04:00'
+  - name: api:variabletype:write
+    service: api
+    action: write
+    resource: VariableType
+    uuid: 8959cce5-9065-4f98-9ac8-d3240f2ab1ed
+    is_active: true
+    created_at: '2025-06-15T10:59:41.748595-04:00'
+    updated_at: '2025-06-15T10:59:41.748637-04:00'
+  - name: api:user:delete
+    service: api
+    action: delete
+    resource: User
+    uuid: 8bb66250-8ceb-46f6-a128-da28f5a5c056
+    is_active: true
+    created_at: '2025-06-15T10:57:35.529696-04:00'
+    updated_at: '2025-06-15T10:57:35.529738-04:00'
+  - name: api:theme:list
+    service: api
+    action: list
+    resource: Theme
+    uuid: 92ea2c71-70ec-4f6f-9d93-70fb1641e65a
+    is_active: true
+    created_at: '2025-06-15T10:55:29.817463-04:00'
+    updated_at: '2025-06-15T10:55:29.817514-04:00'
+  - name: api:usertoken:write
+    service: api
+    action: write
+    resource: UserToken
+    uuid: 9544f77f-2d54-40f4-bc88-28c8927f1511
+    is_active: true
+    created_at: '2025-06-15T10:59:40.376568-04:00'
+    updated_at: '2025-06-15T10:59:40.376612-04:00'
+  - name: api:template:read
+    service: api
+    action: read
+    resource: Template
+    uuid: 9594ae5c-9824-477c-8fd8-05feb8f8d634
+    is_active: true
+    created_at: '2025-06-15T11:00:19.209619-04:00'
+    updated_at: '2025-06-15T11:00:19.209663-04:00'
+  - name: api:theme:count
+    service: api
+    action: count
+    resource: Theme
+    uuid: 97d2e78d-c7c8-47e8-a902-eb5097664569
+    is_active: true
+    created_at: '2025-06-15T10:56:58.201492-04:00'
+    updated_at: '2025-06-15T10:56:58.201535-04:00'
+  - name: api:databasetype:count
+    service: api
+    action: count
+    resource: DatabaseType
+    uuid: 9845b187-0473-4a30-aba5-fd0e520fc11d
+    is_active: true
+    created_at: '2025-06-15T10:56:37.624416-04:00'
+    updated_at: '2025-06-15T10:56:37.624459-04:00'
+  - name: api:pagefragment:write
+    service: api
+    action: write
+    resource: PageFragment
+    uuid: 9b71f6a3-c0ed-499e-83a9-4a26483ca706
+    is_active: true
+    created_at: '2025-06-15T10:59:26.632276-04:00'
+    updated_at: '2025-06-15T10:59:26.632405-04:00'
+  - name: api:template:metadata
+    service: api
+    action: metadata
+    resource: Template
+    uuid: 9be65e1e-862a-48d4-a90c-2c8f36162ab1
+    is_active: true
+    created_at: '2025-06-15T10:56:01.836035-04:00'
+    updated_at: '2025-06-15T10:56:01.836077-04:00'
+  - name: api:firewalllog:read
+    service: api
+    action: read
+    resource: FirewallLog
+    uuid: 9c626f5c-5bb9-4c09-befe-74ec1b300097
+    is_active: true
+    created_at: '2025-06-15T11:00:04.124816-04:00'
+    updated_at: '2025-06-15T11:00:04.124856-04:00'
+  - name: api:pagefragment:update
+    service: api
+    action: update
+    resource: PageFragment
+    uuid: 9f798299-6be1-484e-b012-9a091fc88c8b
+    is_active: true
+    created_at: '2025-06-15T10:58:15.944750-04:00'
+    updated_at: '2025-06-15T10:58:15.944793-04:00'
+  - name: api:connection:delete
+    service: api
+    action: delete
+    resource: Connection
+    uuid: 9ff946db-4932-4758-902f-25f38a5f05da
+    is_active: true
+    created_at: '2025-06-15T10:57:09.517308-04:00'
+    updated_at: '2025-06-15T10:57:09.517374-04:00'
+  - name: api:page:read
+    service: api
+    action: read
+    resource: Page
+    uuid: a3dfd253-3adc-46ca-91ef-86863fe8cae5
+    is_active: true
+    created_at: '2025-06-15T11:00:10.978199-04:00'
+    updated_at: '2025-06-15T11:00:10.978240-04:00'
+  - name: api:datatype:list
+    service: api
+    action: list
+    resource: DataType
+    uuid: a4955a94-30e3-450f-a5b6-a77f51435dbb
+    is_active: true
+    created_at: '2025-06-15T10:55:07.803065-04:00'
+    updated_at: '2025-06-15T10:55:07.803109-04:00'
+  - name: api:template:count
+    service: api
+    action: count
+    resource: Template
+    uuid: a5670ab6-708b-40fc-9dfb-d196943fe713
+    is_active: true
+    created_at: '2025-06-15T10:56:55.452818-04:00'
+    updated_at: '2025-06-15T10:56:55.452859-04:00'
+  - name: api:template:update
+    service: api
+    action: update
+    resource: Template
+    uuid: a8d646c6-f834-4d25-9de2-5e0cb134ddab
+    is_active: true
+    created_at: '2025-06-15T10:58:22.829043-04:00'
+    updated_at: '2025-06-15T10:58:22.829085-04:00'
+  - name: api:templatefragment:read
+    service: api
+    action: read
+    resource: TemplateFragment
+    uuid: a977861e-1a0d-47ae-80f5-ec8e7704b0e5
+    is_active: true
+    created_at: '2025-06-15T11:00:20.587549-04:00'
+    updated_at: '2025-06-15T11:00:20.587590-04:00'
+  - name: api:databasetype:metadata
+    service: api
+    action: metadata
+    resource: DatabaseType
+    uuid: aacd84b9-0b31-40e8-8898-5d5a060be4ad
+    is_active: true
+    created_at: '2025-06-15T10:55:43.985162-04:00'
+    updated_at: '2025-06-15T10:55:43.985205-04:00'
+  - name: api:connection:write
+    service: api
+    action: write
+    resource: Connection
+    uuid: ab841210-f271-416f-8b38-8ca941efd5a0
+    is_active: true
+    created_at: '2025-06-15T10:59:11.512249-04:00'
+    updated_at: '2025-06-15T10:59:11.512291-04:00'
+  - name: api:module:list
+    service: api
+    action: list
+    resource: Module
+    uuid: ae07e7b8-17f6-4c09-b776-e718f247ec6c
+    is_active: true
+    created_at: '2025-06-15T10:55:17.455131-04:00'
+    updated_at: '2025-06-15T10:55:17.455174-04:00'
+  - name: api:role:write
+    service: api
+    action: write
+    resource: Role
+    uuid: ae7690f3-2449-4eab-923c-d1a99252bec5
+    is_active: true
+    created_at: '2025-06-15T10:59:30.754550-04:00'
+    updated_at: '2025-06-15T10:59:30.754592-04:00'
+  - name: api:rolepermission:read
+    service: api
+    action: read
+    resource: RolePermission
+    uuid: b2ebff0f-031e-4801-9f6e-e19ae30f2b0d
+    is_active: true
+    created_at: '2025-06-15T11:00:17.840829-04:00'
+    updated_at: '2025-06-15T11:00:17.840870-04:00'
+  - name: api:firewalllog:write
+    service: api
+    action: write
+    resource: FirewallLog
+    uuid: b4a98385-557b-4c39-8358-5576660e4200
+    is_active: true
+    created_at: '2025-06-15T10:59:18.384286-04:00'
+    updated_at: '2025-06-15T10:59:18.384417-04:00'
+  - name: api:cruddef:read
+    service: api
+    action: read
+    resource: CrudDef
+    uuid: b4e161dc-c952-4928-b698-a2694942a8a7
+    is_active: true
+    created_at: '2025-06-15T10:59:58.627299-04:00'
+    updated_at: '2025-06-15T10:59:58.627425-04:00'
+  - name: api:variabletype:metadata
+    service: api
+    action: metadata
+    resource: VariableType
+    uuid: b6d67b6c-eddf-4ccb-911a-fd9f28038b93
+    is_active: true
+    created_at: '2025-06-15T10:56:10.050605-04:00'
+    updated_at: '2025-06-15T10:56:10.050645-04:00'
+  - name: api:usertoken:list
+    service: api
+    action: list
+    resource: UserToken
+    uuid: b71ce4a7-7d9c-4958-91b7-66aa1244c553
+    is_active: true
+    created_at: '2025-06-15T10:55:33.937906-04:00'
+    updated_at: '2025-06-15T10:55:33.937948-04:00'
+  - name: api:rolepermission:update
+    service: api
+    action: update
+    resource: RolePermission
+    uuid: b8072c17-33c4-4deb-88c6-54f0efe687c4
+    is_active: true
+    created_at: '2025-06-15T10:58:21.455408-04:00'
+    updated_at: '2025-06-15T10:58:21.455456-04:00'
+  - name: api:templatefragment:list
+    service: api
+    action: list
+    resource: TemplateFragment
+    uuid: b8416d5f-f66f-49c4-ac5c-679d61da031c
+    is_active: true
+    created_at: '2025-06-15T10:55:28.454764-04:00'
+    updated_at: '2025-06-15T10:55:28.454807-04:00'
+  - name: api:databasetype:list
+    service: api
+    action: list
+    resource: DatabaseType
+    uuid: ba25bec5-01b6-4244-adec-0aca4e0de189
+    is_active: true
+    created_at: '2025-06-15T10:55:09.174724-04:00'
+    updated_at: '2025-06-15T10:55:09.174764-04:00'
+  - name: api:menulink:count
+    service: api
+    action: count
+    resource: MenuLink
+    uuid: bb0a4f04-461c-4dcc-9bb2-bc0478e5e705
+    is_active: true
+    created_at: '2025-06-15T10:56:43.127115-04:00'
+    updated_at: '2025-06-15T10:56:43.127156-04:00'
+  - name: api:menulink:update
+    service: api
+    action: update
+    resource: MenuLink
+    uuid: bbb4c87a-3283-4e9a-b5b6-bf8f402603c7
+    is_active: true
+    created_at: '2025-06-15T10:58:10.456212-04:00'
+    updated_at: '2025-06-15T10:58:10.456256-04:00'
+  - name: api:rbacauditlog:count
+    service: api
+    action: count
+    resource: RbacAuditLog
+    uuid: bebe06a2-e9f9-445d-adc1-b462970519ed
+    is_active: true
+    created_at: '2025-06-15T10:56:51.333549-04:00'
+    updated_at: '2025-06-15T10:56:51.333593-04:00'
+  - name: api:firewalllog:count
+    service: api
+    action: count
+    resource: FirewallLog
+    uuid: befb9f59-074d-4eaa-98c4-1e497ce99a2c
+    is_active: true
+    created_at: '2025-06-15T10:56:40.377157-04:00'
+    updated_at: '2025-06-15T10:56:40.377201-04:00'
+  - name: api:menu:read
+    service: api
+    action: read
+    resource: Menu
+    uuid: bfcba81c-1f61-4764-943c-ad48ec29492b
+    is_active: true
+    created_at: '2025-06-15T11:00:05.516229-04:00'
+    updated_at: '2025-06-15T11:00:05.516272-04:00'
+  - name: api:userquicklink:read
+    service: api
+    action: read
+    resource: UserQuickLink
+    uuid: bfda590d-63f2-4481-89ce-373d1a3a5299
+    is_active: true
+    created_at: '2025-06-15T11:00:24.699605-04:00'
+    updated_at: '2025-06-15T11:00:24.699647-04:00'
+  - name: api:firewalllog:list
+    service: api
+    action: list
+    resource: FirewallLog
+    uuid: bfea3079-8a07-4779-bd65-21c14798d44c
+    is_active: true
+    created_at: '2025-06-15T10:55:11.923861-04:00'
+    updated_at: '2025-06-15T10:55:11.923902-04:00'
+  - name: api:pagefragment:metadata
+    service: api
+    action: metadata
+    resource: PageFragment
+    uuid: c197202a-e918-4e2f-9377-8d51e1848fc4
+    is_active: true
+    created_at: '2025-06-15T10:55:54.952602-04:00'
+    updated_at: '2025-06-15T10:55:54.952645-04:00'
+  - name: api:theme:metadata
+    service: api
+    action: metadata
+    resource: Theme
+    uuid: c1dd9c7b-e191-49aa-9715-6952a0deec8d
+    is_active: true
+    created_at: '2025-06-15T10:56:04.570768-04:00'
+    updated_at: '2025-06-15T10:56:04.570809-04:00'
+  - name: api:permission:list
+    service: api
+    action: list
+    resource: Permission
+    uuid: c3543352-d09e-4869-9bee-8045b1d99332
+    is_active: true
+    created_at: '2025-06-15T10:55:21.589263-04:00'
+    updated_at: '2025-06-15T10:55:21.589305-04:00'
+  - name: api:firewall:metadata
+    service: api
+    action: metadata
+    resource: Firewall
+    uuid: c38f865c-ec60-472c-952b-ed192f8e660c
+    is_active: true
+    created_at: '2025-06-15T10:55:45.351001-04:00'
+    updated_at: '2025-06-15T10:55:45.351042-04:00'
+  - name: api:firewalllog:metadata
+    service: api
+    action: metadata
+    resource: FirewallLog
+    uuid: c59c5aa4-131d-459a-9fac-4d906164f118
+    is_active: true
+    created_at: '2025-06-15T10:55:46.725606-04:00'
+    updated_at: '2025-06-15T10:55:46.725648-04:00'
+  - name: api:userquicklink:count
+    service: api
+    action: count
+    resource: UserQuickLink
+    uuid: c86bc742-331f-4b7c-bfe6-73ea44807e48
+    is_active: true
+    created_at: '2025-06-15T10:57:00.955002-04:00'
+    updated_at: '2025-06-15T10:57:00.955046-04:00'
+  - name: api:page:write
+    service: api
+    action: write
+    resource: Page
+    uuid: cc6a0b67-e964-4841-a39c-f7a245d0ae9f
+    is_active: true
+    created_at: '2025-06-15T10:59:25.265195-04:00'
+    updated_at: '2025-06-15T10:59:25.265236-04:00'
+  - name: api:role:count
+    service: api
+    action: count
+    resource: Role
+    uuid: ccf46f5e-c3e9-4f01-a78f-965abdeb11d1
+    is_active: true
+    created_at: '2025-06-15T10:56:52.701855-04:00'
+    updated_at: '2025-06-15T10:56:52.701897-04:00'
+  - name: api:rolepermission:write
+    service: api
+    action: write
+    resource: RolePermission
+    uuid: ce824e92-544b-4f67-803b-7647438751ba
+    is_active: true
+    created_at: '2025-06-15T10:59:32.136436-04:00'
+    updated_at: '2025-06-15T10:59:32.136480-04:00'
+  - name: api:menutier:metadata
+    service: api
+    action: metadata
+    resource: MenuTier
+    uuid: cfc10363-6fb3-481e-9242-c941bb0259ce
+    is_active: true
+    created_at: '2025-06-15T10:55:50.848961-04:00'
+    updated_at: '2025-06-15T10:55:50.849003-04:00'
+  - name: api:variabletype:count
+    service: api
+    action: count
+    resource: VariableType
+    uuid: d2672abd-22a9-43d5-ba11-632b800d639c
+    is_active: true
+    created_at: '2025-06-15T10:57:03.711588-04:00'
+    updated_at: '2025-06-15T10:57:03.711635-04:00'
+  - name: api:templatefragment:metadata
+    service: api
+    action: metadata
+    resource: TemplateFragment
+    uuid: d34a8340-ff8c-4715-9a1a-caa3c897d610
+    is_active: true
+    created_at: '2025-06-15T10:56:03.209689-04:00'
+    updated_at: '2025-06-15T10:56:03.209731-04:00'
+  - name: api:role:delete
+    service: api
+    action: delete
+    resource: Role
+    uuid: d78c3e8f-c384-4b25-a7f6-9a67787a34b5
+    is_active: true
+    created_at: '2025-06-15T10:57:28.640149-04:00'
+    updated_at: '2025-06-15T10:57:28.640190-04:00'
+  - name: api:template:delete
+    service: api
+    action: delete
+    resource: Template
+    uuid: d819aede-7f98-4cd6-a3d3-ea498f6d84aa
+    is_active: true
+    created_at: '2025-06-15T10:57:31.383338-04:00'
+    updated_at: '2025-06-15T10:57:31.383385-04:00'
+  - name: api:menulink:delete
+    service: api
+    action: delete
+    resource: MenuLink
+    uuid: d8225a49-393e-4224-a85b-b2fa7e40e3db
+    is_active: true
+    created_at: '2025-06-15T10:57:19.077704-04:00'
+    updated_at: '2025-06-15T10:57:19.077745-04:00'
+  - name: api:templatefragment:count
+    service: api
+    action: count
+    resource: TemplateFragment
+    uuid: d9768da2-acf7-48f5-b0f8-c8366967dd85
+    is_active: true
+    created_at: '2025-06-15T10:56:56.823049-04:00'
+    updated_at: '2025-06-15T10:56:56.823100-04:00'
+  - name: api:permission:delete
+    service: api
+    action: delete
+    resource: Permission
+    uuid: d9a0cb1c-d24d-4020-91b9-0c4abbf8bbd6
+    is_active: true
+    created_at: '2025-06-15T10:57:25.902280-04:00'
+    updated_at: '2025-06-15T10:57:25.902409-04:00'
+  - name: api:permission:update
+    service: api
+    action: update
+    resource: Permission
+    uuid: d9d69a3c-a740-468a-bfed-802525cadb25
+    is_active: true
+    created_at: '2025-06-15T10:58:17.318073-04:00'
+    updated_at: '2025-06-15T10:58:17.318113-04:00'
+  - name: api:user:list
+    service: api
+    action: list
+    resource: User
+    uuid: dd374242-e3d8-4b32-95c4-7e842709a1ea
+    is_active: true
+    created_at: '2025-06-15T10:55:31.193921-04:00'
+    updated_at: '2025-06-15T10:55:31.193962-04:00'
+  - name: api:datatype:update
+    service: api
+    action: update
+    resource: DataType
+    uuid: df1e2956-19fd-4f69-91f7-dd338187d93e
+    is_active: true
+    created_at: '2025-06-15T10:58:03.575761-04:00'
+    updated_at: '2025-06-15T10:58:03.575804-04:00'
+  - name: api:rbacauditlog:write
+    service: api
+    action: write
+    resource: RbacAuditLog
+    uuid: df72b72a-2848-4be8-8081-3d69818a0c79
+    is_active: true
+    created_at: '2025-06-15T10:59:29.382057-04:00'
+    updated_at: '2025-06-15T10:59:29.382099-04:00'
+  - name: api:pagefragment:list
+    service: api
+    action: list
+    resource: PageFragment
+    uuid: e1fb3c55-1e27-408a-b04f-506ff7c9089f
+    is_active: true
+    created_at: '2025-06-15T10:55:20.207065-04:00'
+    updated_at: '2025-06-15T10:55:20.207108-04:00'
+  - name: api:page:update
+    service: api
+    action: update
+    resource: Page
+    uuid: e25e57e6-42c4-4ad5-9404-74b477236dc7
+    is_active: true
+    created_at: '2025-06-15T10:58:14.565185-04:00'
+    updated_at: '2025-06-15T10:58:14.565224-04:00'
+  - name: api:cruddef:write
+    service: api
+    action: write
+    resource: CrudDef
+    uuid: e5c2ec77-2bb2-4daf-92c1-4ae5449428fa
+    is_active: true
+    created_at: '2025-06-15T10:59:12.892074-04:00'
+    updated_at: '2025-06-15T10:59:12.892116-04:00'
+  - name: api:theme:update
+    service: api
+    action: update
+    resource: Theme
+    uuid: e603ce19-0b00-4d4e-92ea-b9bc77fd9090
+    is_active: true
+    created_at: '2025-06-15T10:58:25.564078-04:00'
+    updated_at: '2025-06-15T10:58:25.564120-04:00'
+  - name: api:module:read
+    service: api
+    action: read
+    resource: Module
+    uuid: e6156695-ee09-422e-807f-02e98a8bf7e0
+    is_active: true
+    created_at: '2025-06-15T11:00:09.600688-04:00'
+    updated_at: '2025-06-15T11:00:09.600731-04:00'
+  - name: api:userquicklink:metadata
+    service: api
+    action: metadata
+    resource: UserQuickLink
+    uuid: ea580e99-7d13-48b3-a71e-3d69400530bb
+    is_active: true
+    created_at: '2025-06-15T10:56:07.317296-04:00'
+    updated_at: '2025-06-15T10:56:07.317352-04:00'
+  - name: api:theme:delete
+    service: api
+    action: delete
+    resource: Theme
+    uuid: ec4cdb3a-62cc-47c2-90d0-01a5a64a3d39
+    is_active: true
+    created_at: '2025-06-15T10:57:34.141010-04:00'
+    updated_at: '2025-06-15T10:57:34.141051-04:00'
+  - name: api:datatype:count
+    service: api
+    action: count
+    resource: DataType
+    uuid: ec8e348c-659e-461a-b7f7-fb3bf46f47d1
+    is_active: true
+    created_at: '2025-06-15T10:56:36.248716-04:00'
+    updated_at: '2025-06-15T10:56:36.248756-04:00'
+  - name: api:role:metadata
+    service: api
+    action: metadata
+    resource: Role
+    uuid: ed81b8d0-a659-4ce3-8653-9b03d77897ed
+    is_active: true
+    created_at: '2025-06-15T10:55:59.069464-04:00'
+    updated_at: '2025-06-15T10:55:59.069505-04:00'
+  - name: api:pagefragment:delete
+    service: api
+    action: delete
+    resource: PageFragment
+    uuid: ee18b0b8-f87c-4c94-b0b0-432b0022be6c
+    is_active: true
+    created_at: '2025-06-15T10:57:24.535073-04:00'
+    updated_at: '2025-06-15T10:57:24.535116-04:00'
+  - name: api:variabletype:delete
+    service: api
+    action: delete
+    resource: VariableType
+    uuid: f0519eeb-aa9d-4df5-836e-f47ef55e0769
+    is_active: true
+    created_at: '2025-06-15T10:57:39.649126-04:00'
+    updated_at: '2025-06-15T10:57:39.649168-04:00'
+  - name: api:variabletype:update
+    service: api
+    action: update
+    resource: VariableType
+    uuid: f30125fc-d5bd-4437-a399-b5517504d77d
+    is_active: true
+    created_at: '2025-06-15T10:58:31.038979-04:00'
+    updated_at: '2025-06-15T10:58:31.039021-04:00'
+  - name: api:module:count
+    service: api
+    action: count
+    resource: Module
+    uuid: f38592da-5d00-44ed-a68c-03c55799b537
+    is_active: true
+    created_at: '2025-06-15T10:56:45.853263-04:00'
+    updated_at: '2025-06-15T10:56:45.853304-04:00'
+  - name: api:menutier:read
+    service: api
+    action: read
+    resource: MenuTier
+    uuid: f5f35492-0206-4e5f-92ef-e552a7636ce0
+    is_active: true
+    created_at: '2025-06-15T11:00:08.238597-04:00'
+    updated_at: '2025-06-15T11:00:08.238637-04:00'
+  - name: api:rbacauditlog:read
+    service: api
+    action: read
+    resource: RbacAuditLog
+    uuid: f8abc70b-9292-4399-8f37-d15963b23d1c
+    is_active: true
+    created_at: '2025-06-15T11:00:15.076643-04:00'
+    updated_at: '2025-06-15T11:00:15.076684-04:00'

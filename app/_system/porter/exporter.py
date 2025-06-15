@@ -254,3 +254,158 @@ class ComponentExporter:
             self.output_manager.log_error(f"Error exporting model object: {e}")
             self.output_manager.output_error(f"Error exporting: {e}")
             return 1
+        
+    def export_all_model_objects(self, model_class, output_file_path, 
+                                    foreign_key_mappings=None, header_title=None, 
+                                    header_description=None, template_mode=False,
+                                    filter_conditions=None, order_by=None, limit=None):
+            """
+            Export all objects from a model class to a single YAML file
+            
+            Args:
+                model_class: The SQLAlchemy model class
+                output_file_path: Path where YAML file will be written
+                foreign_key_mappings: Dict mapping UUID fields to name fields
+                header_title: Custom header title
+                header_description: Custom header description
+                template_mode: If True, comment out auto-generated fields
+                filter_conditions: Optional dict of field:value pairs to filter records
+                order_by: Optional field name to order results
+                limit: Optional limit on number of records
+            """
+            try:
+                # Ensure output directory exists
+                output_path = Path(output_file_path)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                if foreign_key_mappings is None:
+                    foreign_key_mappings = {}
+                
+                # Build query
+                query = self.session.query(model_class)
+                
+                # Apply filters if provided
+                if filter_conditions:
+                    for field, value in filter_conditions.items():
+                        if hasattr(model_class, field):
+                            query = query.filter(getattr(model_class, field) == value)
+                
+                # Apply ordering
+                if order_by and hasattr(model_class, order_by):
+                    query = query.order_by(getattr(model_class, order_by))
+                else:
+                    # Default ordering by uuid for consistency
+                    if hasattr(model_class, 'uuid'):
+                        query = query.order_by(model_class.uuid)
+                
+                # Apply limit if specified
+                if limit:
+                    query = query.limit(limit)
+                
+                # Execute query
+                objects = query.all()
+                
+                if not objects:
+                    self.output_manager.output_warning(f"No {model_class.__name__} objects found")
+                    return 1
+                
+                # Build nested structure
+                model_name = model_class.__name__
+                root_data = OrderedDict()
+                
+                # Add model as top level key
+                model_data = OrderedDict()
+                
+                # Add meta section
+                model_data['meta'] = self._get_model_meta(objects[0])
+                
+                # Build data section with list of objects
+                data_list = []
+                
+                for obj in objects:
+                    obj_data = OrderedDict()
+                    
+                    # First pass: add all column data
+                    for column in model_class.__table__.columns:
+                        value = getattr(obj, column.name)
+                        converted_value = self._convert_value_to_exportable(value)
+                        
+                        if template_mode or converted_value is not None:
+                            if template_mode and converted_value is None:
+                                if column.name.lower() in self.auto_generated_fields:
+                                    if column.name == 'uuid':
+                                        converted_value = f"uuid_{data_list.__len__() + 1}"
+                                    elif 'created_at' in column.name or 'updated_at' in column.name:
+                                        converted_value = "2024-01-01T00:00:00"
+                                    else:
+                                        converted_value = "auto_generated_value"
+                            
+                            obj_data[column.name] = converted_value
+                    
+                    # Second pass: add foreign key names
+                    if foreign_key_mappings:
+                        items = list(obj_data.items())
+                        new_items = []
+                        
+                        for key, val in items:
+                            new_items.append((key, val))
+                            
+                            if key in foreign_key_mappings:
+                                name_field = foreign_key_mappings[key]
+                                related_name = self._get_foreign_key_name(obj, key, name_field)
+                                if related_name:
+                                    name_key = key.replace('_uuid', f'_{name_field}')
+                                    new_items.append((name_key, related_name))
+                        
+                        obj_data = OrderedDict(new_items)
+                    
+                    data_list.append(obj_data)
+                
+                # Add data list to model
+                model_data['data'] = data_list
+                
+                # Add model to root
+                root_data[model_name] = model_data
+                
+                # Configure YAML dumper
+                def represent_ordereddict(dumper, data):
+                    return dumper.represent_mapping('tag:yaml.org,2002:map', data.items())
+                
+                def represent_str(dumper, data):
+                    if '\n' in data:
+                        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+                    return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+                
+                yaml.add_representer(OrderedDict, represent_ordereddict)
+                yaml.add_representer(str, represent_str)
+                
+                # Format YAML
+                yaml_content = yaml.dump(root_data, default_flow_style=False)
+                
+                # Generate header
+                if header_title is None:
+                    header_title = f"{model_name} - All Records"
+                
+                header_suffix = " (Template)" if template_mode else ""
+                
+                # Write file with header
+                with open(output_path, 'w') as f:
+                    f.write(f"# {header_title}{header_suffix}\n")
+                    f.write(f"# Total records: {len(objects)}\n")
+                    if filter_conditions:
+                        f.write(f"# Filters applied: {filter_conditions}\n")
+                    if template_mode:
+                        f.write(f"# Template file - edit values before importing\n")
+                    if header_description:
+                        f.write(f"# {header_description}\n")
+                    f.write(f"# Exported from template CLI\n")
+                    f.write(f"\n")
+                    f.write(yaml_content)
+                
+                self.output_manager.output_success(f"Exported {len(objects)} {model_name} records to: {output_path}")
+                return 0
+                
+            except Exception as e:
+                self.output_manager.log_error(f"Error exporting all model objects: {e}")
+                self.output_manager.output_error(f"Error exporting: {e}")
+                return 1        

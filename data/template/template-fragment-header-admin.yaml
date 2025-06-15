@@ -38,100 +38,79 @@ TemplateFragment:
                             </div>
                         </div>
                         <div class="dropdown_section">
-                            <h4>Quick Actions</h4>
-                            <a href="#" class="dropdown_link"><i class="fas fa-search"></i> Search</a>
-                            <a href="#" class="dropdown_link"><i class="fas fa-bookmark"></i> Bookmarks</a>
-                            <a href="#" class="dropdown_link"><i class="fas fa-history"></i> Recent</a>
                         </div>
                         <div class="dropdown_section">
-                            <h4>Tools</h4>
-                            <a href="#" class="dropdown_link"><i class="fas fa-download"></i> Download PDF</a>
-                            <a href="#" class="dropdown_link"><i class="fas fa-print"></i> Print</a>
-                            <a href="#" class="dropdown_link"><i class="fas fa-share"></i> Share</a>
-                        </div>
+                          <h4>Account</h4>
+                                  <a href="#" class="dropdown_link" onclick="window.logout(); return false;">
+                                      <i class="fas fa-sign-out-alt"></i> Logout
+                                  </a>
+                          </div>
                     </div>
                 </div>
             </div>
         </header>
-
         <script>
-        function toggle_nine_dot_dropdown() {
-            const dropdown = document.getElementById('nine_dot_dropdown');
-            dropdown.classList.toggle('show');
-        }
+          function toggle_nine_dot_dropdown() {
+              const dropdown = document.getElementById('nine_dot_dropdown');
+              dropdown.classList.toggle('show');
+          }
 
-        function toggle_sidebar() {
-            const content_area = document.querySelector('.content_area');
-            const sidebar_toggle = document.querySelector('.sidebar_toggle i');
-            
-            content_area.classList.toggle('collapsed');
-            
-            // Update the icon direction
-            if (content_area.classList.contains('collapsed')) {
-                sidebar_toggle.className = 'fas fa-chevron-right';
-            } else {
-                sidebar_toggle.className = 'fas fa-chevron-left';
-            }
-        }
+          function toggle_theme() {
+              const toggle = document.getElementById('dark_mode_toggle');
+              const html = document.documentElement;
 
-        function toggle_nav_item(element) {
-            element.classList.toggle('expanded');
-        }
+              if (toggle.checked) {
+                  html.setAttribute('data-theme', 'dark');
+                  localStorage.setItem('theme_preference', 'dark');
+              } else {
+                  html.setAttribute('data-theme', 'light');
+                  localStorage.setItem('theme_preference', 'light');
+              }
+          }
 
-        function toggle_theme() {
-            const toggle = document.getElementById('dark_mode_toggle');
-            const html = document.documentElement;
+          function get_theme_preference() {
+              const saved_preference = localStorage.getItem('theme_preference');
+              if (saved_preference !== null) {
+                  return saved_preference;
+              }
+              return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
 
-            if (toggle.checked) {
-                html.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme_preference', 'dark');
-            } else {
-                html.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme_preference', 'light');
-            }
-        }
+          function apply_theme(theme) {
+              const html = document.documentElement;
+              const toggle = document.getElementById('dark_mode_toggle');
+              
+              html.setAttribute('data-theme', theme);
+              if (toggle) {
+                  toggle.checked = theme === 'dark';
+              }
+              localStorage.setItem('theme_preference', theme);
+          }
 
-        function get_theme_preference() {
-            const saved_preference = localStorage.getItem('theme_preference');
-            if (saved_preference !== null) {
-                return saved_preference;
-            }
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
+          function reset_theme_to_auto() {
+              localStorage.removeItem('theme_preference');
+              const system_theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              apply_theme(system_theme);
+          }
 
-        function apply_theme(theme) {
-            const html = document.documentElement;
-            const toggle = document.getElementById('dark_mode_toggle');
-            
-            html.setAttribute('data-theme', theme);
-            if (toggle) {
-                toggle.checked = theme === 'dark';
-            }
-            localStorage.setItem('theme_preference', theme);
-        }
+          // Initialize theme on load
+          document.addEventListener('DOMContentLoaded', function() {
+              const preferred_theme = get_theme_preference();
+              apply_theme(preferred_theme);
+          });
 
-        function reset_theme_to_auto() {
-            localStorage.removeItem('theme_preference');
-            const system_theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            apply_theme(system_theme);
-        }
+          // Close dropdown when clicking outside
+          document.addEventListener('click', function(event) {
+              const menu = document.querySelector('.nine_dot_menu');
+              const dropdown = document.getElementById('nine_dot_dropdown');
 
-        // Initialize theme on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const preferred_theme = get_theme_preference();
-            apply_theme(preferred_theme);
-        });
+              if (!menu.contains(event.target)) {
+                  dropdown.classList.remove('show');
+              }
+          });
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const menu = document.querySelector('.nine_dot_menu');
-            const dropdown = document.getElementById('nine_dot_dropdown');
-
-            if (!menu.contains(event.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
-        </script>
+          </script>
+        
       template_hash: null
       variables_schema: |
         {

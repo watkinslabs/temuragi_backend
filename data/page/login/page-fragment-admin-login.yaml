@@ -35,57 +35,57 @@ PageFragment:
                 align-items: center;
                 justify-content: center;
             }
-            
+
             .login-container {
                 max-width: 400px;
                 width: 100%;
                 padding: 2rem;
             }
-            
+
             .card {
                 border: none;
                 border-radius: 12px;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             }
-            
+
             .card-header {
                 background-color: transparent;
                 border-bottom: none;
                 padding: 1.5rem 1.5rem 0;
             }
-            
+
             .card-body {
                 padding: 1.5rem;
             }
-            
+
             .logo-container {
                 text-align: center;
                 margin-bottom: 1rem;
             }
-            
+
             .logo-container h2 {
                 color: #333;
                 font-weight: 700;
             }
-            
+
             .form-floating {
                 margin-bottom: 1.2rem;
             }
-            
+
             .form-floating > label {
                 padding: 0.75rem 1rem;
             }
-            
+
             .form-control {
                 border-radius: 8px;
                 border: 1px solid #e1e1e1;
             }
-            
+
             .form-control:focus {
                 box-shadow: 0 0 0 0.25rem rgba(0, 114, 255, 0.25);
                 border-color: #0072ff;
             }
-            
+
             .btn-login {
                 background-color: #0072ff;
                 color: white;
@@ -98,39 +98,56 @@ PageFragment:
                 letter-spacing: 0.5px;
                 transition: all 0.3s;
             }
-            
+
             .btn-login:hover {
                 background-color: #005ecf;
                 transform: translateY(-2px);
                 box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
             }
-            
+
+            .btn-login:disabled {
+                background-color: #6c757d;
+                cursor: not-allowed;
+                transform: none;
+            }
+
             .remember-forgot {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 1.5rem;
             }
-            
+
             .form-check-input:checked {
                 background-color: #0072ff;
                 border-color: #0072ff;
             }
-            
+
             .forgot-link {
                 color: #0072ff;
                 text-decoration: none;
                 font-size: 0.875rem;
             }
-            
+
             .forgot-link:hover {
                 text-decoration: underline;
             }
-            
+
             .alert {
                 border-radius: 8px;
                 padding: 0.75rem 1rem;
                 margin-bottom: 1.5rem;
+            }
+
+            .spinner-border {
+                width: 1.2rem;
+                height: 1.2rem;
+                margin-right: 0.5rem;
+                display: none;
+            }
+
+            .btn-login.loading .spinner-border {
+                display: inline-block;
             }
         </style>
         {% endblock %}
@@ -146,6 +163,8 @@ PageFragment:
                     </div>
                 </div>
                 <div class="card-body">
+                    <div id="login-alerts"></div>
+                    
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
@@ -156,8 +175,8 @@ PageFragment:
                             {% endfor %}
                         {% endif %}
                     {% endwith %}
-                    
-                    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+
+                    <form id="login-form" novalidate>
                         <div class="form-floating">
                             <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
                             <label for="username">Username</label>
@@ -175,7 +194,10 @@ PageFragment:
                             </div>
                             <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">Forgot password?</a>
                         </div>
-                        <button type="submit" class="btn btn-login">Sign In</button>
+                        <button type="submit" class="btn btn-login" id="login-button">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span class="button-text">Sign In</span>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -187,9 +209,125 @@ PageFragment:
 
         {% block custom_js %}
         <script>
-            // Focus username field on page load
+            // Auto-redirect if already logged in
+            function check_existing_auth() {
+                const api_token = localStorage.getItem('api_token');
+                const refresh_token = localStorage.getItem('refresh_token');
+                const user_uuid = localStorage.getItem('user_uuid');
+                
+                if (api_token && refresh_token && user_uuid) {
+                    // Already have credentials, redirect to main app
+                    window.location.href = '/';
+                }
+            }
+
+            // Show alert message
+            function show_alert(message, type = 'danger') {
+                const alert_html = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                document.getElementById('login-alerts').innerHTML = alert_html;
+            }
+
+            // Clear all alerts
+            function clear_alerts() {
+                document.getElementById('login-alerts').innerHTML = '';
+            }
+
+            // Handle login form submission
+            async function handle_login(event) {
+                event.preventDefault();
+                
+                // Clear previous alerts
+                clear_alerts();
+                
+                // Get form data
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const remember = document.getElementById('remember').checked;
+                
+                // Basic validation
+                if (!username || !password) {
+                    show_alert('Please enter both username and password.');
+                    return;
+                }
+                
+                // Disable button and show loading
+                const login_button = document.getElementById('login-button');
+                login_button.disabled = true;
+                login_button.classList.add('loading');
+                
+                try {
+                    // Make login request
+                    const response = await fetch('{{ url_for("api_auth.login") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            username: username,
+                            password: password,
+                            remember: remember
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        // Store tokens in localStorage
+                        localStorage.setItem('api_token', data.api_token);
+                        localStorage.setItem('refresh_token', data.refresh_token);
+                        localStorage.setItem('user_uuid', data.user_uuid);
+                        
+                        // Optional: Store additional user info if provided
+                        if (data.user_info) {
+                            localStorage.setItem('user_info', JSON.stringify(data.user_info));
+                        }
+                        
+                        // Show success message briefly
+                        show_alert('Login successful! Redirecting...', 'success');
+                        
+                        // Redirect to main app
+                        setTimeout(() => {
+                            window.location.href = data.redirect_url || '/';
+                        }, 500);
+                        
+                    } else {
+                        // Show error message
+                        show_alert(data.message || 'Invalid username or password.');
+                        login_button.disabled = false;
+                        login_button.classList.remove('loading');
+                    }
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    show_alert('An error occurred during login. Please try again.');
+                    login_button.disabled = false;
+                    login_button.classList.remove('loading');
+                }
+            }
+
+            // Initialize on page load
             document.addEventListener('DOMContentLoaded', function() {
+                // Check if already logged in
+                check_existing_auth();
+                
+                // Focus username field
                 document.getElementById('username').focus();
+                
+                // Attach form submit handler
+                document.getElementById('login-form').addEventListener('submit', handle_login);
+                
+                // Handle enter key in password field
+                document.getElementById('password').addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        handle_login(event);
+                    }
+                });
             });
         </script>
         {% endblock %}

@@ -23,6 +23,12 @@ def find_all_classes(root_dir):
     
     # First pass: Find all classes
     for py_file in Path(root_dir).rglob('*.py'):
+        # Skip model files, CLI files, and register directory
+        if (str(py_file).endswith('_model.py') or 
+            str(py_file).endswith('_cli.py') or
+            '/register/' in str(py_file)):
+            continue
+            
         try:
             with open(py_file, 'r') as f:
                 tree = ast.parse(f.read(), filename=str(py_file))
@@ -114,11 +120,14 @@ def analyze_all_dependencies(root_dir):
     """
     print(f"Scanning {root_dir} for Python classes...")
     
-    # First pass: discover all classes
+    # First pass: discover ALL classes in ALL files
     class_registry = find_all_classes(root_dir)
     print(f"Found {len(class_registry)} classes")
     
-    # Second pass: find dependencies for each file
+    # List all class names for debugging
+    print(f"Classes found: {', '.join(sorted(class_registry.keys()))}")
+    
+    # Second pass: Now that we know ALL classes, analyze dependencies
     processed_files = set()
     
     for class_name, class_info in class_registry.items():
@@ -129,12 +138,15 @@ def analyze_all_dependencies(root_dir):
             processed_files.add(file_path)
             
             # Find all dependencies in this file
+            # Pass the complete class_registry so it knows about ALL classes
             file_deps = find_class_dependencies(file_path, class_registry)
             
             # Update registry with dependencies
             for cls_name, deps in file_deps.items():
                 if cls_name in class_registry:
                     class_registry[cls_name]['dependencies'] = deps
+                    if deps:
+                        print(f"  {cls_name} depends on: {', '.join(deps)}")
     
     return class_registry
 
@@ -166,11 +178,12 @@ def resolve_transitive_dependencies(class_registry):
     
     return class_registry
 
-def update_class_depends_on(class_registry, dry_run=False):
+def update_class_depends_on(class_registry, dry_run=False, verbose=True):
     """
     Update __depends_on__ in each class file
     """
     files_to_update = {}
+    total_changes = 0
     
     # Group classes by file
     for class_name, info in class_registry.items():
@@ -189,6 +202,8 @@ def update_class_depends_on(class_registry, dry_run=False):
             with open(file_path, 'r') as f:
                 lines = f.readlines()
             
+            file_changes = []
+            
             # Sort classes by line number (reverse order to update from bottom)
             classes.sort(key=lambda x: x['line'], reverse=True)
             
@@ -203,6 +218,7 @@ def update_class_depends_on(class_registry, dry_run=False):
                 # Find where to insert __depends_on__
                 insert_line = None
                 existing_depends_line = None
+                existing_deps = []
                 
                 # Look for class definition and scan for insertion point
                 for i in range(class_line, len(lines)):
@@ -216,6 +232,11 @@ def update_class_depends_on(class_registry, dry_run=False):
                     # Check if __depends_on__ already exists
                     if '__depends_on__' in stripped:
                         existing_depends_line = i
+                        # Extract existing dependencies
+                        match = re.search(r'__depends_on__\s*=\s*\[(.*?)\]', stripped)
+                        if match:
+                            deps_str = match.group(1)
+                            existing_deps = [d.strip().strip("'\"") for d in deps_str.split(',') if d.strip()]
                         break
                     
                     # Find first non-comment, non-empty line after class
@@ -230,28 +251,66 @@ def update_class_depends_on(class_registry, dry_run=False):
                 indent = '    '  # Standard 4-space indent
                 depends_line = f"{indent}__depends_on__ = {deps}\n"
                 
-                # Update or insert
+                # Determine what action to take
                 if existing_depends_line is not None:
-                    lines[existing_depends_line] = depends_line
-                    print(f"Updated {class_name} in {file_path}")
+                    if set(existing_deps) != set(deps):
+                        file_changes.append({
+                            'class': class_name,
+                            'action': 'update',
+                            'line': existing_depends_line + 1,
+                            'old': existing_deps,
+                            'new': deps,
+                            'old_line': lines[existing_depends_line].strip(),
+                            'new_line': depends_line.strip()
+                        })
+                        if not dry_run:
+                            lines[existing_depends_line] = depends_line
                 elif insert_line is not None:
-                    lines.insert(insert_line, depends_line)
-                    print(f"Added __depends_on__ to {class_name} in {file_path}")
+                    file_changes.append({
+                        'class': class_name,
+                        'action': 'add',
+                        'line': insert_line + 1,
+                        'new': deps,
+                        'new_line': depends_line.strip()
+                    })
+                    if not dry_run:
+                        lines.insert(insert_line, depends_line)
                 else:
                     print(f"WARNING: Could not find insertion point for {class_name} in {file_path}")
             
-            # Write back to file
-            if not dry_run and any(c['dependencies'] for c in classes):
-                with open(file_path, 'w') as f:
-                    f.writelines(lines)
-                print(f"Updated {file_path}")
-            elif dry_run:
-                print(f"Would update {file_path}")
+            # Report changes for this file
+            if file_changes:
+                print(f"\n{'Would update' if dry_run else 'Updating'} {file_path}:")
+                for change in file_changes:
+                    print(f"\n  Class: {change['class']} (line {change['line']})")
+                    if change['action'] == 'add':
+                        print(f"    ADD: {change['new_line']}")
+                        print(f"    Dependencies: {', '.join(change['new'])}")
+                    else:  # update
+                        print(f"    OLD: {change['old_line']}")
+                        print(f"    NEW: {change['new_line']}")
+                        print(f"    Old deps: {', '.join(change['old'])}")
+                        print(f"    New deps: {', '.join(change['new'])}")
+                        added = set(change['new']) - set(change['old'])
+                        removed = set(change['old']) - set(change['new'])
+                        if added:
+                            print(f"    Added: {', '.join(added)}")
+                        if removed:
+                            print(f"    Removed: {', '.join(removed)}")
                 
+                total_changes += len(file_changes)
+                
+                # Write back to file
+                if not dry_run:
+                    with open(file_path, 'w') as f:
+                        f.writelines(lines)
+                        
         except Exception as e:
             print(f"Error updating {file_path}: {e}")
+    
+    print(f"\n{'Would make' if dry_run else 'Made'} {total_changes} total changes")
+    return total_changes
 
-# Add to main function
 def main():
     parser = argparse.ArgumentParser(description='Analyze Python class dependencies')
     parser.add_argument('root', help='Root directory to scan')
@@ -278,7 +337,24 @@ def main():
         update_class_depends_on(class_registry, dry_run=args.dry_run)
         return
     
-    # ... rest of output logic
+    # Output results
+    if args.json:
+        output = json.dumps(class_registry, indent=2)
+    else:
+        output = f"Found {len(class_registry)} classes:\n\n"
+        for name, info in sorted(class_registry.items()):
+            output += f"{name} ({info['file']}:{info['line']})\n"
+            if info.get('dependencies'):
+                output += f"  Direct deps: {', '.join(info['dependencies'])}\n"
+            if args.transitive and info.get('transitive_dependencies'):
+                output += f"  All deps: {', '.join(info['transitive_dependencies'])}\n"
+            output += "\n"
+    
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(output)
+    else:
+        print(output)
 
 if __name__ == '__main__':
     main()

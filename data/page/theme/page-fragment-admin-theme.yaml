@@ -24,479 +24,90 @@ PageFragment:
     version_label: v1.0
     is_active: true
     content_source: |
-        <!-- Header -->
-            <div class="row header-bar text-white py-4 mb-4">
-                <div class="col">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0 fw-bold"><i class="fas fa-file-code me-2"></i>Template Management</h4>
-                            <small style="opacity: 0.9;">Design and manage page templates and layouts</small>
-                        </div>
-                        <div>
-                            <button class="btn btn-light text-dark fw-medium" onclick="create_template()">
-                                <i class="fas fa-plus me-2"></i>New Template
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filters -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <label class="form-label">Template Type</label>
-                    <select id="filter_type" class="form-select form-select-sm">
-                        <option value="">All Templates</option>
-                        <option value="system">System Templates</option>
-                        <option value="module">Module Templates</option>
-                        <option value="admin">Admin Templates</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Layout Type</label>
-                    <select id="filter_layout" class="form-select form-select-sm">
-                        <option value="">All Layouts</option>
-                        <option value="full-width">Full Width</option>
-                        <option value="sidebar-left">Sidebar Left</option>
-                        <option value="sidebar-right">Sidebar Right</option>
-                        <option value="centered">Centered</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Theme</label>
-                    <select id="filter_theme" class="form-select form-select-sm">
-                        <option value="">All Themes</option>
-                        <option value="default">Default Theme</option>
-                        <option value="dark">Dark Theme</option>
-                        <option value="minimal">Minimal Theme</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Search</label>
-                    <input type="text" id="global_search" class="form-control form-control-sm" placeholder="Search templates...">
-                </div>
-            </div>
-
-            <!-- Templates Table -->
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-body p-0">
-                            <table id="templates_table" class="table table-hover mb-0" style="width:100%">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Preview</th>
-                                        <th>Name</th>
-                                        <th>Display Name</th>
-                                        <th>Layout</th>
-                                        <th>Theme</th>
-                                        <th>Features</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Container for the dynamic table -->
+            <div id="dynamic_table_container"></div>
 
             <script>
-            let templates_table;
-            const API_BASE_URL = "{{ url_for('api.data') }}";
-            const TOKEN_URL = "{{ url_for('api.token') }}";
-            let API_TOKEN = null;
-            let token_expires = 0;
-
-            // Get fresh API token
-            async function get_api_token() {
-                // Return cached token if still valid
-                if (API_TOKEN && Date.now() < token_expires) {
-                    return API_TOKEN;
-                }
-                
-                try {
-                    const response = await fetch(TOKEN_URL, {
-                        method: 'POST',
-                        credentials: 'include', // Include session cookie for auth
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error('Failed to get token');
-                    }
-                    
-                    const data = await response.json();
-                    API_TOKEN = data.token;
-                    // Token expires in 15 minutes (or whatever the API returns)
-                    token_expires = Date.now() + ((data.expires_in || 900) * 1000);
-                    
-                    return API_TOKEN;
-                } catch (error) {
-                    console.error('Token fetch error:', error);
-                    show_notification('Failed to authenticate with API', 'error');
-                    return null;
-                }
-            }
 
             $(document).ready(function() {
-                // Initialize DataTable
-                templates_table = $('#templates_table').DataTable({
-                    "processing": true,
-                    "serverSide": true,
-                    "ajax": {
-                        "url": API_BASE_URL,
-                        "type": "POST",
-                        "headers": {
-                            "Content-Type": "application/json"
+                // Create global reference for action handlers
+                window.theme_table = new DynamicDataTable('dynamic_table_container', 'Theme', '{{ url_for('miner.data') }}', {
+                    table_title: 'Theme Management',
+                    table_description: 'Design and manage page Themes and layouts',
+                    columns: {
+                        name: {
+                            order: 1,
+                            searchable: true,
+                            label: 'Theme Name'
                         },
-                        "data": async function(d) {
-                            const token = await get_api_token();
-                            if (!token) {
-                                throw new Error('No API token available');
-                            }
-                            
-                            // Set authorization header
-                            this.headers = {
-                                "Content-Type": "application/json",
-                                "Authorization": "Bearer " + token
-                            };
-                            
-                            // Convert DataTables parameters to API format
-                            return JSON.stringify({
-                                model: "Template",
-                                action: "list",
-                                filters: {
-                                    template_type: $('#filter_type').val() || null,
-                                    layout_type: $('#filter_layout').val() || null,
-                                    theme: $('#filter_theme').val() || null
-                                },
-                                search: $('#global_search').val() || null,
-                                page: Math.floor(d.start / d.length) + 1,
-                                page_size: d.length,
-                                sort_by: d.columns[d.order[0].column].data,
-                                sort_order: d.order[0].dir
+                        description: {
+                            order: 2,
+                            searchable: true,
+                            label: 'Description'
+                        },
+                        is_active: {
+                            order: 3,
+                            searchable: false,  // Don't search on boolean
+                            format: 'boolean',
+                            label: 'Active'
+                        },
+                        created_at: {
+                            order: 4,
+                            searchable: false,
+                            format: 'date',
+                            label: 'Created'
+                        },
+                        updated_at: {
+                            order: 5,
+                            searchable: false,
+                            format: 'date',
+                            label: 'Last Updated'
+                        }
+                    },
+                    excluded_columns: ['password_hash', 'created_by', 'updated_by', 'deleted_at'],
+                    actions: ['edit', 'copy', {
+                        name: 'preview',
+                        icon: 'fas fa-eye',
+                        color: 'info',
+                        title: 'Preview Theme'
+                    }, {
+                        name: 'export',
+                        icon: 'fas fa-download',
+                        color: 'warning',
+                        title: 'Export Theme'
+                    }, 'delete'],
+                    create_url: "{{ url_for('theme.create_Theme') }}",
+                    edit_url: "{{ url_for('theme.edit_Theme', Theme_uuid='{uuid}') }}",
+                    custom_handlers: {
+                        preview: function(uuid) {
+                            window.open("{{ url_for('theme.preview_Theme', theme_uuid='UUID_PLACEHOLDER') }}".replace('UUID_PLACEHOLDER', uuid), '_blank');
+                        },
+                        export: function(uuid) {
+                            window.theme_table.api_request({
+                                model: "Theme",
+                                operation: "read",
+                                uuid: uuid,
+                                export: true
+                            }, function(response) {
+                                if (response.success && response.data) {
+                                    const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
+                                    const url = window.URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `theme_${response.data.name || uuid}.json`;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    window.URL.revokeObjectURL(url);
+                                    document.body.removeChild(a);
+                                    window.theme_table.show_notification('Theme exported successfully', 'success');
+                                }
                             });
-                        },
-                        "dataSrc": function(json) {
-                            // Convert API response to DataTables format
-                            return {
-                                draw: json.draw || 1,
-                                recordsTotal: json.total_count || 0,
-                                recordsFiltered: json.filtered_count || json.total_count || 0,
-                                data: json.data || []
-                            };
-                        },
-                        "error": function(xhr, error, code) {
-                            console.error('API Error:', error, code);
-                            show_notification('Error loading templates: ' + (xhr.responseJSON?.message || error), 'error');
                         }
-                    },
-                    "columns": [
-                        {
-                            "data": "uuid",
-                            "name": "preview",
-                            "orderable": false,
-                            "searchable": false,
-                            "render": function(data, type, row) {
-                                let sidebar_html = row.sidebar_enabled ? 
-                                    `<div class="preview-sidebar" style="background: ${row.sidebar_color || '#6c757d'};"></div>` : '';
-                                
-                                let dark_indicator = row.is_dark_theme ? 
-                                    '<div class="dark-mode-indicator">DARK</div>' : '';
-
-                                return `
-                                    <div>
-                                        <div class="template-preview" style="--header-color: ${row.header_color || '#007bff'}; --footer-color: ${row.footer_color || '#6c757d'}; --sidebar-color: ${row.sidebar_color || '#6c757d'};">
-                                            <div class="preview-header"></div>
-                                            ${sidebar_html}
-                                            <div class="preview-content"></div>
-                                            <div class="preview-footer"></div>
-                                        </div>
-                                        <div class="theme-colors">
-                                            <div class="color-dot" style="background: ${row.primary_color || '#007bff'};" title="Primary"></div>
-                                            <div class="color-dot" style="background: ${row.secondary_color || '#6c757d'};" title="Secondary"></div>
-                                            <div class="color-dot" style="background: ${row.accent_color || '#17a2b8'};" title="Accent"></div>
-                                            ${dark_indicator}
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                        },
-                        {
-                            "data": "name",
-                            "render": function(data, type, row) {
-                                return `
-                                    <code class="text-primary fw-medium">${data}</code>
-                                    <div class="small text-muted">${row.description || 'No description'}</div>
-                                `;
-                            }
-                        },
-                        { "data": "display_name" },
-                        {
-                            "data": "layout_type",
-                            "render": function(data, type, row) {
-                                let badge_class = {
-                                    'full-width': 'bg-info',
-                                    'sidebar-left': 'bg-warning text-dark',
-                                    'sidebar-right': 'bg-warning text-dark',
-                                    'centered': 'bg-success'
-                                }[data] || 'bg-secondary';
-                                
-                                return `
-                                    <span class="badge ${badge_class} bg-gradient">${data}</span>
-                                    <div class="small text-muted">${row.container_class || 'container'}</div>
-                                `;
-                            }
-                        },
-                        {
-                            "data": "theme",
-                            "render": function(data, type, row) {
-                                let badge_class = {
-                                    'default': 'bg-secondary',
-                                    'dark': 'bg-dark',
-                                    'minimal': 'bg-light text-dark'
-                                }[data] || 'bg-secondary';
-                                
-                                return `<span class="badge ${badge_class} bg-gradient">${data}</span>`;
-                            }
-                        },
-                        {
-                            "data": "uuid",
-                            "name": "features",
-                            "orderable": false,
-                            "render": function(data, type, row) {
-                                let features = [];
-                                
-                                if (row.header_type === 'fixed') {
-                                    features.push('<i class="fas fa-thumbtack text-primary" title="Fixed Header"></i>');
-                                } else if (row.header_type === 'static') {
-                                    features.push('<i class="fas fa-bars text-success" title="Static Header"></i>');
-                                } else if (row.header_type === 'minimal') {
-                                    features.push('<i class="fas fa-minus text-muted" title="Minimal Header"></i>');
-                                }
-                                
-                                if (row.footer_type === 'static') {
-                                    features.push('<i class="fas fa-step-backward text-success" title="Static Footer"></i>');
-                                } else if (row.footer_type === 'minimal') {
-                                    features.push('<i class="fas fa-eye-slash text-muted" title="Minimal Footer"></i>');
-                                }
-                                
-                                if (row.breadcrumbs_enabled) {
-                                    features.push('<i class="fas fa-route text-success" title="Breadcrumbs"></i>');
-                                } else {
-                                    features.push('<i class="fas fa-times text-danger" title="No Breadcrumbs"></i>');
-                                }
-                                
-                                if (row.sidebar_enabled) {
-                                    features.push('<i class="fas fa-sidebar text-success" title="Sidebar"></i>');
-                                }
-                                
-                                return `<div class="d-flex gap-1">${features.join('')}</div>`;
-                            }
-                        },
-                        {
-                            "data": "uuid",
-                            "name": "status",
-                            "render": function(data, type, row) {
-                                let badges = [];
-                                
-                                if (row.is_default_template) {
-                                    badges.push('<span class="badge bg-success bg-gradient status-badge"><i class="fas fa-star me-1"></i>Default</span>');
-                                }
-                                
-                                if (row.is_admin_template) {
-                                    badges.push('<span class="badge bg-danger bg-gradient status-badge"><i class="fas fa-shield-alt me-1"></i>Admin</span>');
-                                }
-                                
-                                if (row.is_system) {
-                                    badges.push('<span class="badge bg-primary bg-gradient status-badge">System</span>');
-                                } else {
-                                    badges.push('<span class="badge bg-info bg-gradient status-badge"><i class="fas fa-puzzle-piece me-1"></i>Module</span>');
-                                }
-                                
-                                return badges.join(' ');
-                            }
-                        },
-                        {
-                            "data": "uuid",
-                            "name": "actions",
-                            "orderable": false,
-                            "searchable": false,
-                            "render": function(data, type, row) {
-                                let actions = `
-                                    <div class="template-actions">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="edit_template('${row.uuid}')" title="Edit Template">
-                                            <i class="fas fa-edit me-1"></i>Edit
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-success" onclick="copy_template('${row.uuid}')" title="Copy Template">
-                                            <i class="fas fa-copy me-1"></i>Copy
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-info" onclick="preview_template('${row.uuid}')" title="Preview Template">
-                                            <i class="fas fa-eye me-1"></i>Preview
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-warning" onclick="export_template('${row.uuid}')" title="Export Template">
-                                            <i class="fas fa-download me-1"></i>Export
-                                        </button>
-                                `;
-                                
-                                if (!row.is_system) {
-                                    actions += `
-                                        <button class="btn btn-sm btn-outline-danger" onclick="delete_template('${row.uuid}')" title="Delete Template">
-                                            <i class="fas fa-trash me-1"></i>Delete
-                                        </button>
-                                    `;
-                                }
-                                
-                                actions += '</div>';
-                                return actions;
-                            }
-                        }
-                    ],
-                    "pageLength": 25,
-                    "responsive": true,
-                    "language": {
-                        "emptyTable": "No templates found",
-                        "processing": '<i class="fas fa-spinner fa-spin"></i> Loading templates...'
-                    },
-                    "order": [[2, "asc"]]
+                    }
                 });
-
-                // Filter handlers
-                $('#filter_type, #filter_layout, #filter_theme').on('change', function() {
-                    templates_table.ajax.reload();
-                });
-
-                $('#global_search').on('keyup', function() {
-                    templates_table.ajax.reload();
-                });
+                
+                theme_table.init();
             });
-
-            // API helper function
-            async function api_request(data, callback) {
-                const token = await get_api_token();
-                if (!token) {
-                    show_notification('Failed to get API token', 'error');
-                    return;
-                }
-                
-                $.ajax({
-                    url: API_BASE_URL,
-                    type: 'POST',
-                    contentType: 'application/json',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
-                    data: JSON.stringify(data),
-                    success: callback,
-                    error: function(xhr, status, error) {
-                        console.error('API Error:', error);
-                        let message = 'API request failed';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            message = xhr.responseJSON.message;
-                        }
-                        show_notification(message, 'error');
-                    }
-                });
-            }
-
-            // Action functions
-            function create_template() {
-                window.location.href = "{{ url_for('admin.create_template') }}";
-            }
-
-            function edit_template(uuid) {
-                window.location.href = "{{ url_for('admin.edit_template', template_uuid='UUID_PLACEHOLDER') }}".replace('UUID_PLACEHOLDER', uuid);
-            }
-
-            function copy_template(uuid) {
-                api_request({
-                    model: "Template",
-                    action: "create",
-                    data: {
-                        copy_from_uuid: uuid
-                    }
-                }, function(response) {
-                    if (response.success) {
-                        templates_table.ajax.reload();
-                        show_notification('Template copied successfully', 'success');
-                    } else {
-                        show_notification('Error copying template: ' + (response.message || 'Unknown error'), 'error');
-                    }
-                });
-            }
-
-            function preview_template(uuid) {
-                window.open("{{ url_for('admin.preview_template', template_uuid='UUID_PLACEHOLDER') }}".replace('UUID_PLACEHOLDER', uuid), '_blank');
-            }
-
-            function export_template(uuid) {
-                api_request({
-                    model: "Template",
-                    action: "read",
-                    uuid: uuid,
-                    export: true
-                }, function(response) {
-                    if (response.success && response.data) {
-                        // Create download
-                        const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `template_${response.data.name || uuid}.json`;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-                        show_notification('Template exported successfully', 'success');
-                    } else {
-                        show_notification('Error exporting template: ' + (response.message || 'Unknown error'), 'error');
-                    }
-                });
-            }
-
-            function delete_template(uuid) {
-                if (confirm('Are you sure you want to delete this template?')) {
-                    api_request({
-                        model: "Template",
-                        action: "delete",
-                        uuid: uuid
-                    }, function(response) {
-                        if (response.success) {
-                            templates_table.ajax.reload();
-                            show_notification('Template deleted successfully', 'success');
-                        } else {
-                            show_notification('Error deleting template: ' + (response.message || 'Unknown error'), 'error');
-                        }
-                    });
-                }
-            }
-
-            function show_notification(message, type) {
-                // Toast notification implementation
-                const toast = $(`
-                    <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body">${message}</div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                        </div>
-                    </div>
-                `);
-                
-                if (!$('.toast-container').length) {
-                    $('body').append('<div class="toast-container position-fixed top-0 end-0 p-3"></div>');
-                }
-                
-                $('.toast-container').append(toast);
-                toast.toast('show');
-                
-                // Auto-remove after toast hides
-                toast.on('hidden.bs.toast', function() {
-                    $(this).remove();
-                });
-            }
             </script>
     content_hash: null
     variables_data: null
@@ -514,3 +125,7 @@ PageFragment:
     # uuid: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided
     # created_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
     # updated_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
+
+
+
+            
