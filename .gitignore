@@ -18,3 +18,4 @@ l
 TODO.md
 app/user/database
 db
+.env
