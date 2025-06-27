@@ -3,9 +3,17 @@ from pprint import pprint
 from sqlalchemy import and_
 from typing import List, Dict, Optional, Union
 
-from app.models import Menu, MenuTier, MenuLink, UserQuickLink, RolePermission, Permission, Role, User
+
+from app.models import Menu
+from app.models import User
+from app.models import MenuTier
+from app.models import MenuLink
+from app.models import UserQuickLink
+from app.models import RolePermission
 
 class MenuBuilder:
+    
+    __depends_on__ = [ 'Menu','MenuTier','MenuLink','UserQuickLink','RolePermission','User' ]
     def __init__(self, db_session):
         """
         Initialize the MenuBuilder with a database session.
@@ -15,30 +23,30 @@ class MenuBuilder:
         """
         self.db_session = db_session
 
-    def get_menu_structure(self, menu_name="ADMIN", user_uuid=None):
+    def get_menu_structure(self, menu_name="ADMIN", user_id=None):
        """
        Build a complete menu structure from the database.
 
        Args:
            menu_name: Name of the menu to build
-           user_uuid: Optional UUID of user for permission filtering (can be string or UUID)
+           user_id: Optional UUID of user for permission filtering (can be string or UUID)
 
        Returns:
            Dictionary containing the menu structure
        """
        # Convert string UUID to UUID object if needed
-       if user_uuid and isinstance(user_uuid, str):
-           user_uuid = uuid.UUID(user_uuid)
+       if user_id and isinstance(user_id, str):
+           user_id = uuid.UUID(user_id)
 
        menu = self.db_session.query(Menu).filter_by(name=menu_name).first()
        if not menu:
            return None
 
-       # Get root tiers (those without parents or with parent_uuid=None)
+       # Get root tiers (those without parents or with parent_id=None)
        root_tiers = self.db_session.query(MenuTier).filter(
            and_(
-               MenuTier.menu_uuid == menu.uuid,
-               MenuTier.parent_uuid == None,
+               MenuTier.menu_id == menu.id,
+               MenuTier.parent_id == None,
                MenuTier.is_active == True,
                MenuTier.visible == True
            )
@@ -56,40 +64,40 @@ class MenuBuilder:
 
        # Build nested structure
        for tier in root_tiers:
-           tier_dict = self._build_tier_nested(tier, user_uuid)
+           tier_dict = self._build_tier_nested(tier, user_id)
            if tier_dict:  # Only add if tier has content or is visible
                menu_structure["items"].append(tier_dict)
 
        # pprint(menu_structure)
        return menu_structure
 
-    def _build_tier_nested(self, tier, user_uuid=None):
+    def _build_tier_nested(self, tier, user_id=None):
        """
        Recursively build nested structure for a tier.
 
        Args:
            tier: MenuTier object
-           user_uuid: Optional UUID of user for permission filtering
+           user_id: Optional UUID of user for permission filtering
 
        Returns:
            Dictionary representing the tier with nested items
        """
        # Get links for this tier
        links_query = self.db_session.query(MenuLink).filter(
-           MenuLink.tier_uuid == tier.uuid,
+           MenuLink.tier_id == tier.id,
            MenuLink.is_active == True,
            MenuLink.visible == True
        ).order_by(MenuLink.position)
 
-       # If user_uuid is provided, filter by permissions
-       if user_uuid:
-           user = self.db_session.query(User).filter(User.uuid == user_uuid).first()
+       # If user_id is provided, filter by permissions
+       if user_id:
+           user = self.db_session.query(User).filter(User.id == user_id).first()
            if user:
                links_query = links_query.join(
                    RolePermission,
-                   MenuLink.uuid == RolePermission.menu_link_uuid
+                   MenuLink.id == RolePermission.menu_link_id
                ).filter(
-                   RolePermission.role_uuid == user.role_uuid
+                   RolePermission.role_id == user.role_id
                )
 
        links = links_query.all()
@@ -105,7 +113,7 @@ class MenuBuilder:
        for link in links:
            link_item = {
                "type": "link",
-               "uuid": str(link.uuid),
+               "id": str(link.id),
                "name": link.name,
                "display": link.display,
                "url": link.url,
@@ -120,14 +128,14 @@ class MenuBuilder:
        
        # Add child tiers as nested items
        for child_tier in child_tiers:
-           child_dict = self._build_tier_nested(child_tier, user_uuid)
+           child_dict = self._build_tier_nested(child_tier, user_id)
            if child_dict:
                items.append(child_dict)
        
        # Create tier dictionary
        tier_dict = {
            "type": "tier",
-           "uuid": str(tier.uuid),
+           "id": str(tier.id),
            "name": tier.name,
            "display": tier.display,
            "slug": tier.slug,
@@ -138,12 +146,12 @@ class MenuBuilder:
        
        return tier_dict
 
-    def get_user_quick_links(self, user_uuid):
+    def get_user_quick_links(self, user_id):
         """
         Get a user's quick links.
 
         Args:
-            user_uuid: UUID of the user
+            user_id: UUID of the user
 
         Returns:
             List of MenuLink objects
@@ -151,8 +159,8 @@ class MenuBuilder:
         quick_links = self.db_session.query(MenuLink).join(
             UserQuickLink,
             and_(
-                UserQuickLink.menu_link_uuid == MenuLink.uuid,
-                UserQuickLink.user_uuid == user_uuid
+                UserQuickLink.menu_link_id == MenuLink.id,
+                UserQuickLink.user_id == user_id
             )
         ).filter(
             MenuLink.is_active == True
@@ -160,13 +168,13 @@ class MenuBuilder:
 
         return quick_links
 
-    def add_user_quick_link(self, user_uuid, menu_link_uuid, position=None):
+    def add_user_quick_link(self, user_id, menu_link_id, position=None):
         """
         Add a quick link for a user.
 
         Args:
-            user_uuid: UUID of the user
-            menu_link_uuid: UUID of the menu link
+            user_id: UUID of the user
+            menu_link_id: UUID of the menu link
             position: Optional position for the quick link
 
         Returns:
@@ -174,8 +182,8 @@ class MenuBuilder:
         """
         # Check if the quick link already exists
         existing = self.db_session.query(UserQuickLink).filter_by(
-            user_uuid=user_uuid,
-            menu_link_uuid=menu_link_uuid
+            user_id=user_id,
+            menu_link_id=menu_link_id
         ).first()
 
         if existing:
@@ -184,7 +192,7 @@ class MenuBuilder:
         # Determine position if not provided
         if position is None:
             max_position = self.db_session.query(UserQuickLink).filter_by(
-                user_uuid=user_uuid
+                user_id=user_id
             ).order_by(UserQuickLink.position.desc()).first()
 
             if max_position:
@@ -194,8 +202,8 @@ class MenuBuilder:
 
         # Create new quick link
         quick_link = UserQuickLink(
-            user_uuid=user_uuid,
-            menu_link_uuid=menu_link_uuid,
+            user_id=user_id,
+            menu_link_id=menu_link_id,
             position=position
         )
 
@@ -204,20 +212,20 @@ class MenuBuilder:
 
         return quick_link
 
-    def remove_user_quick_link(self, user_uuid, menu_link_uuid):
+    def remove_user_quick_link(self, user_id, menu_link_id):
         """
         Remove a quick link for a user.
 
         Args:
-            user_uuid: UUID of the user
-            menu_link_uuid: UUID of the menu link
+            user_id: UUID of the user
+            menu_link_id: UUID of the menu link
 
         Returns:
             True if removed, False if not found
         """
         quick_link = self.db_session.query(UserQuickLink).filter_by(
-            user_uuid=user_uuid,
-            menu_link_uuid=menu_link_uuid
+            user_id=user_id,
+            menu_link_id=menu_link_id
         ).first()
 
         if quick_link:

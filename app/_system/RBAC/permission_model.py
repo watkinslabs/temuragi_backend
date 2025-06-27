@@ -11,7 +11,8 @@ class Permission(BaseModel):
     Examples: accounting:read, customer:update, invoice:approve
     """
     __tablename__ = 'permissions'
-
+    __depends_on_ = []
+    
     name = Column(String(100), unique=True, nullable=False)  # "accounting:read"
     service = Column(String(50), nullable=False)             # "accounting"
     action = Column(String(50), nullable=False)              # "read", "write", "create", "delete", "approve"
@@ -74,7 +75,7 @@ class Permission(BaseModel):
     def to_dict(self):
         """Convert permission to dictionary"""
         return {
-            'uuid': str(self.uuid),
+            'id': str(self.id),
             'name': self.name,
             'service': self.service,
             'action': self.action,

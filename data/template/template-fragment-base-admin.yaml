@@ -3,7 +3,7 @@ TemplateFragment:
       tablename: template_fragments
       schema: public
     data:
-      template_uuid: 00000000-0000-0000-0000-000000000002
+      template_id: 00000000-0000-0000-0000-000000000002
       fragment_type: base
       fragment_name: Admin Base Layout
       fragment_key: base
@@ -22,19 +22,36 @@ TemplateFragment:
             <title>...</title>
             <meta name="csrf-token" content="{{ csrf_token() }}">
 
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
             <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
             <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/blitzer/jquery-ui.css">
             <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css">
             <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
             <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js" integrity="sha256-AlTido85uXPlSyyaZNsjJXeCs07eSv3r43kyCVc8ChI=" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
             <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
-
-
-            <script src="/static/app.js"></script>
-
+            
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js" integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/sql/sql.min.js" integrity="sha512-JOURLWZEM9blfKvYn1pKWvUZJeFwrkn77cQLJOS6M/7MVIRdPacZGNm2ij5xtDV/fpuhorOswIiJF3x/woe5fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+            <script src="/static/v2/app_core.js"></script>
+            <script src="/static/v2/token_manager.js"></script>
+            <script src="/static/v2/api_manager.js"></script>
+            <script src="/static/v2/auth_manager.js"></script>
+            <script src="/static/v2/connection_manager.js"></script>
+            <script src="/static/v2/template_manager.js"></script>
+            <script src="/static/v2/datatable.js"></script>
+            <script src="/static/v2/header.js"></script>
+            <script src="/static/v2/data_form.js"></script>
+            <script src="/static/v2/sidebar.js"></script>
+            <script src="/static/v2/report.js"></script>
+            <script src="/static/v2/app.js"></script>
+            
             <script src="https://unpkg.com/htmx.org@1.9.10"></script>
             <script src="https://unpkg.com/htmx.org/dist/ext/head-support.js"></script>
+            <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+
 
             <style>
                 {{ theme_css()|safe }}
@@ -74,6 +91,81 @@ TemplateFragment:
                     0% { transform: translateX(-100%); }
                     100% { transform: translateX(100%); }
                 }
+                /* toast.css */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            font-size:14px;
+            right: 20px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            pointer-events: all;
+            display: flex;
+            align-items: center;
+            min-width: 250px;
+            max-width: 500px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .toast-message {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 10px;
+            opacity: 0.7;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        /* Type variants */
+        .toast-success {
+            background: #28a745;
+        }
+
+        .toast-error {
+            background: #dc3545;
+        }
+
+        .toast-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .toast-info {
+            background: #17a2b8;
+        }
             </style>
         </head>
         <body>
@@ -113,116 +205,23 @@ TemplateFragment:
             <script>
                 const csrf_token = document.querySelector('meta[name="csrf-token"]').content;
 
-                class AppInitializer {
-                    constructor() {
-                        this.token_manager = null;
-                        this.auth_manager = null;
-                        this.connection_monitor = null;
-                        this.health_check_interval = window.health_check_interval || 10000;
-                    }
+                const app_urls = {
+                    login_url: '{{ url_for("auth.login") }}',
+                    validate_url: '{{ url_for("api_auth.validate") }}',
+                    refresh_url: '{{ url_for("api_auth.refresh") }}',
+                    logout_url: '{{ url_for("api_auth.logout") }}',
+                    status_url: '{{ url_for("api_auth.status") }}',
+                    health_endpoint: '{{ url_for("api_auth.health") }}',
+                    login_page_path: '{{ url_for("auth.login") }}',
+                    api_url: '{{ url_for("miner.data") }}'
                     
-                    async init() {
-                        // Create instances
-                        this.token_manager = new TokenManager();
-                        
-                        this.auth_manager = new AuthManager(this.token_manager, {
-                            login_url: '{{ url_for("auth.login") }}',
-                            validate_url: '{{ url_for("api_auth.validate") }}',
-                            refresh_url: '{{ url_for("api_auth.refresh") }}',
-                            logout_url: '{{ url_for("api_auth.logout") }}',
-                            status_url: '{{ url_for("api_auth.status") }}'
-                        });
-                        
-                        this.connection_monitor = new ConnectionMonitor({
-                            health_endpoint: '{{ url_for("api_auth.health") }}',
-                            check_interval: this.health_check_interval,
-                            max_consecutive_failures: 1
+                };
 
-                        });
-                        
-                        // Set cross-references
-                        this.connection_monitor.set_token_manager(this.token_manager);
-                        this.connection_monitor.set_auth_manager(this.auth_manager);
-                        this.auth_manager.set_connection_monitor(this.connection_monitor);
-                        
-                        // Expose globally for backwards compatibility
-                        window.token_manager = this.token_manager;
-                        window.auth_manager = this.auth_manager;
-                        window.connection_monitor = this.connection_monitor;
-                        
-                        // Global functions
-                        window.logout = () => this.auth_manager.logout();
-                        window.check_auth_status = () => this.auth_manager.check_status();
-                        
-                        // Check if we're on login page
-                        const is_login_page = window.location.pathname === '{{ url_for("auth.login") }}';
-                        
-                        if (!is_login_page) {
-                            // Initialize authentication
-                            const auth_success = await this.auth_manager.init();
-                            
-                            // Hide loading screen
-                            document.getElementById('auth-loading').classList.add('hidden');
-                            
-                            if (auth_success) {
-                                // Show app content
-                                document.getElementById('app-content').style.display = 'block';
-                            }
-                            // If auth fails, init() will redirect to login
-                        } else {
-                            // On login page - just hide loader and show content
-                            document.getElementById('auth-loading').classList.add('hidden');
-                            document.getElementById('app-content').style.display = 'block';
-                        }
-                        
-                        // Set up HTMX loading indicators
-                        this.setup_htmx_indicators();
-                        
-                        // Set up visibility change handler
-                        this.setup_visibility_handler();
-                    }
-                    
-                    setup_htmx_indicators() {
-                        document.body.addEventListener('htmx:beforeRequest', function(evt) {
-                            document.body.classList.add('htmx-loading');
-                        });
-                        
-                        document.body.addEventListener('htmx:afterRequest', function(evt) {
-                            document.body.classList.remove('htmx-loading');
-                        });
-                        
-                        // Update active nav items after HTMX swaps
-                        document.body.addEventListener('htmx:afterSwap', function(evt) {
-                            document.querySelectorAll('.nav_item[aria-current="page"]').forEach(el => {
-                                el.removeAttribute('aria-current');
-                            });
-                            
-                            const currentPath = window.location.pathname;
-                            document.querySelectorAll('.nav_item[href="' + currentPath + '"]').forEach(el => {
-                                el.setAttribute('aria-current', 'page');
-                            });
-                        });
-                    }
-                    
-                    setup_visibility_handler() {
-                        document.addEventListener('visibilitychange', async () => {
-                            if (!document.hidden && this.auth_manager.validation_interval) {
-                                console.log('Tab became active - validating tokens');
-                                const is_valid = await this.auth_manager.validate_tokens();
-                                if (!is_valid) {
-                                    this.auth_manager.redirect_to_login();
-                                }
-                            }
-                        });
-                    }
-                }
-
-                // Initialize when DOM is ready
                 document.addEventListener('DOMContentLoaded', async () => {
-                    const app = new AppInitializer();
+                    const app = new AppInitializer(app_urls);
                     await app.init();
                 });
-            </script>
+                </script>
         </body>
         </html>
       template_hash: null
@@ -258,5 +257,5 @@ TemplateFragment:
       cache_duration: 3600
       last_compiled: null
       change_description: Initial admin base layout fragment
-      created_by_user_uuid: null
+      created_by_user_id: null
 

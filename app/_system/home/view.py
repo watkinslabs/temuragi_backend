@@ -15,7 +15,7 @@ def index():
         page = session.query(Page).filter_by(slug='Home').first()
         
         # Render the page using the template system
-        rendered_content = renderer.render_page(page.uuid)
+        rendered_content = renderer.render_page(page.id)
         
         return rendered_content
         

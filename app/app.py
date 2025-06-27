@@ -18,6 +18,7 @@ from .register.database import register_db
 from .register.classes import register_classes
 
 
+
 def create_app():
     
     app = Flask(__name__)
@@ -26,10 +27,10 @@ def create_app():
     register_logger(app)
     
     # registeres the scan paths internally
+    register_classes()
+
     register_db(app)
     
-    register_classes(app)
-
         
 
     # Register hooks for all scan paths

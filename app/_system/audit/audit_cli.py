@@ -49,7 +49,7 @@ class AuditAnalysisCLI(BaseCLI):
             rows = []
 
             for activity in activities:
-                user_display = 'System' if not activity.user_uuid else str(activity.user_uuid)[:8] + '...'
+                user_display = 'System' if not activity.user_id else str(activity.user_id)[:8] + '...'
                 time_str = activity.created_at.strftime('%H:%M:%S')
                 status_icon = '✓' if activity.permission_granted else '✗'
                 resource_display = f"{activity.resource_type or 'N/A'}/{activity.resource_name or 'N/A'}"
@@ -89,7 +89,7 @@ class AuditAnalysisCLI(BaseCLI):
             rows = []
 
             for alert in alerts:
-                user_display = 'System' if not alert.user_uuid else str(alert.user_uuid)[:8] + '...'
+                user_display = 'System' if not alert.user_id else str(alert.user_id)[:8] + '...'
                 time_str = alert.created_at.strftime('%m-%d %H:%M')
                 resource_display = f"{alert.resource_type or 'N/A'}/{alert.resource_name or 'N/A'}"
                 reason = alert.access_denied_reason or 'Permission denied'
@@ -166,15 +166,15 @@ class AuditAnalysisCLI(BaseCLI):
                 if not user:
                     self.output_error(f"User not found: {user_identity}")
                     return 1
-                user_uuid = user.uuid
+                user_id = user.id
                 user_display = f"{user.username} ({user.email})"
             else:
                 # Assume user_identity is UUID
-                user_uuid = user_identity
+                user_id = user_identity
                 user_display = user_identity
 
             # Get activity summary using the model method
-            activity_summary = self.audit_log_model.get_user_permission_activity(self.session, user_uuid, days)
+            activity_summary = self.audit_log_model.get_user_permission_activity(self.session, user_id, days)
 
             if not activity_summary:
                 self.output_info(f"No activity found for user {user_display}")
@@ -208,7 +208,7 @@ class AuditAnalysisCLI(BaseCLI):
             self.output_info(f"Total attempts: {total_attempts}, Overall success rate: {overall_success}")
 
             # Show recent detailed activity using model method
-            recent_activity = self.audit_log_model.get_user_recent_activity(self.session, user_uuid, days=1, limit=10)
+            recent_activity = self.audit_log_model.get_user_recent_activity(self.session, user_id, days=1, limit=10)
 
             if recent_activity:
                 self.output_info("\nRecent Activity (Last 24 hours):")
@@ -312,7 +312,7 @@ class AuditAnalysisCLI(BaseCLI):
 
                 for denial in recent_denials:
                     time_str = denial.created_at.strftime('%H:%M:%S')
-                    user_display = 'System' if not denial.user_uuid else str(denial.user_uuid)[:8] + '...'
+                    user_display = 'System' if not denial.user_id else str(denial.user_id)[:8] + '...'
                     reason = (denial.access_denied_reason or 'No reason')[:50]
                     if len(denial.access_denied_reason or '') > 50:
                         reason += '...'
@@ -351,7 +351,7 @@ class AuditAnalysisCLI(BaseCLI):
             rows = []
 
             for user_activity in suspicious_users:
-                user_display = str(user_activity.user_uuid)[:8] + '...' if user_activity.user_uuid else 'System'
+                user_display = str(user_activity.user_id)[:8] + '...' if user_activity.user_id else 'System'
                 last_denial_str = user_activity.last_denial.strftime('%m-%d %H:%M') if user_activity.last_denial else 'N/A'
 
                 rows.append([

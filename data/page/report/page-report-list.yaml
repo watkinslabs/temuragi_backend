@@ -1,0 +1,27 @@
+# About Page
+Page:
+  meta:
+    tablename: pages
+    schema: public
+  data:
+    name: report
+    title: Reprort Home
+    slug: report
+    template_id: 00000000-0000-0000-0000-000000000002
+    meta_description: 
+    meta_keywords: 
+    og_title: 
+    og_description:
+    og_image: 
+    canonical_url: /report
+    published: true
+    featured: false
+    sort_order: 2
+    publish_date: null
+    expire_date: null
+    view_count: 0
+    requires_auth: false
+    cache_duration: 7200
+    id: 00000000-0000-0000-0000-100000000010
+    is_active: true
+

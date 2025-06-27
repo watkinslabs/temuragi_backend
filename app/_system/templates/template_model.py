@@ -16,8 +16,8 @@ class Template(BaseModel):
     - name: Unique identifier for the template (kebab-case)
     - display_name: Human-readable template name
     - description: Description of template purpose and usage
-    - theme_uuid: Foreign key to themes table
-    - menu_type_uuid: Foreign key to menu table (which menu to display)
+    - theme_id: Foreign key to themes table
+    - menu_type_id: Foreign key to menu table (which menu to display)
     - layout_type: Layout style (full-width, sidebar-left, sidebar-right, centered)
     - container_class: CSS class for main container
     - sidebar_enabled: Whether template includes sidebar navigation
@@ -36,12 +36,12 @@ class Template(BaseModel):
                          comment="Human-readable template name")
     description = Column(Text, nullable=True,
                         comment="Description of template purpose and usage")
-    theme_uuid = Column(UUID(as_uuid=True),
-                       ForeignKey('themes.uuid', name='fk_templates_theme'),
+    theme_id = Column(UUID(as_uuid=True),
+                       ForeignKey('themes.id', name='fk_templates_theme'),
                        nullable=True,
                        comment="Foreign key to themes table")
-    menu_uuid = Column(UUID(as_uuid=True),
-                           ForeignKey('menu.uuid', name='fk_templates_menu'),
+    menu_id = Column(UUID(as_uuid=True),
+                           ForeignKey('menu.id', name='fk_templates_menu'),
                            nullable=True,
                            comment="Foreign key to menu table")
     layout_type = Column(String(50), nullable=False, default='full-width',
@@ -57,8 +57,8 @@ class Template(BaseModel):
     breadcrumbs_enabled = Column(Boolean, default=True, nullable=False,
                                 comment="Whether to show breadcrumb navigation")
 
-    module_uuid = Column(UUID(as_uuid=True),
-                    ForeignKey('modules.uuid', name='fk_templates_module'),
+    module_id = Column(UUID(as_uuid=True),
+                    ForeignKey('modules.id', name='fk_templates_module'),
                     nullable=True,
                     comment="Module that owns this template (NULL for system)")
 
@@ -71,7 +71,7 @@ class Template(BaseModel):
 
     # Relationships - FIXED
     theme = relationship("Theme", back_populates="templates")
-    menu = relationship("Menu", foreign_keys=[menu_uuid])
+    menu = relationship("Menu", foreign_keys=[menu_id])
     pages = relationship("Page", back_populates="template")
     template_fragments = relationship("TemplateFragment", back_populates="template", cascade="all, delete-orphan")
     module = relationship("Module", back_populates="templates")
@@ -79,14 +79,14 @@ class Template(BaseModel):
     # Indexes
     __table_args__ = (
         Index('idx_templates_name', 'name'),
-        Index('idx_templates_theme', 'theme_uuid'),
-        Index('idx_templates_menu', 'menu_uuid'),
+        Index('idx_templates_theme', 'theme_id'),
+        Index('idx_templates_menu', 'menu_id'),
         Index('idx_templates_admin', 'is_admin_template'),
         Index('idx_templates_default', 'is_default_template'),
         Index('idx_templates_layout', 'layout_type'),
-        Index('idx_templates_module', 'module_uuid'),
+        Index('idx_templates_module', 'module_id'),
 
-        UniqueConstraint('module_uuid', 'name', name='uq_templates_module_name'),
+        UniqueConstraint('module_id', 'name', name='uq_templates_module_name'),
     )
 
     @staticmethod
@@ -117,33 +117,33 @@ class Template(BaseModel):
         validation_errors = []
         
         # Validate theme reference
-        if self.theme_uuid:
+        if self.theme_id:
             from app.models import Theme
-            theme = session.query(Theme).filter_by(uuid=self.theme_uuid).first()
+            theme = session.query(Theme).filter_by(id=self.theme_id).first()
             if not theme:
-                error_msg = f"Referenced theme {self.theme_uuid} does not exist"
+                error_msg = f"Referenced theme {self.theme_id} does not exist"
                 validation_errors.append(error_msg)
                 logger.warning(f"Template '{self.name}': {error_msg}")
             else:
                 logger.debug(f"Template '{self.name}' theme reference valid: {theme.name}")
         
         # Validate menu reference
-        if self.menu_type_uuid:
+        if self.menu_type_id:
             from app.models import Menu
-            menu = session.query(Menu).filter_by(uuid=self.menu_type_uuid).first()
+            menu = session.query(Menu).filter_by(id=self.menu_type_id).first()
             if not menu:
-                error_msg = f"Referenced menu {self.menu_type_uuid} does not exist"
+                error_msg = f"Referenced menu {self.menu_type_id} does not exist"
                 validation_errors.append(error_msg)
                 logger.warning(f"Template '{self.name}': {error_msg}")
             else:
                 logger.debug(f"Template '{self.name}' menu reference valid: {menu.name}")
         
         # Validate module reference
-        if self.module_uuid:
+        if self.module_id:
             from app.models import Module
-            module = session.query(Module).filter_by(uuid=self.module_uuid).first()
+            module = session.query(Module).filter_by(id=self.module_id).first()
             if not module:
-                error_msg = f"Referenced module {self.module_uuid} does not exist"
+                error_msg = f"Referenced module {self.module_id} does not exist"
                 validation_errors.append(error_msg)
                 logger.warning(f"Template '{self.name}': {error_msg}")
             else:
@@ -161,7 +161,7 @@ class Template(BaseModel):
         from app.models import TemplateFragment
         
         count = session.query(TemplateFragment).filter_by(
-            template_uuid=self.uuid,
+            template_id=self.id,
             is_active=True
         ).count()
         
@@ -177,7 +177,7 @@ class Template(BaseModel):
         logger.debug(f"Getting fragment summary for template '{self.name}'")
         
         fragments = session.query(TemplateFragment).filter_by(
-            template_uuid=self.uuid,
+            template_id=self.id,
             is_active=True
         ).all()
         
@@ -197,7 +197,7 @@ class Template(BaseModel):
         logger = self._get_logger()
         
         base_fragment = session.query(TemplateFragment).filter_by(
-            template_uuid=self.uuid,
+            template_id=self.id,
             fragment_type='base',
             is_active=True
         ).first()
@@ -214,7 +214,7 @@ class Template(BaseModel):
         """Get count of pages using this template"""
         from app.models import Page
         
-        count = session.query(Page).filter_by(template_uuid=self.uuid).count()
+        count = session.query(Page).filter_by(template_id=self.id).count()
         
         logger = self._get_logger()
         logger.debug(f"Template '{self.name}' is used by {count} pages")
@@ -226,16 +226,16 @@ class Template(BaseModel):
         logger.info(f"Setting template '{self.name}' as default")
         
         # Remove default flag from all other templates in same module
-        if self.module_uuid:
+        if self.module_id:
             session.query(Template).filter_by(
-                module_uuid=self.module_uuid,
+                module_id=self.module_id,
                 is_default_template=True
             ).update({'is_default_template': False})
-            logger.debug(f"Removed default flag from other templates in module {self.module_uuid}")
+            logger.debug(f"Removed default flag from other templates in module {self.module_id}")
         else:
             # System templates
             session.query(Template).filter_by(
-                module_uuid=None,
+                module_id=None,
                 is_default_template=True
             ).update({'is_default_template': False})
             logger.debug("Removed default flag from other system templates")
@@ -261,15 +261,15 @@ class Template(BaseModel):
             name=new_name,
             display_name=new_display_name or f"{self.display_name} (Copy)",
             description=f"Cloned from {self.name}",
-            theme_uuid=self.theme_uuid,
-            menu_type_uuid=self.menu_type_uuid,
+            theme_id=self.theme_id,
+            menu_type_id=self.menu_type_id,
             layout_type=self.layout_type,
             container_class=self.container_class,
             sidebar_enabled=self.sidebar_enabled,
             header_type=self.header_type,
             footer_type=self.footer_type,
             breadcrumbs_enabled=self.breadcrumbs_enabled,
-            module_uuid=self.module_uuid,
+            module_id=self.module_id,
             is_system=self.is_system,
             is_admin_template=self.is_admin_template,
             is_default_template=False  # Clones are never default
@@ -281,14 +281,14 @@ class Template(BaseModel):
         # Clone all fragments
         from app.models import TemplateFragment
         fragments = session.query(TemplateFragment).filter_by(
-            template_uuid=self.uuid,
+            template_id=self.id,
             is_active=True
         ).all()
         
         cloned_count = 0
         for fragment in fragments:
             new_fragment = TemplateFragment(
-                template_uuid=new_template.uuid,
+                template_id=new_template.id,
                 fragment_type=fragment.fragment_type,
                 fragment_name=fragment.fragment_name,
                 fragment_key=fragment.fragment_key,
@@ -331,7 +331,7 @@ class Template(BaseModel):
         
         logger = self._get_logger()
         
-        query = session.query(Page).filter_by(template_uuid=self.uuid)
+        query = session.query(Page).filter_by(template_id=self.id)
         if published_only:
             query = query.filter_by(published=True)
         
@@ -367,12 +367,12 @@ class Template(BaseModel):
         
         # Check fragment dependencies
         from app.models import TemplateFragment
-        if not TemplateFragment.find_circular_dependencies(session, self.uuid):
+        if not TemplateFragment.find_circular_dependencies(session, self.id):
             issues.append("Circular dependencies detected in fragments")
         
         # Validate each fragment
         fragments = session.query(TemplateFragment).filter_by(
-            template_uuid=self.uuid,
+            template_id=self.id,
             is_active=True
         ).all()
         
@@ -390,32 +390,32 @@ class Template(BaseModel):
         return True
 
     @classmethod
-    def get_by_name(cls, session, name, module_uuid=None):
+    def get_by_name(cls, session, name, module_id=None):
         """Get template by name with optional module scoping"""
         logger = cls._get_logger()
-        logger.debug(f"Getting template by name: '{name}', module: {module_uuid}")
+        logger.debug(f"Getting template by name: '{name}', module: {module_id}")
         
         query = session.query(cls).filter_by(name=name)
-        if module_uuid:
-            query = query.filter_by(module_uuid=module_uuid)
+        if module_id:
+            query = query.filter_by(module_id=module_id)
         
         template = query.first()
         
         if template:
-            logger.debug(f"Found template: '{name}' ({template.uuid})")
+            logger.debug(f"Found template: '{name}' ({template.id})")
         else:
-            logger.warning(f"Template not found: '{name}' in module {module_uuid}")
+            logger.warning(f"Template not found: '{name}' in module {module_id}")
         
         return template
 
     @classmethod
-    def get_default_template(cls, session, module_uuid=None, admin_only=False):
+    def get_default_template(cls, session, module_id=None, admin_only=False):
         """Get the default template for a module or system"""
         logger = cls._get_logger()
-        logger.debug(f"Getting default template: module={module_uuid}, admin_only={admin_only}")
+        logger.debug(f"Getting default template: module={module_id}, admin_only={admin_only}")
         
         query = session.query(cls).filter_by(
-            module_uuid=module_uuid,
+            module_id=module_id,
             is_default_template=True
         )
         
@@ -428,16 +428,16 @@ class Template(BaseModel):
             logger.debug(f"Found default template: '{template.name}'")
         else:
             scope = "admin " if admin_only else ""
-            context = f"module {module_uuid}" if module_uuid else "system"
+            context = f"module {module_id}" if module_id else "system"
             logger.warning(f"No default {scope}template found for {context}")
         
         return template
 
     @classmethod
-    def get_templates_by_type(cls, session, layout_type=None, is_admin=None, module_uuid=None):
+    def get_templates_by_type(cls, session, layout_type=None, is_admin=None, module_id=None):
         """Get templates filtered by type and other criteria"""
         logger = cls._get_logger()
-        logger.debug(f"Getting templates: layout={layout_type}, admin={is_admin}, module={module_uuid}")
+        logger.debug(f"Getting templates: layout={layout_type}, admin={is_admin}, module={module_id}")
         
         query = session.query(cls)
         
@@ -447,8 +447,8 @@ class Template(BaseModel):
         if is_admin is not None:
             query = query.filter_by(is_admin_template=is_admin)
         
-        if module_uuid is not None:
-            query = query.filter_by(module_uuid=module_uuid)
+        if module_id is not None:
+            query = query.filter_by(module_id=module_id)
         
         templates = query.order_by(cls.name).all()
         
@@ -462,7 +462,7 @@ class Template(BaseModel):
         
         context = {
             'template_name': self.name,
-            'template_uuid': str(self.uuid),
+            'template_id': str(self.id),
             'layout_type': self.layout_type,
             'container_class': self.container_class,
             'sidebar_enabled': self.sidebar_enabled,

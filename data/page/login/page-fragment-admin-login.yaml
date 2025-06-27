@@ -14,8 +14,8 @@ PageFragment:
     tablename: page_fragments
     schema: public
   data:
-    page_uuid: 00000000-0000-0000-0000-000000000080
-    # NOTE: page_uuid must reference existing record UUID
+    page_id: 00000000-0000-0000-0000-000000000080
+    # NOTE: page_id must reference existing record UUID
     fragment_type: content
     fragment_name: Login User
     fragment_key: base
@@ -28,128 +28,402 @@ PageFragment:
 
         {% block custom_css %}
         <style>
-            body {
-                background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+            
+            :root {
+                    --primary-dark: #0f1419;
+                    --primary-blue: #0062ff;
+                    --secondary-blue: #054ada;
+                    --gray-100: #f5f7fa;
+                    --gray-200: #e9ecef;
+                    --gray-300: #dee2e6;
+                    --gray-400: #ced4da;
+                    --gray-500: #8b92a8;
+                    --gray-600: #6c757d;
+                    --gray-700: #495057;
+                    --gray-800: #343a40;
+                    --gray-900: #212529;
+                    --success: #198754;
+                    --danger: #dc3545;
+                    --warning: #ffc107;
+                }
 
-            .login-container {
-                max-width: 400px;
-                width: 100%;
-                padding: 2rem;
-            }
+                * {
+                    box-sizing: border-box;
+                }
 
-            .card {
-                border: none;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            }
+                body {
+                    background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                    color: var(--gray-900);
+                    position: relative;
+                    overflow: hidden;
+                }
 
-            .card-header {
-                background-color: transparent;
-                border-bottom: none;
-                padding: 1.5rem 1.5rem 0;
-            }
+                /* Subtle background pattern */
+                body::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-position: 0 0, 0 15px, 15px -15px, -15px 0px;
+                    opacity: 0.03;
+                    z-index: 0;
+                }
 
-            .card-body {
-                padding: 1.5rem;
-            }
+                .login-container {
+                    max-width: 480px;
+                    width: 100%;
+                    padding: 2rem;
+                    position: relative;
+                    z-index: 1;
+                }
 
-            .logo-container {
-                text-align: center;
-                margin-bottom: 1rem;
-            }
+                .card {
+                    border: none;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.08);
+                    background: white;
+                    overflow: hidden;
+                }
 
-            .logo-container h2 {
-                color: #333;
-                font-weight: 700;
-            }
+                .card-header {
+                    background: var(--primary-dark);
+                    border-bottom: none;
+                    padding: 2rem;
+                    text-align: center;
+                }
 
-            .form-floating {
-                margin-bottom: 1.2rem;
-            }
+                .logo-container h2 {
+                    color: white;
+                    font-weight: 300;
+                    font-size: 1.75rem;
+                    margin: 0;
+                    letter-spacing: -0.5px;
+                }
 
-            .form-floating > label {
-                padding: 0.75rem 1rem;
-            }
+                .logo-icon {
+                    width: 48px;
+                    height: 48px;
+                    margin: 0 auto 1rem;
+                    background: white;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    color: var(--primary-dark);
+                }
 
-            .form-control {
-                border-radius: 8px;
-                border: 1px solid #e1e1e1;
-            }
+                .security-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    color: var(--gray-500);
+                    font-size: 0.75rem;
+                    margin-top: 1rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
 
-            .form-control:focus {
-                box-shadow: 0 0 0 0.25rem rgba(0, 114, 255, 0.25);
-                border-color: #0072ff;
-            }
+                .security-badge i {
+                    color: var(--success);
+                }
 
-            .btn-login {
-                background-color: #0072ff;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                padding: 0.75rem 0;
-                font-weight: 600;
-                width: 100%;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                transition: all 0.3s;
-            }
+                .card-body {
+                    padding: 2.5rem 2rem;
+                }
 
-            .btn-login:hover {
-                background-color: #005ecf;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
-            }
+                /* SSO Section */
+                .sso-section {
+                    margin-bottom: 2rem;
+                }
 
-            .btn-login:disabled {
-                background-color: #6c757d;
-                cursor: not-allowed;
-                transform: none;
-            }
+                .sso-button {
+                    width: 100%;
+                    padding: 0.875rem;
+                    border: 1px solid var(--gray-300);
+                    background: white;
+                    color: var(--gray-800);
+                    border-radius: 8px;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.75rem;
+                    transition: all 0.2s ease;
+                    text-decoration: none;
+                    position: relative;
+                    overflow: hidden;
+                }
 
-            .remember-forgot {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1.5rem;
-            }
+                .sso-button:hover {
+                    background: var(--gray-100);
+                    border-color: var(--gray-400);
+                    color: var(--gray-900);
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
 
-            .form-check-input:checked {
-                background-color: #0072ff;
-                border-color: #0072ff;
-            }
+                .sso-button:active {
+                    transform: translateY(0);
+                    box-shadow: none;
+                }
 
-            .forgot-link {
-                color: #0072ff;
-                text-decoration: none;
-                font-size: 0.875rem;
-            }
+                .sso-button i {
+                    font-size: 1.25rem;
+                }
 
-            .forgot-link:hover {
-                text-decoration: underline;
-            }
+                /* Divider */
+                .auth-divider {
+                    position: relative;
+                    text-align: center;
+                    margin: 2rem 0;
+                }
 
-            .alert {
-                border-radius: 8px;
-                padding: 0.75rem 1rem;
-                margin-bottom: 1.5rem;
-            }
+                .auth-divider::before {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 0;
+                    right: 0;
+                    height: 1px;
+                    background: var(--gray-300);
+                }
 
-            .spinner-border {
-                width: 1.2rem;
-                height: 1.2rem;
-                margin-right: 0.5rem;
-                display: none;
-            }
+                .auth-divider span {
+                    background: white;
+                    padding: 0 1rem;
+                    position: relative;
+                    color: var(--gray-600);
+                    font-size: 0.875rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
 
-            .btn-login.loading .spinner-border {
-                display: inline-block;
-            }
-        </style>
+                /* Form Styling */
+                .form-floating {
+                    margin-bottom: 1rem;
+                }
+
+                .form-control {
+                    border-radius: 8px;
+                    border: 1px solid var(--gray-300);
+                    font-size: 0.95rem;
+                    padding: 0.75rem 1rem;
+                    transition: all 0.2s ease;
+                }
+
+                .form-control:focus {
+                    box-shadow: 0 0 0 3px rgba(0, 98, 255, 0.1);
+                    border-color: var(--primary-blue);
+                }
+
+                .form-floating > label {
+                    padding: 0.75rem 1rem;
+                    color: var(--gray-600);
+                }
+
+                /* Remember and Forgot */
+                .remember-forgot {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                }
+
+                .form-check-input {
+                    border-radius: 4px;
+                }
+
+                .form-check-input:checked {
+                    background-color: var(--primary-blue);
+                    border-color: var(--primary-blue);
+                }
+
+                .form-check-label {
+                    color: var(--gray-700);
+                    font-size: 0.875rem;
+                }
+
+                .forgot-link {
+                    color: var(--primary-blue);
+                    text-decoration: none;
+                    font-size: 0.875rem;
+                    transition: color 0.2s ease;
+                }
+
+                .forgot-link:hover {
+                    color: var(--secondary-blue);
+                    text-decoration: underline;
+                }
+
+                /* Login Button */
+                .btn-login {
+                    background: var(--primary-blue);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    padding: 0.875rem;
+                    font-weight: 500;
+                    width: 100%;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    transition: all 0.2s ease;
+                    position: relative;
+                    overflow: hidden;
+                }
+
+                .btn-login::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                    transition: left 0.5s ease;
+                }
+
+                .btn-login:hover {
+                    background: var(--secondary-blue);
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 8px rgba(0, 98, 255, 0.3);
+                }
+
+                .btn-login:hover::before {
+                    left: 100%;
+                }
+
+                .btn-login:active {
+                    transform: translateY(0);
+                    box-shadow: none;
+                }
+
+                .btn-login:disabled {
+                    background: var(--gray-500);
+                    cursor: not-allowed;
+                    transform: none;
+                }
+
+                .spinner-border {
+                    width: 1rem;
+                    height: 1rem;
+                    margin-right: 0.5rem;
+                    display: none;
+                }
+
+                .btn-login.loading .spinner-border {
+                    display: inline-block;
+                }
+
+                /* Alerts */
+                .alert {
+                    border-radius: 2px;
+                    padding: 0.75rem 1rem;
+                    margin-bottom: 1.5rem;
+                    border: none;
+                    font-size: 0.875rem;
+                }
+
+                .alert-danger {
+                    background: #fef2f2;
+                    color: #991b1b;
+                }
+
+                .alert-success {
+                    background: #f0fdf4;
+                    color: #166534;
+                }
+
+                /* Footer */
+                .login-footer {
+                    text-align: center;
+                    margin-top: 2rem;
+                    color: var(--gray-600);
+                    font-size: 0.75rem;
+                }
+
+                .login-footer a {
+                    color: var(--gray-600);
+                    text-decoration: none;
+                    margin: 0 0.5rem;
+                }
+
+                .login-footer a:hover {
+                    color: var(--gray-800);
+                    text-decoration: underline;
+                }
+
+                /* Enterprise touches */
+                .compliance-badges {
+                    display: flex;
+                    justify-content: center;
+                    gap: 1rem;
+                    margin-top: 1rem;
+                    opacity: 0.6;
+                }
+
+                .compliance-badges img {
+                    height: 24px;
+                    filter: grayscale(100%);
+                    opacity: 0.7;
+                }
+
+                /* Password visibility toggle */
+                .password-toggle {
+                    position: absolute;
+                    right: 1rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    color: var(--gray-500);
+                    z-index: 10;
+                    padding: 0.25rem;
+                }
+
+                .password-toggle:hover {
+                    color: var(--gray-700);
+                }
+
+                .password-field-wrapper {
+                    position: relative;
+                }
+
+                /* Loading overlay */
+                .loading-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(255, 255, 255, 0.9);
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                }
+
+                .loading-overlay.active {
+                    display: flex;
+                }
+
+                /* Responsive */
+                @media (max-width: 576px) {
+                    .login-container {
+                        padding: 1rem;
+                    }
+                    
+                    .card-body {
+                        padding: 1.5rem;
+                    }
+                }
+            </style>
         {% endblock %}
 
         {% block content %}
@@ -157,33 +431,61 @@ PageFragment:
             <div class="card">
                 <div class="card-header">
                     <div class="logo-container">
-                        <h2>
-                            {{ site_name }}
-                        </h2>
+                        <div class="logo-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h2>{{ site_name }}</h2>
+                        <div class="security-badge">
+                            <i class="fas fa-lock"></i>
+                            <span>Secure Authentication</span>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="loading-overlay">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
                     <div id="login-alerts"></div>
                     
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
                                 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-{{ 'exclamation-circle' if category == 'danger' else 'check-circle' }}"></i>
                                     {{ message }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             {% endfor %}
                         {% endif %}
                     {% endwith %}
-
+                    
+                    <!-- Local Login Form -->
                     <form id="login-form" novalidate>
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                            <input type="text" 
+                                class="form-control" 
+                                id="username" 
+                                name="username" 
+                                placeholder="Username" 
+                                autocomplete="username"
+                                required>
                             <label for="username">Username</label>
                         </div>
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        <div class="form-floating password-field-wrapper">
+                            <input type="password" 
+                                class="form-control" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Password" 
+                                autocomplete="current-password"
+                                required>
                             <label for="password">Password</label>
+                            <span class="password-toggle" id="password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </span>
                         </div>
                         <div class="remember-forgot">
                             <div class="form-check">
@@ -199,136 +501,254 @@ PageFragment:
                             <span class="button-text">Sign In</span>
                         </button>
                     </form>
+
                 </div>
             </div>
-            <div class="text-center mt-3 text-white">
-                <small>&copy; {{ current_year }} {{ site_name }} - All rights reserved.</small>
+            
+            <div class="login-footer">
+                <div>&copy; {{ current_year }} {{ site_name }}. All rights reserved.</div>
+                <div>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Security</a>
+                </div>
+                <div class="compliance-badges">
+                    <!-- Add compliance badge images here if needed -->
+                </div>
             </div>
         </div>
         {% endblock %}
-
         {% block custom_js %}
         <script>
-            // Auto-redirect if already logged in
-            function check_existing_auth() {
-                const api_token = localStorage.getItem('api_token');
-                const refresh_token = localStorage.getItem('refresh_token');
-                const user_uuid = localStorage.getItem('user_uuid');
-                
-                if (api_token && refresh_token && user_uuid) {
-                    // Already have credentials, redirect to main app
-                    window.location.href = '/';
-                }
-            }
+        // Show alert message
+        function show_alert(message, type = 'danger') {
+            const alert_html = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            document.getElementById('login-alerts').innerHTML = alert_html;
+        }
 
-            // Show alert message
-            function show_alert(message, type = 'danger') {
-                const alert_html = `
-                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                `;
-                document.getElementById('login-alerts').innerHTML = alert_html;
-            }
+        // Clear all alerts
+        function clear_alerts() {
+            document.getElementById('login-alerts').innerHTML = '';
+        }
 
-            // Clear all alerts
-            function clear_alerts() {
-                document.getElementById('login-alerts').innerHTML = '';
+        // Reset form to clean state
+        function reset_form_state() {
+            const login_button = document.getElementById('login-button');
+            const login_form = document.getElementById('login-form');
+            const password_field = document.getElementById('password');
+            
+            // Reset button state
+            login_button.disabled = false;
+            login_button.classList.remove('loading');
+            
+            // Clear password field only (preserve username for remember me)
+            password_field.value = '';
+            
+            // Clear any loading overlays
+            const loading_overlay = document.querySelector('.loading-overlay');
+            if (loading_overlay) {
+                loading_overlay.classList.remove('active');
             }
+            
+            // Clear alerts
+            clear_alerts();
+        }
 
-            // Handle login form submission
-            async function handle_login(event) {
-                event.preventDefault();
+        // Check why user arrived at login
+        function check_login_reason() {
+            const url_params = new URLSearchParams(window.location.search);
+            const reason = url_params.get('reason');
+            
+            if (reason === 'token_expired' || reason === 'invalid_token') {
+                show_alert('Your session has expired. Please log in again.');
+                // Clear any stored tokens
+                clear_all_tokens();
+            } else if (reason === 'logout') {
+                show_alert('You have been logged out successfully.', 'success');
+            } else if (reason === 'unauthorized') {
+                show_alert('Please log in to access that page.');
+            }
+            
+            // Clean up URL
+            if (reason) {
+                const clean_url = window.location.pathname;
+                window.history.replaceState({}, document.title, clean_url);
+            }
+        }
+
+        // Clear all stored tokens
+        function clear_all_tokens() {
+            // Only clear authentication tokens, not user preferences
+            localStorage.removeItem('api_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('user_info');
+            
+            // Clear session storage but preserve remember me
+            const temp_keys = ['api_token', 'refresh_token', 'user_id', 'user_info'];
+            temp_keys.forEach(key => sessionStorage.removeItem(key));
+        }
+
+        // Check for remembered username and pre-fill form
+        function check_remembered_username() {
+            const remembered_username = localStorage.getItem('remembered_username');
+            if (remembered_username) {
+                document.getElementById('username').value = remembered_username;
+                document.getElementById('remember').checked = true;
+                // Focus on password field since username is pre-filled
+                document.getElementById('password').focus();
+            } else {
+                // Focus on username field if not remembered
+                document.getElementById('username').focus();
+            }
+        }
+
+        // Handle login form submission
+        async function handle_login(event) {
+            event.preventDefault();
+            
+            // Clear previous alerts
+            clear_alerts();
+            
+            // Get form data
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            // Basic validation
+            if (!username || !password) {
+                show_alert('Please enter both username and password.');
+                return;
+            }
+            
+            // Handle remember me - only store username
+            if (remember) {
+                localStorage.setItem('remembered_username', username);
+            } else {
+                localStorage.removeItem('remembered_username');
+            }
+            
+            // Disable button and show loading
+            const login_button = document.getElementById('login-button');
+            login_button.disabled = true;
+            login_button.classList.add('loading');
+            
+            try {
+                // Make login request
+                const response = await fetch('/v2/api/auth/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        remember: remember
+                    })
+                });
                 
-                // Clear previous alerts
-                clear_alerts();
+                const data = await response.json();
                 
-                // Get form data
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value;
-                const remember = document.getElementById('remember').checked;
-                
-                // Basic validation
-                if (!username || !password) {
-                    show_alert('Please enter both username and password.');
-                    return;
-                }
-                
-                // Disable button and show loading
-                const login_button = document.getElementById('login-button');
-                login_button.disabled = true;
-                login_button.classList.add('loading');
-                
-                try {
-                    // Make login request
-                    const response = await fetch('{{ url_for("api_auth.login") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-Token': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            username: username,
-                            password: password,
-                            remember: remember
-                        })
-                    });
+                if (response.ok && data.success) {
+                    // Store tokens in localStorage
+                    localStorage.setItem('api_token', data.api_token);
+                    localStorage.setItem('refresh_token', data.refresh_token);
+                    localStorage.setItem('user_id', data.user_id);
                     
-                    const data = await response.json();
-                    
-                    if (response.ok && data.success) {
-                        // Store tokens in localStorage
-                        localStorage.setItem('api_token', data.api_token);
-                        localStorage.setItem('refresh_token', data.refresh_token);
-                        localStorage.setItem('user_uuid', data.user_uuid);
-                        
-                        // Optional: Store additional user info if provided
-                        if (data.user_info) {
-                            localStorage.setItem('user_info', JSON.stringify(data.user_info));
-                        }
-                        
-                        // Show success message briefly
-                        show_alert('Login successful! Redirecting...', 'success');
-                        
-                        // Redirect to main app
-                        setTimeout(() => {
-                            window.location.href = data.redirect_url || '/';
-                        }, 500);
-                        
-                    } else {
-                        // Show error message
-                        show_alert(data.message || 'Invalid username or password.');
-                        login_button.disabled = false;
-                        login_button.classList.remove('loading');
+                    // Optional: Store additional user info if provided
+                    if (data.user_info) {
+                        localStorage.setItem('user_info', JSON.stringify(data.user_info));
                     }
                     
-                } catch (error) {
-                    console.error('Login error:', error);
-                    show_alert('An error occurred during login. Please try again.');
+                    // Show success message briefly
+                    show_alert('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url || '/';
+                    }, 500);
+                    
+                } else {
+                    // Show error message
+                    show_alert(data.message || 'Invalid username or password.');
                     login_button.disabled = false;
                     login_button.classList.remove('loading');
                 }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                show_alert('An error occurred during login. Please try again.');
+                login_button.disabled = false;
+                login_button.classList.remove('loading');
             }
+        }
 
-            // Initialize on page load
-            document.addEventListener('DOMContentLoaded', function() {
-                // Check if already logged in
-                check_existing_auth();
-                
-                // Focus username field
-                document.getElementById('username').focus();
-                
-                // Attach form submit handler
-                document.getElementById('login-form').addEventListener('submit', handle_login);
-                
-                // Handle enter key in password field
-                document.getElementById('password').addEventListener('keypress', function(event) {
-                    if (event.key === 'Enter') {
-                        handle_login(event);
-                    }
-                });
+        // Toggle password visibility
+        function toggle_password_visibility() {
+            const password_input = document.getElementById('password');
+            const toggle_icon = document.querySelector('#password-toggle i');
+            
+            if (password_input.type === 'password') {
+                password_input.type = 'text';
+                toggle_icon.classList.remove('fa-eye');
+                toggle_icon.classList.add('fa-eye-slash');
+            } else {
+                password_input.type = 'password';
+                toggle_icon.classList.remove('fa-eye-slash');
+                toggle_icon.classList.add('fa-eye');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // ALWAYS reset form state first
+            reset_form_state();
+            
+            // Clear any stale auth tokens if on login page
+            // This ensures clean slate when arriving at login
+            // But preserves remembered username
+            clear_all_tokens();
+            
+            // Check why user arrived at login
+            check_login_reason();
+            
+            // Check for remembered username only
+            check_remembered_username();
+            
+            // Attach form submit handler
+            document.getElementById('login-form').addEventListener('submit', handle_login);
+            
+            // Add password toggle handler
+            document.getElementById('password-toggle').addEventListener('click', toggle_password_visibility);
+            
+            // Handle enter key in password field
+            document.getElementById('password').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    handle_login(event);
+                }
             });
+        });
+
+        // Handle page show event (for back button)
+        window.addEventListener('pageshow', function(event) {
+            // Reset form state when page is shown (including back button)
+            reset_form_state();
+            check_login_reason();
+            
+            // Re-check for remembered username when using back button
+            check_remembered_username();
+        });
+
+        // Prevent form resubmission on refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
         </script>
         {% endblock %}
     content_hash: null
@@ -342,8 +762,8 @@ PageFragment:
     cache_duration: 3600
     last_rendered: null
     change_description: Initial content fragment for page
-    created_by_user_uuid: null
-    # NOTE: created_by_user_uuid must reference existing record UUID
-    # uuid: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided
+    created_by_user_id: null
+    # NOTE: created_by_user_id must reference existing record UUID
+    # id: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided
     # created_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
     # updated_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided

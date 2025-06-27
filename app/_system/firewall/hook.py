@@ -35,7 +35,8 @@ def register_firewall_handlers(app):
             # This assumes you have a separate logging mechanism
             # If not, you can remove this part or implement it separately
             log_ip_request(db_session, ip, allowed, reason)
-            app.logger.info(f"Firewall:  {ip}, Allowed: {allowed}, Msg: {reason}")
+            # no need to junk up the log file if its already logged...
+            #app.logger.info(f"Firewall:  {ip}, Allowed: {allowed}, Msg: {reason}")
         except Exception as e:
             # Don't block requests due to logging errors
             app.logger.error(f"Error logging IP request: {str(e)}")

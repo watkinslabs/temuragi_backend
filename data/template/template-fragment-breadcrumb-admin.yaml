@@ -5,7 +5,7 @@ TemplateFragment:
       tablename: template_fragments
       schema: public
     data:
-      template_uuid: 00000000-0000-0000-0000-000000000002
+      template_id: 00000000-0000-0000-0000-000000000002
       fragment_type: breadcrumb
       fragment_name: Bread Crumb
       fragment_key: breadcrumb
@@ -43,4 +43,4 @@ TemplateFragment:
       cache_duration: 300
       last_compiled: null
       change_description: 
-      created_by_user_uuid: null
+      created_by_user_id: null

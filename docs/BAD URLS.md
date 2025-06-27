@@ -4,11 +4,7 @@
 127.0.0.1 - - [12/Jun/2025 22:12:46] "GET /.env HTTP/1.0" 404 -
 127.0.0.1 - - [12/Jun/2025 22:20:07] "GET /.env HTTP/1.0" 404 -
 127.0.0.1 - - [12/Jun/2025 22:51:32] "GET /.git/index HTTP/1.0" 404 -
-127.0.0.1 - - [12/Jun/2025 23:13:20] "GET / HTTP/1.0" 404 -
-127.0.0.1 - - [12/Jun/2025 23:13:20] "GET / HTTP/1.0" 404 -
-127.0.0.1 - - [12/Jun/2025 23:22:32] "GET / HTTP/1.0" 404 -
 127.0.0.1 - - [13/Jun/2025 00:08:00] "GET /solr/ HTTP/1.0" 404 -
-127.0.0.1 - - [13/Jun/2025 00:23:22] "GET / HTTP/1.0" 404 -
 127.0.0.1 - - [13/Jun/2025 00:27:50] "GET /remote/login HTTP/1.0" 404 -
 127.0.0.1 - - [13/Jun/2025 00:27:52] "GET /login HTTP/1.0" 404 -
 127.0.0.1 - - [13/Jun/2025 00:34:58] "GET /.env HTTP/1.0" 404 -
@@ -83,3 +79,4 @@
 127.0.0.1 - - [13/Jun/2025 12:46:05] "GET /index.php?lang=../../../../../../../../tmp/index1 HTTP/1.0" 404 -
 127.0.0.1 - - [13/Jun/2025 12:46:05] "GET /remote/login HTTP/1.0" 404 -
 127.0.0.1 - - [13/Jun/2025 12:46:06] "GET /containers/json HTTP/1.0" 404 -
+127.0.0.1 - - [16/Jun/2025 18:09:14] "GET /ecp/Current/exporttool/microsoft.exchange.ediscovery.exporttool.application HTTP/1.0" 404 -

@@ -4,7 +4,7 @@ TemplateFragment:
       tablename: template_fragments
       schema: public
     data:
-      template_uuid: 00000000-0000-0000-0000-000000000002
+      template_id: 00000000-0000-0000-0000-000000000002
       fragment_type: footer
       fragment_name: Admin Footer Bar
       fragment_key: footer
@@ -48,4 +48,4 @@ TemplateFragment:
       cache_duration: 1800
       last_compiled: null
       change_description: Initial admin footer fragment
-      created_by_user_uuid: null
+      created_by_user_id: null

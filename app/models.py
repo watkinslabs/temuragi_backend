@@ -4,29 +4,30 @@ Clean model access using the register_db discovery system
 Usage: from app.models import get_model, Theme, PageTemplate
 """
 
-# Import the functions from the register system
-from .register.database import get_model, list_models, get_all_models, _model_registry
-
-# Make functions available directly
-__all__ = ['get_model', 'list_models', 'get_all_models']
-
-# Populate globals for static imports
-for name, model in _model_registry.items():
-    if not name.islower():  # skip aliases
-        globals()[name] = model
-        __all__.append(name)
+from .register.classes import get_model
 
 
-# Dynamic attribute access for clean imports
+__all__ = ['get_model']
+
+# If you want to keep __getattr__ as a fallback for dynamic access:
 def __getattr__(name):
     """
-    Allow direct imports like: from app.models import Theme
-    Falls back to registry lookup if not found as regular attribute
+    Fallback for any classes that might not have been injected yet
     """
-    # Check if it's in the global registry
-    if name in _model_registry:
-        return _model_registry[name]
+    # First try to get it from globals (in case it was injected after this module loaded)
+    if name in globals():
+        return globals()[name]
     
-    # If not found, give helpful error
-    available = [k for k in _model_registry.keys() if not k.islower()]  # Skip table aliases
-    raise AttributeError(f"Model '{name}' not found in registry. Available models: {available}")
+    # Try getting from register if available
+    try:
+        from .register.classes import _model_registry
+        if name in _model_registry:
+            # Also inject it for next time
+            globals()[name] = _model_registry[name]
+            return _model_registry[name]
+    except:
+        pass
+    
+    # Give a helpful error
+    available = [k for k in dir() if not k.startswith('_') and k[0].isupper()]
+    raise AttributeError(f"Model '{name}' not found. Available models: {available}")

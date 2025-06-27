@@ -7,11 +7,11 @@ UserToken:
     tablename: user_tokens
     schema: public
   data:
-    user_uuid: 11111111-1111-1111-1111-111111111111
+    user_id: 11111111-1111-1111-1111-111111111111
     token: 879d3937706b550a750eaaf63b8cff5a98f2ea0bf0bce3e20fdf7d39fdcad6f5
     token_type: user
     ignore_expiration: false
-    uuid: 0dc7849d-4bdb-4450-8fdb-937a6ddaa58d
+    id: 0dc7849d-4bdb-4450-8fdb-937a6ddaa58d
     is_active: true
     created_at: '2025-06-11T18:45:20.415777-04:00'
     updated_at: '2025-06-11T18:45:20.415832-04:00'

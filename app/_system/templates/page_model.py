@@ -15,7 +15,7 @@ class Page(BaseModel):
     Columns:
     - title: Page title for display and SEO
     - slug: URL-friendly identifier (unique)
-    - template_uuid: Foreign key to templates table
+    - template_id: Foreign key to templates table
     - meta_description: SEO meta description
     - meta_keywords: SEO meta keywords (comma-separated)
     - og_title: Open Graph title for social sharing
@@ -40,8 +40,8 @@ class Page(BaseModel):
                   comment="Page title for display and SEO")
     slug = Column(String(100), unique=True, nullable=False,
                  comment="URL-friendly identifier")
-    template_uuid = Column(UUID(as_uuid=True),
-                          ForeignKey('templates.uuid', name='fk_pages_template'),
+    template_id = Column(UUID(as_uuid=True),
+                          ForeignKey('templates.id', name='fk_pages_template'),
                           nullable=True,
                           comment="Foreign key to templates table")
     meta_description = Column(String(255), nullable=True,
@@ -73,8 +73,8 @@ class Page(BaseModel):
     cache_duration = Column(Integer, default=300, nullable=False,
                            comment="Cache duration in seconds (0 = no cache)")
 
-    module_uuid = Column(UUID(as_uuid=True),
-                    ForeignKey('modules.uuid', name='fk_pages_module'),
+    module_id = Column(UUID(as_uuid=True),
+                    ForeignKey('modules.id', name='fk_pages_module'),
                     nullable=True,
                     comment="Module that owns this page (NULL for system)")
 
@@ -90,16 +90,16 @@ class Page(BaseModel):
     __table_args__ = (
         Index('idx_pages_name', 'name'),
         Index('idx_pages_slug', 'slug'),
-        Index('idx_pages_template', 'template_uuid'),
+        Index('idx_pages_template', 'template_id'),
         Index('idx_pages_published', 'published'),
         Index('idx_pages_featured', 'featured'),
         Index('idx_pages_publish_date', 'publish_date'),
         Index('idx_pages_expire_date', 'expire_date'),
         Index('idx_pages_auth', 'requires_auth'),
         Index('idx_pages_sort', 'sort_order'),
-        Index('idx_pages_module', 'module_uuid'),
+        Index('idx_pages_module', 'module_id'),
 
-        UniqueConstraint('module_uuid', 'slug', name='uq_pages_module_slug'),
+        UniqueConstraint('module_id', 'slug', name='uq_pages_module_slug'),
     )
 
     @staticmethod
@@ -230,17 +230,17 @@ class Page(BaseModel):
         """Ensure referenced template exists"""
         logger = self._get_logger()
         
-        if not self.template_uuid:
+        if not self.template_id:
             logger.warning(f"Page '{self.slug}' has no template assigned")
             return True
         
-        logger.debug(f"Validating template {self.template_uuid} for page '{self.slug}'")
+        logger.debug(f"Validating template {self.template_id} for page '{self.slug}'")
         
         from app.models import Template
-        template = session.query(Template).filter_by(uuid=self.template_uuid).first()
+        template = session.query(Template).filter_by(id=self.template_id).first()
         
         if not template:
-            logger.error(f"Template {self.template_uuid} not found for page '{self.slug}'")
+            logger.error(f"Template {self.template_id} not found for page '{self.slug}'")
             raise ValueError("Referenced template does not exist")
         
         logger.debug(f"Template validation successful for page '{self.slug}': {template.name}")
@@ -270,15 +270,15 @@ class Page(BaseModel):
         return page
 
     @classmethod
-    def get_published_pages(cls, session, module_uuid=None, featured_only=False, limit=None):
+    def get_published_pages(cls, session, module_id=None, featured_only=False, limit=None):
         """Get published pages with optional filtering"""
         logger = cls._get_logger()
-        logger.debug(f"Getting published pages: module={module_uuid}, featured_only={featured_only}, limit={limit}")
+        logger.debug(f"Getting published pages: module={module_id}, featured_only={featured_only}, limit={limit}")
         
         query = session.query(cls).filter_by(published=True)
         
-        if module_uuid:
-            query = query.filter_by(module_uuid=module_uuid)
+        if module_id:
+            query = query.filter_by(module_id=module_id)
         
         if featured_only:
             query = query.filter_by(featured=True)
@@ -329,12 +329,12 @@ class Page(BaseModel):
         return pages
 
     @classmethod
-    def get_pages_by_template(cls, session, template_uuid, published_only=True):
+    def get_pages_by_template(cls, session, template_id, published_only=True):
         """Get all pages using a specific template"""
         logger = cls._get_logger()
-        logger.debug(f"Getting pages by template: {template_uuid}, published_only={published_only}")
+        logger.debug(f"Getting pages by template: {template_id}, published_only={published_only}")
         
-        query = session.query(cls).filter_by(template_uuid=template_uuid)
+        query = session.query(cls).filter_by(template_id=template_id)
         
         if published_only:
             query = query.filter_by(published=True)
@@ -343,10 +343,10 @@ class Page(BaseModel):
         
         if published_only:
             visible_pages = [p for p in pages if p.is_visible()]
-            logger.info(f"Found {len(visible_pages)} visible pages using template {template_uuid} (total: {len(pages)})")
+            logger.info(f"Found {len(visible_pages)} visible pages using template {template_id} (total: {len(pages)})")
             return visible_pages
         
-        logger.info(f"Found {len(pages)} pages using template {template_uuid}")
+        logger.info(f"Found {len(pages)} pages using template {template_id}")
         return pages
 
     def get_fragment_count(self, session):
@@ -354,7 +354,7 @@ class Page(BaseModel):
         from app.models import PageFragment
         
         count = session.query(PageFragment).filter_by(
-            page_uuid=self.uuid,
+            page_id=self.id,
             is_active=True
         ).count()
         
@@ -371,7 +371,7 @@ class Page(BaseModel):
         from app.models import PageFragment
         
         existing_fragments = session.query(PageFragment.fragment_key).filter_by(
-            page_uuid=self.uuid,
+            page_id=self.id,
             is_active=True
         ).all()
         

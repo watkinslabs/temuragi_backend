@@ -73,10 +73,10 @@ def logout():
         # API logout
         data = request.get_json()
         access_token = data.get('access_token')
-        user_uuid = data.get('user_uuid')
+        user_id = data.get('user_id')
         
         auth = AuthService(g.session)
-        result = auth.logout_api(access_token, user_uuid)
+        result = auth.logout_api(access_token, user_id)
         
         return jsonify(result), 200
     
@@ -87,7 +87,7 @@ def logout():
     return redirect(url_for('auth.login'))
 
 @bp.route('/status', methods=['GET'])
-def auth_status():
+def status():
     """Quick auth status check"""
     auth_header = request.headers.get('Authorization')
     

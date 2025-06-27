@@ -6,25 +6,37 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 
 from app.base.model import BaseModel
 
-
+from app.classes import Permission,RolePermission,User
 class Report(BaseModel):
 
     """Model for storing reports with SQL queries and configuration"""
     __tablename__ = 'reports'
-    __depends_on__ = ['Connection', 'DatabaseType', 'DataType', 'VariableType', 'Permission']
-    
+    __depends_on__ = [
+        'Connection',
+        'DataType',
+        'VariableType',
+        'Permission',
+        'RolePermission',
+        'User',
+        'Model'
+    ]    
     # Core fields
     slug = Column(String(255), nullable=False, unique=True)  # Immutable identifier for permissions
     name = Column(String(255), nullable=False)  # Display name that can change
     display = Column(String(255), nullable=True)  # Optional longer display name
     query = Column(Text, nullable=True)
     description = Column(Text, nullable=True)
+    model_id = Column(
+        PG_UUID(as_uuid=True),
+        ForeignKey('models.id', ondelete='CASCADE'),
+        nullable=True
+    )
     
     # Database connection
     connection_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('connections.uuid', ondelete='RESTRICT'),
-        nullable=False
+        ForeignKey('connections.id', ondelete='RESTRICT'),
+        nullable=True
     )
     
     # Configuration fields
@@ -33,11 +45,6 @@ class Report(BaseModel):
     icon = Column(String(50), nullable=True)
     color = Column(String(7), nullable=True)
     
-    related_report_id = Column(
-        PG_UUID(as_uuid=True),
-        ForeignKey('reports.uuid', ondelete='SET NULL'),
-        nullable=True
-    )
     
     # Boolean flags
     is_wide = Column(Boolean, default=False)
@@ -45,9 +52,12 @@ class Report(BaseModel):
     is_auto_run = Column(Boolean, default=False)
     is_searchable = Column(Boolean, default=True)
     is_public = Column(Boolean, default=False)
+    is_published = Column(Boolean, default=False)  # Controls draft/published state
     is_download_csv = Column(Boolean, default=False)
     is_download_xlsx = Column(Boolean, default=False)
     is_system = Column(Boolean, default=False)
+    is_model = Column(Boolean, nullable=False, default=False)
+    
     
     # Permission tracking
     permissions_created = Column(Boolean, default=False)  # Track if permissions were created
@@ -61,6 +71,7 @@ class Report(BaseModel):
     
     # Relationships
     connection = relationship("Connection", foreign_keys=[connection_id])
+    
     columns = relationship(
         "ReportColumn", 
         back_populates="report", 
@@ -83,20 +94,26 @@ class Report(BaseModel):
         back_populates="report", 
         cascade="all, delete-orphan"
     )
+    model = relationship("Model", foreign_keys=[model_id])
+
     
-    # Self-referential relationship
-    related_report = relationship(
-        "Report", 
-        remote_side='Report.uuid',
-        foreign_keys=[related_report_id]
+   
+        
+    report_template_id = Column(
+        PG_UUID(as_uuid=True),
+        ForeignKey('report_templates.id', ondelete='SET NULL'),
+        nullable=True
     )
-    
+
+    report_template = relationship("ReportTemplate", foreign_keys=[report_template_id])
     # Indexes
     __table_args__ = (
         Index('idx_report_slug', 'slug'),
         Index('idx_report_name', 'name'),
         Index('idx_report_category', 'category'),
         Index('idx_report_public', 'is_public'),
+        Index('idx_report_published', 'is_published'),
+        Index('idx_report_published_public', 'is_published', 'is_public'),
     )
     
     def __init__(self, **kwargs):
@@ -144,23 +161,17 @@ class Report(BaseModel):
         """Validate slug format and prevent changes after creation"""
         if not slug:
             raise ValueError("Slug cannot be empty")
-        
-        # Check if this is an update (object already has an ID)
-        if self.uuid and hasattr(self, '_sa_instance_state'):
-            # Get the current value from the database
-            history = self._sa_instance_state.attrs.slug.history
-            if history.unchanged and history.unchanged[0] != slug:
-                raise ValueError("Slug cannot be changed after creation. Create a new report instead.")
-        
-        # Validate slug format
-        if not re.match(r'^[a-z0-9\-]+$', slug):
-            raise ValueError("Slug can only contain lowercase letters, numbers, and hyphens")
+            
+        # Validate slug format first
+        if not re.match(r'^[a-z0-9\-/]+$', slug):
+            raise ValueError("Slug can only contain lowercase letters, numbers, hyphens, and slashes")        
+      
         
         return slug
-    
+
     def save(self, session=None):
         """Override save to handle permission creation"""
-        is_new = not self.uuid
+        is_new = not self.id
         old_name = None
         old_display = None
         
@@ -260,11 +271,6 @@ class Report(BaseModel):
     @classmethod
     def create_initial_data(cls, session):
         """Create initial report management permissions"""
-        from app.register.database import get_model
-        
-        Permission = get_model('Permission')
-        if not Permission:
-            return
         
         # Create general report management permissions
         management_permissions = [
@@ -289,13 +295,7 @@ class Report(BaseModel):
     
     def create_permissions(self, session):
         """Create permissions for this specific report using slug"""
-        from app.register.database import get_model
         
-        Permission = get_model('Permission')
-        if not Permission:
-            return False, "Permission model not available"
-        
-        # Skip if already created
         if self.permissions_created:
             return False, "Permissions already created"
         
@@ -330,11 +330,6 @@ class Report(BaseModel):
     
     def update_permission_descriptions(self, session):
         """Update permission descriptions when report name changes"""
-        from app.register.database import get_model
-        Permission = get_model('Permission')
-        
-        if not Permission:
-            return False, "Permission model not available"
         
         permissions = session.query(Permission).filter(
             Permission.service == 'report',
@@ -360,11 +355,6 @@ class Report(BaseModel):
     
     def delete_permissions(self, session):
         """Delete all permissions for this report"""
-        from app.register.database import get_model
-        Permission = get_model('Permission')
-        
-        if not Permission:
-            return False, "Permission model not available"
         
         permissions = session.query(Permission).filter(
             Permission.service == 'report',
@@ -372,11 +362,10 @@ class Report(BaseModel):
         ).all()
         
         # Also need to delete RolePermission entries
-        RolePermission = get_model('RolePermission')
         if RolePermission:
             for perm in permissions:
                 role_perms = session.query(RolePermission).filter(
-                    RolePermission.permission_uuid == perm.uuid
+                    RolePermission.permission_id == perm.id
                 ).all()
                 for rp in role_perms:
                     session.delete(rp)
@@ -388,7 +377,7 @@ class Report(BaseModel):
         return True, f"Deleted {len(permissions)} permissions"
     
     @classmethod
-    def check_permission(cls, session, user_uuid, report_slug, action='view'):
+    def check_permission(cls, session, user_id, report_slug, action='view'):
         """Check if user has permission for specific report action"""
         from app._system.RBAC.permission_class import RbacPermissionChecker
         
@@ -398,24 +387,51 @@ class Report(BaseModel):
         
         report = session.query(cls).filter_by(slug=report_slug).first()
         
+        # Check if report exists and is published (unless user has edit permission)
+        if report and not report.is_published and action in ['view', 'execute', 'export']:
+            # Allow viewing unpublished reports only if user has edit permission
+            edit_permission = f"report:{report_slug}:edit"
+            can_edit = checker.check_permission(
+                user_id=user_id,
+                permission_name=edit_permission,
+                resource_type='report',
+                resource_name=report.name,
+                resource_id=str(report.id),
+                action_attempted='edit'
+            )
+            
+            # Also check for admin edit_any permission
+            if not can_edit:
+                admin_edit_permission = "report:system:edit_any"
+                can_edit = checker.check_permission(
+                    user_id=user_id,
+                    permission_name=admin_edit_permission,
+                    resource_type='report',
+                    resource_name=report.name,
+                    action_attempted='edit'
+                )
+            
+            if not can_edit:
+                return False  # Deny access to unpublished reports
+        
         has_permission = checker.check_permission(
-            user_uuid=user_uuid,
+            user_id=user_id,
             permission_name=permission_name,
             resource_type='report',
             resource_name=report.name if report else report_slug,
-            resource_id=str(report.uuid) if report else None,
+            resource_id=str(report.id) if report else None,
             action_attempted=action
         )
         
-        # Public reports allow view/execute
-        if report and report.is_public and action in ['view', 'execute']:
+        # Public reports allow view/execute (only if published)
+        if report and report.is_public and report.is_published and action in ['view', 'execute']:
             return True
         
         # Check admin permissions
         if action in ['edit', 'delete'] and not has_permission:
             admin_permission = f"report:system:{action}_any"
             has_permission = checker.check_permission(
-                user_uuid=user_uuid,
+                user_id=user_id,
                 permission_name=admin_permission,
                 resource_type='report',
                 resource_name=report.name if report else report_slug,
@@ -426,7 +442,7 @@ class Report(BaseModel):
         if action == 'view' and not has_permission:
             view_all_permission = "report:system:view_all"
             has_permission = checker.check_permission(
-                user_uuid=user_uuid,
+                user_id=user_id,
                 permission_name=view_all_permission,
                 resource_type='report',
                 resource_name=report.name if report else report_slug,
@@ -436,59 +452,89 @@ class Report(BaseModel):
         return has_permission
     
     @classmethod
-    def get_user_reports(cls, session, user_uuid):
+    def get_user_reports(cls, session, user_id, include_unpublished=False):
         """Get all reports a user has permission to view"""
-        from app.register.database import get_model
-        
-        RolePermission = get_model('RolePermission')
-        Permission = get_model('Permission')
-        User = get_model('User')
         
         if not all([RolePermission, Permission, User]):
             return []
         
-        user = session.query(User).filter_by(uuid=user_uuid).first()
-        if not user or not user.role_uuid:
-            return session.query(cls).filter(cls.is_public == True).all()
+        user = session.query(User).filter_by(id=user_id).first()
+        if not user or not user.role_id:
+            # Anonymous users only see published public reports
+            return session.query(cls).filter(
+                cls.is_public == True,
+                cls.is_published == True
+            ).all()
+        
+        # Check if user has edit permissions
+        can_edit_any = False
+        if include_unpublished:
+            edit_any_perm = session.query(Permission).join(RolePermission).filter(
+                RolePermission.role_id == user.role_id,
+                Permission.name == 'report:system:edit_any'
+            ).first()
+            can_edit_any = bool(edit_any_perm)
         
         # Check view_all permission
         view_all_perm = session.query(Permission).join(RolePermission).filter(
-            RolePermission.role_uuid == user.role_uuid,
+            RolePermission.role_id == user.role_id,
             Permission.name == 'report:system:view_all'
         ).first()
         
         if view_all_perm:
-            return session.query(cls).all()
+            query = session.query(cls)
+            if not can_edit_any and not include_unpublished:
+                query = query.filter(cls.is_published == True)
+            return query.all()
         
-        # Get report view permissions
+        # Get report permissions
         report_permissions = session.query(Permission).join(RolePermission).filter(
-            RolePermission.role_uuid == user.role_uuid,
+            RolePermission.role_id == user.role_id,
             Permission.service == 'report',
-            Permission.action == 'view'
+            Permission.action.in_(['view', 'edit'])
         ).all()
         
-        report_slugs = [perm.resource for perm in report_permissions 
-                       if perm.resource and perm.resource != 'system']
+        # Separate view and edit permissions
+        view_slugs = []
+        edit_slugs = []
+        for perm in report_permissions:
+            if perm.resource and perm.resource != 'system':
+                if perm.action == 'edit':
+                    edit_slugs.append(perm.resource)
+                elif perm.action == 'view':
+                    view_slugs.append(perm.resource)
         
-        reports = session.query(cls).filter(
-            cls.slug.in_(report_slugs)
-        ).all()
+        # Build queries
+        reports = []
         
+        # Reports user can edit (see even if unpublished)
+        if edit_slugs:
+            edit_reports = session.query(cls).filter(
+                cls.slug.in_(edit_slugs)
+            ).all()
+            reports.extend(edit_reports)
+        
+        # Reports user can only view (must be published)
+        if view_slugs:
+            view_reports = session.query(cls).filter(
+                cls.slug.in_(view_slugs),
+                cls.is_published == True
+            ).all()
+            reports.extend(view_reports)
+        
+        # Public reports (must be published)
         public_reports = session.query(cls).filter(
-            cls.is_public == True
+            cls.is_public == True,
+            cls.is_published == True
         ).all()
         
-        all_reports = {r.uuid: r for r in reports + public_reports}
+        # Combine and deduplicate
+        all_reports = {r.id: r for r in reports + public_reports}
         
         return list(all_reports.values())
     
-    def assign_to_role(self, session, role_uuid, actions=None):
+    def assign_to_role(self, session, role_id, actions=None):
         """Assign this report to a role with specified actions"""
-        from app.register.database import get_model
-        
-        RolePermission = get_model('RolePermission')
-        if not RolePermission:
-            return False, "RolePermission model not available"
         
         # Ensure permissions exist first
         if not self.permissions_created:
@@ -505,7 +551,7 @@ class Report(BaseModel):
         for action in actions:
             permission_name = f"report:{self.slug}:{action}"
             success, result = RolePermission.grant_permission(
-                session, role_uuid, permission_name
+                session, role_id, permission_name
             )
             if success:
                 granted.append(action)
@@ -517,13 +563,8 @@ class Report(BaseModel):
         
         return True, f"Granted actions: {', '.join(granted)}"
     
-    def remove_from_role(self, session, role_uuid, actions=None):
+    def remove_from_role(self, session, role_id, actions=None):
         """Remove this report from a role"""
-        from app.register.database import get_model
-        
-        RolePermission = get_model('RolePermission')
-        if not RolePermission:
-            return False, "RolePermission model not available"
         
         if actions is None:
             actions = ['view', 'execute', 'export', 'schedule', 'edit', 'delete', 'share']
@@ -532,7 +573,7 @@ class Report(BaseModel):
         for action in actions:
             permission_name = f"report:{self.slug}:{action}"
             success, result = RolePermission.revoke_permission(
-                session, role_uuid, permission_name
+                session, role_id, permission_name
             )
             if success:
                 revoked.append(action)
@@ -541,11 +582,6 @@ class Report(BaseModel):
     
     def get_roles_with_access(self, session, action='view'):
         """Get all roles that have access to this report"""
-        from app.register.database import get_model
-        
-        Permission = get_model('Permission')
-        RolePermission = get_model('RolePermission')
-        Role = get_model('Role')
         
         if not all([Permission, RolePermission, Role]):
             return []
@@ -558,15 +594,17 @@ class Report(BaseModel):
         
         return roles
     
+    # Update the duplicate method in the Report model (report_model.py):
+
     def duplicate(self, session, new_name, new_slug=None):
         """Create a copy of this report with a new name and slug"""
         if not new_slug:
             new_slug = self.generate_slug(new_name, session)
-        
+
         existing = session.query(Report).filter_by(slug=new_slug).first()
         if existing:
             return None, f"Report with slug '{new_slug}' already exists"
-        
+
         new_report = Report(
             slug=new_slug,
             name=new_name,
@@ -574,27 +612,32 @@ class Report(BaseModel):
             query=self.query,
             description=self.description,
             connection_id=self.connection_id,
+            model_id=self.model_id,  # Add this to copy the model association
             category=self.category,
             tags=self.tags.copy() if self.tags else [],
+            icon=self.icon,
+            color=self.color,
             is_wide=self.is_wide,
             is_ajax=self.is_ajax,
             is_auto_run=self.is_auto_run,
             is_searchable=self.is_searchable,
             is_public=False,
+            is_published=False,  # New reports start as draft
             is_download_csv=self.is_download_csv,
             is_download_xlsx=self.is_download_xlsx,
+            is_model=self.is_model,  # Add this
             options=self.options.copy() if self.options else self.get_default_options()
         )
-        
+
         session.add(new_report)
         session.flush()
-        
+
         from app.models import ReportColumn, ReportVariable
 
         # Copy columns
         for col in self.columns:
             new_col = ReportColumn(
-                report_id=new_report.uuid,
+                report_id=new_report.id,
                 name=col.name,
                 display_name=col.display_name,
                 data_type_id=col.data_type_id,
@@ -615,11 +658,10 @@ class Report(BaseModel):
         # Copy variables
         for var in self.variables:
             new_var = ReportVariable(
-                report_id=new_report.uuid,
+                report_id=new_report.id,
                 name=var.name,
                 display_name=var.display_name,
                 variable_type_id=var.variable_type_id,
-                data_type_id=var.data_type_id,
                 default_value=var.default_value,
                 placeholder=var.placeholder,
                 help_text=var.help_text,
@@ -640,6 +682,18 @@ class Report(BaseModel):
         session.commit()
         
         return new_report, "Report duplicated successfully"
+    
+    def publish(self, session):
+        """Publish this report"""
+        self.is_published = True
+        self.save(session)
+        return True, "Report published successfully"
+    
+    def unpublish(self, session):
+        """Unpublish this report (set to draft)"""
+        self.is_published = False
+        self.save(session)
+        return True, "Report unpublished successfully"
     
     def __repr__(self):
         return f"<Report {self.slug} - {self.name}>"

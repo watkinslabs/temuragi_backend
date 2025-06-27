@@ -14,7 +14,7 @@ class ReportSchedule(BaseModel):
     
     report_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('reports.uuid', ondelete='CASCADE'),
+        ForeignKey('reports.id', ondelete='CASCADE'),
         nullable=False
     )
     
@@ -59,6 +59,7 @@ class ReportSchedule(BaseModel):
     def create_initial_data(cls, session):
         """Create sample report schedules"""
         # Get the user activity report
+        from app.classes import Report
         user_report = session.query(Report).filter_by(name='user_activity_report').first()
         if not user_report:
             return
@@ -70,7 +71,7 @@ class ReportSchedule(BaseModel):
         
         # Create a weekly schedule for the user activity report
         schedule = cls(
-            report_id=user_report.uuid,
+            report_id=user_report.id,
             schedule_type='weekly',
             day_of_week=1,  # Monday
             time_of_day='09:00',

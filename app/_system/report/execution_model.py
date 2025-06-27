@@ -10,16 +10,16 @@ from app.base.model import BaseModel
 class ReportExecution(BaseModel):
     """Model for tracking report execution history"""
     __tablename__ = 'report_executions'
-    __depends_on__ = ['Report']
+    __depends_on__ = ['Report','User']
     
     report_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('reports.uuid', ondelete='CASCADE'),
+        ForeignKey('reports.id', ondelete='CASCADE'),
         nullable=False
     )
     user_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('users.uuid', ondelete='SET NULL'),
+        ForeignKey('users.id', ondelete='SET NULL'),
         nullable=True
     )
     

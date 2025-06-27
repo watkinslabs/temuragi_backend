@@ -105,7 +105,7 @@ class MenuCLI(BaseCLI):
                 for menu_type in menu_types:
                     # Get tier count for this menu type
                     tier_count = self.session.query(self.menu_tier_model).filter_by(
-                        menu_type_uuid=menu_type.uuid
+                        menu_type_id=menu_type.id
                     ).count()
                     
                     # Get link count through tiers
@@ -134,7 +134,7 @@ class MenuCLI(BaseCLI):
             self.output_info("Menu Hierarchy Summary:")
             
             # Get root tiers (no parent)
-            root_tiers = self.session.query(self.menu_tier_model).filter_by(parent_uuid=None).all()
+            root_tiers = self.session.query(self.menu_tier_model).filter_by(parent_id=None).all()
             
             if not root_tiers:
                 self.output_warning("No menu hierarchy found")
@@ -202,10 +202,10 @@ class MenuCLI(BaseCLI):
                 
                 status = "ACTIVE" if getattr(menu_type, 'is_active', True) else "INACTIVE"
                 desc_short = menu_type.description[:40] + ('...' if len(menu_type.description or '') > 40 else '') if menu_type.description else ''
-                uuid_short = str(menu_type.uuid)[:8] + '...'
+                id_short = str(menu_type.id)[:8] + '...'
                 created_short = menu_type.created_at.strftime('%Y-%m-%d') if menu_type.created_at else ''
                 
-                rows.append([menu_type.name, status, desc_short, tier_count, uuid_short, created_short])
+                rows.append([menu_type.name, status, desc_short, tier_count, id_short, created_short])
 
             self.output_table(rows, headers=headers)
             return 0
@@ -251,7 +251,7 @@ class MenuCLI(BaseCLI):
                 print("-" * (len(menu_type.name) + 1))
                 
                 # Get root tiers for this menu type
-                root_tiers = [tier for tier in menu_type.tiers if tier.parent_uuid is None]
+                root_tiers = [tier for tier in menu_type.tiers if tier.parent_id is None]
                 root_tiers.sort(key=lambda x: x.position)
                 
                 if root_tiers:
@@ -288,7 +288,7 @@ class MenuCLI(BaseCLI):
             self.session.add(menu_type)
             self.session.commit()
             
-            self.output_success(f"Created menu type '{name}' with UUID: {menu_type.uuid}")
+            self.output_success(f"Created menu type '{name}' with UUID: {menu_type.id}")
             return 0
 
         except Exception as e:
@@ -309,23 +309,23 @@ class MenuCLI(BaseCLI):
                 return 1
 
             # Get parent tier UUID if specified
-            parent_uuid = None
+            parent_id = None
             if parent_tier_name:
                 parent_tier = self.session.query(self.menu_tier_model).filter_by(
                     name=parent_tier_name,
-                    menu_type_uuid=menu_type.uuid
+                    menu_type_id=menu_type.id
                 ).first()
                 
                 if not parent_tier:
                     self.output_error(f"Parent tier '{parent_tier_name}' not found in menu type '{menu_type_name}'")
                     return 1
                 
-                parent_uuid = parent_tier.uuid
+                parent_id = parent_tier.id
 
             # Check if tier already exists
             existing = self.session.query(self.menu_tier_model).filter_by(
                 name=name,
-                menu_type_uuid=menu_type.uuid
+                menu_type_id=menu_type.id
             ).first()
 
             if existing:
@@ -340,8 +340,8 @@ class MenuCLI(BaseCLI):
                 name=name,
                 display=name,
                 slug=slug,
-                menu_type_uuid=menu_type.uuid,
-                parent_uuid=parent_uuid,
+                menu_type_id=menu_type.id,
+                parent_id=parent_id,
                 position=sort_order
             )
 
@@ -350,7 +350,7 @@ class MenuCLI(BaseCLI):
 
             parent_info = f" under '{parent_tier_name}'" if parent_tier_name else " as root tier"
             self.output_success(f"Created menu tier '{name}'{parent_info} in '{menu_type_name}'")
-            self.output_info(f"UUID: {tier.uuid}")
+            self.output_info(f"UUID: {tier.id}")
             return 0
 
         except Exception as e:
@@ -433,7 +433,7 @@ class MenuCLI(BaseCLI):
             # Delete tiers
             for tier, depth in tiers_with_depth:
                 # Check if tier still exists (might have been deleted by cascade)
-                if self.session.query(self.menu_tier_model).filter_by(uuid=tier.uuid).first():
+                if self.session.query(self.menu_tier_model).filter_by(id=tier.id).first():
                     self.session.delete(tier)
                     deleted_count += 1
 
@@ -482,7 +482,7 @@ class MenuCLI(BaseCLI):
                     rows.append([
                         menu_type.name,
                         menu_type.description or '',
-                        str(menu_type.uuid)[:8] + '...'
+                        str(menu_type.id)[:8] + '...'
                     ])
                 self.output_table(rows, headers=headers)
 
@@ -495,7 +495,7 @@ class MenuCLI(BaseCLI):
                         tier.name,
                         tier.display,
                         tier.slug,
-                        str(tier.uuid)[:8] + '...'
+                        str(tier.id)[:8] + '...'
                     ])
                 self.output_table(rows, headers=headers)
 
@@ -508,7 +508,7 @@ class MenuCLI(BaseCLI):
                         link.name,
                         link.display,
                         link.url[:40] + ('...' if len(link.url) > 40 else ''),
-                        str(link.uuid)[:8] + '...'
+                        str(link.id)[:8] + '...'
                     ])
                 self.output_table(rows, headers=headers)
 

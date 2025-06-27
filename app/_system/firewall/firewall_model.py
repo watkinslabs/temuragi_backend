@@ -9,7 +9,8 @@ from app.base.model import BaseModel
 class Firewall(BaseModel):
     """Model for storing IP whitelist/blacklist patterns with order priority"""
     __tablename__ = 'firewall'
-
+    __depends_on__=[]
+    
     ip_pattern = Column(String(50), nullable=False, unique=True)
     ip_type = Column(String(10), nullable=False)  # 'allow' or 'block'
     description = Column(String(255), nullable=True)
@@ -90,7 +91,7 @@ class Firewall(BaseModel):
     @classmethod
     def find_by_id(cls, db_session, pattern_id):
         """Find IP filter by ID"""
-        return db_session.query(cls).filter(cls.uuid == pattern_id).first()
+        return db_session.query(cls).filter(cls.id == pattern_id).first()
 
     @classmethod
     def add_pattern(cls, db_session, ip_pattern, ip_type, description=None, order=100):

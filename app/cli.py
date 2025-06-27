@@ -224,9 +224,9 @@ class TMasterCLI(BaseCLI):
         if args is None:
             args = []
 
-        self.log_operation_start(f"Running CLI module: {cli_name}")
-        self.output_info(f"Original sys.argv: {sys.argv}")
-        self.output_info(f"Passing args to {cli_name}: {args}")
+        #self.log_operation_start(f"Running CLI module: {cli_name}")
+        #self.output_info(f"Original sys.argv: {sys.argv}")
+        #self.output_info(f"Passing args to {cli_name}: {args}")
 
         cli_func = self.discovery.load_cli_module(cli_name)
         if not cli_func:

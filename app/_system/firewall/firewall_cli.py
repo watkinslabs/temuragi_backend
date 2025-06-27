@@ -70,7 +70,7 @@ class FirewallCLI(BaseCLI):
 
             for pattern in patterns:
                 rows.append([
-                    str(pattern.uuid)[:8] + '...',
+                    str(pattern.id)[:8] + '...',
                     pattern.ip_pattern,
                     pattern.ip_type,
                     pattern.order,
@@ -201,11 +201,11 @@ class FirewallCLI(BaseCLI):
                 pattern = self.firewall_model.find_by_pattern(self.session, search_term)
 
             if pattern:
-                self.log_info(f"Pattern found: {pattern.ip_pattern} (ID: {pattern.uuid})")
+                self.log_info(f"Pattern found: {pattern.ip_pattern} (ID: {pattern.id})")
                 
                 headers = ['Field', 'Value']
                 rows = [
-                    ['ID', str(pattern.uuid)],
+                    ['ID', str(pattern.id)],
                     ['Pattern', pattern.ip_pattern],
                     ['Type', pattern.ip_type],
                     ['Order', pattern.order],
@@ -245,7 +245,7 @@ class FirewallCLI(BaseCLI):
                 return 0
 
             for pattern in patterns:
-                self.log_debug(f"Deactivating blocking rule: {pattern.uuid}")
+                self.log_debug(f"Deactivating blocking rule: {pattern.id}")
                 pattern.is_active = False
 
             self.session.commit()

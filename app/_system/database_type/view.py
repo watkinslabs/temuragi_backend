@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 from app.admin.connection.connection_model import Connection
-from .database_type_model import DatabaseType
+from ..report.database_type_model import DatabaseType
 
 bp = Blueprint(
     'database_type',
@@ -96,7 +96,7 @@ def data_ajax():
     
     # Format the data
     data = [{
-        'uuid': str(dt.uuid),
+        'id': str(dt.id),
         'name': dt.name,
         'display': dt.display,
         'active': 'Yes' if dt.active else 'No'
@@ -131,7 +131,7 @@ def create_ajax():
 def update_ajax():
     sess = g.session
     payload = request.get_json()
-    db_type = sess.query(DatabaseType).get(uuid.UUID(payload['uuid']))
+    db_type = sess.query(DatabaseType).get(uuid.UUID(payload['id']))
     if not db_type:
         return jsonify(status='error', msg='Not found'), 404
     try:
@@ -148,7 +148,7 @@ def update_ajax():
 def delete_ajax():
     sess = g.session
     payload = request.get_json()
-    db_type = sess.query(DatabaseType).get(uuid.UUID(payload['uuid']))
+    db_type = sess.query(DatabaseType).get(uuid.UUID(payload['id']))
     if not db_type:
         return jsonify(status='error', msg='Not found'), 404
     

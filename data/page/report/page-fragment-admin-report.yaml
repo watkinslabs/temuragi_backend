@@ -1,0 +1,176 @@
+# PageFragment Template (Template)
+# Template file - edit values before importing
+# 
+# INSTRUCTIONS:
+# 1. AUTO-GENERATED fields are optional - uncomment to set specific values
+# 2. Update foreign key UUIDs to reference existing records
+# 3. Edit all other values as needed
+# 4. Foreign key constraints must be satisfied before import
+# Template file - edit values before importing
+# Exported from template CLI
+
+PageFragment:
+  meta:
+    tablename: page_fragments
+    schema: public
+  data:
+    page_id: 00000000-0000-0000-0000-100000000010
+    # NOTE: page_id must reference existing record UUID
+    fragment_type: content
+    fragment_name: Report Home
+    fragment_key: base
+    content_type: text/html
+    version_number: 1
+    version_label: v1.0
+    is_active: true
+    content_source: |
+            <!-- Container for the dynamic table -->
+            <div id="dynamic_table_container"></div>
+
+            <script>
+                $(document).ready(function() {
+                    // Create global reference for action handlers
+                    window.report_table = new DynamicDataTable('dynamic_table_container', 'Report', '{{ url_for('miner.data') }}', {
+                        table_title: 'Report Management',
+                        table_description: 'Create and manage SQL reports with dynamic parameters',
+                        columns: {
+                            name: {
+                                order: 1,
+                                searchable: true,
+                                label: 'Report Name',
+                                render: function(data, type, row) {
+                                    // Make name clickable to view report
+                                    return `<a href="#" hx-post="{{ url_for("report.view_report") }}" 
+                                                        hx-vals='{"id": "${row.id}"}' 
+                                                        hx-target="#main-content" 
+                                                        hx-swap="innerHTML" 
+                                                        hx-indicator=".htmx-indicator">
+                                                        ${data}
+                                                        </a>`;
+                                }
+                            },
+                            slug: {
+                                order: 2,
+                                searchable: true,
+                                label: 'Slug',
+                                className: 'text-muted small'
+                            },
+                            category: {
+                                order: 3,
+                                searchable: true,
+                                label: 'Category'
+                            },
+                            description: {
+                                order: 4,
+                                searchable: true,
+                                label: 'Description',
+                                render: function(data) {
+                                    return data ? data.substring(0, 100) + (data.length > 100 ? '...' : '') : '';
+                                }
+                            },
+                            is_public: {
+                                order: 5,
+                                searchable: false,
+                                format: 'boolean',
+                                label: 'Public',
+                                render: function(data) {
+                                    return data ? '<span class="badge bg-success">Public</span>' : '<span class="badge bg-secondary">Private</span>';
+                                }
+                            },
+                            is_ajax: {
+                                order: 6,
+                                searchable: false,
+                                format: 'boolean',
+                                label: 'AJAX',
+                                render: function(data) {
+                                    return data ? '<i class="fas fa-check text-success"></i>' : '';
+                                }
+                            },
+                            connection: {
+                                order: 7,
+                                searchable: false,
+                                label: 'Database',
+                                data: 'connection.name',
+                                defaultContent: ''
+                            },
+                            report_template: {
+                                order: 8,
+                                searchable: false,
+                                label: 'Template',
+                                data: 'report_template.display_name',
+                                defaultContent: 'Default'
+                            },
+                            created_at: {
+                                order: 9,
+                                searchable: false,
+                                format: 'date',
+                                label: 'Created'
+                            },
+                            updated_at: {
+                                order: 10,
+                                searchable: false,
+                                format: 'date',
+                                label: 'Updated'
+                            }
+                        },
+                        excluded_columns: ['query', 'options', 'tags', 'is_wide', 'is_auto_run', 'is_searchable', 'is_download_csv', 'is_download_xlsx', 'permissions_created'],
+                        actions: ['edit', 'copy', 'delete'],
+                        create_url: "{{ url_for('report.create') }}",
+                        edit_url: "{{ url_for('report.edit') }}",
+                        view_url: "{{ url_for('report.view') }}",
+                        deleteurl: "{{ url_for('report.delete') }}",
+                        copy_url: "{{ url_for('report.copy') }}",
+                       
+                        // Add related models for joins
+                        related_models: ['Connection', 'ReportTemplate'],
+                        
+                        // Custom filter for report categories
+                        custom_filters: [{
+                            id: 'category_filter',
+                            label: 'Category',
+                            type: 'select',
+                            options: function(callback) {
+                                $.ajax({
+                                    url: "{{ url_for('report_api.get_stats') }}",
+                                    headers: {
+                                        'Authorization': 'Bearer ' + (window.token_manager?.get_tokens()?.api_token || '')
+                                    },
+                                    success: function(response) {
+                                        if (response.success && response.data.categories) {
+                                            const options = [{ value: '', text: 'All Categories' }];
+                                            Object.keys(response.data.categories).forEach(cat => {
+                                                if (cat) {
+                                                    options.push({ 
+                                                        value: cat, 
+                                                        text: `${cat} (${response.data.categories[cat]})` 
+                                                    });
+                                                }
+                                            });
+                                            callback(options);
+                                        }
+                                    }
+                                });
+                            },
+                            column: 'category'
+                        }]
+                    });
+                    
+                    report_table.init();
+                });
+            </script>
+    content_hash: null
+    variables_data: null
+    template_fragment_key: null
+    description: Main content block for the Report management page
+    sort_order: 1
+    is_published: true
+    publish_date: null
+    expire_date: null
+    cache_duration: 3600
+    last_rendered: null
+    change_description: Report management table with preview, export, and permission actions
+    created_by_user_id: null
+    # NOTE: created_by_user_id must reference existing record UUID
+    # id: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided
+    # created_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
+    # updated_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided

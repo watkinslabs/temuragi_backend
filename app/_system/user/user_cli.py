@@ -13,7 +13,6 @@ from tabulate import tabulate
 
 # Add your app path to import the model and config
 sys.path.append('/web/temuragi')
-from app.register.database import register_models_for_cli, get_model
 from app.base.cli import BaseCLI
 
 CLI_DESCRIPTION = "Manages user accounts and authentication"
@@ -83,7 +82,7 @@ class UserCLI(BaseCLI):
             for user in users:
                 last_login = user.last_login_date.strftime('%Y-%m-%d %H:%M') if user.last_login_date else 'Never'
                 rows.append([
-                    str(user.uuid),
+                    str(user.id),
                     user.username,
                     user.email,
                     user.role.name if user.role else 'No Role',
@@ -121,14 +120,14 @@ class UserCLI(BaseCLI):
                 return 1
 
             # Find role if specified
-            role_uuid = None
+            role_id = None
             if role_name:
                 role = self.session.query(self.role_model).filter(self.role_model.name == role_name).first()
                 if not role:
                     self.log_warning(f"Role not found: {role_name}")
                     self.output_error(f"Role not found: {role_name}")
                     return 1
-                role_uuid = role.uuid
+                role_id = role.id
 
             # Get password if not provided
             if not password:
@@ -143,7 +142,7 @@ class UserCLI(BaseCLI):
             new_user = self.user_model(
                 username=username,
                 email=email,
-                role_uuid=role_uuid,
+                role_id=role_id,
                 is_active=active
             )
             new_user.set_password(password)
@@ -152,9 +151,9 @@ class UserCLI(BaseCLI):
             self.session.commit()
 
             role_msg = f" with role {role_name}" if role_name else " with no role"
-            self.log_info(f"User added successfully: {username}{role_msg} (UUID: {new_user.uuid})")
+            self.log_info(f"User added successfully: {username}{role_msg} (UUID: {new_user.id})")
             self.output_success(f"User created: {username}{role_msg}")
-            self.output_info(f"UUID: {new_user.uuid}")
+            self.output_info(f"UUID: {new_user.id}")
             return 0
 
         except Exception as e:
@@ -328,7 +327,7 @@ class UserCLI(BaseCLI):
                 return 1
 
             old_role_name = user.role.name if user.role else 'None'
-            user.role_uuid = new_role.uuid
+            user.role_id = new_role.id
 
             self.session.commit()
 
@@ -355,7 +354,7 @@ class UserCLI(BaseCLI):
 
             headers = ['Field', 'Value']
             rows = [
-                ['UUID', str(user.uuid)],
+                ['UUID', str(user.id)],
                 ['Username', user.username],
                 ['Email', user.email],
                 ['Role', user.role.name if user.role else 'No Role'],

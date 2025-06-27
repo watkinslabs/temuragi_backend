@@ -1,20 +1,18 @@
-from flask import Blueprint, request, jsonify, g
-from werkzeug.exceptions import BadRequest, Unauthorized
 import uuid
 import time
 import traceback
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import or_, and_, desc, asc, func, text
-from sqlalchemy.orm import Query
-from datetime import datetime, timezone
-import re
-import logging
+from sqlalchemy.orm import RelationshipProperty
+from sqlalchemy import or_,  desc, asc, func
+from flask import request, jsonify, g
 
-from app.register.database import get_model
+from app.register.classes import get_model
 
 
 class MinerError(Exception):
     """Custom exception for Miner operations"""
+    __depends_on__ =[]
+
     def __init__(self, message, error_type="MinerError", status_code=400, details=None):
         self.message = message
         self.error_type = error_type
@@ -25,6 +23,8 @@ class MinerError(Exception):
 
 class MinerPermissionError(MinerError):
     """Permission denied error"""
+    __depends_on__ =[]
+
     def __init__(self, message, permission_required=None):
         super().__init__(message, "PermissionError", 403, {'permission_required': permission_required})
 
@@ -33,8 +33,8 @@ class Miner:
     """
     Enhanced Data API handler with RBAC, logging, audit trails, and slim output
     """
+    __depends_on__ = [ 'MinerError', 'MinerPermissionError', 'RbacPermissionChecker']
 
-    __depends_on__ = ['MinerError', 'MinerPermissionError', 'RbacPermissionChecker']
     def __init__(self, app=None):
         self.app = app
         self.logger = None
@@ -82,8 +82,8 @@ class Miner:
             # Store auth context
             g.auth_context = token_obj.get_auth_context()
             audit_data.update({
-                'user_uuid': g.auth_context.get('user_uuid'),
-                'token_uuid': str(token_obj.uuid)
+                'user_id': g.auth_context.get('user_id'),
+                'token_id': str(token_obj.id)
             })
 
             # Parse JSON payload
@@ -101,14 +101,14 @@ class Miner:
             if not model_name or not operation:
                 raise MinerError('model and operation are required', 'ValidationError', 400)
 
-            if operation not in ['read', 'create', 'update', 'delete', 'list', 'count','metadata']:
+            if operation not in ['read', 'create', 'update', 'delete', 'list', 'count','metadata','form_metadata']:
                 raise MinerError(f'Invalid operation: {operation}', 'ValidationError', 400)
 
             # Update audit data
             audit_data.update({
                 'operation': operation,
                 'model_name': model_name,
-                'target_uuid': data.get('uuid'),
+                'target_id': data.get('id'),
                 'request_data': self._sanitize_request_data(data)
             })
 
@@ -136,12 +136,14 @@ class Miner:
                 result = self.handle_count(model_class, data, audit_data)
             elif operation == 'metadata':
                 result = self.handle_metadata(model_class, data, audit_data)
+            elif operation == 'form_metadata':
+                result = self.handle_form_metadata(model_class, data, audit_data)                
 
             # Calculate response time
             response_time_ms = int((time.time() - start_time) * 1000)
             
             # Log successful operation (simplified since RBAC already audited permission)
-            self.logger.info(f"API {operation} {model_name} - User: {audit_data.get('user_uuid')} - Time: {response_time_ms}ms")
+            self.logger.info(f"API {operation} {model_name} - User: {audit_data.get('user_id')} - Time: {response_time_ms}ms")
 
             return result
 
@@ -161,8 +163,8 @@ class Miner:
             'read': 'read',
             'list': 'read', 
             'count': 'read',
-            'create': 'write',
-            'update': 'write', 
+            'create': 'create',
+            'update': 'update', 
             'delete': 'delete'
         }
         
@@ -172,7 +174,7 @@ class Miner:
     def _check_permission(self, permission_required, model_class, operation, data):
         """Check if user has required permission using RBAC system with auto-audit"""
         
-        if not g.auth_context or not g.auth_context.get('user_uuid'):
+        if not g.auth_context or not g.auth_context.get('user_id'):
             raise MinerPermissionError('Authentication required', permission_required)
 
         # Import here to avoid circular imports
@@ -182,12 +184,12 @@ class Miner:
         
         # Check permission with automatic auditing
         granted = checker.check_api_permission(
-            user_uuid=g.auth_context['user_uuid'],
+            user_id=g.auth_context['user_id'],
             permission_name=permission_required,
             model_name=model_class.__name__,
             action=operation,
-            record_id=data.get('uuid'),
-            token_uuid=g.auth_context.get('token_uuid')
+            record_id=data.get('id'),
+            token_id=g.auth_context.get('token_id')
         )
         
         if not granted:
@@ -195,13 +197,13 @@ class Miner:
         
         return granted
 
-    def _log_permission_denial(self, user_uuid, permission_name):
+    def _log_permission_denial(self, user_id, permission_name):
         """Log permission denial for security monitoring"""
         try:
             audit_log_model = get_model('ApiAuditLog')
             if audit_log_model:
                 audit_log_model.log_permission_check(
-                    g.session, user_uuid, permission_name, False, 
+                    g.session, user_id, permission_name, False, 
                     f'Access denied for permission: {permission_name}'
                 )
         except Exception as e:
@@ -259,10 +261,17 @@ class Miner:
     def handle_metadata(self, model_class, data, audit_data):
         """Handle metadata operations - return model structure information"""
         
+        # Define fields to exclude from API
+        excluded_fields = ['is_active']
+        
         columns = []
         
         # Get column information from SQLAlchemy model
         for column in model_class.__table__.columns:
+            # Skip excluded fields
+            if column.name in excluded_fields:
+                continue
+                
             column_info = {
                 'name': column.name,
                 'type': str(column.type),
@@ -341,7 +350,7 @@ class Miner:
             elif 'INTEGER' in column_type_str or 'NUMERIC' in column_type_str or 'FLOAT' in column_type_str:
                 column_info['format'] = 'number'
             elif 'UUID' in column_type_str:
-                column_info['format'] = 'uuid'
+                column_info['format'] = 'id'
             elif 'JSON' in column_type_str:
                 column_info['format'] = 'json'
             else:
@@ -404,12 +413,12 @@ class Miner:
     
     def handle_read(self, model_class, data, audit_data):
         """Handle read operations - single record only"""
-        record_uuid = data.get('uuid')
-        if not record_uuid:
-            raise MinerError('uuid is required for read operation', 'ValidationError', 400)
+        record_id = data.get('id')
+        if not record_id:
+            raise MinerError('id is required for read operation', 'ValidationError', 400)
 
         # Find single record
-        instance = g.session.query(model_class).filter(model_class.uuid == record_uuid).first()
+        instance = g.session.query(model_class).filter(model_class.id == record_id).first()
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
 
@@ -430,17 +439,21 @@ class Miner:
     def handle_create(self, model_class, data, audit_data):
         """Handle create operations"""
         create_data = data.get('data', {})
+        
         if not create_data:
             raise MinerError('data field is required for create operation', 'ValidationError', 400)
 
+        # Filter out is_active - it should always use the model's default
+        filtered_data = {k: v for k, v in create_data.items() if k != 'is_active'}
+
         # Create new instance
-        instance = model_class(**create_data)
+        instance = model_class(**filtered_data)
         g.session.add(instance)
         g.session.commit()
 
         # Update audit data
         audit_data.update({
-            'target_uuid': str(instance.uuid),
+            'target_id': str(instance.id),
             'records_returned': 1
         })
 
@@ -461,28 +474,44 @@ class Miner:
 
     def handle_update(self, model_class, data, audit_data):
         """Handle update operations"""
-        record_uuid = data.get('uuid')
+        record_id = data.get('id')
         update_data = data.get('data', {})
 
-        if not record_uuid:
-            raise MinerError('uuid is required for update operation', 'ValidationError', 400)
+        if not record_id:
+            raise MinerError('id is required for update operation', 'ValidationError', 400)
         if not update_data:
             raise MinerError('data field is required for update operation', 'ValidationError', 400)
 
+        # Filter out is_active - it should never be updated via API
+        filtered_data = {k: v for k, v in update_data.items() if k != 'is_active'}
+
         # Find record
-        instance = g.session.query(model_class).filter(model_class.uuid == record_uuid).first()
+        instance = g.session.query(model_class).filter(model_class.id == record_id).first()
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
 
+        # Get readonly fields for this model
+        readonly_fields = getattr(model_class, '__readonly_fields__', [])
+        
+        # Track attempted readonly updates and successful updates
+        readonly_attempts = []
+        fields_updated = []
+        
         # Update fields
-        for field, value in update_data.items():
+        for field, value in filtered_data.items():
             if hasattr(instance, field):
-                setattr(instance, field, value)
+                if field in readonly_fields:
+                    readonly_attempts.append(field)
+                else:
+                    setattr(instance, field, value)
+                    fields_updated.append(field)
 
         g.session.commit()
 
         # Update audit data
         audit_data['records_returned'] = 1
+        audit_data['fields_updated'] = fields_updated
+        audit_data['readonly_attempts'] = readonly_attempts
 
         # Return updated object
         slim = data.get('slim', False)
@@ -494,21 +523,28 @@ class Miner:
             'message': f'{model_class.__name__} updated successfully'
         }
         
+        # Add warning if readonly fields were attempted
+        if readonly_attempts:
+            response['warning'] = f'The following readonly fields were not updated: {", ".join(readonly_attempts)}'
+            response['readonly_fields_attempted'] = readonly_attempts
+            self.logger.warning(f"User {audit_data.get('user_id')} attempted to update readonly fields {readonly_attempts} on {model_class.__name__} {record_id}")
+        
         if slim:
             response['metadata'] = self._get_model_metadata(model_class)
 
         return jsonify(response)
 
+
     def handle_delete(self, model_class, data, audit_data):
         """Handle delete operations"""
-        record_uuid = data.get('uuid')
+        record_id = data.get('id')
         hard_delete = data.get('hard_delete', False)
 
-        if not record_uuid:
-            raise MinerError('uuid is required for delete operation', 'ValidationError', 400)
+        if not record_id:
+            raise MinerError('id is required for delete operation', 'ValidationError', 400)
 
         # Find record
-        instance = g.session.query(model_class).filter(model_class.uuid == record_uuid).first()
+        instance = g.session.query(model_class).filter(model_class.id == record_id).first()
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
 
@@ -584,7 +620,7 @@ class Miner:
             audit_data['search_terms'] = search_value
         
         # Get total count before filtering (for DataTables recordsTotal)
-        total_query = g.session.query(func.count(model_class.uuid))
+        total_query = g.session.query(func.count(model_class.id))
         if hasattr(model_class, 'is_active') and not include_inactive:
             total_query = total_query.filter(model_class.is_active == True)
         records_total = total_query.scalar() or 0
@@ -632,7 +668,7 @@ class Miner:
         include_inactive = data.get('include_inactive', False)
 
         # Start building query
-        query = g.session.query(func.count(model_class.uuid))
+        query = g.session.query(func.count(model_class.id))
 
         # Apply active filter unless explicitly including inactive
         if hasattr(model_class, 'is_active') and not include_inactive:
@@ -670,7 +706,6 @@ class Miner:
                 mapper_property = model_class.__mapper__.get_property(field_name)
                 
                 # Check if it's a RelationshipProperty
-                from sqlalchemy.orm import RelationshipProperty
                 if isinstance(mapper_property, RelationshipProperty):
                     # Handle relationship filters
                     if value:  # Only filter if value is provided
@@ -737,6 +772,9 @@ class Miner:
         except ValueError:
             pass
 
+        # Check if search term looks like a date/time
+        is_date_time_search = self._looks_like_date_time(search_term)
+
         # If no search fields specified, auto-detect appropriate fields
         if not search_fields:
             search_fields = []
@@ -747,8 +785,10 @@ class Miner:
                 if 'BOOLEAN' in column_type:
                     continue
 
-                # Skip date/time fields
-                if 'DATE' in column_type or 'TIME' in column_type:
+                # Include date/time fields only if search term looks like date/time
+                if 'DATE' in column_type or 'TIME' in column_type or 'TIMESTAMP' in column_type:
+                    if is_date_time_search:
+                        search_fields.append(column.name)
                     continue
 
                 # Include numeric fields only if search term is numeric
@@ -776,12 +816,23 @@ class Miner:
             for field_name in search_fields:
                 if hasattr(model_class, field_name):
                     column = model_class.__table__.columns.get(field_name)
-                    if column is not None:  # Fix: Check if column exists properly
+                    if column is not None:
                         column_type = str(column.type).upper()
-                        if 'BOOLEAN' not in column_type:
-                            valid_search_fields.append(field_name)
-                        elif self.logger:
-                            self.logger.debug(f"Removing boolean field {field_name} from search fields")
+                        
+                        # Skip boolean fields
+                        if 'BOOLEAN' in column_type:
+                            if self.logger:
+                                self.logger.debug(f"Removing boolean field {field_name} from search fields")
+                            continue
+                        
+                        # For date/time fields, only include if search term looks like date/time
+                        if 'DATE' in column_type or 'TIME' in column_type or 'TIMESTAMP' in column_type:
+                            if not is_date_time_search:
+                                if self.logger:
+                                    self.logger.debug(f"Removing date/time field {field_name} from search - term doesn't look like date/time")
+                                continue
+                        
+                        valid_search_fields.append(field_name)
 
             search_fields = valid_search_fields
 
@@ -799,13 +850,20 @@ class Miner:
 
             field = getattr(model_class, field_name)
             column = model_class.__table__.columns.get(field_name)
-            if column is None:  # Fix: Check if column exists properly
+            if column is None:
                 continue
 
             column_type = str(column.type).upper()
 
+            # Handle date/time fields
+            if 'DATE' in column_type or 'TIME' in column_type or 'TIMESTAMP' in column_type:
+                # Cast to text and use ILIKE for partial date matching
+                # This allows searching for "2024" to match "2024-01-15 10:30:00"
+                from sqlalchemy import cast, String
+                search_conditions.append(cast(field, String).ilike(f'%{search_term}%'))
+
             # Handle numeric fields
-            if any(num_type in column_type for num_type in ['INTEGER', 'NUMERIC', 'FLOAT', 'DECIMAL']):
+            elif any(num_type in column_type for num_type in ['INTEGER', 'NUMERIC', 'FLOAT', 'DECIMAL']):
                 if is_numeric_search:
                     search_conditions.append(field == numeric_value)
 
@@ -813,8 +871,8 @@ class Miner:
             elif 'UUID' in column_type:
                 try:
                     import uuid
-                    uuid_value = uuid.UUID(search_term)
-                    search_conditions.append(field == uuid_value)
+                    id_value = uuid.UUID(search_term)
+                    search_conditions.append(field == id_value)
                 except ValueError:
                     pass
 
@@ -836,6 +894,46 @@ class Miner:
 
         return query
 
+    def _looks_like_date_time(self, search_term):
+        """Check if search term looks like it could be a date or time"""
+        if not search_term:
+            return False
+        
+        # Common date/time patterns to check for
+        date_time_indicators = [
+            # Year patterns
+            r'\b(19|20)\d{2}\b',  # 1900-2099
+            # Date separators
+            r'[-/.]',
+            # Month names
+            r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)',
+            # Time indicators
+            r'[:\s](am|pm|AM|PM)\b',
+            r'\d{1,2}:\d{2}',  # HH:MM
+            # ISO date patterns
+            r'\d{4}-\d{1,2}',  # YYYY-MM
+            r'\d{1,2}-\d{1,2}',  # MM-DD or DD-MM
+            # Common date formats
+            r'\d{1,2}/\d{1,2}',  # MM/DD or DD/MM
+        ]
+        
+        import re
+        search_lower = search_term.lower()
+        
+        for pattern in date_time_indicators:
+            if re.search(pattern, search_lower):
+                return True
+        
+        # Check if it's just a 4-digit year
+        if re.match(r'^\d{4}$', search_term):
+            try:
+                year = int(search_term)
+                if 1900 <= year <= 2100:
+                    return True
+            except ValueError:
+                pass
+        
+        return False
     def _apply_sorting(self, query, model_class, sort_by, sort_order):
         """Apply sorting to query"""
         if not hasattr(model_class, sort_by):
@@ -857,14 +955,21 @@ class Miner:
 
     def _serialize_instance(self, instance, slim=False, return_columns=None):
         """Convert model instance to dictionary with optional slim mode and column filtering"""
+        # Define fields to always exclude from API responses
+        excluded_fields = ['is_active']
+        
         if slim:
             # Slim mode: only return indexed data (values as array)
             if return_columns:
+                # Filter out excluded fields from return_columns
+                filtered_columns = [col for col in return_columns if col not in excluded_fields]
                 return [self._serialize_value(getattr(instance, col, None))
-                    for col in return_columns]
+                    for col in filtered_columns]
             else:
+                # Return all columns except excluded fields
                 return [self._serialize_value(getattr(instance, col.name))
-                    for col in instance.__class__.__table__.columns]
+                    for col in instance.__class__.__table__.columns
+                    if col.name not in excluded_fields]
         else:
             # Full mode: return as key-value pairs
             if hasattr(instance, 'to_dict'):
@@ -873,18 +978,23 @@ class Miner:
                 # Basic serialization
                 result = {}
                 for column in instance.__class__.__table__.columns:
-                    value = getattr(instance, column.name)
-                    result[column.name] = self._serialize_value(value)
+                    if column.name not in excluded_fields:
+                        value = getattr(instance, column.name)
+                        result[column.name] = self._serialize_value(value)
+            
+            # Remove excluded fields if they were included by to_dict
+            for field in excluded_fields:
+                result.pop(field, None)
             
             # Filter to only requested columns if specified
             if return_columns:
                 filtered_result = {}
                 for col in return_columns:
-                    if col in result:
+                    if col in result and col not in excluded_fields:
                         filtered_result[col] = result[col]
-                # Always include uuid for actions
-                if 'uuid' in result and 'uuid' not in filtered_result:
-                    filtered_result['uuid'] = result['uuid']
+                # Always include id for actions
+                if 'id' in result and 'id' not in filtered_result:
+                    filtered_result['id'] = result['id']
                 return filtered_result
             
             return result
@@ -900,8 +1010,433 @@ class Miner:
 
     def _get_model_metadata(self, model_class):
         """Get model metadata for slim responses"""
+        # Exclude is_active from metadata columns
+        excluded_fields = ['is_active']
+        columns = [col.name for col in model_class.__table__.columns if col.name not in excluded_fields]
+        
         return {
-            'columns': [col.name for col in model_class.__table__.columns],
+            'columns': columns,
             'table_name': model_class.__tablename__,
             'model_name': model_class.__name__
         }
+    
+    def handle_form_metadata(self, model_class, data, audit_data):
+        """
+        Handle form_metadata operations - return rich metadata for form generation
+        Includes field types, constraints, relationships, and smart FK detection
+        """
+        # Get basic metadata first
+        basic_metadata = self._get_form_basic_metadata(model_class)
+        
+        # Enrich with relationship details
+        relationships = self._get_form_relationship_metadata(model_class)
+        
+        # Get validation rules
+        validation_rules = self._get_form_validation_rules(model_class)
+        
+        # Detect which fields should be shown/hidden in forms
+        form_config = self._get_form_display_config(model_class)
+        
+        # Build complete metadata
+        metadata = {
+            'model': {
+                'name': model_class.__name__,
+                'table_name': model_class.__tablename__,
+                'display_name': self._get_model_display_name(model_class),
+                'description': model_class.__doc__.strip() if model_class.__doc__ else None
+            },
+            'fields': basic_metadata,
+            'relationships': relationships,
+            'validation': validation_rules,
+            'form_config': form_config,
+            'primary_key': [col.name for col in model_class.__table__.primary_key][0] if model_class.__table__.primary_key else 'id'
+        }
+        
+        # Update audit data
+        audit_data['operation_details'] = 'form_metadata_retrieved'
+        
+        try:
+            return jsonify({
+                'success': True,
+                'metadata': metadata
+            })
+        except:
+            return {
+                'success': True,
+                'metadata': metadata
+            }
+
+    def _get_form_basic_metadata(self, model_class):
+        """Get basic field metadata for form generation"""
+        # Define fields to exclude from forms
+        excluded_fields = ['is_active']
+        
+        fields = {}
+        
+        for column in model_class.__table__.columns:
+            # Skip excluded fields
+            if column.name in excluded_fields:
+                continue
+                
+            field_meta = {
+                'name': column.name,
+                'type': self._get_field_type(column),
+                'sql_type': str(column.type),
+                'nullable': column.nullable,
+                'primary_key': column.primary_key,
+                'unique': column.unique or False,
+                'index': column.index or False,
+                'default': self._serialize_default(column.default),
+                'label': self._get_field_label(column.name),
+                'placeholder': self._get_field_placeholder(column),
+                'help_text': None,  # Can be customized per model
+                'readonly': False,
+                'hidden': False,
+                'order': 0
+            }
+            
+            # Add constraints
+            if hasattr(column.type, 'length') and column.type.length:
+                field_meta['max_length'] = column.type.length
+            
+            # Check for foreign keys
+            if column.foreign_keys:
+                fk = list(column.foreign_keys)[0]
+                field_meta['is_foreign_key'] = True
+                field_meta['foreign_key'] = {
+                    'table': fk.column.table.name,
+                    'column': fk.column.name,
+                    'model': self._get_model_from_table_name(fk.column.table.name)
+                }
+            else:
+                field_meta['is_foreign_key'] = False
+            
+            # Auto-detect if field should be hidden
+            if column.primary_key or column.name in ['created_at', 'updated_at', 'deleted_at']:
+                field_meta['hidden'] = True
+            
+            # Auto-detect readonly fields
+            if column.name in ['created_at', 'updated_at', 'created_by', 'updated_by']:
+                field_meta['readonly'] = True
+            
+            # Special handling for common field names
+            if column.name == 'password' or column.name == 'password_hash':
+                field_meta['type'] = 'password'
+                field_meta['hidden_on_edit'] = True
+            
+            if column.name == 'email':
+                field_meta['type'] = 'email'
+            
+            if column.name == 'url' or column.name.endswith('_url'):
+                field_meta['type'] = 'url'
+            
+            fields[column.name] = field_meta
+        
+        return fields
+
+    def _get_form_relationship_metadata(self, model_class):
+        """Get detailed relationship metadata for form generation"""
+        relationships = {}
+        
+        for key, rel in model_class.__mapper__.relationships.items():
+            rel_meta = {
+                'name': key,
+                'type': rel.direction.name,  # MANYTOONE, ONETOMANY, MANYTOMANY
+                'model': rel.mapper.class_.__name__,
+                'table': rel.mapper.class_.__tablename__,
+                'uselist': rel.uselist,
+                'back_populates': rel.back_populates,
+                'cascade': rel.cascade,
+                'lazy': rel.lazy,
+                'display_field': self._detect_display_field(rel.mapper.class_),
+                'foreign_keys': [str(fk) for fk in rel._calculated_foreign_keys],
+                'is_owned': False,  # Will be determined below
+                'back_reference_field': None,
+                'inline_editing': False,
+                'order_by': None
+            }
+            
+            # Detect if this is an "owned" relationship (has back-reference to parent)
+            related_model = rel.mapper.class_
+            for col in related_model.__table__.columns:
+                if col.foreign_keys:
+                    for fk in col.foreign_keys:
+                        if fk.column.table.name == model_class.__tablename__:
+                            rel_meta['is_owned'] = True
+                            rel_meta['back_reference_field'] = col.name
+                            break
+            
+            # Determine if inline editing should be enabled
+            if rel_meta['is_owned'] and rel.uselist:
+                rel_meta['inline_editing'] = True
+            
+            # Check for ordering
+            if hasattr(related_model, 'order_index'):
+                rel_meta['order_by'] = 'order_index'
+            elif hasattr(related_model, 'created_at'):
+                rel_meta['order_by'] = 'created_at'
+            
+            relationships[key] = rel_meta
+        
+        return relationships
+
+    def _get_form_validation_rules(self, model_class):
+        """Extract validation rules from model"""
+        # Define fields to exclude
+        excluded_fields = ['is_active']
+        
+        rules = {}
+        
+        for column in model_class.__table__.columns:
+            # Skip excluded fields
+            if column.name in excluded_fields:
+                continue
+                
+            col_rules = {}
+            
+            # Required fields - a field is required if it's not nullable
+            # Don't mark as required if:
+            # - It's a primary key (usually auto-generated)
+            # - It has a server-side default (like func.now())
+            # - It's an auto-timestamp field
+            if not column.nullable and not column.primary_key:
+                # Check if it has a server-side default
+                has_server_default = False
+                if column.default is not None:
+                    # Check if it's a server-side function (like func.now())
+                    if hasattr(column.default, 'arg') and callable(column.default.arg):
+                        has_server_default = True
+                    # Also check for server_default
+                    if column.server_default is not None:
+                        has_server_default = True
+                
+                # Auto-timestamp fields should not be required in forms
+                auto_timestamp_fields = ['created_at', 'updated_at', 'deleted_at']
+                if column.name not in auto_timestamp_fields and not has_server_default:
+                    col_rules['required'] = True
+            
+            # Length constraints
+            if hasattr(column.type, 'length') and column.type.length:
+                col_rules['max_length'] = column.type.length
+            
+            # Numeric constraints
+            if self._is_numeric_type(column.type):
+                if hasattr(column.type, 'precision'):
+                    col_rules['precision'] = column.type.precision
+                if hasattr(column.type, 'scale'):
+                    col_rules['scale'] = column.type.scale
+            
+            # Pattern constraints for common fields
+            if column.name == 'email':
+                col_rules['pattern'] = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+                col_rules['pattern_message'] = 'Please enter a valid email address'
+            
+            if column.name == 'phone':
+                col_rules['pattern'] = r'^[\d\s\-\+\(\)]+$'
+                col_rules['pattern_message'] = 'Please enter a valid phone number'
+            
+            # Unique constraint
+            if column.unique:
+                col_rules['unique'] = True
+            
+            if col_rules:
+                rules[column.name] = col_rules
+        
+        return rules
+    def _get_form_display_config(self, model_class):
+        """Get form display configuration"""
+        # Define fields to exclude from forms
+        excluded_fields = ['is_active']
+        
+        config = {
+            'field_order': [],
+            'fieldsets': [],
+            'excluded_fields': ['deleted_at', 'password_hash', 'salt', 'is_active'],
+            'readonly_fields': ['created_at', 'updated_at', 'created_by', 'updated_by'],
+            'hidden_fields': ['id', 'uuid'],
+            'inline_models': []
+        }
+        
+        # Build default field order (non-hidden fields)
+        for column in model_class.__table__.columns:
+            if column.name not in config['excluded_fields'] and not column.primary_key:
+                config['field_order'].append(column.name)
+        
+        # Add relationships at the end
+        for key, rel in model_class.__mapper__.relationships.items():
+            if rel.uselist:  # One-to-many or many-to-many
+                config['inline_models'].append(key)
+            else:  # Many-to-one
+                config['field_order'].append(key)
+        
+        # Check for custom form config on model
+        if hasattr(model_class, '__form_config__'):
+            custom_config = model_class.__form_config__
+            config.update(custom_config)
+        
+        return config
+
+    def _get_field_type(self, column):
+        """Map SQL types to form field types"""
+        type_str = str(column.type).upper()
+        
+        # Special cases based on column name
+        if column.name in ['password', 'password_hash']:
+            return 'password'
+        if column.name == 'email':
+            return 'email'
+        if column.name == 'url' or column.name.endswith('_url'):
+            return 'url'
+        
+        # Map SQL types to HTML input types
+        if 'BOOLEAN' in type_str:
+            return 'checkbox'
+        elif 'DATE' in type_str and 'TIME' not in type_str:
+            return 'date'
+        elif 'DATETIME' in type_str or 'TIMESTAMP' in type_str:
+            return 'datetime-local'
+        elif 'TIME' in type_str and 'DATE' not in type_str:
+            return 'time'
+        elif 'INT' in type_str or 'NUMERIC' in type_str or 'DECIMAL' in type_str or 'FLOAT' in type_str:
+            return 'number'
+        elif 'TEXT' in type_str:
+            return 'textarea'
+        elif 'JSON' in type_str:
+            return 'json'
+        elif 'UUID' in type_str:
+            return 'hidden'  # Usually auto-generated
+        else:
+            return 'text'
+
+    def _get_field_label(self, field_name):
+        """Convert field name to human-readable label"""
+        # Remove common suffixes
+        label = field_name.replace('_id', '').replace('_at', '')
+        
+        # Convert snake_case to Title Case
+        label = label.replace('_', ' ').title()
+        
+        # Special cases
+        label_map = {
+            'Uuid': 'UUID',
+            'Id': 'ID',
+            'Url': 'URL',
+            'Api': 'API',
+            'Fk': 'FK',
+            'Ip': 'IP Address',
+            'Json': 'JSON',
+            'Xml': 'XML',
+            'Csv': 'CSV',
+            'Pdf': 'PDF'
+        }
+        
+        for old, new in label_map.items():
+            label = label.replace(old, new)
+        
+        return label
+
+    def _get_field_placeholder(self, column):
+        """Generate appropriate placeholder text"""
+        if column.name == 'email':
+            return 'user@example.com'
+        elif column.name == 'phone':
+            return '(555) 123-4567'
+        elif column.name == 'url' or column.name.endswith('_url'):
+            return 'https://example.com'
+        elif 'name' in column.name:
+            return f'Enter {self._get_field_label(column.name).lower()}'
+        else:
+            return ''
+
+    def _detect_display_field(self, model_class):
+        """Auto-detect the best field to use for display in dropdowns"""
+        # Priority order for display fields
+        display_field_priority = [
+            'display_name', 'display', 'name', 'title', 'label', 
+            'description', 'email', 'username', 'code', 'slug'
+        ]
+        
+        # Check each priority field
+        for field_name in display_field_priority:
+            if hasattr(model_class, field_name):
+                column = model_class.__table__.columns.get(field_name)
+                if column is not None and 'VARCHAR' in str(column.type).upper():
+                    return field_name
+        
+        # Fallback: first string column that's not an ID
+        for column in model_class.__table__.columns:
+            if ('VARCHAR' in str(column.type).upper() or 'TEXT' in str(column.type).upper()) \
+            and not column.primary_key \
+            and not column.foreign_keys \
+            and 'id' not in column.name.lower() \
+            and 'uuid' not in column.name.lower():
+                return column.name
+        
+        # Last resort: use ID
+        return 'id'
+
+    def _serialize_default(self, default):
+        """Serialize column defaults for JSON response"""
+        if default is None:
+            return None
+        
+        if hasattr(default, 'arg'):
+            # SQLAlchemy default
+            if callable(default.arg):
+                return 'function'
+            else:
+                return str(default.arg)
+        
+        return str(default)
+
+    def _get_model_from_table_name(self, table_name):
+        """Get model name from table name by looking it up in the registry"""
+        # Import all registered models
+        from app.register.classes import _model_registry
+
+        
+        # Get all models from the registry
+        # Find the model with matching table name
+        for model_name, model_class in _model_registry.items():
+            if hasattr(model_class, '__tablename__') and model_class.__tablename__ == table_name:
+                return model_class.__name__
+        
+        # If not found in registry, fall back to simple conversion
+        # but log a warning
+        if self.logger:
+            self.logger.warning(f"Table '{table_name}' not found in model registry, using fallback conversion")
+        
+        # Fallback: try to intelligently convert table name
+        # Handle common patterns like 'users' -> 'User', 'user_tokens' -> 'UserToken'
+        parts = table_name.split('_')
+        
+        # Remove common plural suffixes from the last part
+        if parts and parts[-1].endswith('ies'):
+            parts[-1] = parts[-1][:-3] + 'y'  # 'categories' -> 'category'
+        elif parts and parts[-1].endswith('es'):
+            parts[-1] = parts[-1][:-2]  # 'addresses' -> 'address'
+        elif parts and parts[-1].endswith('s'):
+            parts[-1] = parts[-1][:-1]  # 'users' -> 'user'
+        
+        # Capitalize each part
+        model_name = ''.join(part.capitalize() for part in parts)
+        
+        return model_name
+
+    def _get_model_display_name(self, model_class):
+        """Get human-readable display name for model"""
+        if hasattr(model_class, '__display_name__'):
+            return model_class.__display_name__
+        
+        # Convert CamelCase to Title Case
+        import re
+        name = model_class.__name__
+        # Insert spaces before capital letters
+        name = re.sub(r'(?<!^)(?=[A-Z])', ' ', name)
+        return name
+
+    def _is_numeric_type(self, column_type):
+        """Check if column type is numeric"""
+        type_str = str(column_type).upper()
+        numeric_types = ['INTEGER', 'NUMERIC', 'DECIMAL', 'FLOAT', 'REAL', 'SMALLINT', 'BIGINT']
+        return any(t in type_str for t in numeric_types)

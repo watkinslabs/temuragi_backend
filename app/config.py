@@ -12,6 +12,7 @@ config={
                             "stronk_password_%24314X"
                             "@10.90.0.40:5432/temuragi"
                             ),
+    'DB_CONN_ENC_KEY'   : 'lejookie',
     'CIPHER_KEY'        :  b'u1tOOtBW2ECTWXSMS_pZ9wwdn4dEZzg_-ihYJfbYbd8=',
     'SECRET_KEY'        : 'your_secret_key_here',
     'SESSION_LIFETIME'  :  timedelta(days=30),

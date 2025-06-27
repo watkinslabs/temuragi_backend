@@ -7,4 +7,11 @@ x added db init frfom cli
 x added db data from cli
 x add templates
 x export import data
-o render templates
+x render templates
+x ad encrytpthon to passwords for connections
+o encrypt more?
+o password detection if incrypted broken... doesnt matter.. but is
+o report init broken... sets as inactive/wrong options.... maybe js issue.. idk
+o lost only shows active, 
+o report cannot set to inactive/active
+o need log viewer

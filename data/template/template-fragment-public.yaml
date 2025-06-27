@@ -5,7 +5,7 @@ TemplateFragment:
       tablename: template_fragments
       schema: public
     data:
-      template_uuid: 00000000-0000-0000-0000-000000000001
+      template_id: 00000000-0000-0000-0000-000000000001
       fragment_type: content
       fragment_name: Empty Public page
       fragment_key: base
@@ -74,5 +74,5 @@ TemplateFragment:
       cache_duration: 0
       last_compiled: null
       change_description: 
-      created_by_user_uuid: null
+      created_by_user_id: null
 

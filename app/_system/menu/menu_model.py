@@ -8,6 +8,7 @@ from app.base.model import BaseModel
 class Menu(BaseModel):
 
     __tablename__ = 'menu'
+    __depends_on__ = []
 
     name = Column(String(50), unique=True, nullable=False)
     display = Column(String(100), nullable=False)

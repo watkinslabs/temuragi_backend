@@ -7,5 +7,5 @@ Menu:
    name: ADMIN
    display: Admin Menu
    description: Main administrative menu
-   uuid: 00000000-0000-0000-0000-000000001000
+   id: 00000000-0000-0000-0000-000000001000
    is_active: true

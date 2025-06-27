@@ -16,14 +16,14 @@ class RbacAuditLog(BaseModel):
     __tablename__ = 'rbac_audit_logs'
 
     # User context
-    user_uuid = Column(
+    user_id = Column(
         UUID(as_uuid=True),
-        ForeignKey('users.uuid', name='fk_rbac_audit_logs_user'),
+        ForeignKey('users.id', name='fk_rbac_audit_logs_user'),
         nullable=True  # Some operations might be system-level
     )
-    token_uuid = Column(
+    token_id = Column(
         UUID(as_uuid=True),
-        ForeignKey('user_tokens.uuid', name='fk_rbac_audit_logs_token'),
+        ForeignKey('user_tokens.id', name='fk_rbac_audit_logs_token'),
         nullable=True  # CLI operations might not have tokens
     )
 
@@ -60,16 +60,16 @@ class RbacAuditLog(BaseModel):
     token = relationship("UserToken", back_populates="rbac_audit_logs")
 
     __table_args__ = (
-        Index('idx_rbac_audit_logs_user', 'user_uuid'),
+        Index('idx_rbac_audit_logs_user', 'user_id'),
         Index('idx_rbac_audit_logs_permission', 'permission_name'),
         Index('idx_rbac_audit_logs_granted', 'permission_granted'),
         Index('idx_rbac_audit_logs_created', 'created_at'),
         Index('idx_rbac_audit_logs_interface', 'interface_type'),
         Index('idx_rbac_audit_logs_resource', 'resource_type', 'resource_name'),
         # Composite indexes for common queries
-        Index('idx_rbac_audit_logs_user_permission', 'user_uuid', 'permission_name'),
+        Index('idx_rbac_audit_logs_user_permission', 'user_id', 'permission_name'),
         Index('idx_rbac_audit_logs_denied', 'permission_granted', 'created_at'),
-        Index('idx_rbac_audit_logs_user_denied', 'user_uuid', 'permission_granted', 'created_at'),
+        Index('idx_rbac_audit_logs_user_denied', 'user_id', 'permission_granted', 'created_at'),
     )
 
     @classmethod
@@ -80,7 +80,7 @@ class RbacAuditLog(BaseModel):
         Usage:
         RbacAuditLog.log_permission_check(
             session=session,
-            user_uuid=user.uuid,
+            user_id=user.id,
             permission_name="users:read",
             permission_granted=True,
             resource_type="model",
@@ -101,14 +101,14 @@ class RbacAuditLog(BaseModel):
             return None
 
     @classmethod
-    def log_api_permission_check(cls, session, user_uuid, permission_name, granted,
+    def log_api_permission_check(cls, session, user_id, permission_name, granted,
                                 resource_name=None, action=None, context=None,
-                                token_uuid=None, ip_address=None, user_agent=None):
+                                token_id=None, ip_address=None, user_agent=None):
         """Log permission check from API"""
         return cls.log_permission_check(
             session=session,
-            user_uuid=user_uuid,
-            token_uuid=token_uuid,
+            user_id=user_id,
+            token_id=token_id,
             permission_name=permission_name,
             permission_granted=granted,
             resource_type="model",
@@ -122,13 +122,13 @@ class RbacAuditLog(BaseModel):
         )
 
     @classmethod
-    def log_web_permission_check(cls, session, user_uuid, permission_name, granted,
+    def log_web_permission_check(cls, session, user_id, permission_name, granted,
                                 endpoint=None, method=None, ip_address=None,
                                 user_agent=None, session_id=None, context=None):
         """Log permission check from web interface"""
         return cls.log_permission_check(
             session=session,
-            user_uuid=user_uuid,
+            user_id=user_id,
             permission_name=permission_name,
             permission_granted=granted,
             resource_type="view",
@@ -142,12 +142,12 @@ class RbacAuditLog(BaseModel):
         )
 
     @classmethod
-    def log_cli_permission_check(cls, session, user_uuid, permission_name, granted,
+    def log_cli_permission_check(cls, session, user_id, permission_name, granted,
                                 cli_command=None, resource_name=None, action=None, context=None):
         """Log permission check from CLI"""
         return cls.log_permission_check(
             session=session,
-            user_uuid=user_uuid,
+            user_id=user_id,
             permission_name=permission_name,
             permission_granted=granted,
             resource_type="cli",
@@ -187,7 +187,7 @@ class RbacAuditLog(BaseModel):
         query = session.query(
             cls.interface_type,
             cls.permission_name,
-            func.count(cls.uuid).label('total_checks'),
+            func.count(cls.id).label('total_checks'),
             func.avg(cls.check_duration_ms).label('avg_duration'),
             func.max(cls.check_duration_ms).label('max_duration'),
             func.sum(case((cls.permission_granted == True, 1), else_=0)).label('granted'),
@@ -205,11 +205,11 @@ class RbacAuditLog(BaseModel):
             cls.permission_name
         ).order_by(
             cls.interface_type,
-            func.count(cls.uuid).desc()
+            func.count(cls.id).desc()
         ).all()
 
     @classmethod
-    def get_user_permission_activity(cls, session, user_uuid, days=30):
+    def get_user_permission_activity(cls, session, user_id, days=30):
         """Get user permission activity summary"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
@@ -217,24 +217,24 @@ class RbacAuditLog(BaseModel):
             cls.permission_name,
             cls.interface_type,
             cls.resource_type,
-            func.count(cls.uuid).label('attempts'),
+            func.count(cls.id).label('attempts'),
             func.sum(case((cls.permission_granted == True, 1), else_=0)).label('granted'),
             func.sum(case((cls.permission_granted == False, 1), else_=0)).label('denied')
         ).filter(
-            cls.user_uuid == user_uuid,
+            cls.user_id == user_id,
             cls.created_at >= cutoff_date
         ).group_by(
             cls.permission_name, cls.interface_type, cls.resource_type
         ).all()
 
     @classmethod
-    def get_user_recent_activity(cls, session, user_uuid, days=1, limit=10):
+    def get_user_recent_activity(cls, session, user_id, days=1, limit=10):
         """Get recent detailed activity for a user"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
         return session.query(cls)\
             .filter(
-                cls.user_uuid == user_uuid,
+                cls.user_id == user_id,
                 cls.created_at >= cutoff_date
             )\
             .order_by(cls.created_at.desc())\
@@ -248,17 +248,17 @@ class RbacAuditLog(BaseModel):
         return session.query(
             cls.permission_name,
             cls.interface_type,
-            func.count(cls.uuid).label('total_checks'),
+            func.count(cls.id).label('total_checks'),
             func.sum(case((cls.permission_granted == True, 1), else_=0)).label('granted'),
             func.sum(case((cls.permission_granted == False, 1), else_=0)).label('denied'),
-            func.count(func.distinct(cls.user_uuid)).label('unique_users')
+            func.count(func.distinct(cls.user_id)).label('unique_users')
         ).filter(
             cls.created_at >= cutoff_date
         ).group_by(
             cls.permission_name,
             cls.interface_type
         ).order_by(
-            func.count(cls.uuid).desc()
+            func.count(cls.id).desc()
         ).all()
 
     @classmethod
@@ -270,7 +270,7 @@ class RbacAuditLog(BaseModel):
             cls.permission_name,
             cls.interface_type,
             cls.access_denied_reason,
-            func.count(cls.uuid).label('count')
+            func.count(cls.id).label('count')
         ).filter(
             cls.created_at >= cutoff_date,
             cls.permission_granted == False
@@ -279,7 +279,7 @@ class RbacAuditLog(BaseModel):
             cls.interface_type,
             cls.access_denied_reason
         ).order_by(
-            func.count(cls.uuid).desc()
+            func.count(cls.id).desc()
         ).all()
 
         recent_denials = session.query(cls)\
@@ -298,21 +298,21 @@ class RbacAuditLog(BaseModel):
         cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours)
 
         return session.query(
-            cls.user_uuid,
-            func.count(cls.uuid).label('total_denials'),
+            cls.user_id,
+            func.count(cls.id).label('total_denials'),
             func.count(func.distinct(cls.permission_name)).label('unique_permissions'),
             func.count(func.distinct(cls.ip_address)).label('unique_ips'),
             func.max(cls.created_at).label('last_denial')
         ).filter(
             cls.created_at >= cutoff_date,
             cls.permission_granted == False,
-            cls.user_uuid.isnot(None)
+            cls.user_id.isnot(None)
         ).group_by(
-            cls.user_uuid
+            cls.user_id
         ).having(
-            func.count(cls.uuid) >= min_denials
+            func.count(cls.id) >= min_denials
         ).order_by(
-            func.count(cls.uuid).desc()
+            func.count(cls.id).desc()
         ).all()
 
     @classmethod
@@ -321,7 +321,7 @@ class RbacAuditLog(BaseModel):
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
         # Count logs to be deleted
-        old_count = session.query(func.count(cls.uuid))\
+        old_count = session.query(func.count(cls.id))\
             .filter(cls.created_at < cutoff_date).scalar()
 
         return old_count, cutoff_date
@@ -339,9 +339,9 @@ class RbacAuditLog(BaseModel):
     def to_dict(self):
         """Convert audit log to dictionary for API responses"""
         return {
-            'uuid': str(self.uuid),
-            'user_uuid': str(self.user_uuid) if self.user_uuid else None,
-            'token_uuid': str(self.token_uuid) if self.token_uuid else None,
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
+            'token_id': str(self.token_id) if self.token_id else None,
             'permission_name': self.permission_name,
             'permission_granted': self.permission_granted,
             'access_denied_reason': self.access_denied_reason,

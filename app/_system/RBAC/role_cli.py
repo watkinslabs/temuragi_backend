@@ -72,7 +72,7 @@ class RoleCLI(BaseCLI):
                 permission_count = len(role.permissions) if role.permissions else 0
                 
                 rows.append([
-                    str(role.uuid),
+                    str(role.id),
                     role.name,
                     role.display,
                     (role.description or '')[:50] + ('...' if role.description and len(role.description) > 50 else ''),
@@ -114,9 +114,9 @@ class RoleCLI(BaseCLI):
             self.session.add(new_role)
             self.session.commit()
 
-            self.log_info(f"Role added successfully: {name} (UUID: {new_role.uuid})")
+            self.log_info(f"Role added successfully: {name} (UUID: {new_role.id})")
             self.output_success(f"Role created: {name}")
-            self.output_info(f"UUID: {new_role.uuid}")
+            self.output_info(f"UUID: {new_role.id}")
             return 0
 
         except Exception as e:
@@ -219,7 +219,7 @@ class RoleCLI(BaseCLI):
 
             headers = ['Field', 'Value']
             rows = [
-                ['UUID', str(role.uuid)],
+                ['UUID', str(role.id)],
                 ['Name', role.name],
                 ['Display', role.display],
                 ['Description', role.description or 'None'],

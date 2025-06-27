@@ -4,10 +4,11 @@ from functools import wraps
 from flask import session, g, current_app, jsonify
 from sqlalchemy.orm import Session
 
-from app.register.database import get_model
+from app.register.classes import get_model
 
 class AuthService:
     """Authentication service for handling user auth operations"""
+    __depends_on__=[]
     
     def __init__(self, db_session: Session):
         
@@ -64,9 +65,9 @@ class AuthService:
         user.last_login_date = datetime.utcnow()
 
         # Create session
-        session['user_id'] = str(user.uuid)
+        session['user_id'] = str(user.id)
         session['username'] = user.username
-        session['role_uuid'] = str(user.role_uuid) if user.role_uuid else None
+        session['role_id'] = str(user.role_id) if user.role_id else None
 
         if remember:
             session.permanent = True
@@ -98,10 +99,10 @@ class AuthService:
         user = login_result['user']
         
         # Clean up expired tokens for this user before creating new ones
-        self._cleanup_user_tokens(user.uuid)
+        self._cleanup_user_tokens(user.id)
         
         # Check for existing valid refresh token for this application
-        existing_refresh = self._get_valid_refresh_token(user.uuid, application)
+        existing_refresh = self._get_valid_refresh_token(user.id, application)
         
         if existing_refresh:
             # Reuse existing refresh token and create new access token
@@ -113,12 +114,12 @@ class AuthService:
                     'message': 'Login successful',
                     'api_token': access_token.token,
                     'refresh_token': existing_refresh.token,
-                    'user_uuid': str(user.uuid),
+                    'user_id': str(user.id),
                     'user_info': {
                         'username': user.username,
                         'email': user.email,
                         'full_name': getattr(user, 'full_name', None),
-                        'role': str(user.role_uuid) if user.role_uuid else None
+                        'role': str(user.role_id) if user.role_id else None
                     },
                     'expires_in': access_token.expires_in_seconds(),
                     'redirect_url': '/v2/'
@@ -130,11 +131,11 @@ class AuthService:
         # Create new token pair
         try:
             # Revoke any remaining active tokens for this application
-            self._revoke_application_tokens(user.uuid, application)
+            self._revoke_application_tokens(user.id, application)
             
             tokens = self.UserToken.create_token_pair(
                 session=self.db_session,
-                user_uuid=user.uuid,
+                user_id=user.id,
                 name=f"{application} login",
                 application=application,
                 is_system_temporary=False
@@ -145,12 +146,12 @@ class AuthService:
                 'message': 'Login successful',
                 'api_token': tokens['access_token'].token,
                 'refresh_token': tokens['refresh_token'].token,
-                'user_uuid': str(user.uuid),
+                'user_id': str(user.id),
                 'user_info': {
                     'username': user.username,
                     'email': user.email,
                     'full_name': getattr(user, 'full_name', None),
-                    'role': str(user.role_uuid) if user.role_uuid else None
+                    'role': str(user.role_id) if user.role_id else None
                 },
                 'expires_in': tokens['access_token'].expires_in_seconds(),
                 'redirect_url': '/v2/'
@@ -192,7 +193,7 @@ class AuthService:
                 'success': True,
                 'api_token': new_access_token.token,
                 'expires_in': new_access_token.expires_in_seconds(),
-                'user_uuid': str(token_obj.user_uuid)
+                'user_id': str(token_obj.user_id)
             }
             
         except Exception as e:
@@ -224,12 +225,12 @@ class AuthService:
         
         return {
             'success': True,
-            'user_uuid': str(user.uuid),
+            'user_id': str(user.id),
             'user_info': {
                 'username': user.username,
                 'email': user.email,
                 'full_name': getattr(user, 'full_name', None),
-                'role': str(user.role_uuid) if user.role_uuid else None
+                'role': str(user.role_id) if user.role_id else None
             },
             'token_info': {
                 'expires_in': token_obj.expires_in_seconds(),
@@ -237,13 +238,13 @@ class AuthService:
             }
         }
 
-    def logout_api(self, access_token: str = None, user_uuid: str = None) -> dict:
+    def logout_api(self, access_token: str = None, user_id: str = None) -> dict:
         """
         Logout API user by revoking tokens
         
         Args:
             access_token: Current access token to revoke
-            user_uuid: User UUID to revoke all tokens for
+            user_id: User UUID to revoke all tokens for
             
         Returns:
             dict: {'success': bool, 'message': str}
@@ -255,10 +256,10 @@ class AuthService:
                 token_obj.revoke()
                 self.db_session.commit()
         
-        if user_uuid:
+        if user_id:
             # Revoke all active tokens for user
             user_tokens = self.db_session.query(self.UserToken).filter(
-                self.UserToken.user_uuid == user_uuid,
+                self.UserToken.user_id == user_id,
                 self.UserToken.is_active == True
             ).all()
             
@@ -272,7 +273,7 @@ class AuthService:
         
         return {'success': True, 'message': 'Logged out successfully'}
    
-    def register(self, username: str, email: str, password: str, role_uuid: str = None) -> dict:
+    def register(self, username: str, email: str, password: str, role_id: str = None) -> dict:
         """
         Register new user
         
@@ -280,7 +281,7 @@ class AuthService:
             username: Unique username
             email: Unique email address
             password: User password
-            role_uuid: Optional role UUID
+            role_id: Optional role UUID
             
         Returns:
             dict: {'success': bool, 'message': str, 'user': User or None}
@@ -295,10 +296,10 @@ class AuthService:
         
         # Create new user
         user = self.User(
-            uuid=uuid.uuid4(),
+            id=uuid.uuid4(),
             username=username,
             email=email,
-            role_uuid=role_uuid,
+            role_id=role_id,
             is_active=True
         )
         user.set_password(password)
@@ -401,17 +402,17 @@ class AuthService:
         
         return {'success': True, 'message': 'Account unlocked successfully'}
     
-    def _cleanup_user_tokens(self, user_uuid: uuid.UUID) -> None:
+    def _cleanup_user_tokens(self, user_id: uuid.UUID) -> None:
         """
         Clean up expired tokens for a user
         
         Args:
-            user_uuid: User UUID to clean tokens for
+            user_id: User UUID to clean tokens for
         """
         try:
             # Delete expired tokens
             expired_tokens = self.db_session.query(self.UserToken).filter(
-                self.UserToken.user_uuid == user_uuid,
+                self.UserToken.user_id == user_id,
                 self.UserToken.expires_at < datetime.utcnow(),
                 self.UserToken.ignore_expiration == False
             ).all()
@@ -424,35 +425,35 @@ class AuthService:
             current_app.logger.error(f"Token cleanup failed: {str(e)}")
             self.db_session.rollback()
     
-    def _get_valid_refresh_token(self, user_uuid: uuid.UUID, application: str) -> 'UserToken':
+    def _get_valid_refresh_token(self, user_id: uuid.UUID, application: str) -> 'UserToken':
         """
         Get existing valid refresh token for user and application
         
         Args:
-            user_uuid: User UUID
+            user_id: User UUID
             application: Application context
             
         Returns:
             UserToken or None
         """
         return self.db_session.query(self.UserToken).filter(
-            self.UserToken.user_uuid == user_uuid,
+            self.UserToken.user_id == user_id,
             self.UserToken.application == application,
             self.UserToken.token_type == 'refresh',
             self.UserToken.is_active == True,
             (self.UserToken.expires_at > datetime.utcnow()) | (self.UserToken.ignore_expiration == True)
         ).first()
     
-    def _revoke_application_tokens(self, user_uuid: uuid.UUID, application: str) -> None:
+    def _revoke_application_tokens(self, user_id: uuid.UUID, application: str) -> None:
         """
         Revoke all tokens for a specific application
         
         Args:
-            user_uuid: User UUID
+            user_id: User UUID
             application: Application context
         """
         tokens = self.db_session.query(self.UserToken).filter(
-            self.UserToken.user_uuid == user_uuid,
+            self.UserToken.user_id == user_id,
             self.UserToken.application == application,
             self.UserToken.is_active == True
         ).all()
@@ -561,7 +562,7 @@ def api_login_required(f):
             return jsonify({'error': validation_result['message']}), 401
         
         # Store user info in g for access in the view
-        g.current_user_uuid = validation_result['user_uuid']
+        g.current_user_id = validation_result['user_id']
         g.current_user_info = validation_result['user_info']
         g.token_info = validation_result['token_info']
         

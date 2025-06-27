@@ -13,6 +13,7 @@ class DynamicRouteManager:
     Production-ready dynamic route manager for Flask applications.
     Supports adding, removing, enabling/disabling routes with thread safety.
     """
+    __depends_on__=[]
     
     def __init__(self, app: Flask, logger: Optional[logging.Logger] = None):
         self.app = app

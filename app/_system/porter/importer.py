@@ -126,6 +126,9 @@ class ComponentImporter:
         filtered_data = {}
         table_columns = {col.name: col for col in model_class.__table__.columns}
         
+        # Get all model attributes (including those with underscores)
+        model_attrs = set(dir(model_class))
+        
         for key, value in data_dict.items():
             # Skip auto-generated fields
             if key.lower() in self.skip_fields:
@@ -133,18 +136,41 @@ class ComponentImporter:
                 continue
             
             # Skip foreign key name fields (they're just for reference)
-            if key.endswith('_name') and key.replace('_name', '_uuid') in data_dict:
+            if key.endswith('_name') and key.replace('_name', '_id') in data_dict:
                 self.output_manager.log_debug(f"Skipping reference field: {key}")
                 continue
             
-            # Only include fields that exist as columns
-            if key in table_columns:
+            # Check if this is a model attribute (could be mapped to a different column name)
+            if key in model_attrs and hasattr(model_class, key):
+                # Try to determine the actual column name
+                attr = getattr(model_class, key)
+                
+                # Check if it's a column property
+                if hasattr(attr, 'property') and hasattr(attr.property, 'columns'):
+                    # It's a column property, get the actual column name
+                    actual_columns = list(attr.property.columns)
+                    if actual_columns:
+                        column_name = actual_columns[0].name
+                        if column_name in table_columns:
+                            column = table_columns[column_name]
+                            converted_value = self._convert_import_value(value, column.type)
+                            filtered_data[key] = converted_value  # Use the model attribute name
+                            self.output_manager.log_debug(f"Including mapped field: {key} -> column {column_name} = {converted_value}")
+                            continue
+                
+                # If it's a hybrid property or descriptor, we'll still try to set it
+                converted_value = self._convert_import_value(value)
+                filtered_data[key] = converted_value
+                self.output_manager.log_debug(f"Including model attribute: {key} = {converted_value}")
+                
+            elif key in table_columns:
+                # Direct column match
                 column = table_columns[key]
                 converted_value = self._convert_import_value(value, column.type)
                 filtered_data[key] = converted_value
                 self.output_manager.log_debug(f"Including field: {key} = {converted_value}")
             else:
-                self.output_manager.log_warning(f"Field '{key}' not found in table columns, skipping")
+                self.output_manager.log_warning(f"Field '{key}' not found in model attributes or table columns, skipping")
         
         return filtered_data
     
@@ -248,9 +274,9 @@ class ComponentImporter:
             
             # Check for existing record if UUID provided
             existing_record = None
-            if 'uuid' in import_data and update_existing:
+            if 'id' in import_data and update_existing:
                 existing_record = self.session.query(model_class).filter(
-                    model_class.uuid == import_data['uuid']
+                    model_class.id == import_data['id']
                 ).first()
             
             if dry_run:
@@ -258,22 +284,47 @@ class ComponentImporter:
                 self.output_manager.output_info(f"DRY RUN: Would {action} {model_class.__name__} record")
                 return 0
             
+            # Special handling for fields that map to properties
+            # If _credentials exists, we need to use the credentials property
+            property_mappings = {
+                '_credentials': 'credentials'
+            }
+            
+            # Separate property-mapped fields from direct fields
+            property_data = {}
+            direct_data = {}
+            
+            for key, value in import_data.items():
+                if key in property_mappings:
+                    property_data[property_mappings[key]] = value
+                else:
+                    direct_data[key] = value
+            
             if existing_record:
                 # Update existing record
-                for key, value in import_data.items():
-                    if key != 'uuid':  # Don't update UUID
+                for key, value in direct_data.items():
+                    if key != 'id':  # Don't update UUID
                         setattr(existing_record, key, value)
                 
+                # Set property-mapped fields
+                for prop_name, value in property_data.items():
+                    setattr(existing_record, prop_name, value)
+                
                 self.session.commit()
-                self.output_manager.output_success(f"Updated {model_class.__name__} record: {existing_record.uuid}")
+                self.output_manager.output_success(f"Updated {model_class.__name__} record: {existing_record.id}")
                 return 0
             else:
-                # Create new record
-                new_record = model_class(**import_data)
+                # Create new record with direct fields
+                new_record = model_class(**direct_data)
+                
+                # Set property-mapped fields after creation
+                for prop_name, value in property_data.items():
+                    setattr(new_record, prop_name, value)
+                
                 self.session.add(new_record)
                 self.session.commit()
                 
-                self.output_manager.output_success(f"Created {model_class.__name__} record: {new_record.uuid}")
+                self.output_manager.output_success(f"Created {model_class.__name__} record: {new_record.id}")
                 return 0
                 
         except Exception as e:

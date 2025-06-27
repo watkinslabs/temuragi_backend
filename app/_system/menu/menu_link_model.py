@@ -11,9 +11,9 @@ class MenuLink(BaseModel):
     name = Column(String(100), nullable=False)
     display = Column(String(100), nullable=False)
     url = Column(String(255), nullable=True)
-    url_for = Column(String(255), nullable=False)
-    tier_uuid = Column(UUID(as_uuid=True),
-                    ForeignKey('menu_tiers.uuid', name='fk_menu_links_tier', ondelete='CASCADE'),
+    url_for = Column(String(255), nullable=True)
+    tier_id = Column(UUID(as_uuid=True),
+                    ForeignKey('menu_tiers.id', name='fk_menu_links_tier', ondelete='CASCADE'),
                     nullable=True)
 
     description = Column(Text, nullable=True)
@@ -27,6 +27,6 @@ class MenuLink(BaseModel):
     blueprint_name = Column(String(100), nullable=True)  # Store the blueprint name for tracking
     endpoint = Column(String(255), nullable=True)  # Store the endpoint for tracking
 
-    tier = relationship("MenuTier", foreign_keys=[tier_uuid], back_populates="links")
+    tier = relationship("MenuTier", foreign_keys=[tier_id], back_populates="links")
     user_quick_links = relationship("UserQuickLink", back_populates="link", cascade="all, delete-orphan")
 

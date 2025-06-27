@@ -21,7 +21,7 @@ def v2_handler(subpath):
             return "<h1>Page 'Home' not found</h1><p>No page with slug 'Home' exists in the database.</p>"
         
         # Render the page using the template system
-        rendered_content = renderer.render_page(page.uuid)
+        rendered_content = renderer.render_page(page.id)
         
         return rendered_content
         

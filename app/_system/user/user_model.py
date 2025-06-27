@@ -17,9 +17,9 @@ class User(BaseModel):
 
     username = Column(String(100), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
-    role_uuid = Column(
+    role_id = Column(
         UUID(as_uuid=True),
-        ForeignKey('roles.uuid', name='fk_users_role'),
+        ForeignKey('roles.id', name='fk_users_role'),
         nullable=True
     )
     password_hash = Column(String, nullable=False)
@@ -40,7 +40,7 @@ class User(BaseModel):
     __table_args__ = (
         Index('idx_users_email', 'email'),
         Index('idx_users_username', 'username'),
-        Index('idx_users_role', 'role_uuid'),
+        Index('idx_users_role', 'role_id'),
     )
     
     @property
@@ -65,9 +65,9 @@ class User(BaseModel):
         return db_session.query(cls).filter(cls.email == email).first()
 
     @classmethod
-    def find_by_id(cls, db_session, user_uuid):
+    def find_by_id(cls, db_session, user_id):
         """Find a user by UUID"""
-        return db_session.query(cls).filter(cls.uuid == user_uuid).first()
+        return db_session.query(cls).filter(cls.id == user_id).first()
 
     def set_password(self, password):
         """Set user password with a new salt"""
@@ -86,10 +86,10 @@ class User(BaseModel):
     def to_dict(self):
         """Convert user to dictionary for API response"""
         return {
-            'uuid': str(self.uuid),
+            'id': str(self.id),
             'username': self.username,
             'email': self.email,
-            'role_uuid': str(self.role_uuid),
+            'role_id': str(self.role_id),
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,

@@ -1,6 +1,6 @@
 import logging
 from jinja2 import Environment as JinjaEnvironment, BaseLoader, TemplateNotFound, pass_context
-from flask import current_app, has_app_context, request
+from flask import current_app, has_app_context, request, g
 
 
 # Place this class definition above your TemplateRenderer class
@@ -9,6 +9,8 @@ class ContextWrapper:
     A smart wrapper for the template context that allows dot-notation
     for list indices without breaking any other functionality.
     """
+    __depends_on__=[]
+    
     def __init__(self, data):
         self._data = data
 
@@ -39,6 +41,8 @@ class ContextWrapper:
   
 
 class ContextAwareEnvironment(JinjaEnvironment):
+    __depends_on__=[]
+    
     def __init__(self, renderer, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -53,23 +57,14 @@ class ContextAwareEnvironment(JinjaEnvironment):
         context = super().make_context(vars_, shared, locals_)
         
         # Debug logging
-        print("=== MAKE CONTEXT CALLED ===")
+        #print("=== MAKE CONTEXT CALLED ===")
         
         if has_app_context():
-            print("Has app context")
             processors = current_app.template_context_processors.get(None, [])
-            print(f"Found {len(processors)} context processors")
             
             for func in processors:
-                print(f"Running processor: {func.__name__}")
                 data = func()
-                print(f"Processor returned: {data}")
                 context.vars.update(data)
-        else:
-            print("NO APP CONTEXT")
-        
-        print(f"Final context vars: {list(context.vars.keys())}")
-        print("========================")
         
         return context
 
@@ -96,9 +91,9 @@ class ContextAwareEnvironment(JinjaEnvironment):
             ctx = self._renderer._get_current_context()
             if ctx:
                 if ctx['type'] == 'template':
-                    name = f"template_fragment:{ctx['uuid']}:{name}"
+                    name = f"template_fragment:{ctx['id']}:{name}"
                 elif ctx['type'] == 'page':
-                    name = f"page_fragment:{ctx['uuid']}:{name}"
+                    name = f"page_fragment:{ctx['id']}:{name}"
         
         # Get the template
         template = super().get_template(name, parent, globals)
@@ -127,6 +122,8 @@ class ContextAwareEnvironment(JinjaEnvironment):
     
 
 class DbLoader(BaseLoader):
+    __depends_on__=[]
+    
     def __init__(self, session):
         self.session = session
         self._logger = self._get_logger()
@@ -141,25 +138,25 @@ class DbLoader(BaseLoader):
 
 
     def get_source(self, environment, template):
-        self._logger.debug(f"get_source: {template}")
+        #self._logger.debug(f"get_source: {template}")
 
         parts = template.split(':')
         if len(parts) != 3:
             raise TemplateNotFound(template)
 
-        fragment_type, uuid, fragment_key = parts
+        fragment_type, id, fragment_key = parts
 
         renderer = getattr(environment, "_context_renderer", None)
         if renderer:
-            renderer._push_context(fragment_type.replace('_fragment', ''), uuid, fragment_key)
+            renderer._push_context(fragment_type.replace('_fragment', ''), id, fragment_key)
 
         # --- Import models needed for the type check ---
         from app.models import PageFragment, TemplateFragment
 
         if fragment_type == 'template_fragment':
-            fragment = TemplateFragment.get_active_by_key(self.session, uuid, fragment_key)
+            fragment = TemplateFragment.get_active_by_key(self.session, id, fragment_key)
         elif fragment_type == 'page_fragment':
-            fragment = PageFragment.get_active_by_key(self.session, uuid, fragment_key)
+            fragment = PageFragment.get_active_by_key(self.session, id, fragment_key)
         else:
             raise TemplateNotFound(template)
 
@@ -175,7 +172,7 @@ class DbLoader(BaseLoader):
             source = getattr(fragment, 'template_source', None) or fragment.content_source
 
         def uptodate():
-            current_fragment = type(fragment).get_active_by_key(self.session, uuid, fragment_key)
+            current_fragment = type(fragment).get_active_by_key(self.session, id, fragment_key)
             if not current_fragment:
                 return False
 
@@ -197,7 +194,7 @@ class DbLoader(BaseLoader):
 
 class TemplateRenderer:
     """Dynamic template render engine for Flask"""
-    __depends_on__ = ['ContextAwareEnvironment', 'DbLoader', 'MenuBuilder']
+    __depends_on__ = ['ContextAwareEnvironment', 'DbLoader', 'MenuBuilder','Template', 'TemplateFragment','Page','PageFragment']
 
     def __init__(self, session):
         self.session = session
@@ -242,7 +239,7 @@ class TemplateRenderer:
             @pass_context
             def context_include_wrapper(context, fragment_key, **kwargs):
                 # build the template name exactly as before
-                template_name = f"template_fragment:{ context.get('page')['uuid'] }:{ fragment_key }"
+                template_name = f"template_fragment:{ context.get('page')['id'] }:{ fragment_key }"
                 tpl = context.environment.get_template(template_name)
 
                 # merge Jinja context + any overrides
@@ -259,12 +256,29 @@ class TemplateRenderer:
 
             self._jinja_env.globals['include_page_fragment'] = self._include_fragment
             self._jinja_env.globals['include_template_fragment'] = self._include_template_fragment
-            self._jinja_env.globals['theme_css'] = lambda theme_uuid_or_name=None: self.theme_css(self.session, theme_uuid_or_name)
+            self._jinja_env.globals['theme_css'] = lambda theme_id_or_name=None: self.theme_css(self.session, theme_id_or_name)
             self._jinja_env.globals['get_flashed_messages'] = self._get_flashed_messages
             self._jinja_env.globals['url_for'] = self._url_for
+            self._jinja_env.globals['model_url'] = self._model_url
             self._jinja_env.globals['render_menu'] = self._render_menu
 
         return self._jinja_env
+
+    def _model_url(self,endpoint):
+
+        model,action=endpoint.split('.')
+        action2='home'
+        if action=='list':
+            action2='list'
+        elif action=='manage':
+            action2='manage'
+        elif action=='edit':
+            action2='manage'
+        elif action=='create':
+            action2='manage'
+
+        return f"/v2/f/{model}/{action2}"
+    
 
     def _url_for(self, endpoint, _external=False, _anchor=None, **values):
         """
@@ -309,9 +323,6 @@ class TemplateRenderer:
         if not current:
             raise TemplateNotFound(fragment_key)
         
-        # Debug what we're receiving
-        self._logger.debug(f"_context_include called with fragment_key: {fragment_key}")
-        self._logger.debug(f"Context type: {type(context)}")
         
         # Extract variables from Jinja2 context
         merged_context = {}
@@ -336,30 +347,27 @@ class TemplateRenderer:
         # Add passed kwargs on top
         merged_context.update(kwargs)
         
-        self._logger.debug(f"Context include '{fragment_key}' in {current['type']} with merged keys: {list(merged_context.keys())}")
         
         if current['type'] == 'template':
-            return self._include_template_fragment(current['uuid'], fragment_key, **merged_context)
+            return self._include_template_fragment(current['id'], fragment_key, **merged_context)
         if current['type'] == 'page':
-            return self._include_fragment(current['uuid'], fragment_key, **merged_context)
+            return self._include_fragment(current['id'], fragment_key, **merged_context)
         
         raise TemplateNotFound(fragment_key)
 
-    def _push_context(self, context_type, uuid, fragment_key=None):
+    def _push_context(self, context_type, id, fragment_key=None):
         """Push rendering context onto stack"""
         context = {
             'type': context_type,
-            'uuid': uuid,
+            'id': id,
             'fragment_key': fragment_key
         }
         self._context_stack.append(context)
-        self._logger.debug(f"Pushed context: {context}")
     
     def _pop_context(self):
         """Pop rendering context from stack"""
         if self._context_stack:
             context = self._context_stack.pop()
-            self._logger.debug(f"Popped context: {context}")
             return context
         return None
     
@@ -377,18 +385,17 @@ class TemplateRenderer:
         """Reset recursion counter"""
         self._recursion_depth = 0
     
-    def _include_fragment(self, target_uuid, fragment_key, **kwargs):
+    def _include_fragment(self, target_id, fragment_key, **kwargs):
         """Context-aware fragment include - works for both page and template fragments"""
         self._check_recursion()
         
         current_context = self._get_current_context()
-        self._logger.debug(f"Including fragment {target_uuid}:{fragment_key} from context {current_context}")
         
         # If we're in a template fragment context, try template fragment first
         if current_context and current_context['type'] == 'template':
-            template_uuid = current_context['uuid']
+            template_id = current_context['id']
             try:
-                result = self._include_template_fragment(template_uuid, fragment_key, **kwargs)
+                result = self._include_template_fragment(template_id, fragment_key, **kwargs)
                 self._recursion_depth -= 1
                 return result
             except TemplateNotFound:
@@ -396,24 +403,24 @@ class TemplateRenderer:
         
         # Default or fallback: try page fragment
         from app.models import PageFragment
-        fragment = PageFragment.get_active_by_key(self.session, target_uuid, fragment_key)
+        fragment = PageFragment.get_active_by_key(self.session, target_id, fragment_key)
         
         if not fragment:
-            self._logger.warning(f"Page fragment not found: {target_uuid}:{fragment_key}")
+            #self._logger.warning(f"Page fragment not found: {target_id}:{fragment_key}")
             self._recursion_depth -= 1
             return ""
         
         # Push page fragment context
-        self._push_context('page', target_uuid, fragment_key)
+        self._push_context('page', target_id, fragment_key)
         
         try:
             # If fragment has template_fragment_key, use template rendering
             if fragment.template_fragment_key:
                 # Get the page's template for template fragment lookup
                 from app.models import Page
-                page = self.session.query(Page).filter_by(uuid=target_uuid).first()
-                if page and page.template_uuid:
-                    template_name = f"template_fragment:{page.template_uuid}:{fragment.template_fragment_key}"
+                page = self.session.query(Page).filter_by(id=target_id).first()
+                if page and page.template_id:
+                    template_name = f"template_fragment:{page.template_id}:{fragment.template_fragment_key}"
                     try:
                         template = self.jinja_env.get_template(template_name)
                         # Merge fragment variables with passed kwargs
@@ -431,24 +438,23 @@ class TemplateRenderer:
             self._pop_context()
             self._recursion_depth -= 1
     
-    def _include_template_fragment(self, template_uuid, fragment_key, **kwargs):
+    def _include_template_fragment(self, template_id, fragment_key, **kwargs):
         """Include a template fragment with passed context"""
         self._check_recursion()
         
-        self._logger.debug(f"Including template fragment: {template_uuid}:{fragment_key}")
         
         # Push template fragment context
-        self._push_context('template', template_uuid, fragment_key)
+        self._push_context('template', template_id, fragment_key)
         
         try:
-            template_name = f"template_fragment:{template_uuid}:{fragment_key}"
+            template_name = f"template_fragment:{template_id}:{fragment_key}"
             template = self.jinja_env.get_template(template_name)
             
             # Use the passed context directly - it already includes parent context
             result = template.render(**kwargs)
             return result
         except TemplateNotFound:
-            self._logger.warning(f"Template fragment not found: {template_uuid}:{fragment_key}")
+            self._logger.warning(f"Template fragment not found: {template_id}:{fragment_key}")
             return ""
         finally:
             self._pop_context()
@@ -463,8 +469,8 @@ class TemplateRenderer:
         # Check if it's a valid UUID
         try:
             # If it's a valid UUID string, use it as UUID
-            page_uuid = uuid.UUID(str(page_identifier))
-            page = self.session.query(Page).filter_by(uuid=page_uuid).first()
+            page_id = uuid.UUID(str(page_identifier))
+            page = self.session.query(Page).filter_by(id=page_id).first()
         except ValueError:
             # Not a UUID, treat as slug
             page = self.session.query(Page).filter_by(slug=page_identifier).first()
@@ -478,23 +484,23 @@ class TemplateRenderer:
         return page
 
     
-    def _load_template(self, template_uuid):
+    def _load_template(self, template_id):
         """Load template"""
         from app.models import Template
-        template = self.session.query(Template).filter_by(uuid=template_uuid).first()
+        template = self.session.query(Template).filter_by(id=template_id).first()
         
         if not template:
-            raise ValueError(f"Template not found: {template_uuid}")
+            raise ValueError(f"Template not found: {template_id}")
         
         return template
     
-    def _load_theme(self, theme_uuid):
+    def _load_theme(self, theme_id):
         """Load theme"""
         from app.models import Theme
-        theme = self.session.query(Theme).filter_by(uuid=theme_uuid).first()
+        theme = self.session.query(Theme).filter_by(id=theme_id).first()
         
         if not theme:
-            raise ValueError(f"Theme not found: {theme_uuid}")
+            raise ValueError(f"Theme not found: {theme_id}")
         
         return theme
     
@@ -507,7 +513,7 @@ class TemplateRenderer:
         
         # Add page object (read-write for page/fragments)
         context['page'] = {
-            'uuid': str(page.uuid),
+            'id': str(page.id),
             'name': page.name,
             'title': page.title,
             'slug': page.slug,
@@ -527,7 +533,7 @@ class TemplateRenderer:
         # Add theme object (read-only)
         if theme:
             context['theme'] = {
-                'uuid': str(theme.uuid),
+                'id': str(theme.id),
                 'name': theme.name,
                 'display_name': theme.display_name,
                 'description': theme.description,
@@ -536,7 +542,7 @@ class TemplateRenderer:
         
         return context
     
-    def _create_extended_template(self, page_uuid, page_template, theme_template):
+    def _create_extended_template(self, page_id, page_template, theme_template):
         """Create a template that extends template base with page fragments"""
         from app.models import PageFragment, TemplateFragment
         
@@ -544,22 +550,22 @@ class TemplateRenderer:
         template_base = None
         if page_template:
             template_base = TemplateFragment.get_active_by_key(
-                self.session, page_template.uuid, 'base'
+                self.session, page_template.id, 'base'
             )
         
         if not template_base and theme_template:
             template_base = TemplateFragment.get_active_by_key(
-                self.session, theme_template.uuid, 'base'
+                self.session, theme_template.id, 'base'
             )
         
         if not template_base:
             raise ValueError("No base template found")
         
         # Get all active page fragments
-        page_fragments = PageFragment.get_all_active_for_page(self.session, page_uuid)
+        page_fragments = PageFragment.get_all_active_for_page(self.session, page_id)
         
         # Build extended template source
-        extends_line = f"template_fragment:{template_base.template_uuid}:base"
+        extends_line = f"template_fragment:{template_base.template_id}:base"
         
         template_source = f"{{% extends '{extends_line}' %}}\n\n"
         
@@ -577,13 +583,13 @@ class TemplateRenderer:
         
         return template_source
     
-    def _render_page_fragments_only(self, page_uuid, context):
+    def _render_page_fragments_only(self, page_id, context):
         """Render only page fragments without base template"""
         from app.models import PageFragment
         import re
         
         # Get all active page fragments
-        page_fragments = PageFragment.get_all_active_for_page(self.session, page_uuid)
+        page_fragments = PageFragment.get_all_active_for_page(self.session, page_id)
         
         # Build content template
         content_parts = []
@@ -604,15 +610,14 @@ class TemplateRenderer:
         template = self.jinja_env.from_string(content_template_source)
         return template.render(**context)
     
-    def render_page(self, page_identifier, data=None):
+    
+    def render_page(self, page_identifier, **kwargs):
         """Alias for render_template for backward compatibility"""
-        if data is None:
-            data = {}
-        return self.render_template(page_identifier, **data)
+        return self.render_template(page_identifier, **kwargs)
 
     def render_template(self, page_identifier, fragment_only=None, **data):
         """Main render function with htmx support"""
-        self._logger.info(f"Rendering page: {page_identifier}")
+        #self._logger.info(f"Rendering page: {page_identifier}")
         self._reset_recursion()
         self._context_stack = []  # Clear context stack
         
@@ -621,7 +626,7 @@ class TemplateRenderer:
             page = self._load_page(page_identifier)
             
             # Push initial page context
-            self._push_context('page', str(page.uuid))
+            self._push_context('page', str(page.id))
             
             # Determine if we should render fragments only
             if fragment_only is None:
@@ -630,17 +635,17 @@ class TemplateRenderer:
             
             # Load page template
             page_template = None
-            if page.template_uuid:
-                page_template = self._load_template(page.template_uuid)
+            if page.template_id:
+                page_template = self._load_template(page.template_id)
             
             # Load theme template
             theme_template = None
             theme = None
-            if page_template and page_template.theme_uuid:
-                theme = self._load_theme(page_template.theme_uuid)
-                # Assume theme has a default template or get from theme.default_template_uuid
-                if hasattr(theme, 'default_template_uuid') and theme.default_template_uuid:
-                    theme_template = self._load_template(theme.default_template_uuid)
+            if page_template and page_template.theme_id:
+                theme = self._load_theme(page_template.theme_id)
+                # Assume theme has a default template or get from theme.default_template_id
+                if hasattr(theme, 'default_template_id') and theme.default_template_id:
+                    theme_template = self._load_template(theme.default_template_id)
             
             # Build context
             context = self._build_context(page, page_template, theme, **data)
@@ -648,10 +653,10 @@ class TemplateRenderer:
             
             if fragment_only:
                 # Render only fragments for htmx requests
-                rendered_content = self._render_page_fragments_only(str(page.uuid), context)
+                rendered_content = self._render_page_fragments_only(str(page.id), context)
             else:
                 # Create extended template with auto-extension
-                extended_template_source = self._create_extended_template(str(page.uuid), page_template, theme_template)
+                extended_template_source = self._create_extended_template(str(page.id), page_template, theme_template)
                 
                 # Render the extended template
                 template = self.jinja_env.from_string(extended_template_source)
@@ -659,8 +664,22 @@ class TemplateRenderer:
             
             # Increment view count
             page.increment_view_count(self.session)
-            
-            self._logger.info(f"Successfully rendered page: {page.slug}")
+
+            # Apply theme's HTML compression settings if theme exists
+            if theme and any([theme.consolidate_css, theme.consolidate_js, 
+                            theme.minify_css, theme.minify_js, theme.minify_html]):
+                from app.classes import HTMLCompressor
+                compressor = HTMLCompressor()
+                rendered_content = compressor.clean_html(
+                    rendered_content,
+                    consolidate_css=theme.consolidate_css,
+                    consolidate_js=theme.consolidate_js,
+                    minify_css=theme.minify_css,
+                    minify_js=theme.minify_js,
+                    minify_html=theme.minify_html)
+
+
+            #self._logger.info(f"Successfully rendered page: {page.slug}")
             return rendered_content
             
         except Exception as e:
@@ -669,14 +688,14 @@ class TemplateRenderer:
         finally:
             self._context_stack = []  # Clean up context stack
 
-    def theme_css(self, session, theme_uuid_or_name=None):
+    def theme_css(self, session, theme_id_or_name=None):
         """
         Generate complete CSS for a theme including variables and custom styles.
         Can be called in templates like {{ theme_css() }}
         
         Args:
             session: SQLAlchemy session
-            theme_uuid_or_name: Theme UUID string, name, or None for default theme
+            theme_id_or_name: Theme UUID string, name, or None for default theme
             
         Returns:
             Complete CSS as a string ready for <style> block
@@ -688,11 +707,11 @@ class TemplateRenderer:
             
             # Get the theme
             theme = None
-            if theme_uuid_or_name:
+            if theme_id_or_name:
                 theme = session.query(Theme).filter(
                     or_(
-                        Theme.uuid == theme_uuid_or_name,
-                        Theme.name == theme_uuid_or_name
+                        Theme.id == theme_id_or_name,
+                        Theme.name == theme_id_or_name
                     )
                 ).first()
             
@@ -987,7 +1006,7 @@ class TemplateRenderer:
             return f"/* Error generating theme CSS: {e} */"
             
 
-    def _render_menu(self, menu_name='ADMIN', user_uuid=None, **kwargs):
+    def _render_menu(self, menu_name='ADMIN', user_id=None, **kwargs):
         """
         Render menu directly in templates using {{ render_menu('ADMIN') }}
         """
@@ -1002,7 +1021,7 @@ class TemplateRenderer:
             
             # Get menu structure
             menu_builder = MenuBuilder(self.session)
-            menu_structure = menu_builder.get_menu_structure(menu_name, user_uuid)
+            menu_structure = menu_builder.get_menu_structure(menu_name, user_id)
             
             if not menu_structure:
                 return Markup(f"<!-- Menu '{menu_name}' not found -->")
@@ -1017,16 +1036,16 @@ class TemplateRenderer:
                 template = self.session.query(Template).filter_by(name='sidebar_menu').first()
             if template:
                 # Push menu template context
-                self._push_context('template', template.uuid, 'base')
+                self._push_context('template', template.id, 'base')
                 
                 try:
                     # Use the template fragment system with context
-                    template_name = f"template_fragment:{template.uuid}:base"
+                    template_name = f"template_fragment:{template.id}:base"
                     template_obj = self.jinja_env.get_template(template_name)
                     render_context = {
                         'menu': menu_structure,
                         'menu_name': menu_name,
-                        'template_uuid': str(template.uuid),
+                        'template_id': str(template.id),
                         **kwargs
                     }
 
@@ -1051,9 +1070,8 @@ class TemplateRenderer:
             
 def render_template(page_identifier, **data):
     """Convenience function for rendering templates"""
-    from app.database import get_db_session  # Adjust import as needed
     
-    session = get_db_session()
+    session = g.session
     try:
         engine = TemplateRenderer(session)
         return engine.render_template(page_identifier, **data)

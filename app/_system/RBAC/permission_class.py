@@ -3,27 +3,26 @@ from flask import request, session as flask_session, g
 from functools import wraps
 from datetime import datetime, timezone
 
-from app.register.database import get_model
-
+from app.register.classes import get_model
 
 class RbacPermissionChecker:
     """
     Centralized RBAC permission checker with automatic audit logging
     Use this for ALL permission checks across the entire system
     """
-    
+    __depends_on_ = []
     def __init__(self, session):
         self.session = session
         self.role_permission_model = get_model('RolePermission')
         self.rbac_audit_model = get_model('RbacAuditLog')
         self.user_model = get_model('User')
 
-    def check_permission(self, user_uuid, permission_name, **context):
+    def check_permission(self, user_id, permission_name, **context):
         """
         Check if user has permission and automatically audit the result
         
         Args:
-            user_uuid: UUID of user to check
+            user_id: UUID of user to check
             permission_name: Permission string like "users:read"
             **context: Additional context for auditing
             
@@ -34,7 +33,7 @@ class RbacPermissionChecker:
         
         # Default context values
         audit_context = {
-            'user_uuid': user_uuid,
+            'user_id': user_id,
             'permission_name': permission_name,
             'interface_type': context.get('interface_type', 'unknown'),
             'resource_type': context.get('resource_type'),
@@ -46,7 +45,7 @@ class RbacPermissionChecker:
             'ip_address': context.get('ip_address'),
             'user_agent': context.get('user_agent'),
             'session_id': context.get('session_id'),
-            'token_uuid': context.get('token_uuid'),
+            'token_id': context.get('token_id'),
             'request_id': context.get('request_id'),
             'context_data': context.get('context_data')
         }
@@ -57,13 +56,19 @@ class RbacPermissionChecker:
                 # If RBAC system not available, deny by default
                 granted = False
                 audit_context['access_denied_reason'] = 'RBAC system unavailable'
-            elif not user_uuid:
+            elif not user_id:
                 granted = False
                 audit_context['access_denied_reason'] = 'No user provided'
             else:
+                # First check exact permission
                 granted = self.role_permission_model.user_has_permission(
-                    self.session, user_uuid, permission_name
+                    self.session, user_id, permission_name
                 )
+                
+                # If not granted, check wildcard permissions
+                if not granted:
+                    granted = self._check_wildcard_permission(user_id, permission_name)
+                
                 if not granted:
                     audit_context['access_denied_reason'] = f'User lacks permission: {permission_name}'
             
@@ -89,8 +94,46 @@ class RbacPermissionChecker:
             # Deny by default on errors
             return False
 
-    def check_api_permission(self, user_uuid, permission_name, model_name=None, 
-                           action=None, record_id=None, token_uuid=None):
+    def _check_wildcard_permission(self, user_id, permission_name):
+        """
+        Check if user has any wildcard permissions that match the requested permission
+        
+        Args:
+            user_id: UUID of user to check
+            permission_name: Permission string like "api:users:read"
+            
+        Returns:
+            bool: True if wildcard permission found, False otherwise
+        """
+        # Split the requested permission into parts
+        parts = permission_name.split(':')
+        if len(parts) != 3:
+            return False
+        
+        service, resource, action = parts
+        
+        # Generate all possible wildcard combinations
+        wildcard_patterns = [
+            '*:*:*',                    # Full wildcard
+            f'{service}:*:*',          # Service wildcard
+            f'*:{resource}:*',         # Resource wildcard
+            f'*:*:{action}',           # Action wildcard
+            f'{service}:{resource}:*', # Service+Resource wildcard
+            f'{service}:*:{action}',   # Service+Action wildcard
+            f'*:{resource}:{action}',  # Resource+Action wildcard
+        ]
+        
+        # Check each wildcard pattern
+        for pattern in wildcard_patterns:
+            if self.role_permission_model.user_has_permission(
+                self.session, user_id, pattern
+            ):
+                return True
+        
+        return False
+
+    def check_api_permission(self, user_id, permission_name, model_name=None, 
+                           action=None, record_id=None, token_id=None):
         """
         Check permission for API operations
         Auto-detects Flask request context
@@ -103,7 +146,7 @@ class RbacPermissionChecker:
             'action_attempted': action,
             'endpoint': '/api/data',
             'request_method': 'POST',
-            'token_uuid': token_uuid
+            'token_id': token_id
         }
         
         # Auto-detect request context if available
@@ -114,9 +157,9 @@ class RbacPermissionChecker:
                 'request_id': getattr(request, 'id', None)
             })
         
-        return self.check_permission(user_uuid, permission_name, **context)
+        return self.check_permission(user_id, permission_name, **context)
 
-    def check_web_permission(self, user_uuid, permission_name, view_name=None, 
+    def check_web_permission(self, user_id, permission_name, view_name=None, 
                            action=None, resource_id=None):
         """
         Check permission for web interface operations
@@ -140,9 +183,9 @@ class RbacPermissionChecker:
                 'session_id': flask_session.get('session_id') if flask_session else None
             })
         
-        return self.check_permission(user_uuid, permission_name, **context)
+        return self.check_permission(user_id, permission_name, **context)
 
-    def check_cli_permission(self, user_uuid, permission_name, cli_name=None, 
+    def check_cli_permission(self, user_id, permission_name, cli_name=None, 
                            command=None, resource_name=None, action=None):
         """
         Check permission for CLI operations
@@ -156,7 +199,7 @@ class RbacPermissionChecker:
             'request_method': 'CLI'
         }
         
-        return self.check_permission(user_uuid, permission_name, **context)
+        return self.check_permission(user_id, permission_name, **context)
 
     def require_permission(self, permission_name, **kwargs):
         """
@@ -171,9 +214,9 @@ class RbacPermissionChecker:
             @wraps(func)
             def wrapper(*args, **func_kwargs):
                 # Get user from context
-                user_uuid = getattr(g, 'user_uuid', None) if hasattr(g, 'user_uuid') else None
+                user_id = getattr(g, 'user_id', None) if hasattr(g, 'user_id') else None
                 
-                if not user_uuid:
+                if not user_id:
                     raise PermissionError("Authentication required")
                 
                 # Determine interface type from context
@@ -188,7 +231,7 @@ class RbacPermissionChecker:
                 context['interface_type'] = interface_type
                 
                 # Check permission
-                if not self.check_permission(user_uuid, permission_name, **context):
+                if not self.check_permission(user_id, permission_name, **context):
                     raise PermissionError(f"Permission denied: {permission_name}")
                 
                 return func(*args, **func_kwargs)
@@ -228,7 +271,7 @@ class RbacMiddleware:
 
 
 # Convenience functions for common permission checks
-def check_model_permission(user_uuid, model_name, action, session, record_id=None):
+def check_model_permission(user_id, model_name, action, session, record_id=None):
     """
     Check permission for model operations
     """
@@ -239,7 +282,7 @@ def check_model_permission(user_uuid, model_name, action, session, record_id=Non
     interface_type = 'api' if hasattr(g, 'auth_context') else 'web'
     
     return checker.check_permission(
-        user_uuid, 
+        user_id, 
         permission_name,
         interface_type=interface_type,
         resource_type='model',
@@ -263,15 +306,15 @@ def require_model_permission(model_name, action):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            user_uuid = getattr(g, 'user_uuid', None)
-            if not user_uuid:
+            user_id = getattr(g, 'user_id', None)
+            if not user_id:
                 raise PermissionError("Authentication required")
             
             session = getattr(g, 'session', None)
             if not session:
                 raise RuntimeError("Database session not available")
             
-            if not check_model_permission(user_uuid, model_name, action, session):
+            if not check_model_permission(user_id, model_name, action, session):
                 raise PermissionError(f"Permission denied: {permission_name}")
             
             return func(*args, **kwargs)

@@ -51,7 +51,7 @@ class Module(BaseModel):
     @classmethod
     def get_config_by_id(cls, db_session, config_id):
         """Get a module configuration by ID"""
-        return db_session.query(cls).filter(cls.uuid == config_id).first()
+        return db_session.query(cls).filter(cls.id == config_id).first()
 
     @classmethod
     def add_or_update_config(cls, db_session, module_name, config_dict=None, is_active=True):

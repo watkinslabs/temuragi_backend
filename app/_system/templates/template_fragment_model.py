@@ -19,7 +19,7 @@ class TemplateFragment(BaseModel):
     template_file_paths can be active simultaneously for a single template.
 
     Columns:
-    - template_uuid: Foreign key to templates table
+    - template_id: Foreign key to templates table
     - fragment_type: Semantic type (base, header, footer, nav, loop, container, etc.)
     - fragment_name: Human readable name for admin interface
     - fragment_key: Unique programmatic identifier for code access
@@ -49,8 +49,8 @@ class TemplateFragment(BaseModel):
     __depends_on__ = ['Template']  # Depends on Template
     __tablename__ = 'template_fragments'
 
-    template_uuid = Column(UUID(as_uuid=True),
-                          ForeignKey('templates.uuid', name='fk_template_fragments_template'),
+    template_id = Column(UUID(as_uuid=True),
+                          ForeignKey('templates.id', name='fk_template_fragments_template'),
                           nullable=False,
                           comment="Foreign key to templates table")
     
@@ -121,7 +121,7 @@ class TemplateFragment(BaseModel):
     # Change tracking
     change_description = Column(Text, nullable=True,
                                comment="Description of changes in this version")
-    created_by_user_uuid = Column(UUID(as_uuid=True), nullable=True,
+    created_by_user_id = Column(UUID(as_uuid=True), nullable=True,
                                  comment="UUID of user who created this version")
 
     # Relationships
@@ -129,7 +129,7 @@ class TemplateFragment(BaseModel):
 
     # Enhanced indexes and constraints
     __table_args__ = (
-        Index('idx_template_fragments_template', 'template_uuid'),
+        Index('idx_template_fragments_template', 'template_id'),
         Index('idx_template_fragments_type', 'fragment_type'),
         Index('idx_template_fragments_key', 'fragment_key'),
         Index('idx_template_fragments_version_number', 'version_number'),
@@ -138,15 +138,15 @@ class TemplateFragment(BaseModel):
         Index('idx_template_fragments_sort_order', 'sort_order'),
 
         # New indexes for versioning per template_file_path
-        Index('idx_active_template_fragment_by_file', 'template_uuid', 'template_file_path', 'is_active'),
-        Index('idx_template_file_version_lookup', 'template_uuid', 'template_file_path', 'version_number'),
-        Index('idx_template_fragment_type_sort', 'template_uuid', 'fragment_type', 'sort_order'),
+        Index('idx_active_template_fragment_by_file', 'template_id', 'template_file_path', 'is_active'),
+        Index('idx_template_file_version_lookup', 'template_id', 'template_file_path', 'version_number'),
+        Index('idx_template_fragment_type_sort', 'template_id', 'fragment_type', 'sort_order'),
 
         # Ensure unique version numbers per template per template_file_path
-        UniqueConstraint('template_uuid', 'template_file_path', 'version_number',
+        UniqueConstraint('template_id', 'template_file_path', 'version_number',
                         name='uq_template_fragments_template_file_version'),
         # Ensure unique fragment keys per template
-        UniqueConstraint('template_uuid', 'fragment_key', 'is_active',
+        UniqueConstraint('template_id', 'fragment_key', 'is_active',
                         name='uq_template_fragments_key_active'),
     )
 
@@ -217,14 +217,14 @@ class TemplateFragment(BaseModel):
         return False
 
     @classmethod
-    def get_next_version_number(cls, session, template_uuid, template_file_path):
+    def get_next_version_number(cls, session, template_id, template_file_path):
         """Get the next version number for a given template and template_file_path"""
         logger = cls._get_logger()
-        logger.debug(f"Getting next version number for template {template_uuid}, file {template_file_path}")
+        logger.debug(f"Getting next version number for template {template_id}, file {template_file_path}")
         
         from sqlalchemy import func
         max_version = session.query(func.max(cls.version_number))\
-                           .filter_by(template_uuid=template_uuid,
+                           .filter_by(template_id=template_id,
                                     template_file_path=template_file_path)\
                            .scalar()
         
@@ -233,51 +233,51 @@ class TemplateFragment(BaseModel):
         return next_version
 
     @classmethod
-    def get_active_version(cls, session, template_uuid, template_file_path):
+    def get_active_version(cls, session, template_id, template_file_path):
         """Get the currently active version for a specific template and template_file_path"""
         logger = cls._get_logger()
-        logger.debug(f"Getting active version for template {template_uuid}, file {template_file_path}")
+        #logger.debug(f"Getting active version for template {template_id}, file {template_file_path}")
         
         fragment = session.query(cls)\
-                         .filter_by(template_uuid=template_uuid,
+                         .filter_by(template_id=template_id,
                                    template_file_path=template_file_path,
                                    is_active=True)\
                          .first()
         
-        if fragment:
-            logger.debug(f"Found active version {fragment.version_number} for {template_file_path}")
-        else:
-            logger.warning(f"No active version found for template {template_uuid}, file {template_file_path}")
+        #if fragment:
+        #    logger.debug(f"Found active version {fragment.version_number} for {template_file_path}")
+        #else:
+        #    logger.warning(f"No active version found for template {template_id}, file {template_file_path}")
         
         return fragment
 
     @classmethod
-    def get_active_by_key(cls, session, template_uuid, fragment_key):
+    def get_active_by_key(cls, session, template_id, fragment_key):
         """Get active fragment by template and fragment_key"""
         logger = cls._get_logger()
-        logger.debug(f"Getting active fragment by key: template {template_uuid}, fragment {fragment_key}")
+        #logger.debug(f"Getting active fragment by key: template {template_id}, fragment {fragment_key}")
         
         fragment = session.query(cls)\
-                         .filter_by(template_uuid=template_uuid,
+                         .filter_by(template_id=template_id,
                                    fragment_key=fragment_key,
                                    is_active=True)\
                          .first()
         
-        if fragment:
-            logger.debug(f"Found active fragment '{fragment_key}' version {fragment.version_number}")
-        else:
-            logger.warning(f"No active fragment found for template {template_uuid}, key {fragment_key}")
+        #if fragment:
+        #    logger.debug(f"Found active fragment '{fragment_key}' version {fragment.version_number}")
+        #else:
+        #    logger.warning(f"No active fragment found for template {template_id}, key {fragment_key}")
         
         return fragment
 
     @classmethod
-    def get_fragments_by_type(cls, session, template_uuid, fragment_type):
+    def get_fragments_by_type(cls, session, template_id, fragment_type):
         """Get all active fragments of a specific type, ordered by sort_order"""
         logger = cls._get_logger()
-        logger.debug(f"Getting fragments by type '{fragment_type}' for template {template_uuid}")
+        logger.debug(f"Getting fragments by type '{fragment_type}' for template {template_id}")
         
         fragments = session.query(cls)\
-                          .filter_by(template_uuid=template_uuid,
+                          .filter_by(template_id=template_id,
                                     fragment_type=fragment_type,
                                     is_active=True)\
                           .order_by(cls.sort_order, cls.fragment_name)\
@@ -287,13 +287,13 @@ class TemplateFragment(BaseModel):
         return fragments
 
     @classmethod
-    def get_all_active_for_template(cls, session, template_uuid):
+    def get_all_active_for_template(cls, session, template_id):
         """Get all active content pieces for a template (all active template_file_paths)"""
         logger = cls._get_logger()
-        logger.debug(f"Getting all active fragments for template {template_uuid}")
+        logger.debug(f"Getting all active fragments for template {template_id}")
         
         fragments = session.query(cls)\
-                          .filter_by(template_uuid=template_uuid, is_active=True)\
+                          .filter_by(template_id=template_id, is_active=True)\
                           .order_by(cls.fragment_type, cls.sort_order)\
                           .all()
         
@@ -303,23 +303,23 @@ class TemplateFragment(BaseModel):
                 fragment_types[fragment.fragment_type] = 0
             fragment_types[fragment.fragment_type] += 1
         
-        logger.info(f"Retrieved {len(fragments)} active fragments for template {template_uuid}: {fragment_types}")
+        logger.info(f"Retrieved {len(fragments)} active fragments for template {template_id}: {fragment_types}")
         return fragments
 
     @classmethod
-    def set_active_version(cls, session, fragment_uuid):
+    def set_active_version(cls, session, fragment_id):
         """Set a specific version as active (deactivates other versions of same template_file_path)"""
         logger = cls._get_logger()
-        logger.info(f"Setting active version for fragment UUID {fragment_uuid}")
+        logger.info(f"Setting active version for fragment UUID {fragment_id}")
         
-        fragment = session.query(cls).filter_by(uuid=fragment_uuid).first()
+        fragment = session.query(cls).filter_by(id=fragment_id).first()
         if not fragment:
-            logger.error(f"Fragment with UUID {fragment_uuid} not found")
-            raise ValueError(f"Fragment with UUID {fragment_uuid} not found")
+            logger.error(f"Fragment with UUID {fragment_id} not found")
+            raise ValueError(f"Fragment with UUID {fragment_id} not found")
 
         # Deactivate all other versions for this template and template_file_path combination
         updated_count = session.query(cls)\
-                              .filter_by(template_uuid=fragment.template_uuid,
+                              .filter_by(template_id=fragment.template_id,
                                         template_file_path=fragment.template_file_path)\
                               .update({'is_active': False})
         
@@ -334,30 +334,30 @@ class TemplateFragment(BaseModel):
         return fragment
 
     @classmethod
-    def set_active_version_by_file_and_version(cls, session, template_uuid,
+    def set_active_version_by_file_and_version(cls, session, template_id,
                                               template_file_path, version_number):
         """Set active version by template, template_file_path, and version number"""
         logger = cls._get_logger()
-        logger.info(f"Setting active version: template {template_uuid}, file {template_file_path}, version {version_number}")
+        logger.info(f"Setting active version: template {template_id}, file {template_file_path}, version {version_number}")
         
         fragment = session.query(cls)\
-                         .filter_by(template_uuid=template_uuid,
+                         .filter_by(template_id=template_id,
                                    template_file_path=template_file_path,
                                    version_number=version_number)\
                          .first()
 
         if not fragment:
-            logger.error(f"Fragment not found for template {template_uuid}, file {template_file_path}, version {version_number}")
-            raise ValueError(f"Fragment not found for template {template_uuid}, "
+            logger.error(f"Fragment not found for template {template_id}, file {template_file_path}, version {version_number}")
+            raise ValueError(f"Fragment not found for template {template_id}, "
                            f"file {template_file_path}, version {version_number}")
 
-        return cls.set_active_version(session, fragment.uuid)
+        return cls.set_active_version(session, fragment.id)
 
     def activate(self, session):
         """Activate this version (convenience method)"""
         logger = self._get_logger()
         logger.info(f"Activating fragment '{self.fragment_key}' version {self.version_number}")
-        return self.__class__.set_active_version(session, self.uuid)
+        return self.__class__.set_active_version(session, self.id)
 
     def update_content_and_hash(self, new_content):
         """Update template source and recalculate hash"""
@@ -417,7 +417,7 @@ class TemplateFragment(BaseModel):
         
         missing_deps = []
         for dep_key in dependencies:
-            dep_fragment = self.__class__.get_active_by_key(session, self.template_uuid, dep_key)
+            dep_fragment = self.__class__.get_active_by_key(session, self.template_id, dep_key)
             if not dep_fragment:
                 missing_deps.append(dep_key)
         
@@ -429,13 +429,13 @@ class TemplateFragment(BaseModel):
         return True
 
     @classmethod
-    def get_file_version_history(cls, session, template_uuid, template_file_path):
+    def get_file_version_history(cls, session, template_id, template_file_path):
         """Get all versions for a specific template and template_file_path, ordered by version"""
         logger = cls._get_logger()
-        logger.debug(f"Getting version history for template {template_uuid}, file {template_file_path}")
+        logger.debug(f"Getting version history for template {template_id}, file {template_file_path}")
         
         versions = session.query(cls)\
-                         .filter_by(template_uuid=template_uuid,
+                         .filter_by(template_id=template_id,
                                    template_file_path=template_file_path)\
                          .order_by(cls.version_number.desc())\
                          .all()
@@ -444,10 +444,10 @@ class TemplateFragment(BaseModel):
         return versions
 
     @classmethod
-    def get_template_structure(cls, session, template_uuid):
+    def get_template_structure(cls, session, template_id):
         """Get a summary of all files and their active versions for a template"""
         logger = cls._get_logger()
-        logger.debug(f"Getting template structure for template {template_uuid}")
+        logger.debug(f"Getting template structure for template {template_id}")
         
         # Get all unique template_file_paths with their active version info
         active_files = session.query(
@@ -461,7 +461,7 @@ class TemplateFragment(BaseModel):
             cls.sort_order,
             cls.created_at
         ).filter_by(
-            template_uuid=template_uuid,
+            template_id=template_id,
             is_active=True
         ).order_by(cls.fragment_type, cls.sort_order).all()
 
@@ -472,16 +472,16 @@ class TemplateFragment(BaseModel):
                 structure_summary[file_info.fragment_type] = 0
             structure_summary[file_info.fragment_type] += 1
         
-        logger.debug(f"Template structure for {template_uuid}: {len(active_files)} active files, types: {structure_summary}")
+        logger.debug(f"Template structure for {template_id}: {len(active_files)} active files, types: {structure_summary}")
         return active_files
 
     @classmethod
-    def find_circular_dependencies(cls, session, template_uuid):
+    def find_circular_dependencies(cls, session, template_id):
         """Check for circular dependencies within template fragments"""
         logger = cls._get_logger()
-        logger.debug(f"Checking for circular dependencies in template {template_uuid}")
+        logger.debug(f"Checking for circular dependencies in template {template_id}")
         
-        fragments = cls.get_all_active_for_template(session, template_uuid)
+        fragments = cls.get_all_active_for_template(session, template_id)
         
         # Build dependency graph
         dependency_graph = {}
@@ -496,7 +496,7 @@ class TemplateFragment(BaseModel):
         def has_cycle(node, path):
             if node in rec_stack:
                 cycle_path = path[path.index(node):] + [node]
-                logger.warning(f"Circular dependency detected in template {template_uuid}: {' -> '.join(cycle_path)}")
+                logger.warning(f"Circular dependency detected in template {template_id}: {' -> '.join(cycle_path)}")
                 return True
             
             if node in visited:
@@ -521,9 +521,9 @@ class TemplateFragment(BaseModel):
                     cycles_found.append(fragment_key)
         
         if cycles_found:
-            logger.error(f"Circular dependencies found in template {template_uuid}: {cycles_found}")
+            logger.error(f"Circular dependencies found in template {template_id}: {cycles_found}")
         else:
-            logger.debug(f"No circular dependencies found in template {template_uuid}")
+            logger.debug(f"No circular dependencies found in template {template_id}")
         
         return len(cycles_found) == 0
 

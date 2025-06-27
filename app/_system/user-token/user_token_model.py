@@ -16,9 +16,9 @@ class UserToken(BaseModel):
     __depends_on__ = ['User']
     __tablename__ = 'user_tokens'
 
-    user_uuid = Column(
+    user_id = Column(
         UUID(as_uuid=True),
-        ForeignKey('users.uuid', name='fk_user_tokens_user'),
+        ForeignKey('users.id', name='fk_user_tokens_user'),
         nullable=False
     )
     token = Column(String(64), unique=True, nullable=False)
@@ -29,9 +29,9 @@ class UserToken(BaseModel):
     ignore_expiration = Column(Boolean, default=False, nullable=False)
     last_used_at = Column(DateTime(timezone=True), nullable=True)
     is_system_temporary = Column(Boolean, default=False, nullable=False)
-    refresh_token_uuid = Column(
+    refresh_token_id = Column(
         UUID(as_uuid=True),
-        ForeignKey('user_tokens.uuid', name='fk_user_tokens_refresh'),
+        ForeignKey('user_tokens.id', name='fk_user_tokens_refresh'),
         nullable=True
     )
 
@@ -39,22 +39,22 @@ class UserToken(BaseModel):
     user = relationship("User", back_populates="tokens")
     access_tokens = relationship(
         "UserToken", 
-        remote_side="UserToken.refresh_token_uuid", 
+        remote_side="UserToken.refresh_token_id", 
         cascade="all, delete-orphan",
         back_populates="refresh_token"
     )
     refresh_token = relationship(
         "UserToken", 
-        remote_side="UserToken.uuid",
+        remote_side="UserToken.id",
         back_populates="access_tokens"
     )
 
     __table_args__ = (
         Index('idx_user_tokens_token', 'token'),
-        Index('idx_user_tokens_user', 'user_uuid'),
+        Index('idx_user_tokens_user', 'user_id'),
         Index('idx_user_tokens_type', 'token_type'),
         Index('idx_user_tokens_expires', 'expires_at'),
-        Index('idx_user_tokens_refresh', 'refresh_token_uuid'),
+        Index('idx_user_tokens_refresh', 'refresh_token_id'),
     )
 
     # Token lifetime constants
@@ -66,19 +66,19 @@ class UserToken(BaseModel):
         return secrets.token_hex(32)
 
     @classmethod
-    def create_access_token(cls, session, user_uuid, name=None, application=None, refresh_token_uuid=None, is_system_temporary=False):
+    def create_access_token(cls, session, user_id, name=None, application=None, refresh_token_id=None, is_system_temporary=False):
         """Create access token with 15 minute expiration"""
         expires_at = datetime.now(timezone.utc) + timedelta(minutes=cls.ACCESS_TOKEN_LIFETIME_MINUTES)
         
         token_value = cls.generate_token()
         user_token = cls(
-            user_uuid=user_uuid,
+            user_id=user_id,
             token=token_value,
             name=name,
             application=application,
             token_type='access',
             expires_at=expires_at,
-            refresh_token_uuid=refresh_token_uuid,
+            refresh_token_id=refresh_token_id,
             is_system_temporary=is_system_temporary
         )
 
@@ -87,13 +87,13 @@ class UserToken(BaseModel):
         return user_token
 
     @classmethod
-    def create_refresh_token(cls, session, user_uuid, name=None, application=None, is_system_temporary=False):
+    def create_refresh_token(cls, session, user_id, name=None, application=None, is_system_temporary=False):
         """Create refresh token with 1 day expiration"""
         expires_at = datetime.now(timezone.utc) + timedelta(days=cls.REFRESH_TOKEN_LIFETIME_DAYS)
         
         token_value = cls.generate_token()
         user_token = cls(
-            user_uuid=user_uuid,
+            user_id=user_id,
             token=token_value,
             name=name,
             application=application,
@@ -107,15 +107,15 @@ class UserToken(BaseModel):
         return user_token
 
     @classmethod
-    def create_token_pair(cls, session, user_uuid, name=None, application=None, is_system_temporary=False):
+    def create_token_pair(cls, session, user_id, name=None, application=None, is_system_temporary=False):
         """Create both access and refresh tokens linked together"""
         # Create refresh token first
-        refresh_token = cls.create_refresh_token(session, user_uuid, name, application, is_system_temporary)
+        refresh_token = cls.create_refresh_token(session, user_id, name, application, is_system_temporary)
         
         # Create access token linked to refresh token
         access_token = cls.create_access_token(
-            session, user_uuid, name, application, 
-            refresh_token_uuid=refresh_token.uuid, 
+            session, user_id, name, application, 
+            refresh_token_id=refresh_token.id, 
             is_system_temporary=is_system_temporary
         )
         
@@ -125,9 +125,9 @@ class UserToken(BaseModel):
         }
 
     @classmethod
-    def create_user_token(cls, session, user_uuid, name=None, application=None, expires_in_days=None, is_system_temporary=False):
+    def create_user_token(cls, session, user_id, name=None, application=None, expires_in_days=None, is_system_temporary=False):
         """Legacy method - creates access token for backward compatibility"""
-        return cls.create_access_token(session, user_uuid, name, application, is_system_temporary=is_system_temporary)
+        return cls.create_access_token(session, user_id, name, application, is_system_temporary=is_system_temporary)
 
     @classmethod
     def create_service_token(cls, session, name=None, application=None, expires_in_days=None, is_system_temporary=False):
@@ -138,7 +138,7 @@ class UserToken(BaseModel):
             expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
 
         user_token = cls(
-            user_uuid=None,
+            user_id=None,
             token=token_value,
             name=name,
             application=application,
@@ -196,7 +196,7 @@ class UserToken(BaseModel):
         
         # Revoke existing access tokens for this refresh token
         existing_access_tokens = session.query(UserToken).filter(
-            UserToken.refresh_token_uuid == self.uuid,
+            UserToken.refresh_token_id == self.id,
             UserToken.is_active == True
         ).all()
         
@@ -206,21 +206,21 @@ class UserToken(BaseModel):
         # Create new access token
         return self.__class__.create_access_token(
             session=session,
-            user_uuid=self.user_uuid,
+            user_id=self.user_id,
             name=self.name,
             application=self.application,
-            refresh_token_uuid=self.uuid,
+            refresh_token_id=self.id,
             is_system_temporary=self.is_system_temporary
         )
 
     def get_auth_context(self):
         return {
-            'token_uuid': str(self.uuid),
+            'token_id': str(self.id),
             'token_type': self.token_type,
             'user': self.user if self.user else None,
-            'user_uuid': str(self.user_uuid) if self.user_uuid else None,
+            'user_id': str(self.user_id) if self.user_id else None,
             'application': self.application,
-            'refresh_token_uuid': str(self.refresh_token_uuid) if self.refresh_token_uuid else None
+            'refresh_token_id': str(self.refresh_token_id) if self.refresh_token_id else None
         }
 
     def is_expired(self):
@@ -249,7 +249,7 @@ class UserToken(BaseModel):
             session = sessionmaker.object_session(self)
             if session:
                 linked_tokens = session.query(UserToken).filter(
-                    UserToken.refresh_token_uuid == self.uuid,
+                    UserToken.refresh_token_id == self.id,
                     UserToken.is_active == True
                 ).all()
                 
@@ -258,8 +258,8 @@ class UserToken(BaseModel):
 
     def to_dict(self):
         return {
-            'uuid': str(self.uuid),
-            'user_uuid': str(self.user_uuid) if self.user_uuid else None,
+            'id': str(self.id),
+            'user_id': str(self.user_id) if self.user_id else None,
             'name': self.name,
             'application': self.application,
             'token_type': self.token_type,
@@ -270,7 +270,7 @@ class UserToken(BaseModel):
             'is_expired': self.is_expired(),
             'is_active': self.is_active,
             'is_system_temporary': self.is_system_temporary,
-            'refresh_token_uuid': str(self.refresh_token_uuid) if self.refresh_token_uuid else None,
+            'refresh_token_id': str(self.refresh_token_id) if self.refresh_token_id else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

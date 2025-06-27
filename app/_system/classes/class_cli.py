@@ -8,9 +8,7 @@ import argparse
 from collections import defaultdict, deque
 sys.path.append('/web/temuragi')
 from app.base.cli import BaseCLI
-from app.register.classes import (
-    register_classes_for_cli
-)
+
 
 CLI_DESCRIPTION = "Class dependency management and inspection"
 
@@ -26,18 +24,6 @@ class ClassCLI(BaseCLI):
             table_format=table_format
         )
 
-        self.log_info("Starting class CLI initialization")
-
-        try:
-            # Register classes for CLI usage
-            self.class_registry = register_classes_for_cli()
-            self.log_info(f"Loaded {len(self.class_registry)} classes")
-                        
-            self.log_info("Class CLI initialized successfully")
-
-        except Exception as e:
-            self.log_error(f"Failed to initialize class CLI: {e}")
-            raise
 
     def list_all_classes(self, show_dependencies=False):
         """List all registered classes"""
@@ -166,50 +152,161 @@ class ClassCLI(BaseCLI):
         try:
             # Build dependency graph
             dep_graph = {}
+            reverse_graph = defaultdict(list)  # Who depends on each class
+            
             for class_name, cls in self.class_registry.items():
                 deps = getattr(cls, '__depends_on__', [])
                 if isinstance(deps, str):
                     deps = [deps]
+                
                 # Only include deps that are in registry
                 valid_deps = [d for d in deps if d in self.class_registry]
                 dep_graph[class_name] = valid_deps
+                
+                # Build reverse graph
+                for dep in valid_deps:
+                    reverse_graph[dep].append(class_name)
 
-            # Topological sort
+            # Topological sort using Kahn's algorithm
             in_degree = defaultdict(int)
+            
+            # Calculate in-degrees (how many things each class depends on)
             for node, deps in dep_graph.items():
-                for dep in deps:
-                    in_degree[dep] += 1
+                in_degree[node] = len(deps)
+            
+            # Ensure all nodes are in in_degree
+            for node in dep_graph:
+                if node not in in_degree:
+                    in_degree[node] = 0
 
-            # Find nodes with no dependencies
+            # Debug: Show initial state
+            self.log_debug("Initial dependency state:")
+            zero_deps = [n for n, d in in_degree.items() if d == 0]
+            self.log_debug(f"  Classes with no dependencies: {zero_deps}")
+            non_zero = [(n, d) for n, d in in_degree.items() if d > 0]
+            if non_zero:
+                self.log_debug(f"  Classes with dependencies:")
+                for node, degree in non_zero:
+                    self.log_debug(f"    {node}: {degree} deps -> {dep_graph[node]}")
+
+            # Find all nodes with no dependencies
             queue = deque([node for node in dep_graph if in_degree[node] == 0])
+            self.log_debug(f"Initial queue: {list(queue)}")
+            
             load_order = []
+            iteration = 0
 
             while queue:
+                iteration += 1
                 node = queue.popleft()
                 load_order.append(node)
+                self.log_debug(f"Iteration {iteration}: Processing {node}")
                 
-                # Update in-degrees
-                for other, deps in dep_graph.items():
-                    if node in deps:
-                        in_degree[other] -= 1
-                        if in_degree[other] == 0:
-                            queue.append(other)
+                # For each class that depends on this one
+                for dependent in reverse_graph[node]:
+                    in_degree[dependent] -= 1
+                    self.log_debug(f"  Decreased in_degree of {dependent} to {in_degree[dependent]}")
+                    if in_degree[dependent] == 0:
+                        queue.append(dependent)
+                        self.log_debug(f"  Added {dependent} to queue")
 
-            # Check for circular dependencies
+            # Check if all nodes were processed
             if len(load_order) != len(dep_graph):
-                missing = set(dep_graph.keys()) - set(load_order)
-                self.output_error(f"Circular dependency detected!")
-                self.output_error(f"Classes involved: {', '.join(missing)}")
+                # Some nodes weren't processed
+                processed = set(load_order)
+                unprocessed = set(dep_graph.keys()) - processed
                 
-                # Show the circular deps
-                for cls in missing:
-                    deps = dep_graph[cls]
-                    circular = [d for d in deps if d in missing]
-                    if circular:
-                        self.output_error(f"  {cls} -> {circular}")
+                self.output_error("Circular dependency detected!")
+                self.output_error("=" * 60)
+                
+                # Debug why these weren't processed
+                self.output_error("\nDEBUG: Unprocessed classes analysis:")
+                for class_name in sorted(unprocessed):
+                    self.output_error(f"\n{class_name}:")
+                    self.output_error(f"  Dependencies: {dep_graph[class_name]}")
+                    self.output_error(f"  Final in_degree: {in_degree[class_name]}")
+                    self.output_error(f"  Depended on by: {reverse_graph[class_name]}")
+                    
+                    # Check if dependencies are also unprocessed
+                    unproc_deps = [d for d in dep_graph[class_name] if d in unprocessed]
+                    if unproc_deps:
+                        self.output_error(f"  Unprocessed dependencies: {unproc_deps}")
+                
+                # Now find actual cycles
+                self.output_error("\nSearching for circular dependencies...")
+                
+                def find_cycles(graph, nodes):
+                    cycles = []
+                    
+                    def dfs(node, path, visited):
+                        if node in path:
+                            cycle_idx = path.index(node)
+                            cycle = path[cycle_idx:] + [node]
+                            cycles.append(cycle)
+                            return
+                        
+                        if node in visited:
+                            return
+                        
+                        visited.add(node)
+                        path.append(node)
+                        
+                        for neighbor in graph.get(node, []):
+                            if neighbor in nodes:  # Only follow edges within unprocessed nodes
+                                dfs(neighbor, path[:], visited.copy())
+                    
+                    for node in nodes:
+                        dfs(node, [], set())
+                    
+                    # Deduplicate
+                    unique = []
+                    seen = set()
+                    for cycle in cycles:
+                        if len(cycle) > 1:
+                            normalized = tuple(sorted(cycle[:-1]))
+                            if normalized not in seen:
+                                seen.add(normalized)
+                                unique.append(cycle)
+                    
+                    return unique
+                
+                cycles = find_cycles(dep_graph, unprocessed)
+                
+                if cycles:
+                    self.output_error(f"\nFound {len(cycles)} circular dependency cycle(s):")
+                    
+                    for i, cycle in enumerate(cycles, 1):
+                        self.output_error(f"\nCycle #{i}: {' -> '.join(cycle)}")
+                        
+                        # Show dependency tree
+                        def show_tree(node, visited=None, indent=0, prefix=""):
+                            if visited is None:
+                                visited = set()
+                            
+                            if node in visited:
+                                self.output_error(f"{prefix}└── {node} ← CIRCULAR!")
+                                return
+                            
+                            if indent == 0:
+                                self.output_error(node)
+                            else:
+                                self.output_error(f"{prefix}└── {node}")
+                            
+                            visited.add(node)
+                            new_prefix = prefix + "    "
+                            
+                            for dep in dep_graph.get(node, []):
+                                show_tree(dep, visited.copy(), indent + 1, new_prefix)
+                        
+                        show_tree(cycle[0])
+                        self.output_error("")
+                else:
+                    self.output_error("\nNo cycles found! This suggests a bug in the topological sort.")
+                    self.output_error("The unprocessed classes might have dependencies on classes not in the registry.")
+                
                 return 1
-
-            # Display load order
+            
+            # Success - show load order
             self.output_info("Class Load Order:")
             headers = ["Order", "Class Name", "Dependencies"]
             rows = []
@@ -231,7 +328,7 @@ class ClassCLI(BaseCLI):
             self.log_error(f"Error calculating load order: {e}")
             self.output_error(f"Error calculating load order: {e}")
             return 1
-
+        
     def check_dependencies(self):
         """Check for missing or circular dependencies"""
         self.log_info("Checking class dependencies")
@@ -314,25 +411,111 @@ class ClassCLI(BaseCLI):
                 self.output_error("\nCircular Dependencies Detected!")
                 self.output_error("=" * 60)
                 
-                for i, cycle in enumerate(circular_deps, 1):
-                    self.output_error(f"\nCycle {i}: {' -> '.join(cycle)}")
+                # Helper function to build dependency tree
+                def build_dependency_tree(class_name, dep_graph, visited=None, indent=0, prefix="", is_last=True, cycle_path=None):
+                    """Build a tree visualization of dependencies"""
+                    if visited is None:
+                        visited = set()
                     
-                    # Show details for each edge in the cycle
-                    for j in range(len(cycle) - 1):
-                        current = cycle[j]
-                        next_class = cycle[j + 1]
-                        cls = self.class_registry[current]
-                        module = cls.__module__
-                        self.output_error(f"  {current} depends on {next_class}")
-                        self.output_error(f"    (defined in {module})")
+                    tree_lines = []
+                    
+                    # Determine the connector symbols
+                    if indent == 0:
+                        connector = ""
+                        new_prefix = ""
+                    else:
+                        connector = "└── " if is_last else "├── "
+                        new_prefix = prefix + ("    " if is_last else "│   ")
+                    
+                    # Check if this creates a cycle
+                    if class_name in visited:
+                        tree_lines.append(f"{prefix}{connector}{class_name} ← CIRCULAR DEPENDENCY!")
+                        return tree_lines
+                    
+                    # Add current class
+                    tree_lines.append(f"{prefix}{connector}{class_name}")
+                    
+                    # Add this class to visited
+                    visited.add(class_name)
+                    
+                    # Get dependencies
+                    deps = dep_graph.get(class_name, [])
+                    
+                    # Process each dependency
+                    for i, dep in enumerate(deps):
+                        is_last_dep = (i == len(deps) - 1)
+                        
+                        # Check if this dependency is part of the cycle
+                        if cycle_path and dep in cycle_path:
+                            # Highlight cycle dependencies
+                            dep_lines = build_dependency_tree(
+                                dep, 
+                                dep_graph, 
+                                visited.copy(), 
+                                indent + 1, 
+                                new_prefix, 
+                                is_last_dep,
+                                cycle_path
+                            )
+                        else:
+                            # Regular dependency
+                            dep_lines = build_dependency_tree(
+                                dep, 
+                                dep_graph, 
+                                visited.copy(), 
+                                indent + 1, 
+                                new_prefix, 
+                                is_last_dep,
+                                cycle_path
+                            )
+                        
+                        tree_lines.extend(dep_lines)
+                    
+                    return tree_lines
+                
+                # For each cycle, show the full dependency tree
+                for i, cycle in enumerate(circular_deps, 1):
+                    self.output_error(f"\nCircular Dependency #{i}")
+                    self.output_error(f"Cycle: {' -> '.join(cycle)}")
+                    self.output_error("")
+                    
+                    # Convert cycle to set for easy lookup (excluding the duplicate at end)
+                    cycle_set = set(cycle[:-1])
+                    
+                    # Show tree for each class in the cycle
+                    self.output_error("Dependency trees for classes in this cycle:")
+                    self.output_error("")
+                    
+                    for class_name in cycle[:-1]:  # Skip the duplicate at end
+                        tree_lines = build_dependency_tree(class_name, dep_graph, cycle_path=cycle_set)
+                        for line in tree_lines:
+                            self.output_error(line)
+                        self.output_error("")  # Empty line between trees
+                
+                # Show summary
+                self.output_error("=" * 60)
+                self.output_error("Summary:")
                 
                 # Show all involved classes
                 involved = set()
                 for cycle in circular_deps:
                     involved.update(cycle[:-1])  # Don't count the duplicate at end
                 
-                self.output_error(f"\nTotal classes in cycles: {len(involved)}")
+                self.output_error(f"Total cycles found: {len(circular_deps)}")
+                self.output_error(f"Total classes in cycles: {len(involved)}")
                 self.output_error(f"Classes: {', '.join(sorted(involved))}")
+                
+                # Show which classes are in multiple cycles
+                class_cycle_count = defaultdict(int)
+                for cycle in circular_deps:
+                    for class_name in cycle[:-1]:
+                        class_cycle_count[class_name] += 1
+                
+                multi_cycle_classes = [(name, count) for name, count in class_cycle_count.items() if count > 1]
+                if multi_cycle_classes:
+                    self.output_error(f"\nClasses in multiple cycles:")
+                    for name, count in sorted(multi_cycle_classes, key=lambda x: x[1], reverse=True):
+                        self.output_error(f"  {name}: {count} cycles")
 
             return 1
 
@@ -340,6 +523,7 @@ class ClassCLI(BaseCLI):
             self.log_error(f"Error checking dependencies: {e}")
             self.output_error(f"Error checking dependencies: {e}")
             return 1
+        
     def close(self):
         """Clean up resources"""
         self.log_debug("Closing class CLI")

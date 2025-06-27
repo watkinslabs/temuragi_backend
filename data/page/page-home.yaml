@@ -7,7 +7,7 @@ Page:
     name: home
     title: Welcome
     slug: home
-    template_uuid: 00000000-0000-0000-0000-000000000001
+    template_id: 00000000-0000-0000-0000-000000000001
     meta_description: Welcome to our website. Discover our features and services.
     meta_keywords: home, welcome, features, services
     og_title: Welcome to Your Site
@@ -22,5 +22,5 @@ Page:
     view_count: 0
     requires_auth: false
     cache_duration: 3600
-    uuid: 00000000-0000-0000-0000-000000000020
+    id: 00000000-0000-0000-0000-000000000020
     is_active: true

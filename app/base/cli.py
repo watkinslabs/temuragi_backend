@@ -5,9 +5,20 @@ from logging.handlers import RotatingFileHandler
 from tabulate import tabulate
 
 from app.config import config
-from app.register.database import register_models_for_cli, get_model
-from app.register.classes import register_classes_for_cli, get_class
+from app.register.classes import register_classes, get_class, get_model
 
+
+# Track if registration has been done for this process
+_cli_registry_initialized = False
+_cli_db_initialized = False
+
+class AppBase:
+    session=None
+    logger=None
+
+    def __init__(self):
+        pass
+    
 
 class BaseCLI:
     """
@@ -33,8 +44,8 @@ class BaseCLI:
         self.show_icons = show_icons
         self.console_logging = console_logging
         self.session = None
-        self.class_registry = None
         self.initialization_errors = []
+        self.app=AppBase()
 
         # Configure table format from config or parameter
         self.table_format = table_format or config.get('CLI_TABLE_FORMAT', 'simple')
@@ -58,8 +69,18 @@ class BaseCLI:
         except Exception as e:
             self.initialization_errors.append(f"Logger setup failed: {e}")
             print(f"ERROR: Failed to setup logger: {e}")
-     # Setup database connection if requested
-        if connect_db:
+
+        if name != "tmcli":  # Don't setup for the master CLI itself
+
+
+            try:
+                self._setup_class_registry()
+            except Exception as e:
+                self.initialization_errors.append(f"Class registry setup failed: {e}")
+                self.log_warning(f"Class registry setup failed: {e}")
+                if not self.console_logging:
+                    print(f"WARNING: Class registry setup failed: {e}")
+
             try:
                 self._setup_database()
                 if self.session:
@@ -71,21 +92,6 @@ class BaseCLI:
                 if not self.console_logging:
                     print(f"CRITICAL: Database setup failed: {e}")
                 raise
-
-
-        # Setup class registry
-        try:
-            self._setup_class_registry()
-            if self.class_registry:
-                self.log_info("Class registry initialized successfully")
-        except Exception as e:
-            self.initialization_errors.append(f"Class registry setup failed: {e}")
-            self.log_warning(f"Class registry setup failed: {e}")
-            if not self.console_logging:
-                print(f"WARNING: Class registry setup failed: {e}")
-
-   
-   
         if self.initialization_errors:
             self.log_warning(f"CLI initialized with {len(self.initialization_errors)} errors")
             for error in self.initialization_errors:
@@ -143,25 +149,50 @@ class BaseCLI:
             self.logger.info("Console logging enabled")
 
     def _setup_class_registry(self):
-        """Setup class registry for CLI usage"""
+        """Setup class registry for CLI usage - only register once per process"""
+        global _cli_registry_initialized
+
         try:
-            self.log_info("Registering classes for CLI usage")
-            self.class_registry = register_classes_for_cli()
-            self.log_info(f"Registered {len(self.class_registry)} classes")
+            if not _cli_registry_initialized:
+                self.log_info("Registering classes for CLI usage (first time)")
+                # Call register_classes to trigger the autoloader
+                register_classes()
+                _cli_registry_initialized = True
+                
+            # Get the registry after it's been populated
+            self.log_info(f"Class registry loadedclasses")
+                
         except Exception as e:
-            self.log_error(f"Failed to register classes: {e}")
+            self.log_error(f"Failed to setup class registry: {e}")
             raise
 
     def _setup_database(self):
-        """Setup database connection using register_models_for_cli"""
+        """Setup database connection - models are already loaded by autoloader"""
+        global _cli_db_initialized
+
         try:
-            self.log_info("Establishing database connection")
-            self.session = register_models_for_cli()
-            self.log_info("Database connection established successfully")
+            from sqlalchemy import create_engine
+            from sqlalchemy.orm import sessionmaker
+            
+            # Create engine and session
+            engine = create_engine(config['DATABASE_URI'])
+            session_factory = sessionmaker(bind=engine)
+            self.session = session_factory()
+            self.app.session=self.session
+            self.log_info("Database session created successfully")
+            
+            # Verify models are available (they should be loaded by autoloader)
+            from app.models import get_model
+            test_model = get_model('User')  # or any model you know should exist
+            if test_model:
+                self.log_debug(f"Models are available - test model 'User' found: {test_model}")
+            else:
+                self.log_warning("Models may not be properly loaded by autoloader")
+                
         except Exception as e:
             self.log_error(f"Failed to establish database connection: {e}")
             raise
-
+        
     def _mask_database_uri(self, uri):
         """Mask sensitive parts of database URI for logging"""
         if not uri or uri == 'NOT_SET':

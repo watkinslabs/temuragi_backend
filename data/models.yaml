@@ -1,0 +1,182 @@
+# Model Template (Template)
+# Template file - edit values before importing
+# 
+# INSTRUCTIONS:
+# 1. AUTO-GENERATED fields are optional - uncomment to set specific values
+# 2. Update foreign key UUIDs to reference existing records
+# 3. Edit all other values as needed
+# 4. Foreign key constraints must be satisfied before import
+# Template file - edit values before importing
+# Exported from template CLI
+
+Model:
+  meta:
+    tablename: models
+    schema: public
+  data:
+    - name: Connection
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000002
+      is_active: true
+    - name: DataType
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000003
+      is_active: true
+    - name: DatabaseType
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000004
+      is_active: true
+    - name: Firewall
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000005
+      is_active: true
+    - name: FirewallLog
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000006
+      is_active: true
+    - name: Menu
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000007
+      is_active: true
+    - name: MenuLink
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000008
+      is_active: true
+    - name: MenuTier
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000009
+      is_active: true
+    - name: Model
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000010
+      is_active: true
+    - name: Module
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000011
+      is_active: true
+    - name: Page
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000012
+      is_active: true
+    - name: PageFragment
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000013
+      is_active: true
+    - name: Permission
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000014
+      is_active: true
+    - name: RbacAuditLog
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000015
+      is_active: true
+    - name: Report
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000016
+      is_active: true
+    - name: ReportColumn
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000017
+      is_active: true
+    - name: ReportExecution
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000018
+      is_active: true
+    - name: ReportSchedule
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000019
+      is_active: true
+    - name: ReportTemplate
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000020
+      is_active: true
+    - name: ReportVariable
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000021
+      is_active: true
+    - name: Role
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000022
+      is_active: true
+    - name: RolePermission
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000023
+      is_active: true
+    - name: Template
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000024
+      is_active: true
+    - name: TemplateFragment
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000025
+      is_active: true
+    - name: Theme
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000026
+      is_active: true
+    - name: User
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000027
+      is_active: true
+    - name: UserQuickLink
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000028
+      is_active: true
+    - name: UserToken
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000029
+      is_active: true
+    - name: VariableType
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000030
+      is_active: true
+    - name: SiteConfig
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000031
+      is_active: true
+    - name: SiteTag
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000032
+      is_active: true
+    - name: SiteKeyword
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000033
+      is_active: true
+    - name: SitePrefix
+      version: 1.0.0
+      description: 
+      id: 00000000-0000-0000-0000-000000000034
+      is_active: true
+

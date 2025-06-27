@@ -8,8 +8,9 @@ from app.base.model import Base
 class FirewallLog(Base):
     """Model for logging IP access requests"""
     __tablename__ = 'firewall_logs'
-
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    __depends_on__=[]
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     ip_address = Column(String(45), nullable=False)
     status = Column(Boolean, nullable=False)  # True = allowed, False = blocked
     request_path = Column(String(255), nullable=True)
@@ -83,7 +84,7 @@ class FirewallLog(Base):
         # Query for blocked IPs with counts
         results = db_session.query(
             cls.ip_address,
-            func.count(cls.uuid).label('count')
+            func.count(cls.id).label('count')
         ).filter(
             cls.created_at.between(start_date, end_date),
             cls.status == False
@@ -105,7 +106,7 @@ class FirewallLog(Base):
         # Query for allowed IPs with counts
         results = db_session.query(
             cls.ip_address,
-            func.count(cls.uuid).label('count')
+            func.count(cls.id).label('count')
         ).filter(
             cls.created_at.between(start_date, end_date),
             cls.status == True
@@ -128,7 +129,7 @@ class FirewallLog(Base):
         results = db_session.query(
             func.date_trunc('day', cls.created_at).label('day'),
             cls.status,
-            func.count(cls.uuid).label('count')
+            func.count(cls.id).label('count')
         ).filter(
             cls.created_at.between(start_date, end_date)
         ).group_by(
@@ -150,7 +151,7 @@ class FirewallLog(Base):
         results = db_session.query(
             cls.request_path,
             cls.status,
-            func.count(cls.uuid).label('count')
+            func.count(cls.id).label('count')
         ).filter(
             cls.created_at.between(start_date, end_date),
             cls.request_path.isnot(None)

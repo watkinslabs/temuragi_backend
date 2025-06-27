@@ -18,7 +18,12 @@ class TemplateService:
     Comprehensive service for CRUD operations on templates, pages, and fragments.
     Handles all template engine functionality including associations and versioning.
     """
-    
+    __depends_on__ = ['Template',
+                        'Page',
+                        'TemplateFragment',
+                        'PageFragment',
+                        'Theme',]
+
     def __init__(self, session: Session, logger: Optional[logging.Logger] = None):
         self.session = session
         self.logger = logger or logging.getLogger(__name__)
@@ -28,11 +33,11 @@ class TemplateService:
     # =====================================================================
     
     def create_template(self, name: str, display_name: str, description: Optional[str] = None,
-                       theme_uuid: Optional[UUID] = None, menu_type_uuid: Optional[UUID] = None,
+                       theme_id: Optional[UUID] = None, menu_type_id: Optional[UUID] = None,
                        layout_type: str = 'full-width', container_class: str = 'container-fluid',
                        sidebar_enabled: bool = False, header_type: str = 'static',
                        footer_type: str = 'static', breadcrumbs_enabled: bool = True,
-                       module_uuid: Optional[UUID] = None, is_system: bool = False,
+                       module_id: Optional[UUID] = None, is_system: bool = False,
                        is_admin_template: bool = False, is_default_template: bool = False) -> Template:
         """Create a new template with validation"""
         self.logger.info(f"Creating template: {name}")
@@ -41,15 +46,15 @@ class TemplateService:
             name=name,
             display_name=display_name,
             description=description,
-            theme_uuid=theme_uuid,
-            menu_type_uuid=menu_type_uuid,
+            theme_id=theme_id,
+            menu_type_id=menu_type_id,
             layout_type=layout_type,
             container_class=container_class,
             sidebar_enabled=sidebar_enabled,
             header_type=header_type,
             footer_type=footer_type,
             breadcrumbs_enabled=breadcrumbs_enabled,
-            module_uuid=module_uuid,
+            module_id=module_id,
             is_system=is_system,
             is_admin_template=is_admin_template,
             is_default_template=is_default_template
@@ -66,7 +71,7 @@ class TemplateService:
             else:
                 self.session.commit()
             
-            self.logger.info(f"Template created: {name} ({template.uuid})")
+            self.logger.info(f"Template created: {name} ({template.id})")
             return template
             
         except IntegrityError as e:
@@ -75,18 +80,18 @@ class TemplateService:
             raise ValueError(f"Template with name '{name}' already exists")
     
     def get_template(self, template_id: Union[str, UUID], by_name: bool = False,
-                    module_uuid: Optional[UUID] = None) -> Optional[Template]:
+                    module_id: Optional[UUID] = None) -> Optional[Template]:
         """Get template by UUID or name"""
         if by_name:
-            return Template.get_by_name(self.session, template_id, module_uuid)
+            return Template.get_by_name(self.session, template_id, module_id)
         
-        return self.session.query(Template).filter_by(uuid=template_id).first()
+        return self.session.query(Template).filter_by(id=template_id).first()
     
-    def update_template(self, template_uuid: UUID, **kwargs) -> Template:
+    def update_template(self, template_id: UUID, **kwargs) -> Template:
         """Update template with provided fields"""
-        template = self.get_template(template_uuid)
+        template = self.get_template(template_id)
         if not template:
-            raise ValueError(f"Template {template_uuid} not found")
+            raise ValueError(f"Template {template_id} not found")
         
         self.logger.info(f"Updating template: {template.name}")
         
@@ -107,11 +112,11 @@ class TemplateService:
         self.logger.info(f"Template updated: {template.name}")
         return template
     
-    def delete_template(self, template_uuid: UUID, force: bool = False) -> bool:
+    def delete_template(self, template_id: UUID, force: bool = False) -> bool:
         """Delete template if no dependencies exist or force is True"""
-        template = self.get_template(template_uuid)
+        template = self.get_template(template_id)
         if not template:
-            raise ValueError(f"Template {template_uuid} not found")
+            raise ValueError(f"Template {template_id} not found")
         
         if template.is_system and not force:
             raise ValueError("Cannot delete system template without force=True")
@@ -136,22 +141,22 @@ class TemplateService:
             self.logger.error(f"Failed to delete template {template.name}: {e}")
             raise
     
-    def list_templates(self, module_uuid: Optional[UUID] = None, layout_type: Optional[str] = None,
+    def list_templates(self, module_id: Optional[UUID] = None, layout_type: Optional[str] = None,
                       is_admin: Optional[bool] = None, include_system: bool = True) -> List[Template]:
         """List templates with optional filtering"""
         return Template.get_templates_by_type(
             self.session,
             layout_type=layout_type,
             is_admin=is_admin,
-            module_uuid=module_uuid if include_system or module_uuid else module_uuid
+            module_id=module_id if include_system or module_id else module_id
         )
     
-    def clone_template(self, template_uuid: UUID, new_name: str, 
+    def clone_template(self, template_id: UUID, new_name: str, 
                       new_display_name: Optional[str] = None) -> Template:
         """Clone a template with all its fragments"""
-        template = self.get_template(template_uuid)
+        template = self.get_template(template_id)
         if not template:
-            raise ValueError(f"Template {template_uuid} not found")
+            raise ValueError(f"Template {template_id} not found")
         
         return template.clone_template(self.session, new_name, new_display_name)
     
@@ -159,7 +164,7 @@ class TemplateService:
     # TEMPLATE FRAGMENT OPERATIONS
     # =====================================================================
     
-    def create_template_fragment(self, template_uuid: UUID, fragment_type: str,
+    def create_template_fragment(self, template_id: UUID, fragment_type: str,
                                fragment_name: str, fragment_key: str,
                                template_file_path: str, template_source: str,
                                content_type: str = 'text/html',
@@ -171,14 +176,14 @@ class TemplateService:
         
         # Get next version number
         version_number = TemplateFragment.get_next_version_number(
-            self.session, template_uuid, template_file_path
+            self.session, template_id, template_file_path
         )
         
         # Calculate content hash
         content_hash = hashlib.sha256(template_source.encode('utf-8')).hexdigest()
         
         fragment = TemplateFragment(
-            template_uuid=template_uuid,
+            template_id=template_id,
             fragment_type=fragment_type,
             fragment_name=fragment_name,
             fragment_key=fragment_key,
@@ -199,7 +204,7 @@ class TemplateService:
             if is_active:
                 # Deactivate other versions first
                 self.session.query(TemplateFragment)\
-                           .filter_by(template_uuid=template_uuid,
+                           .filter_by(template_id=template_id,
                                      template_file_path=template_file_path)\
                            .update({'is_active': False})
                 fragment.is_active = True
@@ -213,20 +218,20 @@ class TemplateService:
             self.logger.error(f"Failed to create template fragment {fragment_key}: {e}")
             raise
     
-    def get_template_fragment(self, fragment_uuid: UUID) -> Optional[TemplateFragment]:
+    def get_template_fragment(self, fragment_id: UUID) -> Optional[TemplateFragment]:
         """Get template fragment by UUID"""
-        return self.session.query(TemplateFragment).filter_by(uuid=fragment_uuid).first()
+        return self.session.query(TemplateFragment).filter_by(id=fragment_id).first()
     
-    def get_template_fragment_by_key(self, template_uuid: UUID, 
+    def get_template_fragment_by_key(self, template_id: UUID, 
                                    fragment_key: str) -> Optional[TemplateFragment]:
         """Get active template fragment by key"""
-        return TemplateFragment.get_active_by_key(self.session, template_uuid, fragment_key)
+        return TemplateFragment.get_active_by_key(self.session, template_id, fragment_key)
     
-    def update_template_fragment(self, fragment_uuid: UUID, **kwargs) -> TemplateFragment:
+    def update_template_fragment(self, fragment_id: UUID, **kwargs) -> TemplateFragment:
         """Update template fragment"""
-        fragment = self.get_template_fragment(fragment_uuid)
+        fragment = self.get_template_fragment(fragment_id)
         if not fragment:
-            raise ValueError(f"Template fragment {fragment_uuid} not found")
+            raise ValueError(f"Template fragment {fragment_id} not found")
         
         self.logger.info(f"Updating template fragment: {fragment.fragment_key}")
         
@@ -243,32 +248,32 @@ class TemplateService:
         self.logger.info(f"Template fragment updated: {fragment.fragment_key}")
         return fragment
     
-    def activate_template_fragment_version(self, fragment_uuid: UUID) -> TemplateFragment:
+    def activate_template_fragment_version(self, fragment_id: UUID) -> TemplateFragment:
         """Activate a specific template fragment version"""
-        return TemplateFragment.set_active_version(self.session, fragment_uuid)
+        return TemplateFragment.set_active_version(self.session, fragment_id)
     
-    def list_template_fragments(self, template_uuid: UUID, 
+    def list_template_fragments(self, template_id: UUID, 
                               fragment_type: Optional[str] = None,
                               active_only: bool = True) -> List[TemplateFragment]:
         """List template fragments with optional filtering"""
         if fragment_type:
             return TemplateFragment.get_fragments_by_type(
-                self.session, template_uuid, fragment_type
+                self.session, template_id, fragment_type
             )
         
         if active_only:
-            return TemplateFragment.get_all_active_for_template(self.session, template_uuid)
+            return TemplateFragment.get_all_active_for_template(self.session, template_id)
         
         return self.session.query(TemplateFragment)\
-                          .filter_by(template_uuid=template_uuid)\
+                          .filter_by(template_id=template_id)\
                           .order_by(TemplateFragment.fragment_type, TemplateFragment.sort_order)\
                           .all()
     
-    def get_template_fragment_versions(self, template_uuid: UUID, 
+    def get_template_fragment_versions(self, template_id: UUID, 
                                      template_file_path: str) -> List[TemplateFragment]:
         """Get all versions of a template fragment file"""
         return TemplateFragment.get_file_version_history(
-            self.session, template_uuid, template_file_path
+            self.session, template_id, template_file_path
         )
     
     # =====================================================================
@@ -276,8 +281,8 @@ class TemplateService:
     # =====================================================================
     
     def create_page(self, name: str, title: str, slug: str,
-                   template_uuid: Optional[UUID] = None,
-                   module_uuid: Optional[UUID] = None,
+                   template_id: Optional[UUID] = None,
+                   module_id: Optional[UUID] = None,
                    published: bool = False, **kwargs) -> Page:
         """Create a new page"""
         self.logger.info(f"Creating page: {slug}")
@@ -286,8 +291,8 @@ class TemplateService:
             name=name,
             title=title,
             slug=slug,
-            template_uuid=template_uuid,
-            module_uuid=module_uuid,
+            template_id=template_id,
+            module_id=module_id,
             published=published,
             **kwargs
         )
@@ -296,7 +301,7 @@ class TemplateService:
         
         try:
             self.session.commit()
-            self.logger.info(f"Page created: {slug} ({page.uuid})")
+            self.logger.info(f"Page created: {slug} ({page.id})")
             return page
             
         except IntegrityError as e:
@@ -310,13 +315,13 @@ class TemplateService:
         if by_slug:
             return Page.get_by_slug(self.session, page_id, include_unpublished)
         
-        return self.session.query(Page).filter_by(uuid=page_id).first()
+        return self.session.query(Page).filter_by(id=page_id).first()
     
-    def update_page(self, page_uuid: UUID, **kwargs) -> Page:
+    def update_page(self, page_id: UUID, **kwargs) -> Page:
         """Update page with provided fields"""
-        page = self.get_page(page_uuid)
+        page = self.get_page(page_id)
         if not page:
-            raise ValueError(f"Page {page_uuid} not found")
+            raise ValueError(f"Page {page_id} not found")
         
         self.logger.info(f"Updating page: {page.slug}")
         
@@ -328,30 +333,30 @@ class TemplateService:
         self.logger.info(f"Page updated: {page.slug}")
         return page
     
-    def publish_page(self, page_uuid: UUID, 
+    def publish_page(self, page_id: UUID, 
                     publish_date: Optional[datetime.datetime] = None) -> Page:
         """Publish a page"""
-        page = self.get_page(page_uuid)
+        page = self.get_page(page_id)
         if not page:
-            raise ValueError(f"Page {page_uuid} not found")
+            raise ValueError(f"Page {page_id} not found")
         
         page.publish(self.session, publish_date)
         return page
     
-    def unpublish_page(self, page_uuid: UUID) -> Page:
+    def unpublish_page(self, page_id: UUID) -> Page:
         """Unpublish a page"""
-        page = self.get_page(page_uuid)
+        page = self.get_page(page_id)
         if not page:
-            raise ValueError(f"Page {page_uuid} not found")
+            raise ValueError(f"Page {page_id} not found")
         
         page.unpublish(self.session)
         return page
     
-    def delete_page(self, page_uuid: UUID, force: bool = False) -> bool:
+    def delete_page(self, page_id: UUID, force: bool = False) -> bool:
         """Delete page"""
-        page = self.get_page(page_uuid)
+        page = self.get_page(page_id)
         if not page:
-            raise ValueError(f"Page {page_uuid} not found")
+            raise ValueError(f"Page {page_id} not found")
         
         self.logger.info(f"Deleting page: {page.slug}")
         
@@ -368,20 +373,20 @@ class TemplateService:
             self.logger.error(f"Failed to delete page {page.slug}: {e}")
             raise
     
-    def list_pages(self, module_uuid: Optional[UUID] = None, published_only: bool = True,
+    def list_pages(self, module_id: Optional[UUID] = None, published_only: bool = True,
                   featured_only: bool = False, limit: Optional[int] = None) -> List[Page]:
         """List pages with optional filtering"""
         return Page.get_published_pages(
             self.session,
-            module_uuid=module_uuid,
+            module_id=module_id,
             featured_only=featured_only,
             limit=limit
         ) if published_only else self.session.query(Page)\
-                                              .filter_by(module_uuid=module_uuid)\
+                                              .filter_by(module_id=module_id)\
                                               .order_by(Page.sort_order, Page.created_at.desc())\
                                               .limit(limit).all() if limit else \
                                  self.session.query(Page)\
-                                              .filter_by(module_uuid=module_uuid)\
+                                              .filter_by(module_id=module_id)\
                                               .order_by(Page.sort_order, Page.created_at.desc())\
                                               .all()
     
@@ -393,7 +398,7 @@ class TemplateService:
     # PAGE FRAGMENT OPERATIONS
     # =====================================================================
     
-    def create_page_fragment(self, page_uuid: UUID, fragment_type: str,
+    def create_page_fragment(self, page_id: UUID, fragment_type: str,
                            fragment_name: str, fragment_key: str,
                            content_source: str, content_type: str = 'text/html',
                            version_label: Optional[str] = None,
@@ -403,14 +408,14 @@ class TemplateService:
         
         # Get next version number
         version_number = PageFragment.get_next_version_number(
-            self.session, page_uuid, fragment_key
+            self.session, page_id, fragment_key
         )
         
         # Calculate content hash
         content_hash = hashlib.sha256(content_source.encode('utf-8')).hexdigest()
         
         fragment = PageFragment(
-            page_uuid=page_uuid,
+            page_id=page_id,
             fragment_type=fragment_type,
             fragment_name=fragment_name,
             fragment_key=fragment_key,
@@ -429,7 +434,7 @@ class TemplateService:
             if is_active:
                 # Deactivate other versions first
                 self.session.query(PageFragment)\
-                           .filter_by(page_uuid=page_uuid, fragment_key=fragment_key)\
+                           .filter_by(page_id=page_id, fragment_key=fragment_key)\
                            .update({'is_active': False})
                 fragment.is_active = True
             
@@ -442,20 +447,20 @@ class TemplateService:
             self.logger.error(f"Failed to create page fragment {fragment_key}: {e}")
             raise
     
-    def get_page_fragment(self, fragment_uuid: UUID) -> Optional[PageFragment]:
+    def get_page_fragment(self, fragment_id: UUID) -> Optional[PageFragment]:
         """Get page fragment by UUID"""
-        return self.session.query(PageFragment).filter_by(uuid=fragment_uuid).first()
+        return self.session.query(PageFragment).filter_by(id=fragment_id).first()
     
-    def get_page_fragment_by_key(self, page_uuid: UUID, 
+    def get_page_fragment_by_key(self, page_id: UUID, 
                                fragment_key: str) -> Optional[PageFragment]:
         """Get active page fragment by key"""
-        return PageFragment.get_active_by_key(self.session, page_uuid, fragment_key)
+        return PageFragment.get_active_by_key(self.session, page_id, fragment_key)
     
-    def update_page_fragment(self, fragment_uuid: UUID, **kwargs) -> PageFragment:
+    def update_page_fragment(self, fragment_id: UUID, **kwargs) -> PageFragment:
         """Update page fragment"""
-        fragment = self.get_page_fragment(fragment_uuid)
+        fragment = self.get_page_fragment(fragment_id)
         if not fragment:
-            raise ValueError(f"Page fragment {fragment_uuid} not found")
+            raise ValueError(f"Page fragment {fragment_id} not found")
         
         self.logger.info(f"Updating page fragment: {fragment.fragment_key}")
         
@@ -472,34 +477,34 @@ class TemplateService:
         self.logger.info(f"Page fragment updated: {fragment.fragment_key}")
         return fragment
     
-    def activate_page_fragment_version(self, fragment_uuid: UUID) -> PageFragment:
+    def activate_page_fragment_version(self, fragment_id: UUID) -> PageFragment:
         """Activate a specific page fragment version"""
-        return PageFragment.set_active_version(self.session, fragment_uuid)
+        return PageFragment.set_active_version(self.session, fragment_id)
     
-    def list_page_fragments(self, page_uuid: UUID, fragment_type: Optional[str] = None,
+    def list_page_fragments(self, page_id: UUID, fragment_type: Optional[str] = None,
                           include_hidden: bool = False) -> List[PageFragment]:
         """List page fragments with optional filtering"""
         if fragment_type:
             return PageFragment.get_fragments_by_type(
-                self.session, page_uuid, fragment_type, include_hidden
+                self.session, page_id, fragment_type, include_hidden
             )
         
-        return PageFragment.get_all_active_for_page(self.session, page_uuid, include_hidden)
+        return PageFragment.get_all_active_for_page(self.session, page_id, include_hidden)
     
-    def get_page_fragment_versions(self, page_uuid: UUID, 
+    def get_page_fragment_versions(self, page_id: UUID, 
                                  fragment_key: str) -> List[PageFragment]:
         """Get all versions of a page fragment"""
         return PageFragment.get_fragment_version_history(
-            self.session, page_uuid, fragment_key
+            self.session, page_id, fragment_key
         )
     
     # =====================================================================
     # THEME OPERATIONS
     # =====================================================================
     
-    def get_theme(self, theme_uuid: UUID) -> Optional[Theme]:
+    def get_theme(self, theme_id: UUID) -> Optional[Theme]:
         """Get theme by UUID"""
-        return self.session.query(Theme).filter_by(uuid=theme_uuid).first()
+        return self.session.query(Theme).filter_by(id=theme_id).first()
     
     def list_themes(self) -> List[Theme]:
         """List all themes"""
@@ -509,35 +514,35 @@ class TemplateService:
     # ASSOCIATIONS AND RELATIONSHIPS
     # =====================================================================
     
-    def assign_template_to_page(self, page_uuid: UUID, template_uuid: UUID) -> Page:
+    def assign_template_to_page(self, page_id: UUID, template_id: UUID) -> Page:
         """Assign a template to a page"""
-        page = self.get_page(page_uuid)
-        template = self.get_template(template_uuid)
+        page = self.get_page(page_id)
+        template = self.get_template(template_id)
         
         if not page:
-            raise ValueError(f"Page {page_uuid} not found")
+            raise ValueError(f"Page {page_id} not found")
         if not template:
-            raise ValueError(f"Template {template_uuid} not found")
+            raise ValueError(f"Template {template_id} not found")
         
-        page.template_uuid = template_uuid
+        page.template_id = template_id
         page.validate_template_exists(self.session)
         
         self.session.commit()
         self.logger.info(f"Template {template.name} assigned to page {page.slug}")
         return page
     
-    def get_pages_by_template(self, template_uuid: UUID, 
+    def get_pages_by_template(self, template_id: UUID, 
                             published_only: bool = True) -> List[Page]:
         """Get all pages using a specific template"""
-        return Page.get_pages_by_template(self.session, template_uuid, published_only)
+        return Page.get_pages_by_template(self.session, template_id, published_only)
     
-    def get_template_structure(self, template_uuid: UUID) -> Dict[str, Any]:
+    def get_template_structure(self, template_id: UUID) -> Dict[str, Any]:
         """Get complete template structure including fragments"""
-        template = self.get_template(template_uuid)
+        template = self.get_template(template_id)
         if not template:
-            raise ValueError(f"Template {template_uuid} not found")
+            raise ValueError(f"Template {template_id} not found")
         
-        fragments = TemplateFragment.get_template_structure(self.session, template_uuid)
+        fragments = TemplateFragment.get_template_structure(self.session, template_id)
         
         return {
             'template': template,
@@ -546,33 +551,33 @@ class TemplateService:
             'integrity_check': template.validate_template_integrity(self.session)
         }
     
-    def get_page_structure(self, page_uuid: UUID, 
+    def get_page_structure(self, page_id: UUID, 
                          include_hidden: bool = False) -> Dict[str, Any]:
         """Get complete page structure including fragments"""
-        page = self.get_page(page_uuid)
+        page = self.get_page(page_id)
         if not page:
-            raise ValueError(f"Page {page_uuid} not found")
+            raise ValueError(f"Page {page_id} not found")
         
         fragments = PageFragment.get_page_fragment_structure(
-            self.session, page_uuid, include_hidden
+            self.session, page_id, include_hidden
         )
         
         return {
             'page': page,
             'fragments': fragments,
             'fragment_count': len(fragments),
-            'template': self.get_template(page.template_uuid) if page.template_uuid else None
+            'template': self.get_template(page.template_id) if page.template_id else None
         }
     
     # =====================================================================
     # UTILITY METHODS
     # =====================================================================
     
-    def validate_template_integrity(self, template_uuid: UUID) -> Dict[str, Any]:
+    def validate_template_integrity(self, template_id: UUID) -> Dict[str, Any]:
         """Comprehensive template integrity validation"""
-        template = self.get_template(template_uuid)
+        template = self.get_template(template_id)
         if not template:
-            raise ValueError(f"Template {template_uuid} not found")
+            raise ValueError(f"Template {template_id} not found")
         
         issues = []
         
@@ -580,16 +585,16 @@ class TemplateService:
         is_valid = template.validate_template_integrity(self.session)
         
         # Check for circular dependencies
-        has_cycles = not TemplateFragment.find_circular_dependencies(self.session, template_uuid)
+        has_cycles = not TemplateFragment.find_circular_dependencies(self.session, template_id)
         if has_cycles:
             issues.append("Circular dependencies detected")
         
         # Fragment compilation check
-        fragments = self.list_template_fragments(template_uuid)
+        fragments = self.list_template_fragments(template_id)
         needs_compilation = [f for f in fragments if f.needs_compilation()]
         
         return {
-            'template_uuid': template_uuid,
+            'template_id': template_id,
             'is_valid': is_valid and not has_cycles,
             'has_circular_dependencies': has_cycles,
             'fragments_needing_compilation': len(needs_compilation),
@@ -597,9 +602,9 @@ class TemplateService:
             'issues': issues
         }
     
-    def get_dashboard_stats(self, module_uuid: Optional[UUID] = None) -> Dict[str, Any]:
+    def get_dashboard_stats(self, module_id: Optional[UUID] = None) -> Dict[str, Any]:
         """Get dashboard statistics for the template engine"""
-        base_query_args = {'module_uuid': module_uuid} if module_uuid else {}
+        base_query_args = {'module_id': module_id} if module_id else {}
         
         # Template stats
         total_templates = self.session.query(Template).filter_by(**base_query_args).count()
@@ -614,17 +619,17 @@ class TemplateService:
         ).count()
         
         # Fragment stats
-        if module_uuid:
-            template_uuids = [t.uuid for t in self.session.query(Template.uuid).filter_by(module_uuid=module_uuid)]
-            page_uuids = [p.uuid for p in self.session.query(Page.uuid).filter_by(module_uuid=module_uuid)]
+        if module_id:
+            template_ids = [t.id for t in self.session.query(Template.id).filter_by(module_id=module_id)]
+            page_ids = [p.id for p in self.session.query(Page.id).filter_by(module_id=module_id)]
             
             template_fragments = self.session.query(TemplateFragment).filter(
-                TemplateFragment.template_uuid.in_(template_uuids)
-            ).count() if template_uuids else 0
+                TemplateFragment.template_id.in_(template_ids)
+            ).count() if template_ids else 0
             
             page_fragments = self.session.query(PageFragment).filter(
-                PageFragment.page_uuid.in_(page_uuids)
-            ).count() if page_uuids else 0
+                PageFragment.page_id.in_(page_ids)
+            ).count() if page_ids else 0
         else:
             template_fragments = self.session.query(TemplateFragment).count()
             page_fragments = self.session.query(PageFragment).count()

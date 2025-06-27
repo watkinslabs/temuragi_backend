@@ -14,23 +14,16 @@ class ReportVariable(BaseModel):
     
     report_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('reports.uuid', ondelete='CASCADE'),
+        ForeignKey('reports.id', ondelete='CASCADE'),
         nullable=False
     )
     name = Column(String(255), nullable=False)  # Variable name in query {var_name}
     display_name = Column(String(255))
     
-    # Link to variable type
+    # Link to data type
     variable_type_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('variable_types.uuid', ondelete='RESTRICT'),
-        nullable=False
-    )
-    
-    # Link to data type
-    data_type_id = Column(
-        PG_UUID(as_uuid=True),
-        ForeignKey('data_types.uuid', ondelete='RESTRICT'),
+        ForeignKey('variable_types.id', ondelete='RESTRICT'),
         nullable=False
     )
     
@@ -54,7 +47,6 @@ class ReportVariable(BaseModel):
     # Relationships
     report = relationship("Report", back_populates="variables")
     variable_type = relationship("VariableType", foreign_keys=[variable_type_id])
-    data_type = relationship("DataType", foreign_keys=[data_type_id])
     
     # Indexes and constraints
     __table_args__ = (

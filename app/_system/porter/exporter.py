@@ -13,10 +13,29 @@ class ComponentExporter:
 
         # Fields to comment out in template mode
         self.auto_generated_fields = {
-            'uuid', 'created_at', 'updated_at', 'created_on', 'updated_on',
+            'id', 'created_at', 'updated_at', 'created_on', 'updated_on',
             'date_created', 'date_modified', 'timestamp', 'last_modified',
             'id'  # Often auto-increment primary keys
         }
+
+    def _safe_string_convert(self, value):
+        """Safely convert any SQLAlchemy object to string"""
+        if value is None:
+            return None
+            
+        # Handle SQLAlchemy quoted_name objects
+        if hasattr(value, '__class__') and 'quoted_name' in str(value.__class__):
+            return str(value)
+            
+        # Handle any SQLAlchemy wrapper objects
+        if hasattr(value, '__module__') and value.__module__ and 'sqlalchemy' in value.__module__:
+            return str(value)
+            
+        # For any object with explicit string representation
+        if hasattr(value, '__str__') and not isinstance(value, (str, int, float, bool)):
+            return str(value)
+            
+        return value
 
     def _convert_value_to_exportable(self, value):
         """Convert database values to exportable format"""
@@ -34,12 +53,13 @@ class ComponentExporter:
         # Convert SQLAlchemy quoted_name objects to plain strings
         if hasattr(value, '__str__') and 'quoted_name' in str(type(value)):
             return str(value)
+            
+        # Additional safety for any SQLAlchemy objects
+        return self._safe_string_convert(value)
 
-        return value
-
-    def _get_foreign_key_name(self, model_instance, uuid_field, name_field='name'):
+    def _get_foreign_key_name(self, model_instance, id_field, name_field='name'):
         """Get the name for a foreign key UUID field"""
-        relation_attr = uuid_field.replace('_uuid', '')
+        relation_attr = id_field.replace('_id', '')
         if not hasattr(model_instance, relation_attr):
             return None
 
@@ -54,19 +74,13 @@ class ComponentExporter:
         meta = OrderedDict()
 
         # Get table name - convert to string to avoid SQLAlchemy objects
-        table_name = model_object.__table__.name
-        if hasattr(table_name, '__str__'):
-            meta['tablename'] = str(table_name)
-        else:
-            meta['tablename'] = table_name
+        table_name = self._safe_string_convert(model_object.__table__.name)
+        meta['tablename'] = table_name
 
         # Get schema if available - convert to string
         if hasattr(model_object.__table__, 'schema') and model_object.__table__.schema:
-            schema = model_object.__table__.schema
-            if hasattr(schema, '__str__'):
-                meta['schema'] = str(schema)
-            else:
-                meta['schema'] = schema
+            schema = self._safe_string_convert(model_object.__table__.schema)
+            meta['schema'] = schema
         else:
             meta['schema'] = 'public'  # Default schema
 
@@ -106,7 +120,7 @@ class ComponentExporter:
                         # Comment out the line and add explanation
                         indent = line[:len(line) - len(line.lstrip())]
                         processed_lines.append(f"{indent}# {stripped}  # AUTO-GENERATED: Optional, system will create if not provided")
-                    elif '_uuid' in field_name.lower():
+                    elif '_id' in field_name.lower():
                         # Foreign key UUIDs need special handling
                         indent = line[:len(line) - len(line.lstrip())]
                         processed_lines.append(line)
@@ -156,19 +170,23 @@ class ComponentExporter:
 
             # First pass: add all column data in order
             for column in model_object.__table__.columns:
-                value = getattr(model_object, column.name)
+                # Ensure column name is a plain string
+                column_name = self._safe_string_convert(column.name)
+                
+                value = getattr(model_object, column_name)
                 converted_value = self._convert_value_to_exportable(value)
+                
                 # Include ALL fields in templates, even None values for auto-generated fields
                 if template_mode or converted_value is not None:
                     # For template mode, provide example values for None fields
                     if template_mode and converted_value is None:
-                        if column.name.lower() in self.auto_generated_fields:
+                        if column_name.lower() in self.auto_generated_fields:
                             # Provide example values for auto-generated fields
-                            if column.name == 'uuid':
+                            if column_name == 'id':
                                 converted_value = "12345678-1234-1234-1234-123456789abc"
-                            elif 'created_at' in column.name or 'updated_at' in column.name:
+                            elif 'created_at' in column_name or 'updated_at' in column_name:
                                 converted_value = "2024-01-01T00:00:00"
-                            elif 'created_on' in column.name or 'updated_on' in column.name:
+                            elif 'created_on' in column_name or 'updated_on' in column_name:
                                 converted_value = "2024-01-01T00:00:00"
                             else:
                                 converted_value = "auto_generated_value"
@@ -176,7 +194,7 @@ class ComponentExporter:
                             # Regular field with None value, keep as None or provide example
                             converted_value = None
                     
-                    data_section[column.name] = converted_value
+                    data_section[column_name] = converted_value
 
             # Second pass: insert foreign key names after their UUID fields
             if foreign_key_mappings:
@@ -191,7 +209,7 @@ class ComponentExporter:
                         name_field = foreign_key_mappings[key]
                         related_name = self._get_foreign_key_name(model_object, key, name_field)
                         if related_name:
-                            name_key = key.replace('_uuid', f'_{name_field}')
+                            name_key = key.replace('_id', f'_{name_field}')
                             new_items.append((name_key, related_name))
 
                 data_section = OrderedDict(new_items)
@@ -219,7 +237,7 @@ class ComponentExporter:
 
             # Generate header
             if header_title is None:
-                object_name = getattr(model_object, 'name', str(model_object.uuid)[:8])
+                object_name = getattr(model_object, 'name', str(model_object.id)[:8])
                 header_title = f"{model_name} '{object_name}'"
 
             # Add template mode indicator to header
@@ -229,7 +247,7 @@ class ComponentExporter:
             with open(output_path, 'w') as f:
                 f.write(f"# {header_title}{header_suffix}\n")
                 if not template_mode:
-                    f.write(f"# UUID: {model_object.uuid}\n")
+                    f.write(f"# UUID: {model_object.id}\n")
                 else:
                     f.write(f"# Template file - edit values before importing\n")
                     f.write(f"# \n")
@@ -294,9 +312,9 @@ class ComponentExporter:
                 if order_by and hasattr(model_class, order_by):
                     query = query.order_by(getattr(model_class, order_by))
                 else:
-                    # Default ordering by uuid for consistency
-                    if hasattr(model_class, 'uuid'):
-                        query = query.order_by(model_class.uuid)
+                    # Default ordering by id for consistency
+                    if hasattr(model_class, 'id'):
+                        query = query.order_by(model_class.id)
                 
                 # Apply limit if specified
                 if limit:
@@ -327,20 +345,23 @@ class ComponentExporter:
                     
                     # First pass: add all column data
                     for column in model_class.__table__.columns:
-                        value = getattr(obj, column.name)
+                        # Ensure column name is a plain string
+                        column_name = self._safe_string_convert(column.name)
+                        
+                        value = getattr(obj, column_name)
                         converted_value = self._convert_value_to_exportable(value)
                         
                         if template_mode or converted_value is not None:
                             if template_mode and converted_value is None:
-                                if column.name.lower() in self.auto_generated_fields:
-                                    if column.name == 'uuid':
-                                        converted_value = f"uuid_{data_list.__len__() + 1}"
-                                    elif 'created_at' in column.name or 'updated_at' in column.name:
+                                if column_name.lower() in self.auto_generated_fields:
+                                    if column_name == 'id':
+                                        converted_value = f"id_{data_list.__len__() + 1}"
+                                    elif 'created_at' in column_name or 'updated_at' in column_name:
                                         converted_value = "2024-01-01T00:00:00"
                                     else:
                                         converted_value = "auto_generated_value"
                             
-                            obj_data[column.name] = converted_value
+                            obj_data[column_name] = converted_value
                     
                     # Second pass: add foreign key names
                     if foreign_key_mappings:
@@ -354,7 +375,7 @@ class ComponentExporter:
                                 name_field = foreign_key_mappings[key]
                                 related_name = self._get_foreign_key_name(obj, key, name_field)
                                 if related_name:
-                                    name_key = key.replace('_uuid', f'_{name_field}')
+                                    name_key = key.replace('_id', f'_{name_field}')
                                     new_items.append((name_key, related_name))
                         
                         obj_data = OrderedDict(new_items)
@@ -408,4 +429,4 @@ class ComponentExporter:
             except Exception as e:
                 self.output_manager.log_error(f"Error exporting all model objects: {e}")
                 self.output_manager.output_error(f"Error exporting: {e}")
-                return 1        
+                return 1

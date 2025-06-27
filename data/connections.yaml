@@ -1,0 +1,16 @@
+# Connection - All Records
+# Total records: 4
+# Exported from template CLI
+
+Connection:
+  meta:
+    tablename: connections
+    schema: public
+  data:
+  - name: SYSTEM
+    database_type_id: 988dd788-979a-445e-b4b6-f40b87bc4ef8
+    connection_string: postgresql+psycopg2://10.90.0.40:5432/temuragi
+    username: temuragi
+    password: stronk_password_$314X
+    id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    is_active: true

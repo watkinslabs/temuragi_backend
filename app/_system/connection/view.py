@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 
 
-from .connection_model import Connection
+from ..report.connection_model import Connection
 from app.admin.database_type.database_type_model import DatabaseType
 
 
@@ -99,7 +99,7 @@ def data_ajax():
     
     # Format the data
     data = [{
-        'uuid': str(c.uuid),
+        'id': str(c.id),
         'name': c.name,
         'db_type': c.db_type,
         'connection_string': c.connection_string,
@@ -125,7 +125,7 @@ def list_ajax():
         connections = session.query(Connection).filter_by(active=True).all()
         
         data = [{
-            'uuid': str(conn.uuid),
+            'id': str(conn.id),
             'name': conn.name,
             'db_type': conn.db_type
         } for conn in connections]
@@ -162,7 +162,7 @@ def update_ajax():
     session = g.session
 
     payload = request.get_json()
-    conn = session.query(Connection).get(uuid.UUID(payload['uuid']))
+    conn = session.query(Connection).get(uuid.UUID(payload['id']))
     if not conn:
         return jsonify(status='error', msg='Not found'), 404
     try:
@@ -182,7 +182,7 @@ def update_ajax():
 def delete_ajax():
     sess = g.session
     payload = request.get_json()
-    conn = sess.query(Connection).get(uuid.UUID(payload['uuid']))
+    conn = sess.query(Connection).get(uuid.UUID(payload['id']))
     if not conn:
         return jsonify(status='error', msg='Not found'), 404
     sess.delete(conn)

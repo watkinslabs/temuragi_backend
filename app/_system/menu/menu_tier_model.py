@@ -6,19 +6,19 @@ from app.base.model import BaseModel
 
 
 class MenuTier(BaseModel):
-    __depends_on__ = ['Menu']  # Add this line (self-reference for parent_uuid)
+    __depends_on__ = ['Menu']  
     __tablename__ = 'menu_tiers'
 
     name = Column(String(100), nullable=False)
     display = Column(String(100), nullable=False)
     slug = Column(String(100), nullable=False)
 
-    parent_uuid = Column(UUID(as_uuid=True),
-        ForeignKey('menu_tiers.uuid', name='fk_menu_tiers_parent', ondelete='CASCADE'),
+    parent_id = Column(UUID(as_uuid=True),
+        ForeignKey('menu_tiers.id', name='fk_menu_tiers_parent', ondelete='CASCADE'),
         nullable=True)
         
-    menu_uuid = Column(UUID(as_uuid=True), 
-        ForeignKey('menu.uuid', name='fk_menu_tiers_menu', ondelete='CASCADE'), 
+    menu_id = Column(UUID(as_uuid=True), 
+        ForeignKey('menu.id', name='fk_menu_tiers_menu', ondelete='CASCADE'), 
         nullable=False)
                             
     icon = Column(String(100), nullable=True)
@@ -28,14 +28,14 @@ class MenuTier(BaseModel):
     search_terms = Column(Text, nullable=True)
 
     menu = relationship("Menu", back_populates="tiers")
-    links = relationship("MenuLink", foreign_keys="MenuLink.tier_uuid", back_populates="tier", cascade="all, delete-orphan")
+    links = relationship("MenuLink", foreign_keys="MenuLink.tier_id", back_populates="tier", cascade="all, delete-orphan")
     
     parent = relationship("MenuTier", 
-                     remote_side="MenuTier.uuid", 
+                     remote_side="MenuTier.id", 
                      backref=backref("children", cascade="all, delete-orphan"))   
     
     # Create index for uniqueness
     __table_args__ = (
-        Index('idx_menu_tiers_unique', 'slug', 'menu_uuid', 
-            'parent_uuid', unique=True),
+        Index('idx_menu_tiers_unique', 'slug', 'menu_id', 
+            'parent_id', unique=True),
     )

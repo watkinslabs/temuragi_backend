@@ -10,6 +10,7 @@ class Theme(BaseModel):
     Comprehensive theme model for managing visual styling across all devices and contexts.
     """
     __tablename__ = 'themes'
+    __depends_on__ = []
 
     # Core Identity
     name = Column(String(100), unique=True, nullable=False, 
@@ -173,6 +174,17 @@ class Theme(BaseModel):
     rtl_support = Column(Boolean, default=False, nullable=False,
                         comment="Whether theme supports right-to-left languages")
 
+    # Template Output Processing Options
+    consolidate_css = Column(Boolean, default=True, nullable=False,
+                        comment="Consolidate all CSS into single <style> tag in head")
+    consolidate_js = Column(Boolean, default=True, nullable=False,
+                        comment="Consolidate all JavaScript into single <script> tag at end of body")
+    minify_css = Column(Boolean, default=True, nullable=False,
+                    comment="Minify CSS output (remove whitespace, comments)")
+    minify_js = Column(Boolean, default=True, nullable=False,
+                    comment="Minify JavaScript output (remove whitespace, comments)")
+    minify_html = Column(Boolean, default=True, nullable=False,
+                        comment="Minify HTML output (remove unnecessary whitespace)")
     # Relationships
     templates = relationship("Template", back_populates="theme")
 

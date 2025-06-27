@@ -14,8 +14,8 @@ PageFragment:
     tablename: page_fragments
     schema: public
   data:
-    page_uuid: 00000000-0000-0000-0000-000000000030
-    # NOTE: page_uuid must reference existing record UUID
+    page_id: 00000000-0000-0000-0000-000000000030
+    # NOTE: page_id must reference existing record UUID
     fragment_type: content
     fragment_name: Theme Home
     fragment_key: base
@@ -65,28 +65,18 @@ PageFragment:
                         }
                     },
                     excluded_columns: ['password_hash', 'created_by', 'updated_by', 'deleted_at'],
-                    actions: ['edit', 'copy', {
-                        name: 'preview',
-                        icon: 'fas fa-eye',
-                        color: 'info',
-                        title: 'Preview Theme'
-                    }, {
-                        name: 'export',
-                        icon: 'fas fa-download',
-                        color: 'warning',
-                        title: 'Export Theme'
-                    }, 'delete'],
+                    actions: ['edit', 'copy', , 'delete'],
                     create_url: "{{ url_for('theme.create_Theme') }}",
-                    edit_url: "{{ url_for('theme.edit_Theme', Theme_uuid='{uuid}') }}",
+                    edit_url: "{{ url_for('theme.edit_Theme', Theme_id='{id}') }}",
                     custom_handlers: {
-                        preview: function(uuid) {
-                            window.open("{{ url_for('theme.preview_Theme', theme_uuid='UUID_PLACEHOLDER') }}".replace('UUID_PLACEHOLDER', uuid), '_blank');
+                        preview: function(id) {
+                            window.open("{{ url_for('theme.preview_Theme', theme_id='UUID_PLACEHOLDER') }}".replace('UUID_PLACEHOLDER', id), '_blank');
                         },
-                        export: function(uuid) {
+                        export: function(id) {
                             window.theme_table.api_request({
                                 model: "Theme",
                                 operation: "read",
-                                uuid: uuid,
+                                id: id,
                                 export: true
                             }, function(response) {
                                 if (response.success && response.data) {
@@ -94,7 +84,7 @@ PageFragment:
                                     const url = window.URL.createObjectURL(blob);
                                     const a = document.createElement('a');
                                     a.href = url;
-                                    a.download = `theme_${response.data.name || uuid}.json`;
+                                    a.download = `theme_${response.data.name || id}.json`;
                                     document.body.appendChild(a);
                                     a.click();
                                     window.URL.revokeObjectURL(url);
@@ -120,9 +110,9 @@ PageFragment:
     cache_duration: 3600
     last_rendered: null
     change_description: Initial content fragment for page
-    created_by_user_uuid: null
-    # NOTE: created_by_user_uuid must reference existing record UUID
-    # uuid: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided
+    created_by_user_id: null
+    # NOTE: created_by_user_id must reference existing record UUID
+    # id: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided
     # created_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
     # updated_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
 

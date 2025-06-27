@@ -1,7 +1,7 @@
 # module_config/view.py
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, g, json
 
-from app.models import ModuleConfig
+from app.models import Module
 
 bp = Blueprint('module_config', __name__, url_prefix="/module-config", template_folder="tpl")
 
@@ -22,7 +22,7 @@ def close_session(exc):
 def home():
     """Main module configuration management page"""
     db_session = g.session
-    configs = ModuleConfig.get_all_configs(db_session)
+    configs = Module.get_all_configs(db_session)
     return render_template('module_config/home.html', configs=configs)
 
 @bp.route('/add', methods=['GET', 'POST'])
@@ -49,7 +49,7 @@ def add_config():
                                   config_data=config_json)
         
         db_session = g.session
-        success, message = ModuleConfig.add_or_update_config(db_session, module_name, config_dict, is_active)
+        success, message = Module.add_or_update_config(db_session, module_name, config_dict, is_active)
         
         flash(message, 'success' if success else 'error')
         if success:
@@ -72,7 +72,7 @@ def add_config():
 def edit_config(config_id):
     """Edit an existing module configuration"""
     db_session = g.session
-    config = ModuleConfig.get_config_by_id(db_session, config_id)
+    config = Module.get_config_by_id(db_session, config_id)
     
     if not config:
         flash('Configuration not found', 'error')
@@ -127,16 +127,16 @@ def edit_config(config_id):
 def toggle_config(config_id):
     """Toggle a module configuration's active status"""
     db_session = g.session
-    config = ModuleConfig.get_config_by_id(db_session, config_id)
+    config = Module.get_config_by_id(db_session, config_id)
     
     if not config:
         flash('Configuration not found', 'error')
         return redirect(url_for('module_config.home'))
     
     if config.is_active:
-        success, message = ModuleConfig.deactivate_config(db_session, config_id)
+        success, message = Module.deactivate_config(db_session, config_id)
     else:
-        success, message = ModuleConfig.activate_config(db_session, config_id)
+        success, message = Module.activate_config(db_session, config_id)
     
     flash(message, 'success' if success else 'error')
     return redirect(url_for('module_config.home'))
@@ -145,7 +145,7 @@ def toggle_config(config_id):
 def delete_config(config_id):
     """Delete a module configuration"""
     db_session = g.session
-    success, message = ModuleConfig.delete_config(db_session, config_id)
+    success, message = Module.delete_config(db_session, config_id)
     
     flash(message, 'success' if success else 'error')
     return redirect(url_for('module_config.home'))

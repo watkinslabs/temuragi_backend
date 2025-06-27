@@ -9,17 +9,17 @@ Template:
     name: ADMIN
     display_name: Admin Dashboard
     description: Full-featured admin template with sidebar navigation, header controls, and comprehensive layout
-    theme_uuid: 00000000-0000-0000-0000-000000000001
-    menu_type_uuid: null
+    theme_id: 00000000-0000-0000-0000-000000000001
+    menu_type_id: null
     layout_type: admin_dashboard
     container_class: container-fluid
     sidebar_enabled: true
     header_type: admin_header
     footer_type: admin_footer
     breadcrumbs_enabled: true
-    module_uuid: null
+    module_id: null
     is_system: true
     is_admin_template: true
     is_default_template: true
-    uuid: 00000000-0000-0000-0000-000000000002
+    id: 00000000-0000-0000-0000-000000000002
     is_active: true

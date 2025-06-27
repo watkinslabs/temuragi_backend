@@ -1,5 +1,5 @@
 # RolePermission - All Records
-# Total records: 161
+# Total records: 203
 # Exported from template CLI
 
 RolePermission:
@@ -7,969 +7,1221 @@ RolePermission:
     tablename: role_permissions
     schema: public
   data:
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 772207fd-d532-42e9-96cb-4d716b465004
-    uuid: 0180ebb6-2969-4962-a64c-01539316b1fc
-    is_active: true
-    created_at: '2025-06-15T11:19:30.056492-04:00'
-    updated_at: '2025-06-15T11:19:30.056531-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 0397e099-8ea5-41a9-a63e-0b4515f5fc52
-    uuid: 03b4e720-c79d-4c6d-9f67-dd951284ca3f
-    is_active: true
-    created_at: '2025-06-15T11:21:25.745060-04:00'
-    updated_at: '2025-06-15T11:21:25.745101-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9ff946db-4932-4758-902f-25f38a5f05da
-    uuid: 05e54922-0ad1-4a28-b710-15d137506e04
-    is_active: true
-    created_at: '2025-06-15T11:19:23.168426-04:00'
-    updated_at: '2025-06-15T11:19:23.168465-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 7d46abfc-1be8-4067-bbc6-483c7eea5ca7
-    uuid: 07570cd4-6d15-4e2c-b045-f7a6c0e67793
-    is_active: true
-    created_at: '2025-06-15T11:20:34.775506-04:00'
-    updated_at: '2025-06-15T11:20:34.775543-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d9d69a3c-a740-468a-bfed-802525cadb25
-    uuid: 0b51a16f-675c-4499-bbe5-9c013e7c92a5
-    is_active: true
-    created_at: '2025-06-15T11:19:08.063262-04:00'
-    updated_at: '2025-06-15T11:19:08.063299-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ee18b0b8-f87c-4c94-b0b0-432b0022be6c
-    uuid: 0e5abda6-f73a-4a11-a311-c2051e9f1b3f
-    is_active: true
-    created_at: '2025-06-15T11:19:38.335021-04:00'
-    updated_at: '2025-06-15T11:19:38.335062-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 53de28ef-0dc8-4a04-aeeb-16189b1a89c2
-    uuid: 0e7bd63c-87da-44a6-8e2f-50fb3d62ea52
-    is_active: true
-    created_at: '2025-06-15T11:18:52.960670-04:00'
-    updated_at: '2025-06-15T11:18:52.960705-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 820f0ca0-8a97-4441-844f-ebb897347a80
-    uuid: 111cbcb3-6c7a-4e6b-bd99-d5f70458b30b
-    is_active: true
-    created_at: '2025-06-15T11:21:11.972071-04:00'
-    updated_at: '2025-06-15T11:21:11.972107-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 54eb5598-e0b8-414e-836a-fd824af6dc7f
-    uuid: 1600949d-fbef-46d2-bc77-3d1c8dcc9aa3
-    is_active: true
-    created_at: '2025-06-15T11:20:38.897997-04:00'
-    updated_at: '2025-06-15T11:20:38.898034-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 92ea2c71-70ec-4f6f-9d93-70fb1641e65a
-    uuid: 162ec95c-1588-4220-904d-24059813dcd0
-    is_active: true
-    created_at: '2025-06-15T11:21:22.983269-04:00'
-    updated_at: '2025-06-15T11:21:22.983305-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: c86bc742-331f-4b7c-bfe6-73ea44807e48
-    uuid: 177cb9ba-123d-4f3e-b367-410a0ec539c0
-    is_active: true
-    created_at: '2025-06-15T11:20:22.333992-04:00'
-    updated_at: '2025-06-15T11:20:22.334029-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ae07e7b8-17f6-4c09-b776-e718f247ec6c
-    uuid: 18eecef4-58d3-4942-9cae-831ea296c4f6
-    is_active: true
-    created_at: '2025-06-15T11:21:10.589999-04:00'
-    updated_at: '2025-06-15T11:21:10.590039-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: bfea3079-8a07-4779-bd65-21c14798d44c
-    uuid: 19f34e28-982b-4df6-93a6-87d84e119cf7
-    is_active: true
-    created_at: '2025-06-15T11:21:05.094927-04:00'
-    updated_at: '2025-06-15T11:21:05.094962-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3ac11c6e-dd18-4df7-b7c1-8434fe14b7fa
-    uuid: 1ac29b96-4de7-4f47-b783-93f6acb64d30
-    is_active: true
-    created_at: '2025-06-15T11:20:27.853165-04:00'
-    updated_at: '2025-06-15T11:20:27.853202-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ed81b8d0-a659-4ce3-8653-9b03d77897ed
-    uuid: 1d59c68e-cc8e-4767-8081-2141891615f1
-    is_active: true
-    created_at: '2025-06-15T11:20:45.824830-04:00'
-    updated_at: '2025-06-15T11:20:45.824868-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: e603ce19-0b00-4d4e-92ea-b9bc77fd9090
-    uuid: 1d649f10-bcef-4908-83c1-e1f1cfff7952
-    is_active: true
-    created_at: '2025-06-15T11:19:16.289243-04:00'
-    updated_at: '2025-06-15T11:19:16.289280-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 7c7c0f86-03bf-4c04-b811-ede2dab78654
-    uuid: 1e4ec693-fbe5-4db5-88db-ee1da48aa396
-    is_active: true
-    created_at: '2025-06-15T11:18:44.696836-04:00'
-    updated_at: '2025-06-15T11:18:44.696873-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 2ad6f0d4-6808-424e-9a67-645c730df6b0
-    uuid: 1e931215-ee20-4ca6-aae6-446818734cf2
-    is_active: true
-    created_at: '2025-06-15T11:19:54.811918-04:00'
-    updated_at: '2025-06-15T11:19:54.811956-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3754e421-f912-44c3-9405-826f3ad42c94
-    uuid: 1fd96763-248b-4b46-9005-3cd285fd4984
-    is_active: true
-    created_at: '2025-06-15T11:17:48.533158-04:00'
-    updated_at: '2025-06-15T11:17:48.533193-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: bbb4c87a-3283-4e9a-b5b6-bf8f402603c7
-    uuid: 215ea37a-0888-4f35-b9bf-b4d76a849cee
-    is_active: true
-    created_at: '2025-06-15T11:19:01.200793-04:00'
-    updated_at: '2025-06-15T11:19:01.200833-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ba25bec5-01b6-4244-adec-0aca4e0de189
-    uuid: 224392c0-c23d-47a1-abf4-04edede065b5
-    is_active: true
-    created_at: '2025-06-15T11:21:02.347153-04:00'
-    updated_at: '2025-06-15T11:21:02.347187-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 2c93b9b8-5758-40ea-a180-4ba304cc5c44
-    uuid: 22e4a0fc-6187-4a8b-94dc-6a69897b3ba5
-    is_active: true
-    created_at: '2025-06-15T11:18:36.442230-04:00'
-    updated_at: '2025-06-15T11:18:36.442267-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: e6156695-ee09-422e-807f-02e98a8bf7e0
-    uuid: 30a08663-af99-4570-9029-9e3972a228c5
-    is_active: true
-    created_at: '2025-06-15T11:17:51.280422-04:00'
-    updated_at: '2025-06-15T11:17:51.280459-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 1e55a60e-063c-47fc-bc5e-a560c252ddf2
-    uuid: 311e582f-ff31-4ce8-8520-35ba9cb56ef9
-    is_active: true
-    created_at: '2025-06-15T11:18:29.574667-04:00'
-    updated_at: '2025-06-15T11:18:29.574704-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3e783897-111c-42b4-bce1-756104b5c1a2
-    uuid: 31ba4000-c8e5-48ab-ba92-0a21bd51a186
-    is_active: true
-    created_at: '2025-06-15T11:21:17.476097-04:00'
-    updated_at: '2025-06-15T11:21:17.476133-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 611ff8a3-de40-4685-af2a-3935cb6de421
-    uuid: 31f0caf1-4c0e-483f-baa6-175f7f89449f
-    is_active: true
-    created_at: '2025-06-15T11:18:30.948982-04:00'
-    updated_at: '2025-06-15T11:18:30.949019-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: aacd84b9-0b31-40e8-8898-5d5a060be4ad
-    uuid: 330e8189-6c31-4575-be51-aa2cbb3b3189
-    is_active: true
-    created_at: '2025-06-15T11:20:30.624155-04:00'
-    updated_at: '2025-06-15T11:20:30.624197-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: f5f35492-0206-4e5f-92ef-e552a7636ce0
-    uuid: 338b9d52-6515-499b-bd8d-31e027a786b8
-    is_active: true
-    created_at: '2025-06-15T11:17:49.903540-04:00'
-    updated_at: '2025-06-15T11:17:49.903578-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 86d640d8-72df-4a6b-8106-0fbaac8ba13d
-    uuid: 354c10eb-3d8f-47c7-a259-c49d51ec3e4a
-    is_active: true
-    created_at: '2025-06-15T11:21:09.212895-04:00'
-    updated_at: '2025-06-15T11:21:09.212933-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 49f819f3-ac12-4aa4-add3-47fb065921e1
-    uuid: 377128cc-4fbf-48c1-9f41-5e199905358c
-    is_active: true
-    created_at: '2025-06-15T11:18:47.447421-04:00'
-    updated_at: '2025-06-15T11:18:47.447463-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 0eea9ea5-b39d-49c9-bd0d-84df5760646b
-    uuid: 38a84979-76d6-4052-b438-e8773ac2e796
-    is_active: true
-    created_at: '2025-06-15T11:19:10.809865-04:00'
-    updated_at: '2025-06-15T11:19:10.809905-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 45d34c9c-8171-45ca-8822-7e8939e08df8
-    uuid: 38e41e2b-433b-44e4-bf9e-98dec7ad4a56
-    is_active: true
-    created_at: '2025-06-15T11:19:02.573288-04:00'
-    updated_at: '2025-06-15T11:19:02.573363-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: cc6a0b67-e964-4841-a39c-f7a245d0ae9f
-    uuid: 38fc5393-c71e-4ec2-b00d-0b7234982263
-    is_active: true
-    created_at: '2025-06-15T11:18:33.685248-04:00'
-    updated_at: '2025-06-15T11:18:33.685284-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 4edb0dd5-0d97-428c-80fc-2ffb21a522fe
-    uuid: 38ff9a07-c999-42b9-bdc3-4cc890dd6dea
-    is_active: true
-    created_at: '2025-06-15T11:19:28.679795-04:00'
-    updated_at: '2025-06-15T11:19:28.679832-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: b4a98385-557b-4c39-8358-5576660e4200
-    uuid: 39e65e2a-4ba0-4c2a-b731-3d18cd059d10
-    is_active: true
-    created_at: '2025-06-15T11:18:26.818007-04:00'
-    updated_at: '2025-06-15T11:18:26.818044-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 16d32e12-03d4-400f-9506-7e446bf6f112
-    uuid: 3ad03759-8a21-479f-ad1c-20eee008a4b0
-    is_active: true
-    created_at: '2025-06-15T11:20:55.442394-04:00'
-    updated_at: '2025-06-15T11:20:55.442436-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3a55a1be-fda2-4533-bac5-50efd307ba2a
-    uuid: 3d277dc5-7474-4b8e-b288-83de5f88a9a2
-    is_active: true
-    created_at: '2025-06-15T11:17:55.406051-04:00'
-    updated_at: '2025-06-15T11:17:55.406087-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 8bb66250-8ceb-46f6-a128-da28f5a5c056
-    uuid: 3e6de504-9f9f-40f3-bfd6-1a9917a130e1
-    is_active: true
-    created_at: '2025-06-15T11:19:49.330282-04:00'
-    updated_at: '2025-06-15T11:19:49.330331-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 5d6476f1-ee08-4b51-a997-5446d4cd5649
-    uuid: 40bfac21-9f58-486e-9672-ae77811c6c9c
-    is_active: true
-    created_at: '2025-06-15T11:17:41.653897-04:00'
-    updated_at: '2025-06-15T11:17:41.653935-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 97d2e78d-c7c8-47e8-a902-eb5097664569
-    uuid: 41b0025b-72f1-4217-95da-a32ab5c71ad1
-    is_active: true
-    created_at: '2025-06-15T11:20:19.571704-04:00'
-    updated_at: '2025-06-15T11:20:19.571739-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 8959cce5-9065-4f98-9ac8-d3240f2ab1ed
-    uuid: 41ba1f62-8d39-4c4f-a507-4769f6641e32
-    is_active: true
-    created_at: '2025-06-15T11:18:50.201844-04:00'
-    updated_at: '2025-06-15T11:18:50.201881-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: b6d67b6c-eddf-4ccb-911a-fd9f28038b93
-    uuid: 43a4a9cb-7921-4544-bf66-440e3cddad7b
-    is_active: true
-    created_at: '2025-06-15T11:20:56.815554-04:00'
-    updated_at: '2025-06-15T11:20:56.815590-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 17fef53c-7734-4207-99b5-ae23022a5173
-    uuid: 4865dcf9-91d7-4dd5-8982-7a53c2e761b6
-    is_active: true
-    created_at: '2025-06-15T11:20:58.194810-04:00'
-    updated_at: '2025-06-15T11:20:58.194846-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 08511ee1-162f-4cb0-be51-daffa3a46376
-    uuid: 50a67af9-bb43-4d7d-b85c-2b59af862124
-    is_active: true
-    created_at: '2025-06-15T11:19:09.434185-04:00'
-    updated_at: '2025-06-15T11:19:09.434223-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: e1fb3c55-1e27-408a-b04f-506ff7c9089f
-    uuid: 5185011f-63ac-4589-88ae-18250adc4e35
-    is_active: true
-    created_at: '2025-06-15T11:21:13.349799-04:00'
-    updated_at: '2025-06-15T11:21:13.349835-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 34b7b878-38f7-4881-aaf5-d545282ca625
-    uuid: 570adf9f-9346-441e-87be-d14991cba469
-    is_active: true
-    created_at: '2025-06-15T11:19:36.951144-04:00'
-    updated_at: '2025-06-15T11:19:36.951179-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: befb9f59-074d-4eaa-98c4-1e497ce99a2c
-    uuid: 57175e55-5ddc-4a04-afb0-9d1ce123857a
-    is_active: true
-    created_at: '2025-06-15T11:20:01.710431-04:00'
-    updated_at: '2025-06-15T11:20:01.710467-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: e5c2ec77-2bb2-4daf-92c1-4ae5449428fa
-    uuid: 5939c7f5-b1d2-4910-bf4b-83ab6fc94f85
-    is_active: true
-    created_at: '2025-06-15T11:18:21.308901-04:00'
-    updated_at: '2025-06-15T11:18:21.308936-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 7d26757e-a670-4d0d-a09d-f29397af796e
-    uuid: 59752bac-3f43-4652-8539-b507428cfb75
-    is_active: true
-    created_at: '2025-06-15T11:18:28.196303-04:00'
-    updated_at: '2025-06-15T11:18:28.196432-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d9768da2-acf7-48f5-b0f8-c8366967dd85
-    uuid: 59978f8e-ae0b-4bf1-aad3-db6cc2e33e69
-    is_active: true
-    created_at: '2025-06-15T11:20:18.205509-04:00'
-    updated_at: '2025-06-15T11:20:18.205548-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3af6437b-2cdf-4c62-b750-6e44e6ce7262
-    uuid: 59c01b3f-9172-424c-9390-12bd6f8ed235
-    is_active: true
-    created_at: '2025-06-15T11:18:03.676279-04:00'
-    updated_at: '2025-06-15T11:18:03.676313-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9594ae5c-9824-477c-8fd8-05feb8f8d634
-    uuid: 5a3acd2b-2e88-4a0a-9984-5e025bbbe231
-    is_active: true
-    created_at: '2025-06-15T11:18:00.933925-04:00'
-    updated_at: '2025-06-15T11:18:00.933964-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9c626f5c-5bb9-4c09-befe-74ec1b300097
-    uuid: 5c19227c-cd80-456f-a736-8ae377ecc6e1
-    is_active: true
-    created_at: '2025-06-15T11:17:45.787566-04:00'
-    updated_at: '2025-06-15T11:17:45.787603-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: dd374242-e3d8-4b32-95c4-7e842709a1ea
-    uuid: 5c5b318c-0d6f-414e-bf1e-d21b73638513
-    is_active: true
-    created_at: '2025-06-15T11:21:24.356720-04:00'
-    updated_at: '2025-06-15T11:21:24.356757-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: bb0a4f04-461c-4dcc-9bb2-bc0478e5e705
-    uuid: 5cbfa161-cb4f-480c-9234-f9f3ac08515b
-    is_active: true
-    created_at: '2025-06-15T11:20:04.457978-04:00'
-    updated_at: '2025-06-15T11:20:04.458020-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: c59c5aa4-131d-459a-9fac-4d906164f118
-    uuid: 5dd09a33-f9a6-455a-b31e-402252af6dad
-    is_active: true
-    created_at: '2025-06-15T11:20:33.395101-04:00'
-    updated_at: '2025-06-15T11:20:33.395140-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: bfda590d-63f2-4481-89ce-373d1a3a5299
-    uuid: 5f3b1963-65c8-4bb0-9e84-0e36b3fadc4d
-    is_active: true
-    created_at: '2025-06-15T11:18:06.439575-04:00'
-    updated_at: '2025-06-15T11:18:06.439611-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 87cef054-278c-48e3-b626-2be331e6e614
-    uuid: 5f3f2a0b-8260-4ae4-9b27-bc7daa808d84
-    is_active: true
-    created_at: '2025-06-15T11:20:09.945004-04:00'
-    updated_at: '2025-06-15T11:20:09.945039-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 0d7117e5-1828-4289-95b8-a3cb0d2b63e4
-    uuid: 5fb2bf14-884d-457d-bffb-104801f70771
-    is_active: true
-    created_at: '2025-06-15T11:20:00.335336-04:00'
-    updated_at: '2025-06-15T11:20:00.335377-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: b8416d5f-f66f-49c4-ac5c-679d61da031c
-    uuid: 5ff43abc-7895-4af1-827d-5f9ff91f7dbc
-    is_active: true
-    created_at: '2025-06-15T11:21:21.616827-04:00'
-    updated_at: '2025-06-15T11:21:21.616863-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3b88f2a1-cd2a-4abf-bd72-7ee2ec9e9bec
-    uuid: 62bbde7b-0d7e-4690-aaed-c2145a7f4e22
-    is_active: true
-    created_at: '2025-06-15T11:18:22.686430-04:00'
-    updated_at: '2025-06-15T11:18:22.686471-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9b71f6a3-c0ed-499e-83a9-4a26483ca706
-    uuid: 666c0fcc-6108-429b-afb0-b18cca9bf776
-    is_active: true
-    created_at: '2025-06-15T11:18:35.070523-04:00'
-    updated_at: '2025-06-15T11:18:35.070561-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 04da2ba2-dc39-4485-883f-310a6f3c8377
-    uuid: 66d1e619-eaeb-497f-9ce8-e251ecda0024
-    is_active: true
-    created_at: '2025-06-15T11:17:44.409553-04:00'
-    updated_at: '2025-06-15T11:17:44.409591-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: f38592da-5d00-44ed-a68c-03c55799b537
-    uuid: 6b2ff208-69d7-45df-b956-09fd13f24918
-    is_active: true
-    created_at: '2025-06-15T11:20:07.195803-04:00'
-    updated_at: '2025-06-15T11:20:07.195839-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 355131ec-5298-4760-94d8-bbbfd0be0ec5
-    uuid: 6b877fca-b81d-4e64-bdb2-b611109e97e1
-    is_active: true
-    created_at: '2025-06-15T11:18:09.203968-04:00'
-    updated_at: '2025-06-15T11:18:09.204005-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: c3543352-d09e-4869-9bee-8045b1d99332
-    uuid: 6ced0769-890f-4353-aaf7-49bdf42fac7d
-    is_active: true
-    created_at: '2025-06-15T11:21:14.725831-04:00'
-    updated_at: '2025-06-15T11:21:14.725868-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 86a04615-8808-4d11-a99e-6c0d98c70a92
-    uuid: 6e5ec041-461b-4f3e-81ee-b71fef514e15
-    is_active: true
-    created_at: '2025-06-15T11:18:59.819194-04:00'
-    updated_at: '2025-06-15T11:18:59.819230-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 799ed557-57fa-48ba-bbf4-1062e5d34f35
-    uuid: 6f5b0e4c-5419-4505-9472-7208c7710811
-    is_active: true
-    created_at: '2025-06-15T11:18:32.321905-04:00'
-    updated_at: '2025-06-15T11:18:32.321940-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 06c1db0b-0daa-459e-9a8a-6dd9f8f50d75
-    uuid: 72ffb776-1100-4607-ac8a-60bd25c11e89
-    is_active: true
-    created_at: '2025-06-15T11:19:25.933082-04:00'
-    updated_at: '2025-06-15T11:19:25.933120-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 5a7aec9f-6f69-4059-aca6-8e04e5dde92a
-    uuid: 750b8755-649b-49ce-a91b-0d895a21a780
-    is_active: true
-    created_at: '2025-06-15T11:18:46.068336-04:00'
-    updated_at: '2025-06-15T11:18:46.068375-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 5296ac8a-6a95-4457-9c4e-334196dbf039
-    uuid: 771e5c07-8d7a-4ec3-9ce6-35fc246ea7fa
-    is_active: true
-    created_at: '2025-06-15T11:20:40.291914-04:00'
-    updated_at: '2025-06-15T11:20:40.291953-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 49eb045c-76b2-4289-a962-d1c7182d4a38
-    uuid: 77756420-2072-4b88-9482-f2dd2c0d57bc
-    is_active: true
-    created_at: '2025-06-15T11:18:25.443775-04:00'
-    updated_at: '2025-06-15T11:18:25.443812-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 2187f3dc-ef30-4aa2-a3d7-2f58ffe30fb0
-    uuid: 7791c9d0-8b4a-4007-88fd-aef234993bbf
-    is_active: true
-    created_at: '2025-06-15T11:19:50.702263-04:00'
-    updated_at: '2025-06-15T11:19:50.702300-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9f798299-6be1-484e-b012-9a091fc88c8b
-    uuid: 786d1b43-f1eb-43d2-93ac-e8705a8a1d86
-    is_active: true
-    created_at: '2025-06-15T11:19:06.694549-04:00'
-    updated_at: '2025-06-15T11:19:06.694584-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d2672abd-22a9-43d5-ba11-632b800d639c
-    uuid: 78e20de6-77aa-452f-8c89-5f140eb37b1b
-    is_active: true
-    created_at: '2025-06-15T11:20:25.100705-04:00'
-    updated_at: '2025-06-15T11:20:25.100741-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: df1e2956-19fd-4f69-91f7-dd338187d93e
-    uuid: 79778f3a-24db-4aa7-931d-c3add70ad62c
-    is_active: true
-    created_at: '2025-06-15T11:18:54.333655-04:00'
-    updated_at: '2025-06-15T11:18:54.333695-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: a4955a94-30e3-450f-a5b6-a77f51435dbb
-    uuid: 7b6ea4d1-7cc3-40d9-a334-45622b4aa2af
-    is_active: true
-    created_at: '2025-06-15T11:21:00.967332-04:00'
-    updated_at: '2025-06-15T11:21:00.967376-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 43a02a3f-74b0-430a-9d73-72edd3937261
-    uuid: 7dee9101-6ddb-4bab-aa0d-330d8472ca53
-    is_active: true
-    created_at: '2025-06-15T11:19:46.602786-04:00'
-    updated_at: '2025-06-15T11:19:46.602822-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 7abf4895-e136-45e8-81d6-23de9f92d295
-    uuid: 82d39d63-a3b5-4b6a-ae56-d09dd52cdee0
-    is_active: true
-    created_at: '2025-06-15T11:18:41.955041-04:00'
-    updated_at: '2025-06-15T11:18:41.955080-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 169f7d49-4fff-41d1-8713-d0fee79c5654
-    uuid: 83ad020c-e474-44d4-90c7-1b75b0e7dcca
-    is_active: true
-    created_at: '2025-06-15T11:20:15.445491-04:00'
-    updated_at: '2025-06-15T11:20:15.445528-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 7f14a518-6d9c-4495-96fa-db7babe6a486
-    uuid: 84b62e07-d798-4340-b8c0-b953e4b6dede
-    is_active: true
-    created_at: '2025-06-15T11:19:27.299719-04:00'
-    updated_at: '2025-06-15T11:19:27.299755-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 0e006f17-86ed-4f9b-a9b5-4d1ca2ec4e39
-    uuid: 85d69e1f-ac16-41e1-a30f-4d41529a07ca
-    is_active: true
-    created_at: '2025-06-15T11:20:26.488493-04:00'
-    updated_at: '2025-06-15T11:20:26.488531-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ce824e92-544b-4f67-803b-7647438751ba
-    uuid: 87c3768f-2637-4429-b1ee-05c322317c98
-    is_active: true
-    created_at: '2025-06-15T11:18:40.568435-04:00'
-    updated_at: '2025-06-15T11:18:40.568473-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 1eea001e-6d7b-48fd-8357-0e5e3fedb4d0
-    uuid: 892f51eb-6ed0-4f87-8131-322bd4ae08a1
-    is_active: true
-    created_at: '2025-06-15T11:21:07.846246-04:00'
-    updated_at: '2025-06-15T11:21:07.846282-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 1349cf0c-855e-4b53-b0f5-a6d4d73a2563
-    uuid: 89d2b821-ff91-4d7d-ace9-c8aefd9d1d98
-    is_active: true
-    created_at: '2025-06-15T11:20:44.450396-04:00'
-    updated_at: '2025-06-15T11:20:44.450433-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: a5670ab6-708b-40fc-9dfb-d196943fe713
-    uuid: 8c1d3e77-20a5-44f8-9f3b-efedfe6b47d0
-    is_active: true
-    created_at: '2025-06-15T11:20:16.826819-04:00'
-    updated_at: '2025-06-15T11:20:16.826854-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: df72b72a-2848-4be8-8081-3d69818a0c79
-    uuid: 8f1f4da7-b39c-468a-888d-cc95fd3ae260
-    is_active: true
-    created_at: '2025-06-15T11:18:37.822681-04:00'
-    updated_at: '2025-06-15T11:18:37.822716-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 55018a57-7c44-444e-9a04-5a9239c5cf05
-    uuid: 8f5e652b-42c1-42ae-8ec4-c3b6dd4c4cf3
-    is_active: true
-    created_at: '2025-06-15T11:20:23.713250-04:00'
-    updated_at: '2025-06-15T11:20:23.713287-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 70aa6b91-3dbb-4d02-a3c9-9b422605c576
-    uuid: 9054bb76-b39b-416b-8978-c5d3b6a7aa28
-    is_active: true
-    created_at: '2025-06-15T11:17:58.169282-04:00'
-    updated_at: '2025-06-15T11:17:58.169344-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: bfcba81c-1f61-4764-943c-ad48ec29492b
-    uuid: 937e5f6d-55c1-4db1-9666-7d2be497b959
-    is_active: true
-    created_at: '2025-06-15T11:17:47.160029-04:00'
-    updated_at: '2025-06-15T11:17:47.160066-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9845b187-0473-4a30-aba5-fd0e520fc11d
-    uuid: 93c96eac-add6-4286-aa37-c97252415df7
-    is_active: true
-    created_at: '2025-06-15T11:19:58.952747-04:00'
-    updated_at: '2025-06-15T11:19:58.952786-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 79d402fc-7e9f-4c1a-9f5f-b791065ab82a
-    uuid: 940265b5-bf46-4d83-8487-453f9b4f9a7b
-    is_active: true
-    created_at: '2025-06-15T11:19:19.051569-04:00'
-    updated_at: '2025-06-15T11:19:19.051606-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 35cdcd70-738d-479f-bf85-bc7262273cdc
-    uuid: 940e5d37-c756-4035-9161-c75ff1ea4fb2
-    is_active: true
-    created_at: '2025-06-15T11:18:05.068293-04:00'
-    updated_at: '2025-06-15T11:18:05.068408-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 20a3e71e-d08a-46a5-8a35-b1bcddd6b2b0
-    uuid: 99f586fe-4181-42c4-a0a0-c02c6e09a8c7
-    is_active: true
-    created_at: '2025-06-15T11:19:14.922769-04:00'
-    updated_at: '2025-06-15T11:19:14.922805-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 6cac6d3f-df85-4c4c-a4e7-6ec1b13b9af7
-    uuid: 9bd92fa9-204a-4277-9279-d81a3a716cb4
-    is_active: true
-    created_at: '2025-06-15T11:20:08.568822-04:00'
-    updated_at: '2025-06-15T11:20:08.568861-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: a977861e-1a0d-47ae-80f5-ec8e7704b0e5
-    uuid: 9d380f8e-345a-46d4-8bf6-154c06147172
-    is_active: true
-    created_at: '2025-06-15T11:18:02.299178-04:00'
-    updated_at: '2025-06-15T11:18:02.299214-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ea580e99-7d13-48b3-a71e-3d69400530bb
-    uuid: 9d933090-3ec3-40a4-a802-6281fd202c70
-    is_active: true
-    created_at: '2025-06-15T11:20:54.048215-04:00'
-    updated_at: '2025-06-15T11:20:54.048252-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 80700710-f40b-4f74-ab78-58f5387f5a41
-    uuid: 9e2d8943-7500-4ec6-9bc7-da6c2ac5b8bd
-    is_active: true
-    created_at: '2025-06-15T11:21:16.098926-04:00'
-    updated_at: '2025-06-15T11:21:16.098962-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: bebe06a2-e9f9-445d-adc1-b462970519ed
-    uuid: 9e735215-a20c-4f07-8619-41aa1c876b49
-    is_active: true
-    created_at: '2025-06-15T11:20:12.710877-04:00'
-    updated_at: '2025-06-15T11:20:12.710912-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 74e8f61a-286c-4fa5-b241-6360cc6c46ba
-    uuid: 9fc9adba-b8d1-464f-a33a-388371f87cca
-    is_active: true
-    created_at: '2025-06-15T11:21:03.719852-04:00'
-    updated_at: '2025-06-15T11:21:03.719889-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: e25e57e6-42c4-4ad5-9404-74b477236dc7
-    uuid: a0287ce4-63b2-4a61-b8c2-415693e3481e
-    is_active: true
-    created_at: '2025-06-15T11:19:05.315898-04:00'
-    updated_at: '2025-06-15T11:19:05.315937-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 5ba69ac3-09c8-4c80-802a-b53d62ff6718
-    uuid: a1092187-d362-4afb-a102-d6a7d1cf072a
-    is_active: true
-    created_at: '2025-06-15T11:11:11.816573-04:00'
-    updated_at: '2025-06-15T11:11:11.816615-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 20a2d9df-1567-4674-bd80-b7f83c5ee45e
-    uuid: a10afcf8-c977-469b-bc51-dd7fb7243342
-    is_active: true
-    created_at: '2025-06-15T11:17:54.028464-04:00'
-    updated_at: '2025-06-15T11:17:54.028508-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 0b68b20e-1add-4b57-a9a9-8acd501b6c41
-    uuid: a22ca632-c877-4b67-9495-8dd9eb530250
-    is_active: true
-    created_at: '2025-06-15T11:20:05.827782-04:00'
-    updated_at: '2025-06-15T11:20:05.827818-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: c197202a-e918-4e2f-9377-8d51e1848fc4
-    uuid: a2fdb0b8-9a63-4657-a7ca-5ae06ee5f123
-    is_active: true
-    created_at: '2025-06-15T11:20:41.688561-04:00'
-    updated_at: '2025-06-15T11:20:41.688599-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d8225a49-393e-4224-a85b-b2fa7e40e3db
-    uuid: a4aa64b1-9d7c-4c54-95c1-2c406fd2996f
-    is_active: true
-    created_at: '2025-06-15T11:19:32.820195-04:00'
-    updated_at: '2025-06-15T11:19:32.820233-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 2de95535-ca6b-4ddc-8720-2414a2fbb1c4
-    uuid: a4d19dff-33db-4707-b93c-5119bc1ffd47
-    is_active: true
-    created_at: '2025-06-15T11:19:41.101463-04:00'
-    updated_at: '2025-06-15T11:19:41.101499-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 7aa20ff3-1d99-474e-b860-4e42b261f215
-    uuid: a69db346-c04e-44a0-9552-cbc3d25e2174
-    is_active: true
-    created_at: '2025-06-15T11:18:43.324952-04:00'
-    updated_at: '2025-06-15T11:18:43.324989-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 37cdeef4-8adf-40b2-906d-5f76c60fa20a
-    uuid: a6dc536c-df7a-4379-a4f3-602a5aabe41d
-    is_active: true
-    created_at: '2025-06-15T11:18:58.448632-04:00'
-    updated_at: '2025-06-15T11:18:58.448669-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 004716fa-fd0c-4d47-a1bc-f08decf87e98
-    uuid: a72623dd-7467-4d0f-a6f4-897e47330264
-    is_active: true
-    created_at: '2025-06-15T11:18:55.706526-04:00'
-    updated_at: '2025-06-15T11:18:55.706562-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: b8072c17-33c4-4deb-88c6-54f0efe687c4
-    uuid: a8623448-c5bd-482f-b870-2bb3ecb2e363
-    is_active: true
-    created_at: '2025-06-15T11:19:12.184883-04:00'
-    updated_at: '2025-06-15T11:19:12.184920-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 298f10d2-a21d-467d-9b19-1763f051973b
-    uuid: a87b15f1-9252-4e21-a182-92b9603a3418
-    is_active: true
-    created_at: '2025-06-15T11:21:18.853585-04:00'
-    updated_at: '2025-06-15T11:21:18.853621-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 43a7a949-0cf8-4b29-99e8-2443ccfda559
-    uuid: adceed2c-d27b-43f7-a3fa-edb9c396a551
-    is_active: true
-    created_at: '2025-06-15T11:19:20.427246-04:00'
-    updated_at: '2025-06-15T11:19:20.427285-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ec8e348c-659e-461a-b7f7-fb3bf46f47d1
-    uuid: af620286-bbf9-4f01-bb86-6d76de0e4429
-    is_active: true
-    created_at: '2025-06-15T11:19:57.580544-04:00'
-    updated_at: '2025-06-15T11:19:57.580581-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 044adb02-a7d0-4909-a83a-ec4fa3de4641
-    uuid: b499d8e5-b587-4226-a1f7-b77aed929240
-    is_active: true
-    created_at: '2025-06-15T11:20:52.681741-04:00'
-    updated_at: '2025-06-15T11:20:52.681777-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: b2ebff0f-031e-4801-9f6e-e19ae30f2b0d
-    uuid: b4e02d69-9955-4e8c-8ae1-0bd27504f981
-    is_active: true
-    created_at: '2025-06-15T11:17:59.554047-04:00'
-    updated_at: '2025-06-15T11:17:59.554083-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9544f77f-2d54-40f4-bc88-28c8927f1511
-    uuid: b4f2bdce-f5af-46e6-8780-4632ebd6d6d2
-    is_active: true
-    created_at: '2025-06-15T11:18:48.819615-04:00'
-    updated_at: '2025-06-15T11:18:48.819651-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: cfc10363-6fb3-481e-9242-c941bb0259ce
-    uuid: b538fa48-9ca2-4049-b1bd-33236f956d33
-    is_active: true
-    created_at: '2025-06-15T11:20:37.524504-04:00'
-    updated_at: '2025-06-15T11:20:37.524542-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 458a26d8-f066-41b0-b1ec-4636cd5d467a
-    uuid: b628193e-eda4-412f-95e2-89c02b6306aa
-    is_active: true
-    created_at: '2025-06-15T11:21:28.485379-04:00'
-    updated_at: '2025-06-15T11:21:28.485419-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 627692eb-6c85-484c-9529-36d3649455f6
-    uuid: b9aa07e0-4484-404c-a612-b30ff137015d
-    is_active: true
-    created_at: '2025-06-15T11:19:03.947427-04:00'
-    updated_at: '2025-06-15T11:19:03.947464-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 53dd5561-bd7f-4dde-b518-a133f4811e65
-    uuid: ba279259-330a-4a89-be87-2bd8e119f286
-    is_active: true
-    created_at: '2025-06-15T11:19:52.067921-04:00'
-    updated_at: '2025-06-15T11:19:52.067960-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 29c80f80-d0c1-4ed9-b5b3-dc53b85978bf
-    uuid: bd6c7f43-6a9e-4e8b-b57f-3861c4cdd059
-    is_active: true
-    created_at: '2025-06-15T11:20:11.336947-04:00'
-    updated_at: '2025-06-15T11:20:11.336985-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: b4e161dc-c952-4928-b698-a2694942a8a7
-    uuid: bddef46b-4170-4432-8568-1c3882bbdb2b
-    is_active: true
-    created_at: '2025-06-15T11:17:40.273289-04:00'
-    updated_at: '2025-06-15T11:17:40.273340-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: b71ce4a7-7d9c-4958-91b7-66aa1244c553
-    uuid: beff5457-9c6e-43d0-8288-d0f1718a404a
-    is_active: true
-    created_at: '2025-06-15T11:21:27.110909-04:00'
-    updated_at: '2025-06-15T11:21:27.110944-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 5172b1fe-a072-477c-a9a6-12c6799d8b29
-    uuid: c014e5f8-39fd-4972-8800-1ee8cc045365
-    is_active: true
-    created_at: '2025-06-15T11:18:57.079861-04:00'
-    updated_at: '2025-06-15T11:18:57.079900-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 0c4c4e5f-012d-4e82-9ad9-8b329852356d
-    uuid: c030b597-dc50-40a3-9ce1-2fa556b62ee2
-    is_active: true
-    created_at: '2025-06-15T11:19:24.549432-04:00'
-    updated_at: '2025-06-15T11:19:24.549469-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 741eda99-ee7a-4ca0-b12b-b4ac43c14f9d
-    uuid: c14f92fc-d47f-4a78-b8b2-6aedd604f09b
-    is_active: true
-    created_at: '2025-06-15T11:20:47.198551-04:00'
-    updated_at: '2025-06-15T11:20:47.198589-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 1169ea00-74e9-4b64-8d56-e8f813dcce95
-    uuid: c3d95220-7b5e-4c03-8b34-a9a72eac506b
-    is_active: true
-    created_at: '2025-06-15T11:19:56.198140-04:00'
-    updated_at: '2025-06-15T11:19:56.198177-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 24d2bb77-0fec-4401-8e66-3c0428d8384c
-    uuid: c6256124-0baf-4f5e-8ee7-2e9f1e69562f
-    is_active: true
-    created_at: '2025-06-15T11:18:51.583143-04:00'
-    updated_at: '2025-06-15T11:18:51.583179-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 83a82a1b-f42f-4142-b217-28a298fe1126
-    uuid: c753fbb0-d275-4862-9449-a6ac254c1369
-    is_active: true
-    created_at: '2025-06-15T11:20:43.067548-04:00'
-    updated_at: '2025-06-15T11:20:43.067584-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: c1dd9c7b-e191-49aa-9715-6952a0deec8d
-    uuid: c864c932-d012-4bf8-86d5-f95f8f480f6c
-    is_active: true
-    created_at: '2025-06-15T11:20:51.305500-04:00'
-    updated_at: '2025-06-15T11:20:51.305536-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3b9df423-b487-4f17-ba32-8b630017f6db
-    uuid: ca0177ab-9828-49fe-a93e-714effea1e4c
-    is_active: true
-    created_at: '2025-06-15T11:20:03.083012-04:00'
-    updated_at: '2025-06-15T11:20:03.083047-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: c38f865c-ec60-472c-952b-ed192f8e660c
-    uuid: cbf61ea2-79fc-4203-8f47-a68bc892e0fb
-    is_active: true
-    created_at: '2025-06-15T11:20:32.004209-04:00'
-    updated_at: '2025-06-15T11:20:32.004247-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 9be65e1e-862a-48d4-a90c-2c8f36162ab1
-    uuid: d0074317-9914-4d6f-a1cc-04f910b4ed2c
-    is_active: true
-    created_at: '2025-06-15T11:20:48.565291-04:00'
-    updated_at: '2025-06-15T11:20:48.565423-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 8588299e-2b61-4022-aa26-1e3b152daeff
-    uuid: d1d71eb4-bc70-4c9c-8bc9-bf328b5bcf16
-    is_active: true
-    created_at: '2025-06-15T11:19:17.670092-04:00'
-    updated_at: '2025-06-15T11:19:17.670128-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 24664feb-21ad-4215-a191-99080c347db6
-    uuid: d2a71d4f-5d75-4834-8cca-92ba16594991
-    is_active: true
-    created_at: '2025-06-15T11:19:34.185678-04:00'
-    updated_at: '2025-06-15T11:19:34.185715-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 4b85273a-2aad-46bb-bc46-86e869eb4f2b
-    uuid: d7175ae6-db68-4190-abb3-bb7b6b91b046
-    is_active: true
-    created_at: '2025-06-15T11:18:24.067432-04:00'
-    updated_at: '2025-06-15T11:18:24.067472-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: a3dfd253-3adc-46ca-91ef-86863fe8cae5
-    uuid: d7345aea-f12f-4b5c-931f-5f1e41c790b3
-    is_active: true
-    created_at: '2025-06-15T11:17:52.659294-04:00'
-    updated_at: '2025-06-15T11:17:52.659345-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 85a8101d-fd44-4d92-8509-74dd8692656d
-    uuid: dd25a367-f81d-4f9b-a568-ef53cca411f6
-    is_active: true
-    created_at: '2025-06-15T11:19:35.574872-04:00'
-    updated_at: '2025-06-15T11:19:35.574907-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 2d424812-2431-4f6a-ac03-8b6075a2af7b
-    uuid: e039fe0c-a73d-4a56-b6e5-44b9faf1c2a4
-    is_active: true
-    created_at: '2025-06-15T11:19:31.436636-04:00'
-    updated_at: '2025-06-15T11:19:31.436677-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ccf46f5e-c3e9-4f01-a78f-965abdeb11d1
-    uuid: e1031d51-4a48-4d35-af9f-43531093a328
-    is_active: true
-    created_at: '2025-06-15T11:20:14.072134-04:00'
-    updated_at: '2025-06-15T11:20:14.072170-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 6972ff99-070a-42f3-a960-7318453a4997
-    uuid: e47bebbb-39d9-408a-832d-6239702f5e43
-    is_active: true
-    created_at: '2025-06-15T11:21:06.481838-04:00'
-    updated_at: '2025-06-15T11:21:06.481873-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: f30125fc-d5bd-4437-a399-b5517504d77d
-    uuid: e6c2272f-9657-49ef-b5a3-d7cb3a2fb501
-    is_active: true
-    created_at: '2025-06-15T11:19:21.801442-04:00'
-    updated_at: '2025-06-15T11:19:21.801480-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d78c3e8f-c384-4b25-a7f6-9a67787a34b5
-    uuid: e7e8a79a-bdc8-4f6f-8c68-3ea9178faf13
-    is_active: true
-    created_at: '2025-06-15T11:19:42.478557-04:00'
-    updated_at: '2025-06-15T11:19:42.478593-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 0cccf2fe-0675-4fdb-94ce-0b3248687db0
-    uuid: e84df36f-dc72-4c0b-ac02-22552f44c6bf
-    is_active: true
-    created_at: '2025-06-15T11:20:29.237767-04:00'
-    updated_at: '2025-06-15T11:20:29.237809-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d9a0cb1c-d24d-4020-91b9-0c4abbf8bbd6
-    uuid: e85fff88-e48a-49a6-91ed-781512ff4d31
-    is_active: true
-    created_at: '2025-06-15T11:19:39.723579-04:00'
-    updated_at: '2025-06-15T11:19:39.723616-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 843bcc1c-a438-4001-a534-22596aa35d30
-    uuid: eb9281ba-e8f6-4904-85ee-012239de8bf7
-    is_active: true
-    created_at: '2025-06-15T11:18:07.821028-04:00'
-    updated_at: '2025-06-15T11:18:07.821063-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 46f873a1-bfb5-4eea-a54a-dc9ddcaab071
-    uuid: ec214675-6f73-4bd0-9b35-7882bb4927e0
-    is_active: true
-    created_at: '2025-06-15T11:20:36.151939-04:00'
-    updated_at: '2025-06-15T11:20:36.151978-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d34a8340-ff8c-4715-9a1a-caa3c897d610
-    uuid: ecb4c219-f9d8-48ce-8f5a-6e5a20fca1b5
-    is_active: true
-    created_at: '2025-06-15T11:20:49.937673-04:00'
-    updated_at: '2025-06-15T11:20:49.937709-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 175b713e-b644-4e61-9d0c-9ec69c598d64
-    uuid: ef2fdcc5-ab53-40e7-bce6-3f7622cae857
-    is_active: true
-    created_at: '2025-06-15T11:19:43.851665-04:00'
-    updated_at: '2025-06-15T11:19:43.851701-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 3affd1d2-69ec-4e13-b294-6033a80e6947
-    uuid: f36566aa-2e4d-4eb5-9f4c-0f2672466d72
-    is_active: true
-    created_at: '2025-06-15T11:21:20.234929-04:00'
-    updated_at: '2025-06-15T11:21:20.234970-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 2ada3dec-b651-4cb1-be71-64390ff36d91
-    uuid: f3934cb3-9314-4344-af2b-51c7d5cd33f3
-    is_active: true
-    created_at: '2025-06-15T11:20:59.576711-04:00'
-    updated_at: '2025-06-15T11:20:59.576747-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ec4cdb3a-62cc-47c2-90d0-01a5a64a3d39
-    uuid: f3cc8e9f-e026-4a37-9617-a144f5d65fd6
-    is_active: true
-    created_at: '2025-06-15T11:19:47.956018-04:00'
-    updated_at: '2025-06-15T11:19:47.956053-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: a8d646c6-f834-4d25-9de2-5e0cb134ddab
-    uuid: f48fbed0-207a-4076-8e3f-fe6aabef0d62
-    is_active: true
-    created_at: '2025-06-15T11:19:13.556150-04:00'
-    updated_at: '2025-06-15T11:19:13.556186-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ae7690f3-2449-4eab-923c-d1a99252bec5
-    uuid: f6ebc61c-b662-4443-a3f1-9ced382710a0
-    is_active: true
-    created_at: '2025-06-15T11:18:39.192874-04:00'
-    updated_at: '2025-06-15T11:18:39.192913-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: ab841210-f271-416f-8b38-8ca941efd5a0
-    uuid: f7513571-c926-4973-85b8-7cf386fb2036
-    is_active: true
-    created_at: '2025-06-15T11:18:19.917278-04:00'
-    updated_at: '2025-06-15T11:18:19.917316-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: f0519eeb-aa9d-4df5-836e-f47ef55e0769
-    uuid: f99a471e-8488-4c32-bd7d-a3b43fdc3e3d
-    is_active: true
-    created_at: '2025-06-15T11:19:53.434439-04:00'
-    updated_at: '2025-06-15T11:19:53.434477-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: f8abc70b-9292-4399-8f37-d15963b23d1c
-    uuid: fbc4a9ab-a392-4c30-8979-bad40498b5ae
-    is_active: true
-    created_at: '2025-06-15T11:17:56.781913-04:00'
-    updated_at: '2025-06-15T11:17:56.781950-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 15ec176e-3a55-4a98-89ae-7f714a0cafdf
-    uuid: fbf229d8-84f0-4298-92c4-ece7b0d296f2
-    is_active: true
-    created_at: '2025-06-15T11:20:20.949052-04:00'
-    updated_at: '2025-06-15T11:20:20.949089-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: 61af13d6-55f5-4c0a-8634-0a30ca4267d6
-    uuid: fc4adb71-97d5-4ce7-ba52-7926dded9a51
-    is_active: true
-    created_at: '2025-06-15T11:17:43.028626-04:00'
-    updated_at: '2025-06-15T11:17:43.028663-04:00'
-  - role_uuid: 00000000-0000-0000-0000-000000000111
-    permission_uuid: d819aede-7f98-4cd6-a3d3-ea498f6d84aa
-    uuid: fe28b4fd-122c-4856-85b2-c54fab734f3b
-    is_active: true
-    created_at: '2025-06-15T11:19:45.228543-04:00'
-    updated_at: '2025-06-15T11:19:45.228580-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 772207fd-d532-42e9-96cb-4d716b465004
+    id: 0180ebb6-2969-4962-a64c-01539316b1fc
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9d5a9de7-6a87-424d-87c5-6d218f16e1bf
+    id: 01cf68e6-44fd-4649-b894-6c72af5fd27c
+    is_active: true
+    created_at: '2025-06-16T08:28:24.779474-04:00'
+    updated_at: '2025-06-16T08:28:24.779511-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0397e099-8ea5-41a9-a63e-0b4515f5fc52
+    id: 03b4e720-c79d-4c6d-9f67-dd951284ca3f
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: e6160ff0-8464-4da5-a28c-721bac849912
+    id: 055c68ee-9a58-46cd-bf58-5d15e28a4168
+    is_active: true
+    created_at: '2025-06-16T08:28:26.244581-04:00'
+    updated_at: '2025-06-16T08:28:26.244616-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9ff946db-4932-4758-902f-25f38a5f05da
+    id: 05e54922-0ad1-4a28-b710-15d137506e04
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 988f13e2-4210-426f-bb99-f82046d55192
+    id: 064964dc-937c-422e-b142-1f22ce0c20d5
+    is_active: true
+    created_at: '2025-06-16T08:28:37.887214-04:00'
+    updated_at: '2025-06-16T08:28:37.887252-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 08829bec-8800-4db6-9bc2-718119ef9591
+    id: 06d9d61d-7af0-4322-b409-b062b02032e3
+    is_active: true
+    created_at: '2025-06-16T08:28:30.622475-04:00'
+    updated_at: '2025-06-16T08:28:30.622510-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 7d46abfc-1be8-4067-bbc6-483c7eea5ca7
+    id: 07570cd4-6d15-4e2c-b045-f7a6c0e67793
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d9d69a3c-a740-468a-bfed-802525cadb25
+    id: 0b51a16f-675c-4499-bbe5-9c013e7c92a5
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ee18b0b8-f87c-4c94-b0b0-432b0022be6c
+    id: 0e5abda6-f73a-4a11-a311-c2051e9f1b3f
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 53de28ef-0dc8-4a04-aeeb-16189b1a89c2
+    id: 0e7bd63c-87da-44a6-8e2f-50fb3d62ea52
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 459b26d3-b1a5-4d71-b691-c9172586ee48
+    id: 10434049-fca6-4797-a185-9ad95cc85970
+    is_active: true
+    created_at: '2025-06-16T08:28:55.409672-04:00'
+    updated_at: '2025-06-16T08:28:55.409707-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 820f0ca0-8a97-4441-844f-ebb897347a80
+    id: 111cbcb3-6c7a-4e6b-bd99-d5f70458b30b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: a6aff021-f07f-4467-8ca8-b5336978d1a2
+    id: 1236e835-5836-4069-85fa-dd4ca2cbfb18
+    is_active: true
+    created_at: '2025-06-16T08:28:02.899826-04:00'
+    updated_at: '2025-06-16T08:28:02.899862-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 293be551-7f5a-4ea3-adbb-e1f9c90d007f
+    id: 14fe510c-122b-4f4e-94fe-a0e15c392850
+    is_active: true
+    created_at: '2025-06-16T08:28:11.678461-04:00'
+    updated_at: '2025-06-16T08:28:11.678499-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 54eb5598-e0b8-414e-836a-fd824af6dc7f
+    id: 1600949d-fbef-46d2-bc77-3d1c8dcc9aa3
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 92ea2c71-70ec-4f6f-9d93-70fb1641e65a
+    id: 162ec95c-1588-4220-904d-24059813dcd0
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: c86bc742-331f-4b7c-bfe6-73ea44807e48
+    id: 177cb9ba-123d-4f3e-b367-410a0ec539c0
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ae07e7b8-17f6-4c09-b776-e718f247ec6c
+    id: 18eecef4-58d3-4942-9cae-831ea296c4f6
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: bfea3079-8a07-4779-bd65-21c14798d44c
+    id: 19f34e28-982b-4df6-93a6-87d84e119cf7
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3ac11c6e-dd18-4df7-b7c1-8434fe14b7fa
+    id: 1ac29b96-4de7-4f47-b783-93f6acb64d30
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ed81b8d0-a659-4ce3-8653-9b03d77897ed
+    id: 1d59c68e-cc8e-4767-8081-2141891615f1
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: e603ce19-0b00-4d4e-92ea-b9bc77fd9090
+    id: 1d649f10-bcef-4908-83c1-e1f1cfff7952
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 7c7c0f86-03bf-4c04-b811-ede2dab78654
+    id: 1e4ec693-fbe5-4db5-88db-ee1da48aa396
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2ad6f0d4-6808-424e-9a67-645c730df6b0
+    id: 1e931215-ee20-4ca6-aae6-446818734cf2
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3754e421-f912-44c3-9405-826f3ad42c94
+    id: 1fd96763-248b-4b46-9005-3cd285fd4984
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: bbb4c87a-3283-4e9a-b5b6-bf8f402603c7
+    id: 215ea37a-0888-4f35-b9bf-b4d76a849cee
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ba25bec5-01b6-4244-adec-0aca4e0de189
+    id: 224392c0-c23d-47a1-abf4-04edede065b5
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2c93b9b8-5758-40ea-a180-4ba304cc5c44
+    id: 22e4a0fc-6187-4a8b-94dc-6a69897b3ba5
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: cc2f80d6-1486-4d91-926d-b6f3070042f0
+    id: 26206e5f-0966-439f-874d-6ee439d6aab7
+    is_active: true
+    created_at: '2025-06-16T08:28:23.313562-04:00'
+    updated_at: '2025-06-16T08:28:23.313596-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: e6156695-ee09-422e-807f-02e98a8bf7e0
+    id: 30a08663-af99-4570-9029-9e3972a228c5
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 1e55a60e-063c-47fc-bc5e-a560c252ddf2
+    id: 311e582f-ff31-4ce8-8520-35ba9cb56ef9
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3e783897-111c-42b4-bce1-756104b5c1a2
+    id: 31ba4000-c8e5-48ab-ba92-0a21bd51a186
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 611ff8a3-de40-4685-af2a-3935cb6de421
+    id: 31f0caf1-4c0e-483f-baa6-175f7f89449f
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: aacd84b9-0b31-40e8-8898-5d5a060be4ad
+    id: 330e8189-6c31-4575-be51-aa2cbb3b3189
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: f5f35492-0206-4e5f-92ef-e552a7636ce0
+    id: 338b9d52-6515-499b-bd8d-31e027a786b8
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 99c554c6-4797-4e56-b888-47034287f31d
+    id: 348e029e-9bd8-4654-a1cb-5276793a406e
+    is_active: true
+    created_at: '2025-06-16T08:28:17.494467-04:00'
+    updated_at: '2025-06-16T08:28:17.494504-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 86d640d8-72df-4a6b-8106-0fbaac8ba13d
+    id: 354c10eb-3d8f-47c7-a259-c49d51ec3e4a
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 49f819f3-ac12-4aa4-add3-47fb065921e1
+    id: 377128cc-4fbf-48c1-9f41-5e199905358c
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0eea9ea5-b39d-49c9-bd0d-84df5760646b
+    id: 38a84979-76d6-4052-b438-e8773ac2e796
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 45d34c9c-8171-45ca-8822-7e8939e08df8
+    id: 38e41e2b-433b-44e4-bf9e-98dec7ad4a56
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: cc6a0b67-e964-4841-a39c-f7a245d0ae9f
+    id: 38fc5393-c71e-4ec2-b00d-0b7234982263
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 4edb0dd5-0d97-428c-80fc-2ffb21a522fe
+    id: 38ff9a07-c999-42b9-bdc3-4cc890dd6dea
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 33689c6e-e1b8-40b4-922a-de7dbaa593a6
+    id: 393d92f7-84fb-4a1b-bdbc-f98a5ab3d53c
+    is_active: true
+    created_at: '2025-06-16T08:28:43.724026-04:00'
+    updated_at: '2025-06-16T08:28:43.724062-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b4a98385-557b-4c39-8358-5576660e4200
+    id: 39e65e2a-4ba0-4c2a-b731-3d18cd059d10
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 16d32e12-03d4-400f-9506-7e446bf6f112
+    id: 3ad03759-8a21-479f-ad1c-20eee008a4b0
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3a55a1be-fda2-4533-bac5-50efd307ba2a
+    id: 3d277dc5-7474-4b8e-b288-83de5f88a9a2
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 8bb66250-8ceb-46f6-a128-da28f5a5c056
+    id: 3e6de504-9f9f-40f3-bfd6-1a9917a130e1
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 5d6476f1-ee08-4b51-a997-5446d4cd5649
+    id: 40bfac21-9f58-486e-9672-ae77811c6c9c
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 97d2e78d-c7c8-47e8-a902-eb5097664569
+    id: 41b0025b-72f1-4217-95da-a32ab5c71ad1
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 8959cce5-9065-4f98-9ac8-d3240f2ab1ed
+    id: 41ba1f62-8d39-4c4f-a507-4769f6641e32
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b6d67b6c-eddf-4ccb-911a-fd9f28038b93
+    id: 43a4a9cb-7921-4544-bf66-440e3cddad7b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 4f95d821-754d-4900-bf8f-eedf4a7f3524
+    id: 44489e89-8309-46b7-a84d-62400ff32f0c
+    is_active: true
+    created_at: '2025-06-16T08:29:01.254071-04:00'
+    updated_at: '2025-06-16T08:29:01.254107-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 17fef53c-7734-4207-99b5-ae23022a5173
+    id: 4865dcf9-91d7-4dd5-8982-7a53c2e761b6
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2dcfa9b5-745f-4c4f-a04c-bece04d5709d
+    id: 48f654fd-210d-453d-9a5e-521b99889e2d
+    is_active: true
+    created_at: '2025-06-16T08:28:58.332293-04:00'
+    updated_at: '2025-06-16T08:28:58.332357-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 08511ee1-162f-4cb0-be51-daffa3a46376
+    id: 50a67af9-bb43-4d7d-b85c-2b59af862124
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: e1fb3c55-1e27-408a-b04f-506ff7c9089f
+    id: 5185011f-63ac-4589-88ae-18250adc4e35
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 00376396-b139-402c-aed5-4b9c717b07ca
+    id: 527849d6-16d5-4543-87b3-47aebfc39960
+    is_active: true
+    created_at: '2025-06-16T08:28:04.345777-04:00'
+    updated_at: '2025-06-16T08:28:04.345812-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 34b7b878-38f7-4881-aaf5-d545282ca625
+    id: 570adf9f-9346-441e-87be-d14991cba469
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: befb9f59-074d-4eaa-98c4-1e497ce99a2c
+    id: 57175e55-5ddc-4a04-afb0-9d1ce123857a
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: e5c2ec77-2bb2-4daf-92c1-4ae5449428fa
+    id: 5939c7f5-b1d2-4910-bf4b-83ab6fc94f85
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 7d26757e-a670-4d0d-a09d-f29397af796e
+    id: 59752bac-3f43-4652-8539-b507428cfb75
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d9768da2-acf7-48f5-b0f8-c8366967dd85
+    id: 59978f8e-ae0b-4bf1-aad3-db6cc2e33e69
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3af6437b-2cdf-4c62-b750-6e44e6ce7262
+    id: 59c01b3f-9172-424c-9390-12bd6f8ed235
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 33aded0c-d8d1-4b42-aa72-c50772ab3f22
+    id: 5a2084ff-6dee-4c7e-8d14-44adcd3d5365
+    is_active: true
+    created_at: '2025-06-16T08:28:45.187905-04:00'
+    updated_at: '2025-06-16T08:28:45.187940-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9594ae5c-9824-477c-8fd8-05feb8f8d634
+    id: 5a3acd2b-2e88-4a0a-9984-5e025bbbe231
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9c626f5c-5bb9-4c09-befe-74ec1b300097
+    id: 5c19227c-cd80-456f-a736-8ae377ecc6e1
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: dd374242-e3d8-4b32-95c4-7e842709a1ea
+    id: 5c5b318c-0d6f-414e-bf1e-d21b73638513
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: bb0a4f04-461c-4dcc-9bb2-bc0478e5e705
+    id: 5cbfa161-cb4f-480c-9234-f9f3ac08515b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: c59c5aa4-131d-459a-9fac-4d906164f118
+    id: 5dd09a33-f9a6-455a-b31e-402252af6dad
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: bfda590d-63f2-4481-89ce-373d1a3a5299
+    id: 5f3b1963-65c8-4bb0-9e84-0e36b3fadc4d
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 87cef054-278c-48e3-b626-2be331e6e614
+    id: 5f3f2a0b-8260-4ae4-9b27-bc7daa808d84
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0d7117e5-1828-4289-95b8-a3cb0d2b63e4
+    id: 5fb2bf14-884d-457d-bffb-104801f70771
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b8416d5f-f66f-49c4-ac5c-679d61da031c
+    id: 5ff43abc-7895-4af1-827d-5f9ff91f7dbc
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3b88f2a1-cd2a-4abf-bd72-7ee2ec9e9bec
+    id: 62bbde7b-0d7e-4690-aaed-c2145a7f4e22
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 4e90eb40-13ed-46a6-9b8d-a1a8a7bfc180
+    id: 62e54946-fd2f-4b4a-a6bb-3023c920749a
+    is_active: true
+    created_at: '2025-06-16T08:28:32.070133-04:00'
+    updated_at: '2025-06-16T08:28:32.070168-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9b71f6a3-c0ed-499e-83a9-4a26483ca706
+    id: 666c0fcc-6108-429b-afb0-b18cca9bf776
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 04da2ba2-dc39-4485-883f-310a6f3c8377
+    id: 66d1e619-eaeb-497f-9ce8-e251ecda0024
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: f38592da-5d00-44ed-a68c-03c55799b537
+    id: 6b2ff208-69d7-45df-b956-09fd13f24918
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 355131ec-5298-4760-94d8-bbbfd0be0ec5
+    id: 6b877fca-b81d-4e64-bdb2-b611109e97e1
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: c3543352-d09e-4869-9bee-8045b1d99332
+    id: 6ced0769-890f-4353-aaf7-49bdf42fac7d
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 8ee9ec50-83b7-41be-b057-0c7d5115fc1f
+    id: 6d475dd9-0852-410c-9b1a-a518a3ad086d
+    is_active: true
+    created_at: '2025-06-16T08:28:52.505736-04:00'
+    updated_at: '2025-06-16T08:28:52.505772-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 86a04615-8808-4d11-a99e-6c0d98c70a92
+    id: 6e5ec041-461b-4f3e-81ee-b71fef514e15
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 799ed557-57fa-48ba-bbf4-1062e5d34f35
+    id: 6f5b0e4c-5419-4505-9472-7208c7710811
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 88e5f45f-a812-4f80-b488-8e1feaf6e230
+    id: 70885a62-b619-4b6d-a39c-470d6815fbb8
+    is_active: true
+    created_at: '2025-06-16T08:28:53.952521-04:00'
+    updated_at: '2025-06-16T08:28:53.952557-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 06c1db0b-0daa-459e-9a8a-6dd9f8f50d75
+    id: 72ffb776-1100-4607-ac8a-60bd25c11e89
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 5a7aec9f-6f69-4059-aca6-8e04e5dde92a
+    id: 750b8755-649b-49ce-a91b-0d895a21a780
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 73bcdc79-2fb5-42f5-8112-72fef5a7b5b1
+    id: 77023781-e96a-4014-bc17-85ba2450e7a9
+    is_active: true
+    created_at: '2025-06-16T08:28:51.058184-04:00'
+    updated_at: '2025-06-16T08:28:51.058218-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 5296ac8a-6a95-4457-9c4e-334196dbf039
+    id: 771e5c07-8d7a-4ec3-9ce6-35fc246ea7fa
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 49eb045c-76b2-4289-a962-d1c7182d4a38
+    id: 77756420-2072-4b88-9482-f2dd2c0d57bc
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2187f3dc-ef30-4aa2-a3d7-2f58ffe30fb0
+    id: 7791c9d0-8b4a-4007-88fd-aef234993bbf
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9f798299-6be1-484e-b012-9a091fc88c8b
+    id: 786d1b43-f1eb-43d2-93ac-e8705a8a1d86
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d2672abd-22a9-43d5-ba11-632b800d639c
+    id: 78e20de6-77aa-452f-8c89-5f140eb37b1b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: df1e2956-19fd-4f69-91f7-dd338187d93e
+    id: 79778f3a-24db-4aa7-931d-c3add70ad62c
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 19119d02-e6d7-48a4-85b1-bdbe29fbe37a
+    id: 7b0943aa-6c7c-42b1-b225-cbdfbd794eee
+    is_active: true
+    created_at: '2025-06-16T08:28:33.514154-04:00'
+    updated_at: '2025-06-16T08:28:33.514191-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: a4955a94-30e3-450f-a5b6-a77f51435dbb
+    id: 7b6ea4d1-7cc3-40d9-a334-45622b4aa2af
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2731cd0e-f432-4ed1-b311-08b85dcc8656
+    id: 7c3a0d9a-5667-45fd-9e91-30fbe9649df5
+    is_active: true
+    created_at: '2025-06-16T08:28:46.661688-04:00'
+    updated_at: '2025-06-16T08:28:46.661723-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 43a02a3f-74b0-430a-9d73-72edd3937261
+    id: 7dee9101-6ddb-4bab-aa0d-330d8472ca53
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b4f41bb2-acad-42e2-9919-4e8d12bf7801
+    id: 7e1dc70b-76f8-49d8-a7f0-bac7d1fa2712
+    is_active: true
+    created_at: '2025-06-16T08:28:14.596580-04:00'
+    updated_at: '2025-06-16T08:28:14.596617-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 371c7ba4-88b5-43ce-b2af-22826f917fe5
+    id: 7ede8d32-8c80-4cc6-87c7-0f2917267eb2
+    is_active: true
+    created_at: '2025-06-16T08:28:01.452266-04:00'
+    updated_at: '2025-06-16T08:28:01.452303-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0f2a78e8-6faf-4238-a546-954e7d5d38da
+    id: 82a557fe-ef12-40f4-a633-4e9eff4ec76d
+    is_active: true
+    created_at: '2025-06-16T08:28:18.946690-04:00'
+    updated_at: '2025-06-16T08:28:18.946725-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 7abf4895-e136-45e8-81d6-23de9f92d295
+    id: 82d39d63-a3b5-4b6a-ae56-d09dd52cdee0
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 169f7d49-4fff-41d1-8713-d0fee79c5654
+    id: 83ad020c-e474-44d4-90c7-1b75b0e7dcca
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 7f14a518-6d9c-4495-96fa-db7babe6a486
+    id: 84b62e07-d798-4340-b8c0-b953e4b6dede
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0e006f17-86ed-4f9b-a9b5-4d1ca2ec4e39
+    id: 85d69e1f-ac16-41e1-a30f-4d41529a07ca
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 49c702ae-c6a4-49ce-9378-5e012c7174c6
+    id: 8704499e-fb81-4c48-ac96-251595b505a4
+    is_active: true
+    created_at: '2025-06-16T08:28:59.791534-04:00'
+    updated_at: '2025-06-16T08:28:59.791569-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ce824e92-544b-4f67-803b-7647438751ba
+    id: 87c3768f-2637-4429-b1ee-05c322317c98
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 1eea001e-6d7b-48fd-8357-0e5e3fedb4d0
+    id: 892f51eb-6ed0-4f87-8131-322bd4ae08a1
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 1349cf0c-855e-4b53-b0f5-a6d4d73a2563
+    id: 89d2b821-ff91-4d7d-ace9-c8aefd9d1d98
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: a5670ab6-708b-40fc-9dfb-d196943fe713
+    id: 8c1d3e77-20a5-44f8-9f3b-efedfe6b47d0
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: df72b72a-2848-4be8-8081-3d69818a0c79
+    id: 8f1f4da7-b39c-468a-888d-cc95fd3ae260
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 55018a57-7c44-444e-9a04-5a9239c5cf05
+    id: 8f5e652b-42c1-42ae-8ec4-c3b6dd4c4cf3
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 70aa6b91-3dbb-4d02-a3c9-9b422605c576
+    id: 9054bb76-b39b-416b-8978-c5d3b6a7aa28
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: bfcba81c-1f61-4764-943c-ad48ec29492b
+    id: 937e5f6d-55c1-4db1-9666-7d2be497b959
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9845b187-0473-4a30-aba5-fd0e520fc11d
+    id: 93c96eac-add6-4286-aa37-c97252415df7
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 79d402fc-7e9f-4c1a-9f5f-b791065ab82a
+    id: 940265b5-bf46-4d83-8487-453f9b4f9a7b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 35cdcd70-738d-479f-bf85-bc7262273cdc
+    id: 940e5d37-c756-4035-9161-c75ff1ea4fb2
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2b9f470d-2af9-494f-a666-700b01efa75b
+    id: 9695679d-d2ce-427f-8bf1-dc5cab625d07
+    is_active: true
+    created_at: '2025-06-16T08:28:34.975191-04:00'
+    updated_at: '2025-06-16T08:28:34.975226-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 20a3e71e-d08a-46a5-8a35-b1bcddd6b2b0
+    id: 99f586fe-4181-42c4-a0a0-c02c6e09a8c7
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 6cac6d3f-df85-4c4c-a4e7-6ec1b13b9af7
+    id: 9bd92fa9-204a-4277-9279-d81a3a716cb4
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: cab7fb72-40c4-4f1a-89ba-b3f6520c1fb4
+    id: 9c963a37-0daa-4c86-80d0-d0a1790970ae
+    is_active: true
+    created_at: '2025-06-16T08:28:40.804020-04:00'
+    updated_at: '2025-06-16T08:28:40.804055-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: a977861e-1a0d-47ae-80f5-ec8e7704b0e5
+    id: 9d380f8e-345a-46d4-8bf6-154c06147172
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 111090f2-15cb-43cf-b59a-4b1a6a89d636
+    id: 9d51e692-d189-4f73-8dde-263bb75e0c54
+    is_active: true
+    created_at: '2025-06-16T08:28:07.290101-04:00'
+    updated_at: '2025-06-16T08:28:07.290137-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ea580e99-7d13-48b3-a71e-3d69400530bb
+    id: 9d933090-3ec3-40a4-a802-6281fd202c70
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 80700710-f40b-4f74-ab78-58f5387f5a41
+    id: 9e2d8943-7500-4ec6-9bc7-da6c2ac5b8bd
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: cf90ea32-9fe3-4978-ae78-c68dede92452
+    id: 9e3e4746-b63a-4de3-b983-dc6c1f49a835
+    is_active: true
+    created_at: '2025-06-16T08:28:39.351037-04:00'
+    updated_at: '2025-06-16T08:28:39.351074-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: bebe06a2-e9f9-445d-adc1-b462970519ed
+    id: 9e735215-a20c-4f07-8619-41aa1c876b49
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 74e8f61a-286c-4fa5-b241-6360cc6c46ba
+    id: 9fc9adba-b8d1-464f-a33a-388371f87cca
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: e25e57e6-42c4-4ad5-9404-74b477236dc7
+    id: a0287ce4-63b2-4a61-b8c2-415693e3481e
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 5ba69ac3-09c8-4c80-802a-b53d62ff6718
+    id: a1092187-d362-4afb-a102-d6a7d1cf072a
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 20a2d9df-1567-4674-bd80-b7f83c5ee45e
+    id: a10afcf8-c977-469b-bc51-dd7fb7243342
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0b68b20e-1add-4b57-a9a9-8acd501b6c41
+    id: a22ca632-c877-4b67-9495-8dd9eb530250
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: c197202a-e918-4e2f-9377-8d51e1848fc4
+    id: a2fdb0b8-9a63-4657-a7ca-5ae06ee5f123
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d8225a49-393e-4224-a85b-b2fa7e40e3db
+    id: a4aa64b1-9d7c-4c54-95c1-2c406fd2996f
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2de95535-ca6b-4ddc-8720-2414a2fbb1c4
+    id: a4d19dff-33db-4707-b93c-5119bc1ffd47
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 7aa20ff3-1d99-474e-b860-4e42b261f215
+    id: a69db346-c04e-44a0-9552-cbc3d25e2174
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 37cdeef4-8adf-40b2-906d-5f76c60fa20a
+    id: a6dc536c-df7a-4379-a4f3-602a5aabe41d
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 004716fa-fd0c-4d47-a1bc-f08decf87e98
+    id: a72623dd-7467-4d0f-a6f4-897e47330264
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b8072c17-33c4-4deb-88c6-54f0efe687c4
+    id: a8623448-c5bd-482f-b870-2bb3ecb2e363
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 298f10d2-a21d-467d-9b19-1763f051973b
+    id: a87b15f1-9252-4e21-a182-92b9603a3418
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 43a7a949-0cf8-4b29-99e8-2443ccfda559
+    id: adceed2c-d27b-43f7-a3fa-edb9c396a551
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ec8e348c-659e-461a-b7f7-fb3bf46f47d1
+    id: af620286-bbf9-4f01-bb86-6d76de0e4429
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 6ccaa0bb-7633-44e7-81f2-be82a323d3be
+    id: b25c527a-eeec-4446-9ee9-11407b301166
+    is_active: true
+    created_at: '2025-06-16T08:28:29.158943-04:00'
+    updated_at: '2025-06-16T08:28:29.158980-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 044adb02-a7d0-4909-a83a-ec4fa3de4641
+    id: b499d8e5-b587-4226-a1f7-b77aed929240
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b2ebff0f-031e-4801-9f6e-e19ae30f2b0d
+    id: b4e02d69-9955-4e8c-8ae1-0bd27504f981
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9544f77f-2d54-40f4-bc88-28c8927f1511
+    id: b4f2bdce-f5af-46e6-8780-4632ebd6d6d2
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 17b3cc4d-9c4d-469f-9a2f-463b702f6fa8
+    id: b4fb895e-2c00-47b2-a728-64f9bf347327
+    is_active: true
+    created_at: '2025-06-16T08:28:42.261102-04:00'
+    updated_at: '2025-06-16T08:28:42.261137-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: cfc10363-6fb3-481e-9242-c941bb0259ce
+    id: b538fa48-9ca2-4049-b1bd-33236f956d33
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 458a26d8-f066-41b0-b1ec-4636cd5d467a
+    id: b628193e-eda4-412f-95e2-89c02b6306aa
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 627692eb-6c85-484c-9529-36d3649455f6
+    id: b9aa07e0-4484-404c-a612-b30ff137015d
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 53dd5561-bd7f-4dde-b518-a133f4811e65
+    id: ba279259-330a-4a89-be87-2bd8e119f286
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 29c80f80-d0c1-4ed9-b5b3-dc53b85978bf
+    id: bd6c7f43-6a9e-4e8b-b57f-3861c4cdd059
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b4e161dc-c952-4928-b698-a2694942a8a7
+    id: bddef46b-4170-4432-8568-1c3882bbdb2b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: b71ce4a7-7d9c-4958-91b7-66aa1244c553
+    id: beff5457-9c6e-43d0-8288-d0f1718a404a
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 5172b1fe-a072-477c-a9a6-12c6799d8b29
+    id: c014e5f8-39fd-4972-8800-1ee8cc045365
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0c4c4e5f-012d-4e82-9ad9-8b329852356d
+    id: c030b597-dc50-40a3-9ce1-2fa556b62ee2
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 741eda99-ee7a-4ca0-b12b-b4ac43c14f9d
+    id: c14f92fc-d47f-4a78-b8b2-6aedd604f09b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 8042a655-40d6-404e-9f68-837ce80beb6c
+    id: c363a2c2-9ff0-487c-90b9-214259092ce1
+    is_active: true
+    created_at: '2025-06-16T08:28:48.126313-04:00'
+    updated_at: '2025-06-16T08:28:48.126367-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 1169ea00-74e9-4b64-8d56-e8f813dcce95
+    id: c3d95220-7b5e-4c03-8b34-a9a72eac506b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 24d2bb77-0fec-4401-8e66-3c0428d8384c
+    id: c6256124-0baf-4f5e-8ee7-2e9f1e69562f
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 83a82a1b-f42f-4142-b217-28a298fe1126
+    id: c753fbb0-d275-4862-9449-a6ac254c1369
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: c1dd9c7b-e191-49aa-9715-6952a0deec8d
+    id: c864c932-d012-4bf8-86d5-f95f8f480f6c
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3b9df423-b487-4f17-ba32-8b630017f6db
+    id: ca0177ab-9828-49fe-a93e-714effea1e4c
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 827a585f-4043-4049-8a8e-2079884297e8
+    id: cb51eefd-25ed-45b9-bb0a-1774a3a2eb1b
+    is_active: true
+    created_at: '2025-06-16T08:28:56.875042-04:00'
+    updated_at: '2025-06-16T08:28:56.875076-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: c38f865c-ec60-472c-952b-ed192f8e660c
+    id: cbf61ea2-79fc-4203-8f47-a68bc892e0fb
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 9be65e1e-862a-48d4-a90c-2c8f36162ab1
+    id: d0074317-9914-4d6f-a1cc-04f910b4ed2c
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 8588299e-2b61-4022-aa26-1e3b152daeff
+    id: d1d71eb4-bc70-4c9c-8bc9-bf328b5bcf16
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 24664feb-21ad-4215-a191-99080c347db6
+    id: d2a71d4f-5d75-4834-8cca-92ba16594991
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 4b85273a-2aad-46bb-bc46-86e869eb4f2b
+    id: d7175ae6-db68-4190-abb3-bb7b6b91b046
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: a3dfd253-3adc-46ca-91ef-86863fe8cae5
+    id: d7345aea-f12f-4b5c-931f-5f1e41c790b3
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: bbee8029-fe10-4613-8559-1d01631f6494
+    id: d8e50c58-8ff4-4467-83c0-1a9a2d21e9f6
+    is_active: true
+    created_at: '2025-06-16T08:28:16.047504-04:00'
+    updated_at: '2025-06-16T08:28:16.047540-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 79fe454e-d32c-4c9f-b501-a3b0b2c0cf9c
+    id: d916b07c-a2d6-4d72-be76-4e65ab8a8fc3
+    is_active: true
+    created_at: '2025-06-16T08:28:27.698231-04:00'
+    updated_at: '2025-06-16T08:28:27.698271-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 85a8101d-fd44-4d92-8509-74dd8692656d
+    id: dd25a367-f81d-4f9b-a568-ef53cca411f6
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2d424812-2431-4f6a-ac03-8b6075a2af7b
+    id: e039fe0c-a73d-4a56-b6e5-44b9faf1c2a4
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ccf46f5e-c3e9-4f01-a78f-965abdeb11d1
+    id: e1031d51-4a48-4d35-af9f-43531093a328
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 5150c793-f4d5-4e70-8a3d-85d5c6df65e0
+    id: e27d0751-76c9-44ae-be34-87e2feb55f8f
+    is_active: true
+    created_at: '2025-06-16T08:28:10.225678-04:00'
+    updated_at: '2025-06-16T08:28:10.225714-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 724417f1-8224-4591-adf4-c5624c5cde89
+    id: e437eb74-e283-4253-bef8-b2cdb5d149d9
+    is_active: true
+    created_at: '2025-06-16T08:28:20.402346-04:00'
+    updated_at: '2025-06-16T08:28:20.402387-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 6972ff99-070a-42f3-a960-7318453a4997
+    id: e47bebbb-39d9-408a-832d-6239702f5e43
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: f30125fc-d5bd-4437-a399-b5517504d77d
+    id: e6c2272f-9657-49ef-b5a3-d7cb3a2fb501
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d78c3e8f-c384-4b25-a7f6-9a67787a34b5
+    id: e7e8a79a-bdc8-4f6f-8c68-3ea9178faf13
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 0cccf2fe-0675-4fdb-94ce-0b3248687db0
+    id: e84df36f-dc72-4c0b-ac02-22552f44c6bf
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d9a0cb1c-d24d-4020-91b9-0c4abbf8bbd6
+    id: e85fff88-e48a-49a6-91ed-781512ff4d31
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 52e9b7be-622e-4ded-8b25-b8119f0be4e5
+    id: eaf806c9-62cb-48e4-a66b-2a0173e6a995
+    is_active: true
+    created_at: '2025-06-16T08:28:36.430613-04:00'
+    updated_at: '2025-06-16T08:28:36.430653-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 843bcc1c-a438-4001-a534-22596aa35d30
+    id: eb9281ba-e8f6-4904-85ee-012239de8bf7
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 46f873a1-bfb5-4eea-a54a-dc9ddcaab071
+    id: ec214675-6f73-4bd0-9b35-7882bb4927e0
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d34a8340-ff8c-4715-9a1a-caa3c897d610
+    id: ecb4c219-f9d8-48ce-8f5a-6e5a20fca1b5
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 26225dab-b99b-464c-a992-b4d7c2985ff9
+    id: ed5d50b3-bdfc-4fb3-9ab9-34327d2433d9
+    is_active: true
+    created_at: '2025-06-16T08:28:05.812929-04:00'
+    updated_at: '2025-06-16T08:28:05.812963-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 175b713e-b644-4e61-9d0c-9ec69c598d64
+    id: ef2fdcc5-ab53-40e7-bce6-3f7622cae857
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 3affd1d2-69ec-4e13-b294-6033a80e6947
+    id: f36566aa-2e4d-4eb5-9f4c-0f2672466d72
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 2ada3dec-b651-4cb1-be71-64390ff36d91
+    id: f3934cb3-9314-4344-af2b-51c7d5cd33f3
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ec4cdb3a-62cc-47c2-90d0-01a5a64a3d39
+    id: f3cc8e9f-e026-4a37-9617-a144f5d65fd6
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 4cba5d9c-6ce4-49b9-96e3-b848419a7ffb
+    id: f430b1d3-6dcb-4bc3-b579-5427de5bea91
+    is_active: true
+    created_at: '2025-06-16T08:28:13.134153-04:00'
+    updated_at: '2025-06-16T08:28:13.134189-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: a8d646c6-f834-4d25-9de2-5e0cb134ddab
+    id: f48fbed0-207a-4076-8e3f-fe6aabef0d62
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ae7690f3-2449-4eab-923c-d1a99252bec5
+    id: f6ebc61c-b662-4443-a3f1-9ced382710a0
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 59f35e37-c799-4a4d-b110-f07eedf473b1
+    id: f6f5ea74-16f0-45c7-874d-78466ada2c25
+    is_active: true
+    created_at: '2025-06-16T08:28:49.596598-04:00'
+    updated_at: '2025-06-16T08:28:49.596635-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: ab841210-f271-416f-8b38-8ca941efd5a0
+    id: f7513571-c926-4973-85b8-7cf386fb2036
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: f0519eeb-aa9d-4df5-836e-f47ef55e0769
+    id: f99a471e-8488-4c32-bd7d-a3b43fdc3e3d
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 132de315-0738-4fc2-b5e6-6fae34c90a3b
+    id: fa63b83e-7eba-4713-b120-4e5274fc79e7
+    is_active: true
+    created_at: '2025-06-16T08:28:08.762153-04:00'
+    updated_at: '2025-06-16T08:28:08.762189-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: f8abc70b-9292-4399-8f37-d15963b23d1c
+    id: fbc4a9ab-a392-4c30-8979-bad40498b5ae
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 15ec176e-3a55-4a98-89ae-7f714a0cafdf
+    id: fbf229d8-84f0-4298-92c4-ece7b0d296f2
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: 61af13d6-55f5-4c0a-8634-0a30ca4267d6
+    id: fc4adb71-97d5-4ce7-ba52-7926dded9a51
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: dc695ab4-6620-4306-866e-5fb0891b514b
+    id: fd5788b0-1414-4668-b50d-a76a9a1edd89
+    is_active: true
+    created_at: '2025-06-16T08:28:21.862805-04:00'
+    updated_at: '2025-06-16T08:28:21.862843-04:00'
+  - role_id: 00000000-0000-0000-0000-000000000111
+    permission_id: d819aede-7f98-4cd6-a3d3-ea498f6d84aa
+    id: fe28b4fd-122c-4856-85b2-c54fab734f3b
+    is_active: true
+    created_at: '2025-06-16T08:21:04.431171-04:00'
+    updated_at: '2025-06-16T08:21:04.431207-04:00'

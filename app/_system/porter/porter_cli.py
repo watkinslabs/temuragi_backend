@@ -186,10 +186,10 @@ class PorterCLI(BaseCLI):
         rows = []
 
         for i, obj in enumerate(objects, 1):
-            uuid_short = str(obj.uuid)[:8] + '...'
+            id_short = str(obj.id)[:8] + '...'
             identifier = self._get_object_identifier(obj)
             status = self._get_object_status(obj)
-            rows.append([str(i), uuid_short, identifier, status])
+            rows.append([str(i), id_short, identifier, status])
 
         self.output_table(rows, headers=headers)
 
@@ -224,7 +224,7 @@ class PorterCLI(BaseCLI):
 
         print()
         self.output_info(f"Exporting {model_name}: {identifier}")
-        self.output_info(f"UUID: {obj.uuid}")
+        self.output_info(f"UUID: {obj.id}")
 
         filename = input(f"Output filename [{default_filename}]: ").strip()
         if not filename:
@@ -292,7 +292,7 @@ class PorterCLI(BaseCLI):
             if len(object_id) == 36 and '-' in object_id:
                 # UUID format
                 model_object = self.session.query(model_class).filter(
-                    model_class.uuid == object_id
+                    model_class.id == object_id
                 ).first()
             else:
                 # Try to find by name or other identifier
@@ -461,10 +461,10 @@ class PorterCLI(BaseCLI):
             rows = []
 
             for obj in objects:
-                uuid_short = str(obj.uuid)[:8] + '...'
+                id_short = str(obj.id)[:8] + '...'
                 identifier = getattr(obj, 'name', getattr(obj, 'title', 'N/A'))
                 active = 'Yes' if getattr(obj, 'is_active', True) else 'No'
-                rows.append([uuid_short, identifier, active])
+                rows.append([id_short, identifier, active])
 
             self.output_table(rows, headers=headers)
             self.output_info(f"Found {len(objects)} objects (limited to {limit})")

@@ -7,7 +7,7 @@ from app.base.model import BaseModel
 
 class Role(BaseModel):
     __tablename__ = 'roles'
-
+    __depends_on__ =[]
     name = Column(String(100), unique=True, nullable=False)
     display = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
@@ -46,7 +46,7 @@ class Role(BaseModel):
                     session, service, action, resource, description
                 )
                 if success:
-                    RolePermission.grant_permission(session, admin_role.uuid, perm.name)
+                    RolePermission.grant_permission(session, admin_role.id, perm.name)
 
     def has_permission(self, session, permission_name):
         """Check if this role has a specific permission"""
@@ -55,8 +55,8 @@ class Role(BaseModel):
             return False
         
         role_permission = session.query(RolePermission).filter(
-            RolePermission.role_uuid == self.uuid,
-            RolePermission.permission_uuid == permission.uuid
+            RolePermission.role_id == self.id,
+            RolePermission.permission_id == permission.id
         ).first()
         
         return role_permission is not None
@@ -64,5 +64,5 @@ class Role(BaseModel):
     def get_permissions(self, session):
         """Get all permissions for this role"""
         return session.query(Permission).join(RolePermission).filter(
-            RolePermission.role_uuid == self.uuid
+            RolePermission.role_id == self.id
         ).order_by(Permission.service, Permission.action).all()

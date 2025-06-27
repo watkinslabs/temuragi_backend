@@ -622,5 +622,5 @@ Theme:
     supports_dark_mode: true
     supports_high_contrast: true
     rtl_support: true
-    uuid: 00000000-0000-0000-0000-000000000001
+    id: 00000000-0000-0000-0000-000000000001
     is_active: true

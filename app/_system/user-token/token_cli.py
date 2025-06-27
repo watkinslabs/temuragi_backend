@@ -53,7 +53,7 @@ class TokenCLI(BaseCLI):
                 if not user:
                     self.output_error(f"User not found: {user_identity}")
                     return 1
-                query = query.filter(self.user_token_model.user_uuid == user.uuid)
+                query = query.filter(self.user_token_model.user_id == user.id)
 
             if token_type:
                 query = query.filter(self.user_token_model.token_type == token_type)
@@ -73,7 +73,7 @@ class TokenCLI(BaseCLI):
                 last_used = token.last_used_at.strftime('%Y-%m-%d %H:%M') if token.last_used_at else 'Never'
 
                 rows.append([
-                    str(token.uuid),
+                    str(token.id),
                     user_name,
                     token.name or '',
                     token.application or '',
@@ -92,7 +92,7 @@ class TokenCLI(BaseCLI):
             self.output_error(f"Error listing tokens: {e}")
             return 1
 
-    def create_access_token(self, user_identity, name=None, application=None, refresh_token_uuid=None, is_system_temporary=False):
+    def create_access_token(self, user_identity, name=None, application=None, refresh_token_id=None, is_system_temporary=False):
         self.log_info(f"Creating access token for user: {user_identity}")
 
         try:
@@ -102,12 +102,12 @@ class TokenCLI(BaseCLI):
                 return 1
 
             token = self.user_token_model.create_access_token(
-                self.session, user.uuid, name, application, refresh_token_uuid, is_system_temporary
+                self.session, user.id, name, application, refresh_token_id, is_system_temporary
             )
 
-            self.log_info(f"Access token created successfully: {token.uuid}")
+            self.log_info(f"Access token created successfully: {token.id}")
             self.output_success(f"Access token created for user: {user.username}")
-            self.output_info(f"Token UUID: {token.uuid}")
+            self.output_info(f"Token UUID: {token.id}")
             self.output_info(f"Token Value: {token.token}")
             self.output_info(f"Expires at: {token.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             self.output_warning("Store this token securely - it will not be shown again!")
@@ -129,12 +129,12 @@ class TokenCLI(BaseCLI):
                 return 1
 
             token = self.user_token_model.create_refresh_token(
-                self.session, user.uuid, name, application, is_system_temporary
+                self.session, user.id, name, application, is_system_temporary
             )
 
-            self.log_info(f"Refresh token created successfully: {token.uuid}")
+            self.log_info(f"Refresh token created successfully: {token.id}")
             self.output_success(f"Refresh token created for user: {user.username}")
-            self.output_info(f"Token UUID: {token.uuid}")
+            self.output_info(f"Token UUID: {token.id}")
             self.output_info(f"Token Value: {token.token}")
             self.output_info(f"Expires at: {token.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             self.output_warning("Store this token securely - it will not be shown again!")
@@ -156,7 +156,7 @@ class TokenCLI(BaseCLI):
                 return 1
 
             tokens = self.user_token_model.create_token_pair(
-                self.session, user.uuid, name, application, is_system_temporary
+                self.session, user.id, name, application, is_system_temporary
             )
 
             access_token = tokens['access_token']
@@ -165,11 +165,11 @@ class TokenCLI(BaseCLI):
             self.log_info(f"Token pair created successfully")
             self.output_success(f"Token pair created for user: {user.username}")
             self.output_info("\nAccess Token:")
-            self.output_info(f"  UUID: {access_token.uuid}")
+            self.output_info(f"  UUID: {access_token.id}")
             self.output_info(f"  Value: {access_token.token}")
             self.output_info(f"  Expires at: {access_token.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             self.output_info("\nRefresh Token:")
-            self.output_info(f"  UUID: {refresh_token.uuid}")
+            self.output_info(f"  UUID: {refresh_token.id}")
             self.output_info(f"  Value: {refresh_token.token}")
             self.output_info(f"  Expires at: {refresh_token.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             self.output_warning("\nStore these tokens securely - they will not be shown again!")
@@ -198,7 +198,7 @@ class TokenCLI(BaseCLI):
                 expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
 
             token = self.user_token_model(
-                user_uuid=user.uuid,
+                user_id=user.id,
                 token=token_value,
                 name=name,
                 application=application,
@@ -210,9 +210,9 @@ class TokenCLI(BaseCLI):
             self.session.add(token)
             self.session.commit()
 
-            self.log_info(f"Service token created successfully: {token.uuid}")
+            self.log_info(f"Service token created successfully: {token.id}")
             self.output_success(f"Service token created for user: {user.username}")
-            self.output_info(f"Token UUID: {token.uuid}")
+            self.output_info(f"Token UUID: {token.id}")
             self.output_info(f"Token Value: {token.token}")
             if token.expires_at:
                 self.output_info(f"Expires at: {token.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
@@ -246,9 +246,9 @@ class TokenCLI(BaseCLI):
 
             new_access_token = refresh_token.refresh_access_token(self.session)
 
-            self.log_info(f"Access token refreshed successfully: {new_access_token.uuid}")
+            self.log_info(f"Access token refreshed successfully: {new_access_token.id}")
             self.output_success("Access token refreshed successfully")
-            self.output_info(f"Token UUID: {new_access_token.uuid}")
+            self.output_info(f"Token UUID: {new_access_token.id}")
             self.output_info(f"Token Value: {new_access_token.token}")
             self.output_info(f"Expires at: {new_access_token.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
             self.output_warning("Store this token securely - it will not be shown again!")
@@ -260,23 +260,23 @@ class TokenCLI(BaseCLI):
             self.output_error(f"Error refreshing access token: {e}")
             return 1
 
-    def revoke_token(self, token_uuid):
-        self.log_info(f"Revoking token: {token_uuid}")
+    def revoke_token(self, token_id):
+        self.log_info(f"Revoking token: {token_id}")
 
         try:
             token = self.session.query(self.user_token_model).filter(
-                self.user_token_model.uuid == token_uuid
+                self.user_token_model.id == token_id
             ).first()
 
             if not token:
-                self.output_error(f"Token not found: {token_uuid}")
+                self.output_error(f"Token not found: {token_id}")
                 return 1
 
             token.revoke()
             self.session.commit()
 
-            self.log_info(f"Token revoked successfully: {token_uuid}")
-            self.output_success(f"Token revoked: {token.name or token_uuid}")
+            self.log_info(f"Token revoked successfully: {token_id}")
+            self.output_success(f"Token revoked: {token.name or token_id}")
             if token.token_type == 'refresh':
                 self.output_info("All associated access tokens have been revoked")
             return 0
@@ -287,26 +287,26 @@ class TokenCLI(BaseCLI):
             self.output_error(f"Error revoking token: {e}")
             return 1
 
-    def show_token_details(self, token_uuid):
-        self.log_info(f"Showing details for token: {token_uuid}")
+    def show_token_details(self, token_id):
+        self.log_info(f"Showing details for token: {token_id}")
 
         try:
             token = self.session.query(self.user_token_model).filter(
-                self.user_token_model.uuid == token_uuid
+                self.user_token_model.id == token_id
             ).first()
 
             if not token:
-                self.output_error(f"Token not found: {token_uuid}")
+                self.output_error(f"Token not found: {token_id}")
                 return 1
 
             headers = ['Field', 'Value']
             rows = [
-                ['UUID', str(token.uuid)],
+                ['UUID', str(token.id)],
                 ['User', token.user.username if token.user else 'Service Token'],
                 ['Name', token.name or 'None'],
                 ['Application', token.application or 'None'],
                 ['Token Type', token.token_type],
-                ['Refresh Token UUID', str(token.refresh_token_uuid) if token.refresh_token_uuid else 'None'],
+                ['Refresh Token UUID', str(token.refresh_token_id) if token.refresh_token_id else 'None'],
                 ['Temporary', 'Yes' if token.is_system_temporary else 'No'],
                 ['Expires At', token.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC') if token.expires_at else 'Never'],
                 ['Expires In', f"{token.expires_in_seconds()} seconds" if token.expires_in_seconds() else 'Never'],
@@ -365,7 +365,7 @@ class TokenCLI(BaseCLI):
                         for token in sample_tokens:
                             user_name = token.user.username if token.user else 'N/A'
                             rows.append([
-                                str(token.uuid)[:8] + '...',
+                                str(token.id)[:8] + '...',
                                 user_name,
                                 token.token_type,
                                 token.application or 'N/A',
@@ -482,11 +482,11 @@ def main():
 
     # Revoke token
     revoke_parser = subparsers.add_parser('revoke', help='Revoke token')
-    revoke_parser.add_argument('token_uuid', help='Token UUID')
+    revoke_parser.add_argument('token_id', help='Token UUID')
 
     # Show token details
     show_parser = subparsers.add_parser('show', help='Show token details')
-    show_parser.add_argument('token_uuid', help='Token UUID')
+    show_parser.add_argument('token_id', help='Token UUID')
 
     # Validate token
     validate_parser = subparsers.add_parser('validate', help='Validate token')
@@ -539,10 +539,10 @@ def main():
             return cli.refresh_access_token(args.token)
 
         elif args.command == 'revoke':
-            return cli.revoke_token(args.token_uuid)
+            return cli.revoke_token(args.token_id)
 
         elif args.command == 'show':
-            return cli.show_token_details(args.token_uuid)
+            return cli.show_token_details(args.token_id)
 
         elif args.command == 'validate':
             return cli.validate_token(args.token, args.type)

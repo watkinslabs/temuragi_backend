@@ -10,12 +10,6 @@ from .register.classes import get_class, list_classes, get_all_classes, _class_r
 # Make functions available directly
 __all__ = ['get_class', 'list_classes', 'get_all_classes']
 
-# Populate globals for static imports
-for name, cls in _class_registry.items():
-    if not name.islower():  # skip aliases
-        globals()[name] = cls
-        __all__.append(name)
-
 
 # Dynamic attribute access for clean imports
 def __getattr__(name):
@@ -24,6 +18,7 @@ def __getattr__(name):
     Falls back to registry lookup if not found as regular attribute
     """
     # Check if it's in the global registry
+    
     if name in _class_registry:
         return _class_registry[name]
     

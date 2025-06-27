@@ -24,7 +24,7 @@ class APITestCLI(BaseCLI):
             table_format=table_format
         )
 
-    def test_endpoint(self, base_url, token, model, operation, data=None, uuid=None, csrf_token="test-token"):
+    def test_endpoint(self, base_url, token, model, operation, data=None, id=None, csrf_token="test-token"):
         url = f"{base_url.rstrip('/')}/api/data"
         headers = {
             'Authorization': f'Bearer {token}',
@@ -32,8 +32,8 @@ class APITestCLI(BaseCLI):
             'X-CSRFToken': csrf_token
         }
         payload = {'model': model, 'operation': operation}
-        if uuid:
-            payload['uuid'] = uuid
+        if id:
+            payload['id'] = id
         if data:
             payload['data'] = data
 
@@ -59,29 +59,29 @@ class APITestCLI(BaseCLI):
 
     def run_full_test(self, base_url, token, model, test_data, csrf_token="test-token"):
         results = {}
-        uuid = None
+        id = None
 
         self.output_info("=== CREATE ===")
         ok, res = self.test_endpoint(base_url, token, model, "create", data=test_data, csrf_token=csrf_token)
         results["create"] = "PASS" if ok else "FAIL"
-        uuid = res.get("uuid") or res.get("data", {}).get("uuid") if res else None
+        id = res.get("id") or res.get("data", {}).get("id") if res else None
 
-        if not uuid:
+        if not id:
             self.output_error("No UUID returned; cannot run remaining tests.")
             self.output_table([[k.upper(), v] for k, v in results.items()], headers=["Operation", "Result"])
             return results
 
         self.output_info("=== READ ===")
-        ok, _ = self.test_endpoint(base_url, token, model, "read", uuid=uuid, csrf_token=csrf_token)
+        ok, _ = self.test_endpoint(base_url, token, model, "read", id=id, csrf_token=csrf_token)
         results["read"] = "PASS" if ok else "FAIL"
 
         self.output_info("=== UPDATE ===")
         update_data = {"name": "Updated Name"}
-        ok, _ = self.test_endpoint(base_url, token, model, "update", uuid=uuid, data=update_data, csrf_token=csrf_token)
+        ok, _ = self.test_endpoint(base_url, token, model, "update", id=id, data=update_data, csrf_token=csrf_token)
         results["update"] = "PASS" if ok else "FAIL"
 
         self.output_info("=== DELETE ===")
-        ok, _ = self.test_endpoint(base_url, token, model, "delete", uuid=uuid, csrf_token=csrf_token)
+        ok, _ = self.test_endpoint(base_url, token, model, "delete", id=id, csrf_token=csrf_token)
         results["delete"] = "PASS" if ok else "FAIL"
 
         self.output_info("=== RESULTS ===")
@@ -97,7 +97,7 @@ class APITestCLI(BaseCLI):
         payload = {
             'model': 'NoModel',
             'operation': 'read',
-            'uuid': '00000000-0000-0000-0000-000000000000'
+            'id': '00000000-0000-0000-0000-000000000000'
         }
 
         self.output_info("Validating token...")
@@ -130,7 +130,7 @@ def main():
     test_parser.add_argument('token', help='Authentication token')
     test_parser.add_argument('model', help='Model name')
     test_parser.add_argument('operation', choices=['create', 'read', 'update', 'delete'])
-    test_parser.add_argument('--uuid', help='Record UUID (for read/update/delete)')
+    test_parser.add_argument('--id', help='Record UUID (for read/update/delete)')
     test_parser.add_argument('--data', help='JSON data (for create/update)')
     
     # Validate token command
@@ -157,7 +157,7 @@ def main():
     try:
         if args.command == 'test':
             data = json.loads(args.data) if args.data else None
-            success = cli.test_endpoint(args.base_url, args.token, args.model, args.operation, data, args.uuid)
+            success = cli.test_endpoint(args.base_url, args.token, args.model, args.operation, data, args.id)
             return 0 if success else 1
             
         elif args.command == 'validate':

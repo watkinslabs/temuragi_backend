@@ -104,7 +104,7 @@ class PermissionCLI(BaseCLI):
             for perm in permissions:
                 description = (perm.description or '')[:40] + ('...' if perm.description and len(perm.description) > 40 else '')
                 rows.append([
-                    str(perm.uuid),
+                    str(perm.id),
                     perm.name,
                     perm.service,
                     perm.resource,
@@ -147,9 +147,9 @@ class PermissionCLI(BaseCLI):
             self.session.add(permission)
             self.session.commit()
 
-            self.log_info(f"Permission added successfully: {permission_name} (UUID: {permission.uuid})")
+            self.log_info(f"Permission added successfully: {permission_name} (UUID: {permission.id})")
             self.output_success(f"Permission created: {permission_name}")
-            self.output_info(f"UUID: {permission.uuid}")
+            self.output_info(f"UUID: {permission.id}")
             self.output_info(f"Service: {service}")
             self.output_info(f"Resource: {resource}")
             self.output_info(f"Action: {action}")
@@ -219,7 +219,7 @@ class PermissionCLI(BaseCLI):
 
             headers = ['Field', 'Value']
             rows = [
-                ['UUID', str(permission.uuid)],
+                ['UUID', str(permission.id)],
                 ['Permission Name', permission.name],
                 ['Service', permission.service],
                 ['Resource', permission.resource],
@@ -356,12 +356,12 @@ class PermissionCLI(BaseCLI):
                 return 1
 
             success, result = self.role_permission_model.grant_permission(
-                self.session, role.uuid, permission_name
+                self.session, role.id, permission_name
             )
 
             if success:
                 role_permission = result
-                self.log_info(f"Permission granted successfully: {permission_name} to {role_name} (RolePermission UUID: {role_permission.uuid})")
+                self.log_info(f"Permission granted successfully: {permission_name} to {role_name} (RolePermission UUID: {role_permission.id})")
                 self.output_success(f"Permission granted to role: {role_name}")
                 self.output_info(f"Permission: {permission_name}")
                 
@@ -372,7 +372,7 @@ class PermissionCLI(BaseCLI):
                     self.output_info(f"  Resource: {parts[1]}")
                     self.output_info(f"  Action: {parts[2]}")
                 
-                self.output_info(f"RolePermission UUID: {role_permission.uuid}")
+                self.output_info(f"RolePermission UUID: {role_permission.id}")
                 return 0
             else:
                 self.log_warning(f"Failed to grant permission: {result}")
@@ -400,7 +400,7 @@ class PermissionCLI(BaseCLI):
                 return 1
 
             success, message = self.role_permission_model.revoke_permission(
-                self.session, role.uuid, permission_name
+                self.session, role.id, permission_name
             )
 
             if success:
@@ -480,7 +480,7 @@ class PermissionCLI(BaseCLI):
                 return 1
 
             has_permission = self.role_permission_model.user_has_permission(
-                self.session, user.uuid, permission_name
+                self.session, user.id, permission_name
             )
 
             status = "GRANTED" if has_permission else "DENIED"
@@ -508,10 +508,45 @@ class PermissionCLI(BaseCLI):
             self.output_error(f"Error checking user permission: {e}")
             return 1
 
+    def create_permissions(self,resource):
+        """Create permissions for this specific report using slug"""
+        
+        print ("TESTING")
+        from app.models import Permission
+        resource=resource.lower()
+        
+        report_actions = [
+            ('read', f'Read report: {resource}'),
+            ('create', f'Create report: {resource}'),
+            ('update', f'Update report: {resource}'),
+            ('delete', f'Delete report: {resource}'),
+            ('list', f'List report: {resource}'),
+            ('count', f'Count report: {resource}'),
+            ('metadata', f'Get metadata for report: {resource}'),
+            ('form_metadata', f'Get form metadata for report: {resource}'),
+        ]
+        
+        created_permissions = []
+        
+        for action, description in report_actions:
+            permission_name = f"api:{resource}:{action}"
+            
+            existing = self.session.query(Permission).filter_by(name=permission_name).first()
+            if not existing:
+                success, result = Permission.create_permission(
+                    session=self.session,
+                    service='api',
+                    action=action,
+                    resource=resource,
+                    description=description
+                    )
+                print(f"Added {permission_name}")
     def close(self):
         """Clean up database session"""
         self.log_debug("Closing permission CLI")
         super().close()
+
+
 
 
 def main():
@@ -536,6 +571,10 @@ def main():
     add_parser.add_argument('resource', help='Resource name (e.g., model, invoice, report)')
     add_parser.add_argument('action', help='Action name (e.g., read, write, create, delete, metadata)')
     add_parser.add_argument('--description', help='Permission description')
+
+    # Add all permission command
+    addall_parser = subparsers.add_parser('add-all', help='Add all actions for am api permission (api:resource:*)')
+    addall_parser.add_argument('resource', help='Resource name (e.g., model, invoice, report)')
 
     # Delete permission command
     delete_parser = subparsers.add_parser('delete', help='Delete permission')
@@ -600,6 +639,8 @@ def main():
                 show_inactive=args.all
             )
 
+        elif args.command == 'add-all':
+            return cli.create_permissions( args.resource)
         elif args.command == 'add':
             return cli.add_permission(args.service, args.resource, args.action, args.description)
 

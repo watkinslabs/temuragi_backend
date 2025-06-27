@@ -16,5 +16,5 @@ def login():
     page = g.session.query(Page).filter_by(slug='login').first()
     renderer = TemplateRenderer(g.session)
     
-    return renderer.render_page(page.uuid)
+    return renderer.render_page(page.id)
     

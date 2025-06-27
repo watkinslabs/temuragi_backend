@@ -14,7 +14,7 @@ class ReportColumn(BaseModel):
     
     report_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('reports.uuid', ondelete='CASCADE'),
+        ForeignKey('reports.id', ondelete='CASCADE'),
         nullable=False
     )
     name = Column(String(255), nullable=False)
@@ -23,7 +23,7 @@ class ReportColumn(BaseModel):
     # Link to data type
     data_type_id = Column(
         PG_UUID(as_uuid=True),
-        ForeignKey('data_types.uuid', ondelete='RESTRICT'),
+        ForeignKey('data_types.id', ondelete='RESTRICT'),
         nullable=False
     )
     

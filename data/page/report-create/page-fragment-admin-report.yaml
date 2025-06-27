@@ -1,0 +1,288 @@
+# PageFragment Template (Template)
+# Template file - edit values before importing
+# 
+# INSTRUCTIONS:
+# 1. AUTO-GENERATED fields are optional - uncomment to set specific values
+# 2. Update foreign key UUIDs to reference existing records
+# 3. Edit all other values as needed
+# 4. Foreign key constraints must be satisfied before import
+# Template file - edit values before importing
+# Exported from template CLI
+
+PageFragment:
+  meta:
+    tablename: page_fragments
+    schema: public
+  data:
+    page_id: 00000000-0000-0000-0000-100000000020
+    # NOTE: page_id must reference existing record UUID
+    fragment_type: content
+    fragment_name: Report Create
+    fragment_key: base
+    content_type: text/html
+    version_number: 1
+    version_label: v1.0
+    is_active: true
+    content_source: |
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div class="container-fluid py-4">
+                <h1>Report Builder</h1>
+                
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-pills mb-4" id="builderTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="basic-tab" data-bs-toggle="pill" data-bs-target="#basic" type="button">Basic Info</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="query-tab" data-bs-toggle="pill" data-bs-target="#query" type="button">Query</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="columns-tab" data-bs-toggle="pill" data-bs-target="#columns" type="button">Columns</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="variables-tab" data-bs-toggle="pill" data-bs-target="#variables" type="button">Variables</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings" type="button">Settings</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="preview-tab" data-bs-toggle="pill" data-bs-target="#preview" type="button">Preview</button>
+                    </li>
+                </ul>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="builderTabContent">
+                    <!-- Basic Info Tab -->
+                    <div class="tab-pane fade show active" id="basic" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="reportName" class="form-label">Report Name *</label>
+                                    <input type="text" class="form-control" id="reportName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reportSlug" class="form-label">Slug *</label>
+                                    <input type="text" class="form-control" id="reportSlug" required>
+                                    <small class="text-muted">URL-friendly identifier (auto-generated from name)</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reportDisplay" class="form-label">Display Name</label>
+                                    <input type="text" class="form-control" id="reportDisplay">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reportDescription" class="form-label">Description</label>
+                                    <textarea class="form-control" id="reportDescription" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="reportConnection" class="form-label">Database Connection *</label>
+                                    <select class="form-select" id="reportConnection" required>
+                                        <option value="">Select a connection...</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reportCategory" class="form-label">Category</label>
+                                    <input type="text" class="form-control" id="reportCategory" list="categoryList">
+                                    <datalist id="categoryList"></datalist>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reportTemplate" class="form-label">Report Template</label>
+                                    <select class="form-select" id="reportTemplate">
+                                        <option value="">Default template</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="reportTags" class="form-label">Tags</label>
+                                    <input type="text" class="form-control" id="reportTags" placeholder="tag1, tag2, tag3">
+                                    <small class="text-muted">Comma-separated tags</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Query Tab -->
+                    <div class="tab-pane fade" id="query" role="tabpanel">
+                        <div class="mb-3">
+                            <label class="form-label">SQL Query *</label>
+                            <div id="queryEditor"></div>
+                            <div class="mt-2">
+                                <button class="btn btn-primary" id="testQueryBtn">Test Query</button>
+                                <button class="btn btn-secondary" id="detectVariablesBtn">Detect Variables</button>
+                                <button class="btn btn-info" id="formatQueryBtn">Format SQL</button>
+                            </div>
+                            <div id="queryTestResult" class="mt-3"></div>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>Tips:</strong>
+                            <ul class="mb-0">
+                                <li>Use {variable_name} for dynamic parameters</li>
+                                <li>Test your query to auto-detect columns</li>
+                                <li>Make sure column names are unique</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Columns Tab -->
+                    <div class="tab-pane fade" id="columns" role="tabpanel">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h4>Report Columns</h4>
+                            <button class="btn btn-success btn-sm" id="addColumnBtn">Add Column</button>
+                        </div>
+                        <div id="columnsList">
+                            <div class="text-muted">No columns defined. Test your query to auto-detect columns.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Variables Tab -->
+                    <div class="tab-pane fade" id="variables" role="tabpanel">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h4>Report Variables</h4>
+                            <button class="btn btn-success btn-sm" id="addVariableBtn">Add Variable</button>
+                        </div>
+                        <div id="variablesList">
+                            <div class="text-muted">No variables defined. Use {variable_name} in your query.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Settings Tab -->
+                    <div class="tab-pane fade" id="settings" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Display Settings</h5>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isWide">
+                                    <label class="form-check-label" for="isWide">Wide Layout</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isAjax" checked>
+                                    <label class="form-check-label" for="isAjax">AJAX Loading</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isAutoRun">
+                                    <label class="form-check-label" for="isAutoRun">Auto-run on Load</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isSearchable" checked>
+                                    <label class="form-check-label" for="isSearchable">Searchable</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Export Settings</h5>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isDownloadCsv" checked>
+                                    <label class="form-check-label" for="isDownloadCsv">Allow CSV Export</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isDownloadXlsx" checked>
+                                    <label class="form-check-label" for="isDownloadXlsx">Allow Excel Export</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isPublic">
+                                    <label class="form-check-label" for="isPublic">Public Access</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isPublished">
+                                    <label class="form-check-label" for="isPublished">Published</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h5>Advanced Options</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="resultsLimit" class="form-label">Results Limit (0 = unlimited)</label>
+                                    <input type="number" class="form-control" id="resultsLimit" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cacheMinutes" class="form-label">Cache Duration (minutes)</label>
+                                    <input type="number" class="form-control" id="cacheMinutes" value="60" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview Tab -->
+                    <div class="tab-pane fade" id="preview" role="tabpanel">
+                        <div class="preview-section">
+                            <h4>Report Preview</h4>
+                            <div id="variableInputs" class="mb-3"></div>
+                            <button class="btn btn-primary" id="runPreviewBtn">Run Preview</button>
+                            <div id="previewResults" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="mt-4">
+                    <button class="btn btn-success" id="saveReportBtn">Create Report</button>
+                    <button class="btn btn-secondary" id="saveDraftBtn">Save as Draft</button>
+                    <a href="/reports" class="btn btn-link">Cancel</a>
+                </div>
+            </div>
+
+            <script>
+            // Initialize Report Builder with Flask URLs
+            $(document).ready(function() {
+                window.reportBuilder = new ReportBuilder({
+                    {% if report_id %}
+                    report_id: '{{ report_id }}',
+                    {% endif %}
+
+                    data_api:                 '{{ url_for("miner.data") }}',
+                    execute_report:           '{{ url_for('report_api.execute_report') }}',
+                    test_report:              '{{ url_for('report_api.test_report') }}',
+                    preview_report:           '{{ url_for('report_api.preview_report') }}',
+                    export_report:            '{{ url_for('report_api.export_report') }}',
+                    get_report_permissions:   '{{ url_for('report_api.get_report_permissions') }}',
+                    assign_report:            '{{ url_for('report_api.assign_report') }}',
+                    validate_query:           '{{ url_for('report_api.validate_query') }}',
+                    detect_variables:         '{{ url_for('report_api.detect_variables') }}',
+                    list_report_templates:    '{{ url_for('report_api.list_report_templates') }}',
+                    create_report_template:   '{{ url_for('report_api.create_report_template') }}',
+                    update_report_template:   '{{ url_for('report_api.update_report_template') }}',
+                    delete_report_template:   '{{ url_for('report_api.delete_report_template') }}',
+                    test_connection:          '{{ url_for('report_api.test_connection') }}',
+                    get_stats:                '{{ url_for('report_api.get_stats') }}',
+                    export_report_definition: '{{ url_for('report_api.export_report_definition') }}',
+                    import_report:            '{{ url_for('report_api.import_report') }}',
+                    reorder_columns:          '{{ url_for('report_api.reorder_columns') }}',
+                    validate_variables:       '{{ url_for('report_api.validate_variables') }}',
+                    query_metadata:           '{{ url_for('report_api.get_query_metadata') }}',
+                    analyze_columns:          '{{ url_for('report_api.analyze_report_columns') }}',
+                    sync_columns:             '{{ url_for('report_api.sync_report_columns') }}',
+                    analyze_query:            '{{ url_for('report_api.analyze_query') }}',
+                    detect_column_types:      '{{ url_for('report_api.detect_column_types') }}',
+                    suggest_column_settings:  '{{ url_for('report_api.suggest_column_settings') }}',
+                    reportId: {% if report_id %}'{{ report_id }}'{% else %}null{% endif %}
+                });
+            });
+            </script>
+    content_hash: null
+    variables_data: null
+    template_fragment_key: null
+    description: Main content block for the page, contains title and body content
+    sort_order: 1
+    is_published: true
+    publish_date: null
+    expire_date: null
+    cache_duration: 3600
+    last_rendered: null
+    change_description: Initial content fragment for page
+    created_by_user_id: null
+    # NOTE: created_by_user_id must reference existing record UUID
+    # id: 12345678-1234-1234-1234-123456789abc  # AUTO-GENERATED: Optional, system will create if not provided
+    # created_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
+    # updated_at: '2024-01-01T00:00:00'  # AUTO-GENERATED: Optional, system will create if not provided
+
+
+
+            

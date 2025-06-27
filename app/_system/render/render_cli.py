@@ -10,7 +10,7 @@ import uuid
 from jinja2 import Environment
 sys.path.append('/web/temuragi')
 from app.base.cli import BaseCLI
-from app.classes import TemplateRenderer
+
 
 CLI_DESCRIPTION = "Template and page rendering"
 
@@ -63,7 +63,7 @@ class RenderCLI(BaseCLI):
                 rows.append([
                     template.name,
                     template.display_name or '',
-                    str(template.uuid)
+                    str(template.id)
                 ])
 
             self.output_info("Available Templates:")
@@ -91,8 +91,8 @@ class RenderCLI(BaseCLI):
 
             for page in pages:
                 template_name = ""
-                if page.template_uuid:
-                    template = self.session.query(self.template_model).filter_by(uuid=page.template_uuid).first()
+                if page.template_id:
+                    template = self.session.query(self.template_model).filter_by(id=page.template_id).first()
                     template_name = template.name if template else "MISSING"
 
                 rows.append([
@@ -100,7 +100,7 @@ class RenderCLI(BaseCLI):
                     page.title[:30] + "..." if len(page.title) > 30 else page.title,
                     template_name,
                     "Yes" if page.published else "No",
-                    str(page.uuid)
+                    str(page.id)
                 ])
 
             self.output_info("Available Pages:")
@@ -123,12 +123,12 @@ class RenderCLI(BaseCLI):
                 self.output_error(f"Page '{page_slug}' not found")
                 return 1
 
-            if not page.template_uuid:
+            if not page.template_id:
                 self.output_error(f"Page '{page_slug}' has no template assigned")
                 return 1
 
             # Get template info
-            template = self.session.query(self.template_model).filter_by(uuid=page.template_uuid).first()
+            template = self.session.query(self.template_model).filter_by(id=page.template_id).first()
             template_name = template.name if template else "UNKNOWN"
 
             self.output_info(f"Page: {page.title}")
@@ -145,10 +145,11 @@ class RenderCLI(BaseCLI):
                 except json.JSONDecodeError as e:
                     self.output_error(f"Invalid JSON data: {e}")
                     return 1
-
+            
+            from app.classes import TemplateRenderer
             # Create renderer and render page
             renderer = TemplateRenderer(self.session)
-            rendered_content = renderer.render_template(page.uuid, **data)
+            rendered_content = renderer.render_template(page.id, **data)
 
             # Output result
             self.output_info("Rendered page content:")
