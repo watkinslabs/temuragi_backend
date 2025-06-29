@@ -215,13 +215,6 @@ class FormsCLI(BaseCLI):
 
                 self.output_success(f"Created page at /{page_slug}")
                 
-                # Show action summary
-                if custom_actions is not None:
-                    if custom_actions:
-                        self.output_info(f"Actions configured: {custom_actions}")
-                    else:
-                        self.output_info("No actions configured (explicitly disabled)")
-
             return 0
 
         except Exception as e:
@@ -231,8 +224,6 @@ class FormsCLI(BaseCLI):
                 import traceback
                 traceback.print_exc()
             return 1
-
-    # ... rest of the class methods remain the same ...
 
     def test_form_metadata(self, model_name, generate_html=False, output_file=None,
                           create_page=False, prefix="", raw_form=False, debug=False,

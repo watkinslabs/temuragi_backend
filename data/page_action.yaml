@@ -1,49 +1,56 @@
-# PageAction Template (Template)
-# Template file - edit values before importing
-# 
-# INSTRUCTIONS:
-# 1. AUTO-GENERATED fields are optional - uncomment to set specific values
-# 2. Update foreign key UUIDs to reference existing records
-# 3. Edit all other values as needed
-# 4. Foreign key constraints must be satisfied before import
-# Template file - edit values before importing
-# Exported from template CLI
-
 PageAction:
   meta:
     tablename: page_actions
     schema: public
   data:
     - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+      name: new
+      icon: fas fa-plus
+      color: success
+      display: New Report
+      mode: page
+      action_type: htmx
+      url: /v2/reports/create
+      url_for: 
+      method: POST
+      target: #main_content
+      headers: null
+      payload: 
+      confirm: false
+      confirm_message: 
+      order_index: 0
+      is_active: true
+    - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
       name: edit
       icon: fas fa-edit
-      color: #12F
+      color: primary
       display: Edit
       url: /v2/reports/edit
       url_for: 
+      action_type: htmx
       method: POST
       target: #main_content
       mode: row
       headers: null
       payload: id
       confirm: false
-      confirm_message: Edit This report
+      confirm_message: 
       order_index: 1
       is_active: true
     - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
       name: delete
-      icon: fas fa-edit
-      color: #12F
+      icon: fas fa-trash
+      color: danger
       display: Delete
-      mode: page
-      url: /v2/reports/edit
+      mode: row
+      action_type: api
+      url: /v2/reports/delete
       url_for: 
       method: POST
       target: #main_content
       headers: null
       payload: id
-      confirm: false
-      confirm_message: Edit This report
-      order_index: 1
+      confirm: true
+      confirm_message: Delete this report?
+      order_index: 2
       is_active: true
-            

@@ -739,7 +739,10 @@ class TemplateRenderer:
                 f"--theme-surface: {theme.surface_color};",
                 f"--theme-text: {theme.text_color};",
                 f"--theme-text-muted: {theme.text_muted_color};",
-                f"--theme-border-color: {theme.border_color};"
+                f"--theme-border-color: {theme.border_color};",
+                f"--theme-content-area: {theme.content_area_color};",
+                f"--theme-sidebar: {theme.sidebar_color};",
+                f"--theme-component: {theme.component_color};"
             ])
             
             # Dark mode color variables
@@ -755,7 +758,10 @@ class TemplateRenderer:
                     f"--theme-surface-dark: {theme.surface_color_dark or theme.surface_color};",
                     f"--theme-text-dark: {theme.text_color_dark or theme.text_color};",
                     f"--theme-text-muted-dark: {theme.text_muted_color_dark or theme.text_muted_color};",
-                    f"--theme-border-color-dark: {theme.border_color_dark or theme.border_color};"
+                    f"--theme-border-color-dark: {theme.border_color_dark or theme.border_color};",
+                    f"--theme-content-area-dark: {theme.content_area_color_dark or theme.content_area_color};",
+                    f"--theme-sidebar-dark: {theme.sidebar_color_dark or theme.sidebar_color};",
+                    f"--theme-component-dark: {theme.component_color_dark or theme.component_color};"
                 ])
             
             # Typography variables
@@ -810,7 +816,9 @@ class TemplateRenderer:
                 f"--theme-card-border-radius: {theme.card_border_radius or theme.border_radius};",
                 f"--theme-navbar-height: {theme.navbar_height};",
                 f"--theme-sidebar-width: {theme.sidebar_width};",
-                f"--theme-footer-height: {theme.footer_height};"
+                f"--theme-footer-height: {theme.footer_height};",
+                f"--theme-breadcrumb-height: {theme.breadcrumb_height};",
+                f"--theme-topbar-height: {theme.topbar_height};"
             ])
             
             # Parse JSON CSS variables if they exist
@@ -917,6 +925,9 @@ class TemplateRenderer:
                         f"  --theme-text: {theme.text_color_dark or theme.text_color};",
                         f"  --theme-text-muted: {theme.text_muted_color_dark or theme.text_muted_color};",
                         f"  --theme-border-color: {theme.border_color_dark or theme.border_color};",
+                        f"  --theme-content-area: {theme.content_area_color_dark or theme.content_area_color};",
+                        f"  --theme-sidebar: {theme.sidebar_color_dark or theme.sidebar_color};",
+                        f"  --theme-component: {theme.component_color_dark or theme.component_color};",
                         "}"
                     ])
                 elif theme.mode == 'auto':
@@ -937,6 +948,9 @@ class TemplateRenderer:
                         f"    --theme-text: {theme.text_color_dark or theme.text_color};",
                         f"    --theme-text-muted: {theme.text_muted_color_dark or theme.text_muted_color};",
                         f"    --theme-border-color: {theme.border_color_dark or theme.border_color};",
+                        f"    --theme-content-area: {theme.content_area_color_dark or theme.content_area_color};",
+                        f"    --theme-sidebar: {theme.sidebar_color_dark or theme.sidebar_color};",
+                        f"    --theme-component: {theme.component_color_dark or theme.component_color};",
                         "  }",
                         "}",
                         "",
@@ -953,6 +967,9 @@ class TemplateRenderer:
                         f"  --theme-text: {theme.text_color_dark or theme.text_color};",
                         f"  --theme-text-muted: {theme.text_muted_color_dark or theme.text_muted_color};",
                         f"  --theme-border-color: {theme.border_color_dark or theme.border_color};",
+                        f"  --theme-content-area: {theme.content_area_color_dark or theme.content_area_color};",
+                        f"  --theme-sidebar: {theme.sidebar_color_dark or theme.sidebar_color};",
+                        f"  --theme-component: {theme.component_color_dark or theme.component_color};",
                         "}",
                         "",
                         "/* Manual light theme override */",
@@ -968,6 +985,9 @@ class TemplateRenderer:
                         f"  --theme-text: {theme.text_color};",
                         f"  --theme-text-muted: {theme.text_muted_color};",
                         f"  --theme-border-color: {theme.border_color};",
+                        f"  --theme-content-area: {theme.content_area_color};",
+                        f"  --theme-sidebar: {theme.sidebar_color};",
+                        f"  --theme-component: {theme.component_color};",
                         "}"
                     ])
             
@@ -1003,8 +1023,7 @@ class TemplateRenderer:
             return Markup("\n".join(css_output))
             
         except Exception as e:
-            return f"/* Error generating theme CSS: {e} */"
-            
+            return f"/* Error generating theme CSS: {e} */"        
 
     def _render_menu(self, menu_name='ADMIN', user_id=None, **kwargs):
         """

@@ -29,8 +29,9 @@ Theme:
         align-items: center;
         padding: 0 calc(var(--theme-spacing-unit) * 1.5);
         font-size: 13px;
-        height: 30px;
+        height: var(--theme-topbar-height);
         font-weight: 500;
+
       }
       
       .header {
@@ -220,18 +221,21 @@ Theme:
         font-size: 14px;
         color: var(--theme-text-muted);
         font-weight: 500;
+        height: var(--theme-breadcrumb-height);
+
       }
       
       .content_area {
         display: grid;
         grid-template-columns: var(--theme-sidebar-width) 1fr;
-        min-height: calc(100vh - var(--header-total-height) - var(--theme-footer-height));
+        min-height: calc(100vh - var(--theme-topbar-height)  - var(--theme-breadcrumb-height) - var(--theme-navbar-height)   - var(--theme-footer-height));
         position: relative;
       }
       
       .sidebar_container {
         position: relative;
         transition: transform var(--theme-transition-duration) var(--theme-animation-easing);
+        background-color: var(--theme-sidebar);
       }
       
       .content_area.collapsed .sidebar_container {
@@ -239,7 +243,6 @@ Theme:
       }
       
       .sidebar {
-        background-color: var(--theme-background);
         border-right: 4px solid var(--theme-border-color);
         width: var(--theme-sidebar-width);
         height: 100%;
@@ -389,7 +392,7 @@ Theme:
       }
       
       .main_content {
-        background-color: var(--theme-background);
+        background-color: var(--theme-content-area);
         padding:10px;
         transition: margin-left var(--theme-transition-duration) var(--theme-animation-easing);
       }
@@ -502,10 +505,16 @@ Theme:
         }
 
         :root[data-theme="dark"] .sidebar {
-        background: var(--theme-surface-dark, var(--theme-surface));
+        background: var(--theme-sidebar-dark, var(--theme-sidebar));
         border-color: var(--theme-border-color-dark, var(--theme-border-color));
         }
         
+        :root[data-theme="dark"] .main-area {
+        background: var(--theme-content-area-dark, var(--theme-content-area));
+        border-color: var(--theme-border-color-dark, var(--theme-border-color));
+        }
+        
+
         /* Remove default link styles for nav items HTMLX */
         a.nav_item {
             text-decoration: none;
@@ -565,11 +574,14 @@ Theme:
     warning_color: '#ffc107'
     danger_color: '#dc3545'
     info_color: '#0dcaf0'
-    background_color: '#ffffff'
-    surface_color: '#f8f9fa'
+    background_color: '#f5f5f5'
+    surface_color: '#d4e9ff'
     text_color: '#212529'
-    text_muted_color: '#6c757d'
-    border_color: '#dee2e6'
+    text_muted_color: '#07355e'
+    border_color: '#80a5ca'
+    component_color: '#1b2a42'
+    sidebar_color: '#ededed'
+    content_area_color: '#e4efef'
 
     # Dark mode colors (keeping original Set A dark colors)
     primary_color_dark: '#a0bcff'
@@ -583,6 +595,9 @@ Theme:
     text_color_dark: '#f1f5f9'
     text_muted_color_dark: '#94a3b8'
     border_color_dark: '#334155'
+    component_color_dark: '#1b2a42'
+    sidebar_color_dark: '#020202'
+    content_area_color_dark: '#121924'
 
     font_family_primary: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     font_family_heading: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
@@ -614,6 +629,8 @@ Theme:
     button_border_radius: 0.375rem
     input_border_radius: 0.375rem
     card_border_radius: 0.5rem
+    breadcrumb_height: 50px
+    topbar_height: 30px
     navbar_height: 64px
     sidebar_width: 280px
     footer_height: 80px

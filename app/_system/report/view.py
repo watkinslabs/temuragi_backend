@@ -29,6 +29,8 @@ def list():
     rendered_content = renderer.render_page(slug)
     return rendered_content
 
+
+
 @bp.route('/<report_id>', methods=['POST'])
 def view_report(report_id):
     """Render individual report page"""
@@ -66,10 +68,6 @@ def view_report(report_id):
                 template_id=report.report_template.template_id,
                 context=context
             )
-        else:
-            # Fallback to basic DataTables HTML
-            return render_report_html(report)
-            
     except Exception as e:
         return f"""
         <h1>Error rendering report</h1>
@@ -135,3 +133,33 @@ def edit():
         <p><strong>Error:</strong> {str(e)}</p>
         <pre>{repr(e)}</pre>
         """
+
+
+@bp.route('/delete', methods=['POST'])
+def delete():
+    """Delete a report"""
+    try:
+        service = get_service()
+        
+        # Get report_id from request
+        report_id = request.get_json().get('id')
+        
+        if not report_id:
+            return {'success': False, 'error': 'No report ID provided'}, 400
+        
+        # Get the report
+        from app.models import Report
+        report = g.session.query(Report).filter_by(id=report_id).first()
+        
+        if not report:
+            return {'success': False, 'error': 'Report not found'}, 404
+        
+        # Delete the report
+        g.session.delete(report)
+        g.session.commit()
+        
+        return {'success': True, 'message': f'Report "{report.name}" deleted successfully'}
+        
+    except Exception as e:
+        g.session.rollback()
+        return {'success': False, 'error': str(e)}, 500

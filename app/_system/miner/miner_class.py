@@ -10,74 +10,12 @@ from app.utils import jsonify
 
 from app.register.classes import get_model
 
-
-class MinerError(Exception):
-    """Custom exception for Miner operations"""
-    __depends_on__ =[]
-
-    def __init__(self, message, error_type="MinerError", status_code=400, details=None):
-        self.message = message
-        self.error_type = error_type
-        self.status_code = status_code
-        self.details = details or {}
-        super().__init__(self.message)
-
-
-class MinerPermissionError(MinerError):
-    """Permission denied error"""
-    __depends_on__ =[]
-
-    def __init__(self, message, permission_required=None):
-        super().__init__(message, "PermissionError", 403, {'permission_required': permission_required})
-
-class DataBrokerError(MinerError):
-    """Data broker specific errors"""
-    __depends_on__ = []
-
-    def __init__(self, message, handler_class=None, operation=None):
-        details = {}
-        if handler_class:
-            details['handler_class'] = handler_class
-        if operation:
-            details['operation'] = operation
-        super().__init__(message, "DataBrokerError", 400, details)
-
-class BaseDataHandler:
-    """Base class for specialized data handlers"""
-    
-    def __init__(self, session, auth_context, logger=None):
-        self.session = session
-        self.auth_context = auth_context
-        self.logger = logger
-        self.user_id = auth_context.get('user_id') if auth_context else None
-    
-    def handle_create(self, data):
-        """Override in subclass"""
-        raise NotImplementedError("Subclass must implement handle_create")
-    
-    def handle_update(self, data):
-        """Override in subclass"""
-        raise NotImplementedError("Subclass must implement handle_update")
-    
-    def handle_metadata(self, data):
-        """Override in subclass"""
-        raise NotImplementedError("Subclass must implement handle_metadata")
-    
-    def handle_process(self, data):
-        """Override in subclass for custom processing"""
-        raise NotImplementedError("Subclass must implement handle_process")
-    
-    def handle_batch_create(self, data_list):
-        """Handle batch creation"""
-        results = []
-        for data in data_list:
-            results.append(self.handle_create(data))
-        return results
-    
-    def handle_validate(self, data):
-        """Validate data without saving"""
-        raise NotImplementedError("Subclass must implement handle_validate")
-
+from .handler import  (
+        MinerError,
+        MinerPermissionError,
+        DataBrokerError,
+        BaseDataHandler
+        )
 
 class Miner:
     """
@@ -154,7 +92,8 @@ class Miner:
                 'validate': 'handle_validate',
                 'transform': 'handle_transform',
                 'import': 'handle_import',
-                'export': 'handle_export'
+                'export': 'handle_export',
+                'list': 'handle_list'
             }
             
             method_name = method_map.get(operation)
@@ -682,28 +621,44 @@ class Miner:
         })
     
     def handle_read(self, model_class, data, audit_data):
-        """Handle read operations - single record only"""
-        record_id = data.get('id')
-        if not record_id:
-            raise MinerError('id is required for read operation', 'ValidationError', 400)
-
-        # Find single record
-        instance = g.session.query(model_class).filter(model_class.id == record_id).first()
+        """Handle read operations - single record by any column"""
+        # Support both old 'id' field and new flexible approach
+        if 'id' in data:
+            # Backward compatibility
+            filter_column = 'id'
+            filter_value = data['id']
+        else:
+            # New approach: filter by any column
+            filter_column = data.get('filter_column')
+            filter_value = data.get('filter_value')
+        
+        if not filter_column or filter_value is None:
+            raise MinerError('filter_column and filter_value are required for read operation', 'ValidationError', 400)
+        
+        # Validate column exists
+        if not hasattr(model_class, filter_column):
+            raise MinerError(f'Column {filter_column} does not exist on model {model_class.__name__}', 'ValidationError', 400)
+        
+        # Build query
+        column = getattr(model_class, filter_column)
+        instance = g.session.query(model_class).filter(column == filter_value).first()
+        
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
-
+        
         # Update audit data
         audit_data['records_returned'] = 1
-
+        audit_data['filter_used'] = {filter_column: filter_value}
+        
         # Check for slim output
         slim = data.get('slim', False)
         result_data = self._serialize_instance(instance, slim)
-
+        
         response = {'success': True, 'data': result_data}
         
         if slim:
             response['metadata'] = self._get_model_metadata(model_class)
-
+        
         return jsonify(response)
 
     def handle_create(self, model_class, data, audit_data):
@@ -721,11 +676,14 @@ class Miner:
         g.session.add(instance)
         g.session.commit()
 
+
+        pk_value = self._get_instance_pk_value(instance)
         # Update audit data
         audit_data.update({
-            'target_id': str(instance.id),
+            'target_id': str(pk_value) if pk_value is not None else None,
             'records_returned': 1
         })
+
 
         # Return created object
         slim = data.get('slim', False)
@@ -743,23 +701,38 @@ class Miner:
         return jsonify(response), 201
 
     def handle_update(self, model_class, data, audit_data):
-        """Handle update operations"""
-        record_id = data.get('id')
+        """Handle update operations - find by any column"""
         update_data = data.get('data', {})
-
-        if not record_id:
-            raise MinerError('id is required for update operation', 'ValidationError', 400)
+        
+        # Support both old 'id' field and new flexible approach
+        if 'id' in data:
+            # Backward compatibility
+            filter_column = 'id'
+            filter_value = data['id']
+        else:
+            # New approach: filter by any column
+            filter_column = data.get('filter_column')
+            filter_value = data.get('filter_value')
+        
+        if not filter_column or filter_value is None:
+            raise MinerError('filter_column and filter_value (or id) are required for update operation', 'ValidationError', 400)
         if not update_data:
             raise MinerError('data field is required for update operation', 'ValidationError', 400)
-
+        
+        # Validate column exists
+        if not hasattr(model_class, filter_column):
+            raise MinerError(f'Column {filter_column} does not exist on model {model_class.__name__}', 'ValidationError', 400)
+        
         # Filter out is_active - it should never be updated via API
         filtered_data = {k: v for k, v in update_data.items() if k != 'is_active'}
-
+        
         # Find record
-        instance = g.session.query(model_class).filter(model_class.id == record_id).first()
+        column = getattr(model_class, filter_column)
+        instance = g.session.query(model_class).filter(column == filter_value).first()
+        
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
-
+        
         # Get readonly fields for this model
         readonly_fields = getattr(model_class, '__readonly_fields__', [])
         
@@ -775,18 +748,19 @@ class Miner:
                 else:
                     setattr(instance, field, value)
                     fields_updated.append(field)
-
+        
         g.session.commit()
-
+        
         # Update audit data
         audit_data['records_returned'] = 1
         audit_data['fields_updated'] = fields_updated
         audit_data['readonly_attempts'] = readonly_attempts
-
+        audit_data['filter_used'] = {filter_column: filter_value}
+        
         # Return updated object
         slim = data.get('slim', False)
         result_data = self._serialize_instance(instance, slim)
-
+        
         response = {
             'success': True,
             'data': result_data,
@@ -797,26 +771,44 @@ class Miner:
         if readonly_attempts:
             response['warning'] = f'The following readonly fields were not updated: {", ".join(readonly_attempts)}'
             response['readonly_fields_attempted'] = readonly_attempts
-            self.logger.warning(f"User {audit_data.get('user_id')} attempted to update readonly fields {readonly_attempts} on {model_class.__name__} {record_id}")
+            self.logger.warning(f"User {audit_data.get('user_id')} attempted to update readonly fields {readonly_attempts} on {model_class.__name__} {filter_column}={filter_value}")
         
         if slim:
             response['metadata'] = self._get_model_metadata(model_class)
-
+        
         return jsonify(response)
-
+    
     def handle_delete(self, model_class, data, audit_data):
-        """Handle delete operations"""
-        record_id = data.get('id')
+        """Handle delete operations - find by any column"""
         hard_delete = data.get('hard_delete', False)
-
-        if not record_id:
-            raise MinerError('id is required for delete operation', 'ValidationError', 400)
-
+        
+        # Support both old 'id' field and new flexible approach
+        if 'id' in data:
+            # Backward compatibility
+            filter_column = 'id'
+            filter_value = data['id']
+        else:
+            # New approach: filter by any column
+            filter_column = data.get('filter_column')
+            filter_value = data.get('filter_value')
+        
+        if not filter_column or filter_value is None:
+            raise MinerError('filter_column and filter_value (or id) are required for delete operation', 'ValidationError', 400)
+        
+        # Validate column exists
+        if not hasattr(model_class, filter_column):
+            raise MinerError(f'Column {filter_column} does not exist on model {model_class.__name__}', 'ValidationError', 400)
+        
         # Find record
-        instance = g.session.query(model_class).filter(model_class.id == record_id).first()
+        column = getattr(model_class, filter_column)
+        instance = g.session.query(model_class).filter(column == filter_value).first()
+        
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
-
+        
+        # Store filter info for audit
+        audit_data['filter_used'] = {filter_column: filter_value}
+        
         if hard_delete:
             g.session.delete(instance)
         else:
@@ -825,16 +817,16 @@ class Miner:
                 instance.soft_delete()
             else:
                 g.session.delete(instance)
-
+        
         g.session.commit()
-
+        
         delete_type = 'permanently deleted' if hard_delete else 'deactivated'
-
+        
         return jsonify({
             'success': True,
             'message': f'{model_class.__name__} {delete_type} successfully'
         })
-
+    
     def handle_list(self, model_class, data, audit_data):
         """Handle list operations with pagination, filtering, sorting, and search"""
         
@@ -889,7 +881,9 @@ class Miner:
             audit_data['search_terms'] = search_value
         
         # Get total count before filtering (for DataTables recordsTotal)
-        total_query = g.session.query(func.count(model_class.id))
+        pk_field = self._get_primary_key_field(model_class)
+        pk_column = getattr(model_class, pk_field)
+        total_query = g.session.query(func.count(pk_column))
         if hasattr(model_class, 'is_active') and not include_inactive:
             total_query = total_query.filter(model_class.is_active == True)
         records_total = total_query.scalar() or 0
@@ -903,7 +897,10 @@ class Miner:
         query = self._apply_sorting(query, model_class, sort_by, sort_order)
         
         # Apply pagination using DataTables parameters
-        query = query.offset(start).limit(length)
+        if length==0:
+            query = query.offset(start)
+        else:
+            query = query.offset(start).limit(length)
         
         # Execute query
         instances = query.all()
@@ -937,8 +934,12 @@ class Miner:
         filters = data.get('filters', {})
         include_inactive = data.get('include_inactive', False)
 
+        # Get the actual primary key field name
+        pk_field = self._get_primary_key_field(model_class)
+        pk_attr = getattr(model_class, pk_field)
+
         # Start building query
-        query = g.session.query(func.count(model_class.id))
+        query = g.session.query(func.count(pk_attr))
 
         # Apply active filter unless explicitly including inactive
         if hasattr(model_class, 'is_active') and not include_inactive:
@@ -961,6 +962,35 @@ class Miner:
             'count': count,
             'filters_applied': filters
         })
+
+    def _get_primary_key_field(self, model_class):
+        """Get the primary key field name(s) for a model"""
+        pk_columns = list(model_class.__table__.primary_key.columns)
+        if not pk_columns:
+            # Fallback to 'id' if no PK defined
+            if hasattr(model_class, 'id'):
+                return 'id'
+            raise MinerError(f"No primary key defined for {model_class.__name__}", 'ConfigurationError', 500)
+        
+        # Find the attribute name that corresponds to this column
+        pk_column = pk_columns[0]
+        
+        # Search through the model's mapper to find the attribute name
+        for attr_name, attr in model_class.__mapper__.all_orm_descriptors.items():
+            if hasattr(attr, 'property') and hasattr(attr.property, 'columns'):
+                # Check if this attribute maps to our primary key column
+                if pk_column in attr.property.columns:
+                    return attr_name
+        
+        # If we can't find the mapping, log an error and return the column name as fallback
+        if self.logger:
+            self.logger.error(f"Could not find attribute name for primary key column {pk_column.name} in {model_class.__name__}")
+        return pk_column.name
+
+    def _get_instance_pk_value(self, instance):
+        """Get primary key value from an instance"""
+        pk_field = self._get_primary_key_field(instance.__class__)
+        return getattr(instance, pk_field, None)
 
     def _apply_filters(self, query, model_class, filters):
         """Apply filters to query"""
@@ -1712,3 +1742,4 @@ class Miner:
         type_str = str(column_type).upper()
         numeric_types = ['INTEGER', 'NUMERIC', 'DECIMAL', 'FLOAT', 'REAL', 'SMALLINT', 'BIGINT']
         return any(t in type_str for t in numeric_types)
+    

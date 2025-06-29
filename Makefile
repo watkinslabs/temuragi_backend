@@ -72,6 +72,9 @@ rebuild-db: drop-tables create-tables import-data permission
 import-data:
 	@python -m app.cli porter import-dir ./data
 
+import-pr:
+	@python -m app.cli porter import-dir ./data/pr
+
 
 
 permission: 
@@ -171,3 +174,9 @@ report:
 	@python -m app.cli form generate --no-optional-badge --create-page --prefix report_ --mode both Report
 	
 	
+
+
+pr:
+	@-python -m app.cli model_report generate GPACIFIC_dbo_BKAPPO -c PR_MSSQL --slug 'pac_po/list' --name 'Pacific Purchase Orders' --description 'Manage POs for parked orders in virtual inventory' 
+	@-python -m app.cli form report-datatable pac_po/list
+	@-python -m app.cli form report-datatable pac-pt-parked-orders/list

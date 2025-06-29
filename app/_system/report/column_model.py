@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, Text, func, ForeignKey, Index, UniqueConstraint, event
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
+import json
 
 from app.base.model import BaseModel
 
@@ -32,6 +33,7 @@ class ReportColumn(BaseModel):
     search_type = Column(String(50), default='contains')  # exact, contains, starts, ends, range, list
     
     # Display configuration
+    is_default_sort = Column(Boolean, default=False)
     is_visible = Column(Boolean, default=True)
     is_sortable = Column(Boolean, default=True)
     format_string = Column(String(255))  # Python format string like "${:,.2f}"
@@ -65,5 +67,22 @@ class ReportColumn(BaseModel):
     
     def __repr__(self):
         return f"<ReportColumn {self.name} for report {self.report_id}>"
-
-
+    
+    @validates('options')
+    def validate_options(self, key, value):
+        """Fix options if it's stored as a string"""
+        if value is None:
+            return {}
+        
+        if isinstance(value, dict):
+            return value
+        
+        if isinstance(value, str):
+            try:
+                if not value.strip():
+                    return {}
+                return json.loads(value)
+            except (json.JSONDecodeError, ValueError):
+                return {}
+        
+        return {}

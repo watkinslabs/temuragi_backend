@@ -1,5 +1,8 @@
 class ReportBuilder {
     constructor(config) {
+        this.actions = [];
+        this.javascript_editor = null;
+        
         // Map all URLs from config using snake_case
         this.urls = {
             data_api:                 config.data_api,
@@ -57,39 +60,10 @@ class ReportBuilder {
         // Initialize
         this.init();
 
-        // Add default action configurations
-        this.action_configs = {
-            edit: {
-                url_pattern: '/{model}/edit',
-                data_key: 'id',
-                needs_confirmation: false
-            },
-            delete: {
-                url_pattern: '/{model}/delete',
-                data_key: 'id',
-                needs_confirmation: true,
-                confirmation_message: 'Are you sure you want to delete this {model}?',
-                on_success: () => this.reload()  // Reload table after delete
-            },
-            view: {
-                url_pattern: '/{model}/view',
-                data_key: 'id',
-                needs_confirmation: false
-            },
-            copy: {
-                url_pattern: '/{model}/copy',
-                data_key: 'id',
-                needs_confirmation: true,
-                confirmation_message: 'Create a copy of this {model}?',
-                on_success: () => this.reload()
-            }
-        };
+        
 
-        // Allow custom action configs to be passed in options
-        if (options.action_configs) {
-            this.action_configs = { ...this.action_configs, ...options.action_configs };
-        }
-     
+        this.init_actions();
+
     }
 
     async init() {
@@ -105,7 +79,9 @@ class ReportBuilder {
                 this.load_connections(),
                 this.load_report_templates(),
                 this.load_data_types(),
-                this.load_variable_types()
+                this.load_variable_types(),
+                this.load_models()  
+
             ]);
 
             // If editing, load existing report AFTER loading connections/templates
@@ -197,6 +173,14 @@ class ReportBuilder {
             }
         });
 
+        $('#reportModel').on('change', (e) => {
+            const model_id = $(e.target).val();
+            if (model_id && $('#isModel').is(':checked')) {
+                console.log('Model selected:', model_id);
+                this.load_model_query_with_confirmation(model_id);
+            }
+        });
+
         // Button click handlers
         $('#testQueryBtn').on('click', () => this.test_query_with_metadata());
         $('#detectVariablesBtn').on('click', () => this.detect_variables());
@@ -220,6 +204,16 @@ class ReportBuilder {
             } else if (target === '#columns' && this.report_data.pending_column_analysis) {
                 // If we have pending column analysis, show it
                 this.show_column_analysis_results();
+            }
+        });
+
+        $('#isModel').on('change', (e) => {
+            const is_checked = $(e.target).is(':checked');
+            $('#reportModel').prop('disabled', !is_checked);
+            
+            if (!is_checked) {
+                // Clear model selection when disabling
+                $('#reportModel').val('');
             }
         });
     }
@@ -1319,8 +1313,12 @@ class ReportBuilder {
             const report_id = this.is_edit_mode ? this.report_id : result.data.id;
 
             // Save columns and variables
-            await this.save_columns(report_id);
-            await this.save_variables(report_id);
+            if (result.success && this.report_id) {
+                await this.save_columns(report_id);
+                await this.save_variables(report_id);
+                await this.save_all_actions();
+            }
+    
 
             // Success!
             this.show_success('Report saved successfully!');
@@ -1332,6 +1330,8 @@ class ReportBuilder {
                 window.history.replaceState({}, '', `/reports/builder/${report_id}`);
                 this.update_save_button_text();
             }
+
+            
 
         } catch (error) {
             this.show_error('Error saving report: ' + error.message);
@@ -1364,7 +1364,22 @@ class ReportBuilder {
                 $('#reportDisplay').val(report.display || '');
                 $('#reportDescription').val(report.description || '');
                 $('#reportCategory').val(report.category || '');
-                $('#reportTags').val(report.tags ? report.tags.join(', ') : '');
+                
+                let tags_value = '';
+
+                if (report.tags) {
+                    if (Array.isArray(report.tags)) {
+                        tags_value = report.tags.join(', ');
+                    } else if (typeof report.tags === 'string') {
+                        tags_value = report.tags;
+                    } else if (typeof report.tags === 'object') {
+                        tags_value = JSON.stringify(report.tags);
+                    } else {
+                        tags_value = String(report.tags);
+                    }
+                }
+
+                $('#reportTags').val(tags_value);
 
                 // Set query and refresh editor
                 this.query_editor.setValue(report.query);
@@ -1379,10 +1394,11 @@ class ReportBuilder {
                 $('#isAutoRun').prop('checked', report.is_auto_run || false);
                 $('#isSearchable').prop('checked', report.is_searchable || false);
                 $('#isPublic').prop('checked', report.is_public || false);
+                $('#isModel').prop('checked', report.is_model || false);
                 $('#isDownloadCsv').prop('checked', report.is_download_csv || false);
                 $('#isDownloadXlsx').prop('checked', report.is_download_xlsx || false);
                 $('#isPublished').prop('checked', report.is_published !== false);
-
+                
                 // Set options
                 const options = report.options || {};
                 $('#resultsLimit').val(options.results_limit || 0);
@@ -1391,6 +1407,7 @@ class ReportBuilder {
                 // Set connection - with detailed debugging
                 const connection_id = report.connection_id;
                 const template_id = report.report_template_id;
+                const model_id = report.model_id;
 
                 if (connection_id) {
                     // Force a small delay to ensure DOM is ready
@@ -1429,6 +1446,26 @@ class ReportBuilder {
                         console.error('Template ID not found in dropdown:', template_id);
                     }
                 }
+                if (model_id) {
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    
+                    const model_exists = $(`#reportModel option[value="${model_id}"]`).length > 0;
+                    console.log('Checking for model_id:', model_id, 'Exists:', model_exists);
+                    
+                    if (model_exists) {
+                        $('#reportModel').val(model_id);
+                        $('#reportModel').trigger('change');
+                        console.log('Model set to:', $('#reportModel').val());
+                    } else {
+                        console.error('Model ID not found in dropdown:', model_id);
+                    }
+                    // Set the isModel checkbox based on whether a model is selected
+                    $('#isModel').prop('checked', true);
+                    $('#reportModel').prop('disabled', false);
+                } else {
+                    $('#isModel').prop('checked', false);
+                    $('#reportModel').prop('disabled', true);
+                }
 
                 // Now load columns and variables separately
                 const [columns, variables] = await Promise.all([
@@ -1460,6 +1497,38 @@ class ReportBuilder {
         }
     }
 
+    async load_model_default_query(model_id) {
+        if (!model_id) return;
+        
+        try {
+            const model_result = await window.app.api.post(this.urls.data_api, {
+                model: 'Model',
+                operation: 'read',
+                id: model_id
+            });
+            
+            if (model_result.success && model_result.data) {
+                const model = model_result.data;
+                
+                // If the model has a default query, you could set it
+                // This depends on your Model structure
+                if (model.default_query) {
+                    if (confirm('Load the default query for this model?')) {
+                        this.query_editor.setValue(model.default_query);
+                    }
+                } else if (model.table_name) {
+                    // Generate a simple SELECT * query
+                    const default_query = `SELECT * FROM ${model.table_name}`;
+                    if (confirm(`Load default query: ${default_query}?`)) {
+                        this.query_editor.setValue(default_query);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load model details:', error);
+        }
+    }
+
     get_report_data() {
         const tags_value = $('#reportTags').val();
         const tags = tags_value ? tags_value.split(',').map(t => t.trim()).filter(t => t) : [];
@@ -1474,6 +1543,7 @@ class ReportBuilder {
             connection_id: $('#reportConnection').val(),
             category: $('#reportCategory').val() || null,
             tags: tags,
+            model_id: $('#reportModel').val() || null,  
             report_template_id: $('#reportTemplate').val() || null,
             // Flags as direct properties
             is_wide: $('#isWide').is(':checked'),
@@ -1481,6 +1551,7 @@ class ReportBuilder {
             is_auto_run: $('#isAutoRun').is(':checked'),
             is_searchable: $('#isSearchable').is(':checked'),
             is_public: $('#isPublic').is(':checked'),
+            is_model: $('#isModel').is(':checked') && $('#reportModel').val() !== '',
             is_download_csv: $('#isDownloadCsv').is(':checked'),
             is_download_xlsx: $('#isDownloadXlsx').is(':checked'),
             is_published: $('#isPublished').is(':checked'),
@@ -1710,9 +1781,9 @@ class ReportBuilder {
 
         // Validate slug format
        const slug = $('#reportSlug').val();
-       if (slug && !/^[a-z0-9-\/]+$/.test(slug)) {
+       /*if (slug && !/^[a-z0-9-\/]+$/.test(slug)) {
            errors.push('Slug can only contain lowercase letters, numbers, hyphens, and slashes');
-       }
+       }*/
 
         if (errors.length > 0) {
             alert('Please fix the following errors:\n\n' + errors.join('\n'));
@@ -1911,6 +1982,453 @@ class ReportBuilder {
     register_action(name, config) {
         this.action_configs[name] = config;
     }
+
+     // ===== ACTIONS MANAGEMENT =====
+    
+     init_actions() {
+        // Initialize JavaScript editor for actions using CodeMirror
+        this.javascript_editor = CodeMirror(document.getElementById('javascriptEditor'), {
+            mode: 'javascript',
+            theme: 'monokai',
+            lineNumbers: true,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            tabSize: 4,
+            indentWithTabs: false,
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-Enter": () => this.save_action()
+            }
+        });
+        
+        // Event listeners for actions
+        $('#addActionBtn').on('click', () => this.show_add_action());
+        $('#saveActionBtn').on('click', () => this.save_action());
+        $('#actionType').on('change', () => this.toggle_action_fields());
+        $('#actionConfirm').on('change', () => this.toggle_confirm_message());
+        
+        // Load existing actions if editing
+        if (this.report_id) {
+            this.load_actions();
+        }
+    }
+    
+    async load_actions() {
+        if (!this.report_id) return;
+        
+        try {
+            const result = await window.app.api.post(this.urls.data_api, {
+                model: 'PageAction',
+                operation: 'list',
+                filters: {
+                    report_id: this.report_id
+                },
+                order_by: 'order_index'
+            });
+            
+            if (result.success) {
+                this.actions = result.data || [];
+                this.render_actions();
+            } else {
+                console.error('Failed to load actions:', result.message);
+            }
+        } catch (error) {
+            console.error('Failed to load actions:', error);
+        }
+    }
+    
+    render_actions() {
+        const container = $('#actionsList');
+        
+        if (this.actions.length === 0) {
+            container.html('<div class="text-muted">No actions defined.</div>');
+            return;
+        }
+        
+        const actions_html = this.actions
+            .sort((a, b) => a.order_index - b.order_index)
+            .map((action, index) => this.render_action_item(action, index))
+            .join('');
+            
+        container.html(`<div class="action-items">${actions_html}</div>`);
+        
+        // Make sortable
+        this.init_actions_sortable();
+    }
+    
+    render_action_item(action, index) {
+        const icon_html = action.icon ? `<i class="${action.icon}"></i> ` : '';
+        const color_class = action.color ? `btn-${action.color}` : 'btn-secondary';
+        const mode_badge = `<span class="badge bg-info">${action.mode}</span>`;
+        const type_badge = `<span class="badge bg-secondary">${action.action_type}</span>`;
+        
+        return `
+            <div class="action-item card mb-2" data-action-id="${action.id}" data-index="${index}">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-grip-vertical text-muted me-3 drag-handle" style="cursor: move;"></i>
+                        <div>
+                            <strong>${icon_html}${action.display}</strong>
+                            <div class="small text-muted">
+                                ${action.name} ${mode_badge} ${type_badge}
+                                ${action.action_type !== 'javascript' ? `- ${action.method} ${action.url}` : '- JavaScript'}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="window.reportBuilder.edit_action(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="window.reportBuilder.delete_action(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    init_actions_sortable() {
+        $('.action-items').sortable({
+            handle: '.drag-handle',
+            update: (event, ui) => {
+                this.update_action_order();
+            }
+        });
+    }
+    
+    async update_action_order() {
+        const items = $('.action-item');
+        const order_updates = [];
+        
+        items.each((index, item) => {
+            const action_index = $(item).data('index');
+            this.actions[action_index].order_index = index;
+            order_updates.push({
+                id: this.actions[action_index].id,
+                order_index: index
+            });
+        });
+        
+        // Save order to backend using batch update
+        if (this.report_id && order_updates.length > 0) {
+            try {
+                for (const update of order_updates) {
+                    await window.app.api.post(this.urls.data_api, {
+                        model: 'PageAction',
+                        operation: 'update',
+                        id: update.id,
+                        data: {
+                            order_index: update.order_index
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to update action order:', error);
+            }
+        }
+    }
+    
+    show_add_action() {
+        $('#actionModalTitle').text('Add Action');
+        $('#actionForm')[0].reset();
+        $('#actionId').val('');
+        this.javascript_editor.setValue('');
+        this.javascript_editor.clearHistory();
+        this.toggle_action_fields();
+        $('#actionModal').modal('show');
+    }
+    
+    edit_action(index) {
+        const action = this.actions[index];
+        $('#actionModalTitle').text('Edit Action');
+        $('#actionId').val(action.id || index);
+        
+        // Populate form
+        $('#actionName').val(action.name);
+        $('#actionDisplay').val(action.display);
+        $('#actionMode').val(action.mode || 'row');
+        $('#actionType').val(action.action_type);
+        $('#actionIcon').val(action.icon || '');
+        $('#actionColor').val(action.color || '');
+        
+        // URL fields
+        $('#actionUrl').val(action.url || '');
+        $('#actionUrlFor').val(action.url_for || '');
+        $('#actionMethod').val(action.method || 'GET');
+        $('#actionTarget').val(action.target || '_self');
+        $('#actionHeaders').val(JSON.stringify(action.headers || {}, null, 2));
+        $('#actionPayload').val(JSON.stringify(action.payload || {}, null, 2));
+        
+        // JavaScript
+        this.javascript_editor.setValue(action.javascript_code || '');
+        this.javascript_editor.clearHistory();
+        
+        // Confirmation
+        $('#actionConfirm').prop('checked', action.confirm);
+        $('#actionConfirmMessage').val(action.confirm_message || 'Are you sure you want to perform this action?');
+        
+        this.toggle_action_fields();
+        this.toggle_confirm_message();
+        $('#actionModal').modal('show');
+    }
+    
+    save_action() {
+        const action_id = $('#actionId').val();
+        const is_edit = action_id !== '';
+        
+        // Validate form
+        if (!$('#actionName').val() || !$('#actionDisplay').val()) {
+            this.show_error('Name and Display Text are required');
+            return;
+        }
+        
+        // Validate based on type
+        const action_type = $('#actionType').val();
+        if (action_type !== 'javascript' && !$('#actionUrl').val()) {
+            this.show_error('URL is required for HTMX and API actions');
+            return;
+        }
+        
+        if (action_type === 'javascript' && !this.javascript_editor.getValue().trim()) {
+            this.show_error('JavaScript code is required for JavaScript actions');
+            return;
+        }
+        
+        // Validate JSON fields
+        try {
+            JSON.parse($('#actionHeaders').val());
+            JSON.parse($('#actionPayload').val());
+        } catch (e) {
+            this.show_error('Invalid JSON in Headers or Payload fields');
+            return;
+        }
+        
+        // Build action object
+        const action = {
+            name: $('#actionName').val(),
+            display: $('#actionDisplay').val(),
+            mode: $('#actionMode').val(),
+            action_type: action_type,
+            icon: $('#actionIcon').val(),
+            color: $('#actionColor').val(),
+            url: $('#actionUrl').val(),
+            url_for: $('#actionUrlFor').val(),
+            method: $('#actionMethod').val(),
+            target: $('#actionTarget').val(),
+            headers: JSON.parse($('#actionHeaders').val()),
+            payload: JSON.parse($('#actionPayload').val()),
+            javascript_code: action_type === 'javascript' ? this.javascript_editor.getValue() : null,
+            confirm: $('#actionConfirm').is(':checked'),
+            confirm_message: $('#actionConfirmMessage').val()
+        };
+        
+        if (is_edit) {
+            // Update existing
+            const index = this.actions.findIndex(a => (a.id || this.actions.indexOf(a)) == action_id);
+            if (index !== -1) {
+                action.id = this.actions[index].id;
+                action.order_index = this.actions[index].order_index;
+                this.actions[index] = action;
+            }
+        } else {
+            // Add new
+            action.order_index = this.actions.length;
+            this.actions.push(action);
+        }
+        
+        this.render_actions();
+        $('#actionModal').modal('hide');
+        this.mark_unsaved();
+    }
+    
+    delete_action(index) {
+        if (confirm('Are you sure you want to delete this action?')) {
+            this.actions.splice(index, 1);
+            this.render_actions();
+            this.mark_unsaved();
+        }
+    }
+    
+    toggle_action_fields() {
+        const action_type = $('#actionType').val();
+        
+        if (action_type === 'javascript') {
+            $('#urlSection').hide();
+            $('#javascriptSection').show();
+            $('#actionUrl').prop('required', false);
+        } else {
+            $('#urlSection').show();
+            $('#javascriptSection').hide();
+            $('#actionUrl').prop('required', true);
+        }
+    }
+    
+    toggle_confirm_message() {
+        if ($('#actionConfirm').is(':checked')) {
+            $('#confirmMessageSection').show();
+        } else {
+            $('#confirmMessageSection').hide();
+        }
+    }
+    
+    // ===== END ACTIONS MANAGEMENT =====
+    
+   
+    
+    async save_all_actions() {
+        try {
+            // Delete existing actions first (to handle removals)
+            if (this.report_id) {
+                const existing = await window.app.api.post(this.urls.data_api, {
+                    model: 'PageAction',
+                    operation: 'list',
+                    filters: { report_id: this.report_id }
+                });
+                
+                if (existing.success && existing.data) {
+                    for (const action of existing.data) {
+                        await window.app.api.post(this.urls.data_api, {
+                            model: 'PageAction',
+                            operation: 'delete',
+                            id: action.id
+                        });
+                    }
+                }
+            }
+            
+            // Create all current actions
+            for (const action of this.actions) {
+                const action_data = {
+                    report_id: this.report_id,
+                    name: action.name,
+                    display: action.display,
+                    mode: action.mode,
+                    action_type: action.action_type,
+                    icon: action.icon,
+                    color: action.color,
+                    url: action.url,
+                    url_for: action.url_for,
+                    method: action.method,
+                    target: action.target,
+                    headers: action.headers,
+                    payload: action.payload,
+                    javascript_code: action.javascript_code,
+                    confirm: action.confirm,
+                    confirm_message: action.confirm_message,
+                    order_index: action.order_index
+                };
+                
+                await window.app.api.post(this.urls.data_api, {
+                    model: 'PageAction',
+                    operation: 'create',
+                    data: action_data
+                });
+            }
+        } catch (error) {
+            console.error('Failed to save actions:', error);
+            throw error;
+        }
+    }
+        
+    mark_unsaved() {
+        $('#saveReportBtn').removeClass('btn-success').addClass('btn-warning');
+        $('#saveReportBtn').html('<i class="fas fa-save"></i> Save Changes');
+    }
+
+    async load_models() {
+        try {
+            console.log('Loading models...');
+            
+            const result = await window.app.api.post(this.urls.data_api, {
+                model: 'Model',
+                operation: 'list',
+                order_by: 'name',
+                length:0
+            });
+
+            if (result.success) {
+                this.report_data.models = result.data;
+                const select = $('#reportModel');
+                select.empty().append('<option value="">None - Custom Query</option>');
+
+                console.log('Loaded', result.data.length, 'models');
+
+                result.data.forEach(model => {
+                    // Display model name and optionally table name
+                    const display_text = model.table_name ? `${model.name} (${model.table_name})` : model.name;
+                    select.append(`<option value="${model.id}">${display_text}</option>`);
+                });
+
+                console.log('Models dropdown populated with', $('#reportModel option').length - 1, 'models');
+            }
+        } catch (error) {
+            console.error('Failed to load models:', error);
+            this.show_error('Failed to load models');
+        }
+    }
+    async load_model_query_with_confirmation(model_id) {
+        if (!model_id) return;
+        
+        try {
+            const model_result = await window.app.api.post(this.urls.data_api, {
+                model: 'Model',
+                operation: 'read',
+                id: model_id
+            });
+            
+            if (model_result.success && model_result.data) {
+                const model = model_result.data;
+                let new_query = '';
+                
+                // Build query based on model data
+                if (model.default_query) {
+                    new_query = model.default_query;
+                } else if (model.table_name) {
+                    // Generate a SELECT * query
+                    new_query = `SELECT * FROM ${model.table_name}`;
+                } else {
+                    this.show_error('No query information available for this model');
+                    return;
+                }
+                
+                // Check if there's existing query content
+                const current_query = this.query_editor.getValue().trim();
+                
+                if (current_query && current_query !== 'SELECT * FROM temuragi.public.users') {
+                    // Has meaningful content, ask for confirmation
+                    const message = `Replace current query with model query?\n\nCurrent:\n${current_query.substring(0, 100)}${current_query.length > 100 ? '...' : ''}\n\nNew:\n${new_query.substring(0, 100)}${new_query.length > 100 ? '...' : ''}`;
+                    
+                    if (confirm(message)) {
+                        this.query_editor.setValue(new_query);
+                        this.query_editor.refresh();
+                        
+                        // Auto-detect columns for the new query
+                        if (confirm('Auto-detect columns for this model query?')) {
+                            await this.test_query_with_metadata();
+                        }
+                    } else {
+                        // User cancelled, revert model selection
+                        $('#reportModel').val('');
+                    }
+                } else {
+                    // No meaningful content, just set the query
+                    this.query_editor.setValue(new_query);
+                    this.query_editor.refresh();
+                    
+                    // Auto-detect columns
+                    await this.test_query_with_metadata();
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load model details:', error);
+            this.show_error('Failed to load model query: ' + error.message);
+        }
+    }
+
+    
 }
 
 // Event delegation for dynamically created elements

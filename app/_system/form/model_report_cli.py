@@ -189,12 +189,15 @@ class ModelReportCLI(BaseCLI):
             raise
 
     def generate_query_for_model(self, model_class, include_relationships: bool = True,
-                               relationship_depth: int = 1) -> Dict[str, Any]:
+                            relationship_depth: int = 1, is_model: bool = True) -> Dict[str, Any]:
         """Generate SQL query and metadata for a model"""
         
         # Get table name and columns
         mapper = class_mapper(model_class)
         table_name = mapper.mapped_table.name
+        
+        # Get column to attribute mapping if this is a model-based report
+        column_to_attr = self.get_column_to_attribute_map(mapper) if is_model else {}
         
         # Build column list and metadata
         columns = []
@@ -203,15 +206,19 @@ class ModelReportCLI(BaseCLI):
         # Process regular columns
         for column in mapper.mapped_table.columns:
             col_name = column.name
+            
+            # Use attribute name if this is a model-based report and mapping exists
+            attr_name = column_to_attr.get(col_name, col_name) if is_model else col_name
+            
             columns.append(f"t.{col_name}")
             
             # Determine data type
             data_type = self.get_column_data_type(column)
             
-            # Create column metadata
+            # Create column metadata with attribute name
             col_meta = {
-                'name': col_name,
-                'display_name': col_name.replace('_', ' ').title(),
+                'name': attr_name,  # Use attribute name here
+                'display_name': attr_name.replace('_', ' ').title(),
                 'data_type': data_type,
                 'is_primary_key': bool(column.primary_key),
                 'is_foreign_key': bool(column.foreign_keys),
@@ -220,7 +227,7 @@ class ModelReportCLI(BaseCLI):
             }
             
             # Special handling for certain columns
-            if col_name in ['password', 'password_hash', 'secret', 'token']:
+            if attr_name in ['password', 'password_hash', 'secret', 'token']:
                 col_meta['is_visible'] = False
                 col_meta['is_searchable'] = False
             elif column.primary_key:
@@ -339,7 +346,8 @@ class ModelReportCLI(BaseCLI):
                 raise ValueError(f"Connection '{connection_name}' not found")
             
             # Generate query and metadata
-            query_data = self.generate_query_for_model(model_class, include_relationships)
+            query_data = self.generate_query_for_model(model_class, include_relationships, is_model=is_model)
+
             
             # Get or create Model record if requested
             model_id = None
@@ -650,6 +658,18 @@ class ModelReportCLI(BaseCLI):
             self.output_error(f"Error analyzing model: {e}")
             return 1
 
+    def get_column_to_attribute_map(self, mapper):
+        """Map database column names to class attribute names"""
+        column_to_attr = {}
+        
+        # Iterate through all properties in the mapper
+        for prop in mapper.iterate_properties:
+            if hasattr(prop, 'columns'):
+                # This is a column property
+                for col in prop.columns:
+                    column_to_attr[col.name] = prop.key  # key is the attribute name
+        
+        return column_to_attr
     def close(self):
         """Clean up resources"""
         self.log_debug("Closing model report generator CLI")

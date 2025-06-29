@@ -13,7 +13,7 @@ class AppInitializer {
             login_page_path: urls.login_page_path,
             api_url:urls.api_url
         };
-        
+
         // Self-register
         window.app.register('initializer', this);
         window.showToast = function(message, type = 'info', duration = 3000) {
@@ -24,7 +24,7 @@ class AppInitializer {
                 'warning': 'bg-warning',
                 'info': 'bg-info text-white'
             };
-            
+
             const toast_html = `
                 <div class="toast align-items-center ${type_map[type] || ''} border-0" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="d-flex">
@@ -35,7 +35,7 @@ class AppInitializer {
                     </div>
                 </div>
             `;
-            
+
             // Create container if needed
             let container = document.getElementById('toast-container');
             if (!container) {
@@ -45,21 +45,21 @@ class AppInitializer {
                 container.style.zIndex = '1000';
                 document.body.appendChild(container);
             }
-            
+
             // Add toast to container
             const toast_element = document.createElement('div');
             toast_element.innerHTML = toast_html;
             container.appendChild(toast_element);
-            
+
             // Initialize Bootstrap toast
             const toast = new bootstrap.Toast(toast_element.firstElementChild, {
                 autohide: true,
                 delay: duration
             });
-            
+
             // Show toast
             toast.show();
-            
+
             // Clean up after hidden
             toast_element.firstElementChild.addEventListener('hidden.bs.toast', () => {
                 toast_element.remove();
@@ -69,13 +69,13 @@ class AppInitializer {
 
     async init() {
         console.log('Starting app initialization...');
-        
+
         // Create instances - they self-register to window.app
         new TokenManager();
         new ApiManager();
-        
+
         new AuthManager(window.app.token_manager, window.app.config);
-        
+
         new ConnectionMonitor({
             health_endpoint: window.app.config.health_endpoint,
             check_interval: this.health_check_interval,
@@ -86,6 +86,9 @@ class AppInitializer {
         window.app.connection_monitor.set_token_manager(window.app.token_manager);
         window.app.connection_monitor.set_auth_manager(window.app.auth_manager);
         window.app.auth_manager.set_connection_monitor(window.app.connection_monitor);
+
+        // START THE CONNECTION MONITOR - THIS WAS MISSING!
+        window.app.connection_monitor.start();
 
         // Add convenience methods to window.app
         window.app.logout = () => window.app.auth_manager.logout();
@@ -107,7 +110,7 @@ class AppInitializer {
 
         this.setup_htmx_indicators();
         this.setup_visibility_handler();
-        
+
     }
 
     setup_htmx_indicators() {

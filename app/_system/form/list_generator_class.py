@@ -268,9 +268,9 @@ class ReportDataTableGenerator:
         return filters
 
     def generate_datatable_config(self, report_slug: str,
-                             data_url: Optional[str] = None,
-                             show_actions: bool = False,
-                             custom_actions: Optional[List[Dict]] = None) -> Dict[str, Any]:
+                         data_url: Optional[str] = None,
+                         show_actions: bool = False,
+                         custom_actions: Optional[List[Dict]] = None) -> Dict[str, Any]:
         """
         Generate DataTable configuration from a Report record
 
@@ -296,51 +296,62 @@ class ReportDataTableGenerator:
                 action_config = {
                     'name': action.name,
                     'mode': action.mode or 'row',  # Default to 'row' if not specified
+                    'action_type': action.action_type or 'htmx',  # Include action type
                     'url': action.url or action.url_for,
                     'icon': action.icon,
                     'color': action.color,
                     'title': action.display,
                 }
-                
+
                 # Add confirmation if needed
                 if action.confirm and action.confirm_message:
                     action_config['confirm'] = action.confirm_message
-                
+
                 # Add method if not GET
                 if action.method and action.method != 'GET':
                     action_config['method'] = action.method.lower()
-                
+
                 # Add target if not _self
                 if action.target and action.target != '_self':
                     action_config['target'] = action.target
-                
+
+                # Add javascript code if action type is javascript
+                if action.action_type == 'javascript' and action.javascript_code:
+                    action_config['javascript'] = action.javascript_code
+
+                # Add headers and payload for API actions
+                if action.action_type == 'api':
+                    if action.headers:
+                        action_config['headers'] = action.headers
+                    if action.payload:
+                        action_config['payload'] = action.payload
+
                 actions.append(action_config)
-                self._log(f"Added action: {action.name} (mode: {action.mode})")
-        
+                self._log(f"Added action: {action.name} (mode: {action.mode}, type: {action.action_type})")
+
         # Merge with custom_actions if provided
         if custom_actions:
             self._log(f"Merging {len(custom_actions)} custom actions")
             actions.extend(custom_actions)
 
+        # Rest of the method remains the same...
         # Determine model name and data URL based on report type
         model_name = None
-        actual_data_url = data_url  # Store the passed-in override
-
-        # ... rest of the method continues as before ...
         
+        # Always use miner.data unless explicitly overridden
+        if not data_url:
+            data_url = "{{ url_for('miner.data') }}"
+
         if report.is_model:
             self._log(f"Report {report.slug} is marked as model report", level='info')
             self._log(f"Model ID: {report.model_id}", level='info')
-            
+
             if report.model_id and self.report_service:
                 try:
                     model = self.report_service.get_model(report.model_id)
                     if model:
                         model_name = model.name
                         self._log(f"Found model: {model.name}", level='info')
-                        # For model reports, ALWAYS use url_for pattern unless overridden
-                        if not actual_data_url:
-                            actual_data_url = "{{ url_for('miner.data') }}"
                     else:
                         self._log(f"Model not found for model_id: {report.model_id}", level='error')
                         raise ValueError(f"Model not found for report {report.slug}")
@@ -354,14 +365,9 @@ class ReportDataTableGenerator:
                 self._log(f"Model report {report.slug} has no model_id", level='error')
                 raise ValueError(f"Model report {report.slug} has no model_id")
 
-        # Set defaults for non-model reports
+        # Set model_name for non-model reports
         if not model_name:
             model_name = report.slug
-            if not actual_data_url:
-                actual_data_url = f'/api/report/{report.slug}/data'
-                
-        # Update data_url to use the determined value
-        data_url = actual_data_url
 
         # Build column configurations
         columns = {}
@@ -385,6 +391,7 @@ class ReportDataTableGenerator:
         config = {
             'report_slug': report.slug,
             'report_name': report.name,
+            'report_id': report.id,  # Add report ID
             'model_name': model_name,  # Add this for use in template
             'table_title': report.display or report.name,
             'table_description': report.description or f'Data from {report.name}',
@@ -400,7 +407,7 @@ class ReportDataTableGenerator:
             'category': report.category,
             'tags': report.tags,
             'is_model': report.is_model,
-            'actions': actions,  
+            'actions': actions,
         }
 
         # Add actions if requested
@@ -434,11 +441,12 @@ class ReportDataTableGenerator:
         $(document).ready(function() {{
             // Create report table instance
             window.report_{safe_var_name}_table = new DynamicDataTable('report_table_container', '{config['model_name']}','report_{safe_var_name}_table', '{config['data_url']}', {{
-                table_title: '{config['table_title']}',
-                table_description: '{config['table_description']}',
-                report_slug: '{config['report_slug']}',
-                id: '{config['id']}',
-                responsive: true,
+                    table_title: '{config['table_title']}',
+                    table_description: '{config['table_description']}',
+                    report_slug: '{config['report_slug']}',
+                    report_id: '{config['report_id']}',  // Pass report_id
+                    is_model: {str(config['is_model']).lower()},  // Pass is_model
+                    responsive: true,
                     responsive: {{
                         details: {{
                             type: 'column',  // or 'inline', 'column-control'
@@ -446,14 +454,14 @@ class ReportDataTableGenerator:
                         }}
                     }},
 
-                // Column definitions from report
-                columns: {columns_js},
+                    // Column definitions from report
+                    columns: {columns_js},
 
-                // Report features
-                is_searchable: {str(config['is_searchable']).lower()},
-                is_ajax: {str(config['is_ajax']).lower()},
-                is_download_csv: {str(config['is_download_csv']).lower()},
-                is_download_xlsx: {str(config['is_download_xlsx']).lower()},'''
+                    // Report features
+                    is_searchable: {str(config['is_searchable']).lower()},
+                    is_ajax: {str(config['is_ajax']).lower()},
+                    is_download_csv: {str(config['is_download_csv']).lower()},
+                    is_download_xlsx: {str(config['is_download_xlsx']).lower()},'''
 
         # Handle custom actions more intelligently
         if config.get('actions') is not None:
@@ -461,72 +469,72 @@ class ReportDataTableGenerator:
             actions_js = json.dumps(config['actions'])
             template += f'''
 
-                // Actions from report configuration
-                actions: {actions_js},'''
+                    // Actions from report configuration
+                    actions: {actions_js},'''
         else:
             # No actions at all
             template += f'''
 
-                // No actions configured
-                actions: [],'''
+                    // No actions configured
+                    actions: [],'''
 
 
         if config.get('custom_filters'):
             template += f'''
 
-                // Custom filters from report variables
-                custom_filters: {filters_js},'''
+                    // Custom filters from report variables
+                    custom_filters: {filters_js},'''
 
         if config.get('is_model') and config.get('model_name'):
             # Only add model URLs if we have actions enabled
             if config.get('custom_actions') is None or config.get('custom_actions'):
                 template += f'''
 
-                // Model-based URLs
-                create_url: "{{{{ model_url('{config['model_name']}.create') }}}}",
-                edit_url: "{{{{ model_url('{config['model_name']}.edit') }}}}",'''
+                    // Model-based URLs
+                    create_url: "{{{{ model_url('{config['model_name']}.create') }}}}",
+                    edit_url: "{{{{ model_url('{config['model_name']}.edit') }}}}",'''
 
         template += f'''
 
-                // Additional options
-                pageLength: 25,
-                responsive: true,
-                processing: true,
-                serverSide: {str(config['is_ajax']).lower()},
+                    // Additional options
+                    pageLength: 25,
+                    processing: true,
+                    serverSide: {str(config['is_ajax']).lower()},
 
-                // Custom initialization
-                init_complete: function(table) {{
-                    console.log('Report table initialized: {config['report_slug']}');
+                    // Custom initialization
+                    init_complete: function(table) {{
+                        console.log('Report table initialized: {config['report_slug']}');
 
-                    // Add export buttons if enabled
-                    if ({str(config['is_download_csv']).lower()} || {str(config['is_download_xlsx']).lower()}) {{
-                        const exportButtons = [];
-                        if ({str(config['is_download_csv']).lower()}) {{
-                            exportButtons.push({{
-                                text: '<i class="fas fa-file-csv"></i> CSV',
-                                className: 'btn btn-sm btn-outline-secondary',
-                                action: function() {{
-                                    window.location.href = '{config['data_url']}?format=csv';
-                                }}
+                        // Add export buttons if enabled
+                        if ({str(config['is_download_csv']).lower()} || {str(config['is_download_xlsx']).lower()}) {{
+                            const exportButtons = [];
+                            if ({str(config['is_download_csv']).lower()}) {{
+                                exportButtons.push({{
+                                    text: '<i class="fas fa-file-csv"></i> CSV',
+                                    className: 'btn btn-sm btn-outline-secondary',
+                                    action: function() {{
+                                        window.location.href = '{config['data_url']}?format=csv';
+                                    }}
+                                }});
+                            }}
+                            if ({str(config['is_download_xlsx']).lower()}) {{
+                                exportButtons.push({{
+                                    text: '<i class="fas fa-file-excel"></i> Excel',
+                                    className: 'btn btn-sm btn-outline-secondary',
+                                    action: function() {{
+                                        window.location.href = '{config['data_url']}?format=xlsx';
+                                    }}
+                                }});
+                            }}
+
+                            new $.fn.dataTable.Buttons(table, {{
+                                buttons: exportButtons
                             }});
+                            table.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
                         }}
-                        if ({str(config['is_download_xlsx']).lower()}) {{
-                            exportButtons.push({{
-                                text: '<i class="fas fa-file-excel"></i> Excel',
-                                className: 'btn btn-sm btn-outline-secondary',
-                                action: function() {{
-                                    window.location.href = '{config['data_url']}?format=xlsx';
-                                }}
-                            }});
-                        }}
-
-                        new $.fn.dataTable.Buttons(table, {{
-                            buttons: exportButtons
-                        }});
-                        table.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
                     }}
                 }}
-            }});
+            );
 
             // Initialize the table
             window.report_{safe_var_name}_table.init();

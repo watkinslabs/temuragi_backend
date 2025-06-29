@@ -2,37 +2,59 @@ class DynamicDataTable {
     constructor(container_id, model_name, report_name, api_url, options = {}) {
         this.container_id = container_id;
         this.model_name = model_name;
+        this.report_name = report_name;
         this.options = {
             page_length: 25,
             show_search: true,
             show_column_search: false,  // New option for column filtering
             columns: {},  // Changed from custom_columns
             excluded_columns: ['password_hash', 'created_by', 'updated_by', 'deleted_at'],
-            column_order: [],  // Deprecated - kept for backward compatibility
             actions: [],  // No default actions
             table_title: null,
             table_description: null,
-            api_url: api_url, 
+            api_url: api_url,
+            report_id: null,  // Now properly in options
+            is_model: true,   // Default to true
             ...options
         };
+        
+        // Store these at instance level for easy access
+        this.report_id = this.options.report_id;
+        this.is_model = this.options.is_model;
+        this.api_url = this.options.api_url;
+        if ( this.is_model==false) this.model_name="ReportHandler";
+        
         this.table = null;
         this.metadata = null;
-        this.report_name = report_name;
-        
-        // Handle backward compatibility
-        this._handle_backward_compatibility();
     }
     
-    _handle_backward_compatibility() {
-        // If column_order is provided but columns isn't fully configured
-        if (this.options.column_order.length > 0 && Object.keys(this.options.columns).length === 0) {
-            // Convert old format to new format
-            this.options.column_order.forEach((col, index) => {
-                this.options.columns[col] = {
-                    order: index + 1,
-                    searchable: true  // Default to searchable for backward compatibility
-                };
-            });
+    // Centralized API request method
+    async make_api_request(operation, additional_data = {}) {
+        const base_data = {
+            model: this.model_name,
+            operation: operation
+        };
+        
+        // Always include report_id and is_model if they exist
+        if (this.report_id !== null) {
+            base_data.report_id = this.report_id;
+        }
+        if (this.is_model !== null) {
+            base_data.is_model = this.is_model;
+        }
+        
+        // Merge with any additional data
+        const request_data = {
+            ...base_data,
+            ...additional_data
+        };
+        
+        try {
+            const response = await window.app.api.post(this.api_url, request_data);
+            return response;
+        } catch (error) {
+            console.error(`API request failed for operation '${operation}':`, error);
+            throw error;
         }
     }
     
@@ -40,7 +62,7 @@ class DynamicDataTable {
         // Get columns sorted by order attribute
         return Object.entries(this.options.columns)
             .sort(([a, conf_a], [b, conf_b]) => {
-                return (conf_a.order || 999) - (conf_b.order || 999);
+                return (conf_a.order_index || 999) - (conf_b.order_index || 999);
             })
             .map(([name, config]) => ({ name, ...config }));
     }
@@ -77,20 +99,20 @@ class DynamicDataTable {
         this.build_html();
         
         // Get metadata and initialize table
-        this.get_metadata_and_init();
+        //this.get_metadata_and_init();
+        this.init_datatable();
     }
     
     async get_metadata_and_init() {
         try {
-            const response = await window.app.api.post(this.options.api_url, {
-                model: this.model_name,
-                operation: 'metadata'
-            });
+            const response = await this.make_api_request('metadata');
 
             if (response.success && response.metadata) {
                 this.metadata = response.metadata;
                 this._process_metadata();
                 this.init_datatable();
+            } else {
+                throw new Error(response.error || 'No metadata received');
             }
         } catch (error) {
             console.error('Failed to get metadata:', error);
@@ -128,65 +150,80 @@ class DynamicDataTable {
         const title = this.options.table_title || `${this.model_name} Management`;
         const description = this.options.table_description || `Manage ${this.model_name.toLowerCase()} records`;
         const page_actions = this._get_page_actions();
-        
+    
         let html = `
             <!-- Header -->
-            <div class="row header-bar text-white mb-4">
+            <div class="row mb-4">
                 <div class="col">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h4 class="mb-0 fw-bold">
                                 <i class="fas fa-table me-2"></i>${title}
                             </h4>
-                            <small style="opacity: 0.9;">${description}</small>
+                            <small class="text-body-secondary">${description}</small>
                         </div>
         `;
-        
+    
         // Add page actions if any exist
         if (page_actions.length > 0) {
             html += '<div class="btn-group">';
             page_actions.forEach(action => {
-                html += `
-                    <a class="btn btn-${action.color || 'light'} text-${action.color === 'light' ? 'dark' : 'white'} fw-medium" 
-                        id="${this.model_name.toLowerCase()}_${action.name}_btn"
-                        hx-post="${action.url}"
-                        hx-target="#main-content"
-                        hx-swap="innerHTML"
-                        hx-indicator=".htmx-indicator">
-                        <i class="${action.icon} me-2"></i>${action.title || action.name}
-                    </a>
-                `;
+                const action_type = action.action_type || 'htmx';
+                
+                // Different rendering based on action type
+                if (action_type === 'htmx') {
+                    // Original HTMX button
+                    html += `
+                        <a class="btn btn-${action.color || 'secondary'}"
+                            id="${this.model_name.toLowerCase()}_${action.name}_btn"
+                            hx-post="${action.url}"
+                            hx-target="#main-content"
+                            hx-swap="innerHTML"
+                            hx-indicator=".htmx-indicator">
+                            <i class="${action.icon} me-2"></i>${action.title || action.name}
+                        </a>
+                    `;
+                } else {
+                    // API or JavaScript button - use onclick
+                    html += `
+                        <button class="btn btn-${action.color || 'secondary'}"
+                            id="${this.model_name.toLowerCase()}_${action.name}_btn"
+                            onclick="window.${this.report_name.toLowerCase()}.handle_action('${action.name}', null)">
+                            <i class="${action.icon} me-2"></i>${action.title || action.name}
+                        </button>
+                    `;
+                }
             });
             html += '</div>';
         }
-        
+    
         html += `
                     </div>
                 </div>
             </div>
         `;
-        
+    
         if (this.options.show_search) {
             html += `
             <!-- Search Bar -->
             <div class="row mb-4">
                 <div class="col-md-4">
-                    <input type="text" id="${this.model_name.toLowerCase()}_search" 
+                    <input type="text" id="${this.model_name.toLowerCase()}_search"
                         class="form-control" placeholder="Search ${this.model_name.toLowerCase()}s...">
                 </div>
             </div>
             `;
         }
-        
+    
         html += `
             <!-- Table -->
             <div class="row">
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <table id="${this.model_name.toLowerCase()}_table" 
+                            <table id="${this.model_name.toLowerCase()}_table"
                                 class="table table-hover" style="width:100%">`;
-        
+    
         if (this.options.show_column_search) {
             html += `
                                 <tfoot>
@@ -195,7 +232,7 @@ class DynamicDataTable {
                                     </tr>
                                 </tfoot>`;
         }
-        
+    
         html += `
                             </table>
                         </div>
@@ -203,36 +240,32 @@ class DynamicDataTable {
                 </div>
             </div>
         `;
-        
+    
         container.html(html);
-        
+    
+        // Minimal DataTables-specific styles only
         const style = `
             <style>
-                /* Table container styling */
+                /* DataTables minimum height */
                 #${this.container_id} .dataTables_wrapper {
                     min-height: 400px;
                 }
                 
                 /* Empty row styling */
                 #${this.container_id} tr.empty-row {
-                    height: 53px; /* Match your normal row height */
+                    height: 53px;
                 }
-                
+    
                 #${this.container_id} tr.empty-row:hover {
                     background-color: transparent !important;
                     cursor: default;
                 }
-                
-                #${this.container_id} tr.empty-row td {
-                    border-bottom: 1px solid var(--theme-border-color);
-                    padding: 12px;
-                }
-                
-                /* DataTables v2 Pagination Styling */
+    
+                /* DataTables pagination */
                 #${this.container_id} .dt-paging {
                     margin: 15px 0;
                 }
-                
+    
                 #${this.container_id} .dt-paging nav {
                     display: flex;
                     justify-content: flex-end;
@@ -241,156 +274,75 @@ class DynamicDataTable {
                     gap: 2px;
                 }
                 
+                /* Style DataTables buttons like Bootstrap pagination */
                 #${this.container_id} .dt-paging-button {
-                    color: var(--theme-text);
-                    background-color: var(--theme-background);
-                    border: 1px solid var(--theme-border-color);
+                    position: relative;
+                    display: block;
                     padding: 0.375rem 0.75rem;
-                    margin: 0 1px;
-                    border-radius: var(--theme-button-border-radius);
-                    transition: all var(--theme-transition-duration) var(--theme-animation-easing);
-                    font-size: 0.875rem;
-                    line-height: 1.5;
-                    cursor: pointer;
+                    margin-left: -1px;
+                    line-height: 1.25;
+                    color: var(--bs-link-color);
                     text-decoration: none;
-                    display: inline-block;
+                    background-color: var(--bs-body-bg);
+                    border: 1px solid var(--bs-border-color);
                 }
                 
-                #${this.container_id} .dt-paging-button:hover:not(.disabled) {
-                    color: var(--theme-primary);
-                    background-color: var(--theme-surface);
-                    border-color: var(--theme-primary);
-                    text-decoration: none;
+                #${this.container_id} .dt-paging-button:hover {
+                    z-index: 2;
+                    color: var(--bs-link-hover-color);
+                    background-color: var(--bs-secondary-bg);
+                    border-color: var(--bs-border-color);
+                }
+                
+                #${this.container_id} .dt-paging-button:first-child {
+                    border-top-left-radius: var(--bs-border-radius);
+                    border-bottom-left-radius: var(--bs-border-radius);
+                }
+                
+                #${this.container_id} .dt-paging-button:last-child {
+                    border-top-right-radius: var(--bs-border-radius);
+                    border-bottom-right-radius: var(--bs-border-radius);
                 }
                 
                 #${this.container_id} .dt-paging-button.current {
-                    background-color: var(--theme-primary);
-                    border-color: var(--theme-primary);
-                    color: white;
+                    z-index: 3;
+                    color: var(--bs-pagination-active-color);
+                    background-color: var(--bs-pagination-active-bg);
+                    border-color: var(--bs-pagination-active-border-color);
                 }
                 
                 #${this.container_id} .dt-paging-button.disabled {
-                    color: var(--theme-text-muted);
-                    background-color: var(--theme-background);
-                    border-color: var(--theme-border-color);
-                    cursor: not-allowed;
-                    opacity: 0.65;
+                    color: var(--bs-pagination-disabled-color);
+                    pointer-events: none;
+                    background-color: var(--bs-pagination-disabled-bg);
+                    border-color: var(--bs-pagination-disabled-border-color);
                 }
-                
-                /* Ellipsis styling */
-                #${this.container_id} .dt-paging .ellipsis {
-                    padding: 0 5px;
-                    color: var(--theme-text-muted);
-                }
-                
-                /* Empty table message styling */
-                #${this.container_id} .dataTables_empty {
-                    padding: 80px 20px;
-                    text-align: center;
-                    color: var(--theme-text-muted);
-                    font-size: 1.2rem;
-                    background-color: var(--theme-surface);
-                    border-radius: var(--theme-border-radius);
-                }
-                
-                /* Table styling */
-                #${this.container_id} .table {
-                    margin-bottom: 0;
-                }
-                
-                /* Top controls row styling */
-                #${this.container_id} .dt-container > .row:first-child {
-                    margin-bottom: 15px;
-                    padding-bottom: 15px;
-                    border-bottom: 1px solid var(--theme-border-color);
-                    align-items: center;
-                }
-                
-                /* Bottom info and pagination row */
-                #${this.container_id} .dt-info {
-                    padding-top: 8px;
-                    color: var(--theme-text-muted);
-                    margin-bottom: 10px;
-                }
-                
-                /* Length select styling */
-                #${this.container_id} .dt-length {
-                    display: flex;
-                    align-items: center;
-                }
-                
-                #${this.container_id} .dt-length select {
-                    width: auto;
-                    display: inline-block;
-                    margin: 0 5px;
-                    padding: 0.25rem 0.5rem;
-                    font-size: 0.875rem;
-                    line-height: 1.5;
-                    color: var(--theme-text);
-                    background-color: var(--theme-background);
-                    border: 1px solid var(--theme-border-color);
-                    border-radius: var(--theme-input-border-radius);
-                }
-                
-                #${this.container_id} .dt-length label {
-                    margin-bottom: 0;
-                    display: flex;
-                    align-items: center;
-                    font-size: 0.875rem;
-                    color: var(--theme-text);
-                }
-                
+    
                 /* Fix the NaN button issue */
                 #${this.container_id} .dt-paging-button[data-dt-idx="NaN"] {
                     display: none !important;
                 }
                 
-                /* Processing indicator */
-                #${this.container_id} .dt-processing {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    width: 200px;
-                    margin-left: -100px;
-                    margin-top: -26px;
-                    text-align: center;
-                    padding: var(--theme-spacing-unit);
-                    background-color: var(--theme-background);
-                    border: var(--theme-border-width) solid var(--theme-border-color);
-                    border-radius: var(--theme-border-radius);
-                    box-shadow: var(--theme-shadow-lg);
-                    z-index: 1000;
-                }
-                
-                /* Table row hover */
-                #${this.container_id} .table-hover tbody tr:hover:not(.empty-row) {
-                    background-color: var(--theme-surface);
-                }
-                
-                /* Focus states */
-                #${this.container_id} .dt-paging-button:focus {
-                    outline: none;
-                    box-shadow: 0 0 0 var(--theme-focus-ring-width) var(--theme-focus-ring-color);
-                }
-                
-                #${this.container_id} .dt-length select:focus {
-                    outline: none;
-                    border-color: var(--theme-primary);
-                    box-shadow: 0 0 0 var(--theme-focus-ring-width) var(--theme-focus-ring-color);
+                /* DataTables info text */
+                #${this.container_id} .dt-info {
+                    padding-top: 8px;
                 }
             </style>
         `;
-        
+    
         if (!$(`#${this.container_id}_styles`).length) {
             $('head').append(`<div id="${this.container_id}_styles">${style}</div>`);
         }
-
-        if (typeof htmx !== 'undefined') {
-            // Small delay to ensure DOM is ready
-            setTimeout(() => {
-                console.log('Processing HTMX for table:', this.container_id);
-                htmx.process(container[0]);
-            }, 10);
+    
+        // Only process HTMX for HTMX actions
+        if (page_actions.some(action => (action.action_type || 'htmx') === 'htmx')) {
+            if (typeof htmx !== 'undefined') {
+                // Small delay to ensure DOM is ready
+                setTimeout(() => {
+                    console.log('Processing HTMX for table:', this.container_id);
+                    htmx.process(container[0]);
+                }, 10);
+            }
         }
     }
     
@@ -455,27 +407,22 @@ class DynamicDataTable {
                     // Extract just the column names to return
                     const return_columns = ordered_columns.map(col => col.name);
 
-                    // Build request data
-                    const request_data = {
-                        model: this.model_name,
-                        operation: 'list',
+                    // Build request data using our centralized method
+                    const response = await this.make_api_request('list', {
                         draw: data.draw,
                         start: data.start,
                         length: data.length,
                         search: data.search.value,
                         order: data.order,
-                        columns: all_columns,  // Send ALL columns info
-                        return_columns: return_columns,  // Which columns to return in the data
-                        searchable_columns: searchable_columns  // Which columns to search on
-                    };
+                        columns: all_columns,
+                        return_columns: return_columns,
+                        searchable_columns: searchable_columns
+                    });
 
                     // Debug logging
                     if (data.search.value) {
                         console.log('Search request:', data.search.value, 'on columns:', searchable_columns);
                     }
-
-                    // Use window.app.api instead of jQuery ajax
-                    const response = await window.app.api.post(this.options.api_url, request_data);
 
                     // Process the response
                     if (response.success) {
@@ -763,48 +710,158 @@ class DynamicDataTable {
     handle_action(action_name, id) {
         // Find the action configuration
         const action = this.options.actions.find(a => a.name === action_name);
-        
+    
         if (!action) {
             console.error(`Action '${action_name}' not found in configuration`);
             return;
         }
-        
-        // Check for custom handler first
-        if (action.handler && typeof action.handler === 'function') {
-            action.handler(id);
-            return;
-        }
-        
-        // If action has a URL, use HTMX to trigger it
-        if (action.url) {
-            // Add confirmation for destructive actions
-            if (action.confirm) {
-                if (!confirm(action.confirm)) {
-                    return;
-                }
+    
+        // Add confirmation for any action type if needed
+        if (action.confirm) {
+            if (!confirm(action.confirm)) {
+                return;
             }
+        }
+    
+        // Route based on action type
+        const action_type = action.action_type || 'htmx';  // Default to htmx
+    
+        switch (action_type) {
+            case 'javascript':
+                this.handle_javascript_action(action, id);
+                break;
             
-            this.trigger_htmx_request({
-                url: action.url,
-                data: { id: id },
-                on_success: () => {
-                    if (action.on_success) {
-                        if (typeof action.on_success === 'function') {
-                            action.on_success();
-                        } else if (action.on_success === 'reload') {
-                            this.table.ajax.reload();
-                        }
-                    }
-                },
-                on_error: () => {
-                    if (action.on_error && typeof action.on_error === 'function') {
-                        action.on_error();
-                    }
-                }
-            });
-        } else {
-            console.error(`Action '${action_name}' has no URL or handler defined`);
+            case 'api':
+                this.handle_api_action(action, id);
+                break;
+            
+            case 'htmx':
+            default:
+                this.handle_htmx_action(action, id);
+                break;
         }
     }
     
+    handle_javascript_action(action, id) {
+        // Execute custom JavaScript code
+        if (action.javascript) {
+            try {
+                // Create a function with the code and execute it with context
+                const func = new Function('id', 'row_data', 'table', 'action', action.javascript);
+                
+                // Get the row data if id exists
+                let row_data = null;
+                if (id) {
+                    row_data = this.table.row(`#${id}`).data();
+                }
+                
+                // Execute the function
+                func.call(this, id, row_data, this.table, action);
+            } catch (error) {
+                console.error('Error executing JavaScript action:', error);
+                this.show_notification('Error executing action', 'error');
+            }
+        } else {
+            console.error('JavaScript action has no code defined');
+        }
+    }
+    
+    async handle_api_action(action, id) {
+        if (!action.url) {
+            console.error(`API action '${action.name}' has no URL defined`);
+            return;
+        }
+    
+        try {
+            // For API actions, use a different endpoint - don't use make_api_request
+            // as the action URL might be completely different
+            const request_data = {
+                id: id,
+                model: this.model_name,  // Still include model info
+                ...(action.payload || {})
+            };
+            
+            // Include report_id if it exists
+            if (this.report_id !== null) {
+                request_data.report_id = this.report_id;
+            }
+    
+            // Make the API call
+            const method = (action.method || 'POST').toLowerCase();
+            
+            const response = await window.app.api[method](action.url, request_data, {
+                headers: action.headers || {}
+            });
+            
+            // Handle successful response
+            if (response.success) {
+                // Show success message
+                const message = response.message || `${action.title || action.name} completed successfully`;
+                this.show_notification(message, 'success');
+                
+                // Reload table data if needed
+                if (response.reload_table !== false) {  // Default to reload
+                    this.table.ajax.reload();
+                }
+                
+                // Execute any callback in the response
+                if (response.callback && typeof window[response.callback] === 'function') {
+                    window[response.callback](response);
+                }
+            } else {
+                // Show error message
+                const error_message = response.error || response.message || `${action.title || action.name} failed`;
+                this.show_notification(error_message, 'error');
+            }
+        } catch (error) {
+            console.error('API action failed:', error);
+            this.show_notification(`Failed to execute ${action.title || action.name}`, 'error');
+        }
+    }
+    
+    handle_htmx_action(action, id) {
+        // Original HTMX handling
+        if (!action.url) {
+            console.error(`HTMX action '${action.name}' has no URL defined`);
+            return;
+        }
+    
+        // Build data object including report_id if it exists
+        const htmx_data = { id: id };
+        if (this.report_id !== null) {
+            htmx_data.report_id = this.report_id;
+        }
+    
+        this.trigger_htmx_request({
+            url: action.url,
+            data: htmx_data,
+            method: action.method || 'post',
+            on_success: () => {
+                if (action.on_success) {
+                    if (typeof action.on_success === 'function') {
+                        action.on_success();
+                    } else if (action.on_success === 'reload') {
+                        this.table.ajax.reload();
+                    }
+                }
+            },
+            on_error: () => {
+                if (action.on_error && typeof action.on_error === 'function') {
+                    action.on_error();
+                }
+            }
+        });
+    }
+    
+    // Public method to reload table data
+    reload() {
+        if (this.table) {
+            this.table.ajax.reload();
+        }
+    }
+    
+    // Public method to get selected row data
+    get_selected_rows() {
+        return this.table.rows('.selected').data().toArray();
+    }
 }

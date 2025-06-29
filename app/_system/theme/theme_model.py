@@ -56,6 +56,13 @@ class Theme(BaseModel):
     text_muted_color = Column(String(50), nullable=False, default='#6c757d',
                              comment="Secondary text color (hex)")
     
+
+
+    component_color = Column(String(50), nullable=False, default='#6c757d',comment="Secondary text color (hex)")
+    sidebar_color = Column(String(50), nullable=False, default='#6c757d',comment="Secondary text color (hex)")
+    content_area_color = Column(String(50), nullable=False, default='#6c757d',comment="Secondary text color (hex)")
+    
+    
     # Dark Mode Colors
     primary_color_dark = Column(String(50), nullable=True, default='#0d6efd',
                                comment="Dark mode main brand color (hex)")
@@ -79,7 +86,11 @@ class Theme(BaseModel):
                                   comment="Dark mode secondary text color (hex)")
     border_color_dark = Column(String(50), nullable=True, default='#333333',
                               comment="Dark mode border color (hex)")
-    
+    component_color_dark = Column(String(50), nullable=False, default='#6c757d',comment="Secondary text color (hex)")
+    sidebar_color_dark = Column(String(50), nullable=False, default='#6c757d',comment="Secondary text color (hex)")
+    content_area_color_dark = Column(String(50), nullable=False, default='#6c757d',comment="Secondary text color (hex)")
+
+
     # Typography
     font_family_primary = Column(String(500), nullable=False, 
                                 default='system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
@@ -160,6 +171,10 @@ class Theme(BaseModel):
     sidebar_width = Column(String(50), nullable=False, default='280px',
                           comment="Sidebar width when expanded")
     footer_height = Column(String(50), nullable=False, default='60px',
+                          comment="Footer height")
+    topbar_height = Column(String(50), nullable=False, default='60px',
+                          comment="Footer height")
+    breadcrumb_height = Column(String(50), nullable=False, default='60px',
                           comment="Footer height")
     
     # System & Metadata

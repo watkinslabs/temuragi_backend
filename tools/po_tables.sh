@@ -7,32 +7,37 @@ DSN='DSN=mssql-dev;UID=webuser;PWD=!w21eb1;'
 CONN='PR_MSSQL'
 OUTPUT='app/user/'
 
-# Just paste your list here - format: "DATABASE TABLE OPTIONS"
+#    "JADVDATA locations s l"
+#    "JADVDATA po_log s l"
+#    "JADVDATA po_lock s l"
+#    "GPACIFIC BKAPHPOL s l -S BKAPPOL"
+#    "GPACIFIC BKAPHPO s l -S BKAPPO"
+#    "GPACIFIC _po_details n l"
+#    "GPACIFIC BKAPPO s l"
+#    "GPACIFIC BKAPPOL s l"
+#    "GPACIFIC BKPOERD s l"
+#    "GPACIFIC BKGLCOA s l -S BKGL"
+#    "GPACIFIC BKICLOC s l"
+#    "GPACIFIC BKSYMSTR s l -S BKSY"
+#    "GPACIFIC BKGLCOA s l"    
+#    "GCANADA BKAPHPO s l -S BKAPPO"
+#    "GCANADA BKAPHPOL s l -S BKAPPOL"
+#    "GCANADA _po_details n l"
+#    "GCANADA BKAPPO s l"
+#    "GCANADA BKAPPOL s l"
+#    "GCANADA BKGLCOA s l -S BKGL"
+#    "GCANADA BKICLOC s l"
+#    "GCANADA BKPOERD s l"
+#    "GCANADA BKSYMSTR s l  -S BKSY"
+#    
 
 
 TABLES=(
-    "JADVDATA locations s l"
-    "JADVDATA po_log s l"
-    "JADVDATA po_lock s l"
-    "GPACIFIC BKAPHPOL s l -S BKAPPOL"
-    "GPACIFIC BKAPHPO s l -S BKAPPO"
-    "GPACIFIC _po_details n l"
-    "GPACIFIC BKAPPO s l"
-    "GPACIFIC BKAPPOL s l"
-    "GPACIFIC BKPOERD s l"
-    "GPACIFIC BKGLCOA s l -S BKGL"
-    "GPACIFIC BKICLOC s l"
-    "GPACIFIC BKSYMSTR s l -S BKSY"
-    "GPACIFIC BKGLCOA s l"    
-    "GCANADA BKAPHPO s l -S BKAPPO"
-    "GCANADA BKAPHPOL s l -S BKAPPOL"
-    "GCANADA _po_details n l"
-    "GCANADA BKAPPO s l"
-    "GCANADA BKAPPOL s l"
-    "GCANADA BKGLCOA s l -S BKGL"
-    "GCANADA BKICLOC s l"
-    "GCANADA BKPOERD s l"
-    "GCANADA BKSYMSTR s l  -S BKSY"
+    PartsTrader orders
+    PartsTrader parked_orders
+    PartsTrader parked_order_parts
+    PartsTrader repairers
+    PartsTrader requesters
     
 )
 

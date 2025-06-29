@@ -9,9 +9,11 @@ function toggle_theme() {
 
     if (toggle.checked) {
         html.setAttribute('data-theme', 'dark');
+        html.setAttribute('data-bs-theme', 'dark'); // Bootstrap 5.3+ dark mode
         localStorage.setItem('theme_preference', 'dark');
     } else {
         html.setAttribute('data-theme', 'light');
+        html.setAttribute('data-bs-theme', 'light'); // Bootstrap 5.3+ light mode
         localStorage.setItem('theme_preference', 'light');
     }
 }
@@ -29,6 +31,7 @@ function apply_theme(theme) {
     const toggle = document.getElementById('dark_mode_toggle');
     
     html.setAttribute('data-theme', theme);
+    html.setAttribute('data-bs-theme', theme); // Bootstrap 5.3+ theme
     if (toggle) {
         toggle.checked = theme === 'dark';
     }
@@ -56,4 +59,3 @@ document.addEventListener('click', function(event) {
         dropdown.classList.remove('show');
     }
 });
-

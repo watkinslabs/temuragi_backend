@@ -152,6 +152,7 @@ class ReportQueryExecutor:
     GENERATORS = {
         'mssql': MSSQLQueryGenerator,
         'postgresql': PostgreSQLQueryGenerator,
+        'postgres': PostgreSQLQueryGenerator,
         'mysql': MySQLQueryGenerator,
     }
     
@@ -170,89 +171,105 @@ class ReportQueryExecutor:
         start = int(request_data.get('start', 0))
         length = int(request_data.get('length', 10))
         search_value = request_data.get('search[value]', '')
-        
+
         # Extract column ordering
         order_column_idx = request_data.get('order[0][column]')
         order_dir = request_data.get('order[0][dir]', 'asc').upper()
-        
+
         # Extract column information
         columns_data = {}
         column_search = {}
-        
+
         for key in request_data:
             if key.startswith('columns[') and key.endswith('][data]'):
                 idx = key[8:key.find(']')]
                 columns_data[idx] = request_data[key]
-                
+
                 search_key = f'columns[{idx}][search][value]'
                 if search_key in request_data and request_data[search_key]:
                     column_search[idx] = request_data[search_key]
-        
+
         # Extract variables
         vars_form = {}
         for key in request_data:
             if key.startswith('vars['):
                 var_name = key[5:-1]
                 vars_form[var_name] = request_data[key]
-        
-        # Get column names from report
-        column_names = [col.get('name') for col in report.columns if col.get('name')]
-        
+
+        # Get column names from report - FIX HERE
+        column_names = [col.name for col in report.columns if col.name]
+
         # Build ORDER BY clause
         order_by = ""
         if order_column_idx is not None and column_names:
             order_column = columns_data.get(order_column_idx, column_names[0])
+        else:
+            # No explicit order specified - find default sort column
+            default_sort_column = None
+            for col in report.columns:
+                if col.name and hasattr(col, 'is_default_sort') and col.is_default_sort:
+                    default_sort_column = col.name
+                    break
+            
+            # Use default sort column if found, otherwise first column
+            order_column = default_sort_column if default_sort_column else column_names[0]
+            order_dir = 'ASC'  # Default direction when no order specified
+
+        # Always build ORDER BY since ROW_NUMBER() requires it
+        if order_column:
             if self.db_type == 'mssql':
                 order_by = f"ORDER BY [{order_column}] {order_dir}"
-            elif self.db_type == 'postgresql':
+            elif self.db_type in ('postgresql', 'postgres'):
                 order_by = f'ORDER BY "{order_column}" {order_dir}'
             else:  # mysql
                 order_by = f"ORDER BY `{order_column}` {order_dir}"
-        
+
         # Process base query
         base_query = report.query.strip().rstrip(';')
         base_query = self.generator.process_variables(base_query, vars_form)
-        
+
         # Build filter conditions
         filters = self.generator.build_filter_conditions(
             column_names, column_search, search_value
         )
-        
+
         try:
             # Build and execute paginated query
             paginated_query = self.generator.build_paginated_query(
                 base_query, column_names, filters, order_by, length, start
             )
-            
+
             results = db_session.execute(text(paginated_query), vars_form).fetchall()
-            
+
             # Convert results to list of dicts
             data_rows = []
             for row in results:
                 data_rows.append(dict(row._mapping))
-            
+
             # Get total count
             count_query = self.generator.build_count_query(base_query)
             count_result = db_session.execute(text(count_query), vars_form).fetchone()
             total_rows = count_result.count if count_result else 0
-            
+
             # Get filtered count
             filtered_count = total_rows
             if filters:
                 filtered_query = self.generator.build_count_query(base_query, filters)
                 filtered_result = db_session.execute(text(filtered_query), vars_form).fetchone()
                 filtered_count = filtered_result.count if filtered_result else 0
-            
+
             return {
+                "success": True,
                 "draw": draw,
                 "recordsTotal": total_rows,
                 "recordsFiltered": filtered_count,
                 "data": data_rows,
                 "headers": column_names
             }
-            
+
         except Exception as e:
             return {
+                "success": False,
                 "draw": draw,
                 "recordsTotal": 0,
                 "recordsFiltered": 0,
@@ -284,4 +301,9 @@ class ReportQueryExecutor:
             return columns
         except Exception as e:
             raise Exception(f"Query test failed: {str(e)}")
+
+
+
+
+
 
