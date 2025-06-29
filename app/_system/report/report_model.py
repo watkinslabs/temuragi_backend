@@ -18,7 +18,7 @@ class Report(BaseModel):
         'Permission',
         'RolePermission',
         'User',
-        'Model'
+        'Model',
     ]    
     # Core fields
     slug = Column(String(255), nullable=False, unique=True)  # Immutable identifier for permissions
@@ -97,8 +97,7 @@ class Report(BaseModel):
     model = relationship("Model", foreign_keys=[model_id])
 
     
-   
-        
+    
     report_template_id = Column(
         PG_UUID(as_uuid=True),
         ForeignKey('report_templates.id', ondelete='SET NULL'),
@@ -106,6 +105,14 @@ class Report(BaseModel):
     )
 
     report_template = relationship("ReportTemplate", foreign_keys=[report_template_id])
+    
+    page_actions = relationship(
+        "PageAction",
+        back_populates="report",
+        cascade="all, delete-orphan",
+        order_by="PageAction.order_index"
+    )
+        
     # Indexes
     __table_args__ = (
         Index('idx_report_slug', 'slug'),
@@ -156,7 +163,7 @@ class Report(BaseModel):
         
         return slug
     
-    @validates('slug')
+    #@validates('slug')
     def validate_slug(self, key, slug):
         """Validate slug format and prevent changes after creation"""
         if not slug:
@@ -612,7 +619,7 @@ class Report(BaseModel):
             query=self.query,
             description=self.description,
             connection_id=self.connection_id,
-            model_id=self.model_id,  # Add this to copy the model association
+            model_id=self.model_id,
             category=self.category,
             tags=self.tags.copy() if self.tags else [],
             icon=self.icon,
@@ -625,14 +632,14 @@ class Report(BaseModel):
             is_published=False,  # New reports start as draft
             is_download_csv=self.is_download_csv,
             is_download_xlsx=self.is_download_xlsx,
-            is_model=self.is_model,  # Add this
+            is_model=self.is_model,
             options=self.options.copy() if self.options else self.get_default_options()
         )
 
         session.add(new_report)
         session.flush()
 
-        from app.models import ReportColumn, ReportVariable
+        from app.models import ReportColumn, ReportVariable, PageAction
 
         # Copy columns
         for col in self.columns:
@@ -654,7 +661,7 @@ class Report(BaseModel):
                 validation_message=col.validation_message
             )
             session.add(new_col)
-        
+
         # Copy variables
         for var in self.variables:
             new_var = ReportVariable(
@@ -673,14 +680,34 @@ class Report(BaseModel):
                 order_index=var.order_index
             )
             session.add(new_var)
-        
+
+        # Copy page actions
+        for action in self.page_actions:
+            new_action = PageAction(
+                report_id=new_report.id,
+                name=action.name,
+                icon=action.icon,
+                color=action.color,
+                title=action.title,
+                url=action.url,
+                url_for=action.url_for,
+                method=action.method,
+                target=action.target,
+                headers=action.headers.copy() if action.headers else {},
+                payload=action.payload.copy() if action.payload else {},
+                confirm=action.confirm,
+                confirm_message=action.confirm_message,
+                order_index=action.order_index
+            )
+            session.add(new_action)
+
         session.commit()
-        
+
         # Create permissions
         new_report.create_permissions(session)
         new_report.permissions_created = True
         session.commit()
-        
+
         return new_report, "Report duplicated successfully"
     
     def publish(self, session):

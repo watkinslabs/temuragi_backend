@@ -4,7 +4,9 @@ import traceback
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy import or_,  desc, asc, func
-from flask import request, jsonify, g
+from flask import request, g
+from app.utils import jsonify
+
 
 from app.register.classes import get_model
 
@@ -28,16 +30,66 @@ class MinerPermissionError(MinerError):
     def __init__(self, message, permission_required=None):
         super().__init__(message, "PermissionError", 403, {'permission_required': permission_required})
 
+class DataBrokerError(MinerError):
+    """Data broker specific errors"""
+    __depends_on__ = []
+
+    def __init__(self, message, handler_class=None, operation=None):
+        details = {}
+        if handler_class:
+            details['handler_class'] = handler_class
+        if operation:
+            details['operation'] = operation
+        super().__init__(message, "DataBrokerError", 400, details)
+
+class BaseDataHandler:
+    """Base class for specialized data handlers"""
+    
+    def __init__(self, session, auth_context, logger=None):
+        self.session = session
+        self.auth_context = auth_context
+        self.logger = logger
+        self.user_id = auth_context.get('user_id') if auth_context else None
+    
+    def handle_create(self, data):
+        """Override in subclass"""
+        raise NotImplementedError("Subclass must implement handle_create")
+    
+    def handle_update(self, data):
+        """Override in subclass"""
+        raise NotImplementedError("Subclass must implement handle_update")
+    
+    def handle_metadata(self, data):
+        """Override in subclass"""
+        raise NotImplementedError("Subclass must implement handle_metadata")
+    
+    def handle_process(self, data):
+        """Override in subclass for custom processing"""
+        raise NotImplementedError("Subclass must implement handle_process")
+    
+    def handle_batch_create(self, data_list):
+        """Handle batch creation"""
+        results = []
+        for data in data_list:
+            results.append(self.handle_create(data))
+        return results
+    
+    def handle_validate(self, data):
+        """Validate data without saving"""
+        raise NotImplementedError("Subclass must implement handle_validate")
+
 
 class Miner:
     """
     Enhanced Data API handler with RBAC, logging, audit trails, and slim output
+    Now includes data broker functionality for delegating to specialized handlers
     """
-    __depends_on__ = [ 'MinerError', 'MinerPermissionError', 'RbacPermissionChecker']
+    __depends_on__ = ['MinerError', 'MinerPermissionError', 'DataBrokerError', 'RbacPermissionChecker']
 
     def __init__(self, app=None):
         self.app = app
         self.logger = None
+        self.data_handlers = {}  # Registry for specialized data handlers
         if app:
             self.init_app(app)
 
@@ -47,7 +99,158 @@ class Miner:
         self.logger = app.logger
         app.miner = self
 
+    def register_data_handler(self, model_name, handler_class):
+        """
+        Register a specialized handler for a specific model
+        
+        Args:
+            model_name: Name of the model (e.g., 'PurchaseOrder')
+            handler_class: Class that will handle operations for this model
+        """
+        self.data_handlers[model_name] = handler_class
+        if self.logger:
+            self.logger.info(f"Registered data handler {handler_class.__name__} for model {model_name}")
 
+    def broker_data(self, model_name, operation, data=None, context=None):
+        """
+        Broker data to a specialized handler class
+        
+        Args:
+            model_name: Name of the model to handle
+            operation: Operation to perform ('create', 'update', 'metadata', 'process', etc.)
+            data: Data to process (single object or dict of objects)
+            context: Additional context (user info, permissions, etc.)
+            
+        Returns:
+            Result from the handler
+        """
+        start_time = time.time()
+        self.logger.info(f"In Miner Data API Service processor {model_name}")
+
+        
+        # Get the handler for this model
+        handler_class = self.data_handlers.get(model_name)
+        if not handler_class:
+            # Fall back to standard Miner processing
+            return self._process_standard_operation(model_name, operation, data, context)
+        
+        try:
+            # Initialize handler with context
+            handler = handler_class(
+                session=g.session,
+                auth_context=context or g.auth_context,
+                logger=self.logger
+            )
+            
+            # Determine which method to call on the handler
+            method_map = {
+                'create': 'handle_create',
+                'update': 'handle_update',
+                'delete': 'handle_delete',
+                'metadata': 'handle_metadata',
+                'process': 'handle_process',
+                'batch_create': 'handle_batch_create',
+                'batch_update': 'handle_batch_update',
+                'validate': 'handle_validate',
+                'transform': 'handle_transform',
+                'import': 'handle_import',
+                'export': 'handle_export'
+            }
+            
+            method_name = method_map.get(operation)
+            # Direct debugging
+            self.logger.debug(f"Testing method access for '{method_name}':")
+            self.logger.debug(f"  method_name type: {type(method_name)}")
+            self.logger.debug(f"  method_name repr: {repr(method_name)}")
+
+            # Test different ways of checking
+            try:
+                # Direct getattr
+                method = getattr(handler, method_name, None)
+                self.logger.debug(f"  getattr returned: {method}")
+                self.logger.debug(f"  method is None: {method is None}")
+                self.logger.debug(f"  method is callable: {callable(method) if method else False}")
+            except Exception as e:
+                self.logger.debug(f"  getattr raised: {type(e).__name__}: {e}")
+
+            # Check hasattr explicitly
+            has_attr_result = hasattr(handler, method_name)
+            self.logger.debug(f"  hasattr result: {has_attr_result}")
+
+            # The original check that's failing
+            if not method_name or not hasattr(handler, method_name):
+                self.logger.debug(f"FAILING: method_name={repr(method_name)}, hasattr={hasattr(handler, method_name)}")
+                raise DataBrokerError(
+                    f"Handler {handler_class.__name__} does not support operation '{operation}'",
+                    handler_class=handler_class.__name__,
+                    operation=operation
+                )
+            # Call the handler method
+            method = getattr(handler, method_name)
+            result = method(data)
+            
+            # Log successful operation
+            response_time_ms = int((time.time() - start_time) * 1000)
+            self.logger.info(
+                f"Data broker: {handler_class.__name__}.{method_name} completed in {response_time_ms}ms"
+            )
+            
+            return result
+            
+        except Exception as e:
+            # Log error and re-raise
+            self.logger.error(
+                f"Data broker error: {handler_class.__name__} failed on {operation}: {str(e)}"
+            )
+            raise
+
+    def broker_batch_data(self, operations):
+        """
+        Process multiple operations in a batch
+        
+        Args:
+            operations: List of operation dicts, each containing:
+                - model_name: Name of the model
+                - operation: Operation to perform
+                - data: Data for the operation
+                - context: Optional context override
+                
+        Returns:
+            List of results in the same order as operations
+        """
+        results = []
+        errors = []
+        
+        for idx, op in enumerate(operations):
+            try:
+                result = self.broker_data(
+                    model_name=op.get('model_name'),
+                    operation=op.get('operation'),
+                    data=op.get('data'),
+                    context=op.get('context')
+                )
+                results.append({
+                    'index': idx,
+                    'success': True,
+                    'result': result
+                })
+            except Exception as e:
+                error_detail = {
+                    'index': idx,
+                    'success': False,
+                    'error': str(e),
+                    'error_type': type(e).__name__
+                }
+                errors.append(error_detail)
+                results.append(error_detail)
+        
+        return {
+            'results': results,
+            'errors': errors,
+            'total': len(operations),
+            'successful': len(operations) - len(errors),
+            'failed': len(errors)
+        }
 
     def data_endpoint(self):
         """Single POST endpoint for all model operations with full RBAC and logging"""
@@ -58,9 +261,8 @@ class Miner:
             'request_method': request.method,
             'endpoint': request.endpoint or '/api/data'
         }
-        
-        try:
 
+        try:
             # Authenticate via token
             auth_token = request.headers.get('Authorization')
             if not auth_token:
@@ -94,6 +296,10 @@ class Miner:
             if not data:
                 raise MinerError('Invalid JSON payload', 'ValidationError', 400)
 
+            # Check if this is a batch operation
+            if data.get('batch'):
+                return self._handle_batch_endpoint(data.get('operations', []), audit_data)
+
             # Validate required fields
             model_name = data.get('model')
             operation = data.get('operation').lower()
@@ -101,7 +307,19 @@ class Miner:
             if not model_name or not operation:
                 raise MinerError('model and operation are required', 'ValidationError', 400)
 
-            if operation not in ['read', 'create', 'update', 'delete', 'list', 'count','metadata','form_metadata']:
+            # Check if we should broker to a specialized handler
+            if model_name in self.data_handlers:
+                # Let the broker handle permission checking internally
+                result = self.broker_data(
+                    model_name=model_name,
+                    operation=operation,
+                    data=data,
+                    context=g.auth_context
+                )
+                return jsonify(result)
+
+            # Standard operations continue as before
+            if operation not in ['read', 'create', 'update', 'delete', 'list', 'count', 'metadata', 'form_metadata']:
                 raise MinerError(f'Invalid operation: {operation}', 'ValidationError', 400)
 
             # Update audit data
@@ -117,7 +335,7 @@ class Miner:
             if not model_class:
                 raise MinerError(f'Model {model_name} not found', 'ValidationError', 404)
 
-            # Check RBAC permissions (this will automatically audit the permission check)
+            # Check RBAC permissions
             permission_required = self._get_required_permission(model_class, operation, data)
             self._check_permission(permission_required, model_class, operation, data)
 
@@ -137,12 +355,12 @@ class Miner:
             elif operation == 'metadata':
                 result = self.handle_metadata(model_class, data, audit_data)
             elif operation == 'form_metadata':
-                result = self.handle_form_metadata(model_class, data, audit_data)                
+                result = self.handle_form_metadata(model_class, data, audit_data)
 
             # Calculate response time
             response_time_ms = int((time.time() - start_time) * 1000)
-            
-            # Log successful operation (simplified since RBAC already audited permission)
+
+            # Log successful operation
             self.logger.info(f"API {operation} {model_name} - User: {audit_data.get('user_id')} - Time: {response_time_ms}ms")
 
             return result
@@ -153,6 +371,58 @@ class Miner:
             return self._handle_error(MinerError('Database error', 'DatabaseError', 500, {'original_error': str(e)}), audit_data, start_time)
         except Exception as e:
             return self._handle_error(MinerError('Internal server error', 'SystemError', 500, {'original_error': str(e)}), audit_data, start_time)
+
+    def _handle_batch_endpoint(self, operations, audit_data):
+        """Handle batch operations through the endpoint"""
+        result = self.broker_batch_data(operations)
+        
+        # Log batch operation
+        self.logger.info(
+            f"Batch operation - User: {audit_data.get('user_id')} - "
+            f"Total: {result['total']}, Success: {result['successful']}, Failed: {result['failed']}"
+        )
+        
+        return jsonify(result)
+
+    def _process_standard_operation(self, model_name, operation, data, context):
+        """Fallback to standard Miner processing when no handler is registered"""
+        # This allows the broker to work even for models without specialized handlers
+        request_data = {
+            'model': model_name,
+            'operation': operation
+        }
+        
+        if data:
+            if operation in ['create', 'update']:
+                request_data['data'] = data
+            elif operation in ['read', 'delete']:
+                request_data['id'] = data.get('id') if isinstance(data, dict) else data
+            else:
+                request_data.update(data if isinstance(data, dict) else {})
+        
+        # Get model class
+        model_class = get_model(model_name)
+        if not model_class:
+            raise MinerError(f'Model {model_name} not found', 'ValidationError', 404)
+        
+        # Check permissions
+        permission_required = self._get_required_permission(model_class, operation, request_data)
+        self._check_permission(permission_required, model_class, operation, request_data)
+        
+        # Execute operation
+        audit_data = {}
+        if operation == 'read':
+            return self.handle_read(model_class, request_data, audit_data)
+        elif operation == 'create':
+            return self.handle_create(model_class, request_data, audit_data)
+        elif operation == 'update':
+            return self.handle_update(model_class, request_data, audit_data)
+        elif operation == 'delete':
+            return self.handle_delete(model_class, request_data, audit_data)
+        elif operation == 'metadata':
+            return self.handle_metadata(model_class, request_data, audit_data)
+        else:
+            raise MinerError(f'Operation {operation} not supported in standard processing', 'ValidationError', 400)
 
     def _get_required_permission(self, model_class, operation, data):
         """Determine required permission for operation"""
@@ -534,7 +804,6 @@ class Miner:
 
         return jsonify(response)
 
-
     def handle_delete(self, model_class, data, audit_data):
         """Handle delete operations"""
         record_id = data.get('id')
@@ -662,6 +931,7 @@ class Miner:
             response['metadata'] = self._get_model_metadata(model_class)
         
         return jsonify(response)
+    
     def handle_count(self, model_class, data, audit_data):
         """Handle count operations with optional filtering"""
         filters = data.get('filters', {})
@@ -934,6 +1204,7 @@ class Miner:
                 pass
         
         return False
+    
     def _apply_sorting(self, query, model_class, sort_by, sort_order):
         """Apply sorting to query"""
         if not hasattr(model_class, sort_by):
@@ -1243,6 +1514,7 @@ class Miner:
                 rules[column.name] = col_rules
         
         return rules
+
     def _get_form_display_config(self, model_class):
         """Get form display configuration"""
         # Define fields to exclude from forms

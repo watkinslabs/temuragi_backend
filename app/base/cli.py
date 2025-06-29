@@ -110,7 +110,7 @@ class BaseCLI:
         log_file = log_file or config.get('LOG_FILE', f'logs/{self.name}_cli.log')
         max_bytes = 10485760
         backup_count = 5
-
+        
         # Configure logging format (same as register_logger)
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
@@ -132,6 +132,8 @@ class BaseCLI:
         self.logger = logging.getLogger(f'cli_{self.name}')
         self.logger.handlers.clear()
         self.logger.addHandler(file_handler)
+
+        self.app.logger=self.logger
 
         # Add console handler if requested
         if self.console_logging:

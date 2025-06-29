@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Forms CLI - Test Miner's form_metadata function
+Enhanced with custom actions support for list generators
 """
 
 import sys
@@ -56,12 +57,189 @@ class FormsCLI(BaseCLI):
             raise RuntimeError("Miner class not found in registry")
         self.miner = Miner(self.app)
 
-    def test_form_metadata(self, model_name, generate_html=False, output_file=None, 
-                          create_page=False, prefix="", raw_form=False, debug=False, 
+    def parse_custom_actions(self, actions_str):
+        """
+        Parse custom actions from CLI input
+        
+        Format examples:
+        - "none" or "no" -> no actions
+        - "edit,delete" -> simple actions
+        - "edit:url=/custom/edit,delete,create:url=/custom/create:icon=fa-plus"
+        
+        Returns list of action dicts or None
+        """
+        if not actions_str:
+            return None
+            
+        # Handle special cases
+        if actions_str.lower() in ['none', 'no', 'false']:
+            return []
+            
+        # Parse actions
+        actions = []
+        action_parts = actions_str.split(',')
+        
+        for part in action_parts:
+            if ':' in part:
+                # Complex action with properties
+                action_config = {}
+                sub_parts = part.split(':')
+                action_config['name'] = sub_parts[0].strip()
+                
+                # Parse properties
+                for prop in sub_parts[1:]:
+                    if '=' in prop:
+                        key, value = prop.split('=', 1)
+                        action_config[key.strip()] = value.strip()
+                
+                actions.append(action_config)
+            else:
+                # Simple action name
+                actions.append(part.strip())
+                
+        return actions
+
+    def create_report_datatable_page_with_actions(self, report_slug, actions=None,
+                                              data_url=None, show_actions=None):
+        """Create a page with the DataTable template for a report with custom actions"""
+
+        from .list_generator_class import ReportDataTableGenerator
+        from app.models import Page, PageFragment, Template
+        import hashlib
+        from datetime import datetime
+
+        try:
+            # Generate the DataTable template string
+            generator = ReportDataTableGenerator(self.session, self.logger)
+
+            # Load report to get info
+            report = generator.load_report_by_slug(report_slug)
+
+            # Generate config - page_actions will be fetched automatically
+            config = generator.generate_datatable_config(
+                report_slug,
+                data_url=data_url
+            )
+
+            # Generate the template HTML
+            template_html = generator.generate_jinja_template(
+                report_slug,
+                data_url=data_url
+            )
+
+            # Create page directly
+            page_slug = f"f/{report_slug}"
+
+            # Check if page exists
+            existing_page = self.session.query(Page).filter_by(slug=page_slug).first()
+
+            if existing_page:
+                self.output_warning(f"Page already exists at /{page_slug}")
+
+                # Update the fragment
+                fragment = self.session.query(PageFragment).filter_by(
+                    page_id=existing_page.id,
+                    fragment_key='main_content',
+                    is_active=True
+                ).first()
+
+                if fragment:
+                    fragment.content_source = template_html
+                    fragment.content_hash = hashlib.sha256(template_html.encode('utf-8')).hexdigest()
+                    fragment.updated_at = datetime.utcnow()
+                    self.session.commit()
+                    self.output_success(f"Updated page fragment for /{page_slug}")
+                    
+                    # Show action summary
+                    if config.get('actions'):
+                        action_summary = []
+                        page_actions = [a for a in config['actions'] if a.get('mode') == 'page']
+                        row_actions = [a for a in config['actions'] if a.get('mode') != 'page']
+                        
+                        if page_actions:
+                            action_summary.append(f"{len(page_actions)} page actions")
+                        if row_actions:
+                            action_summary.append(f"{len(row_actions)} row actions")
+                        
+                        if action_summary:
+                            self.output_info(f"Actions configured: {', '.join(action_summary)}")
+                            for action in config['actions']:
+                                self.output_info(f"  - {action['name']} ({action.get('mode', 'row')}): {action.get('title', action['name'])}")
+                    else:
+                        self.output_info("No actions configured")
+                else:
+                    self.output_error("No active fragment found to update")
+                    return 1
+            else:
+                # Get default template
+                template = self.session.query(Template).first()
+                if not template:
+                    self.output_error("No templates found in database")
+                    return 1
+
+                # Create new page
+                page = Page(
+                    name=f"{report.name} Report",
+                    title=report.display or report.name,
+                    slug=page_slug,
+                    template_id=template.id,
+                    meta_description=report.description or f"View {report.name} data",
+                    published=True,
+                    requires_auth=True,
+                    cache_duration=0,
+                    sort_order=999
+                )
+
+                self.session.add(page)
+                self.session.flush()
+
+                # Create fragment
+                fragment = PageFragment(
+                    page_id=page.id,
+                    fragment_type='content',
+                    fragment_name='Main Content',
+                    fragment_key='main_content',
+                    content_type='text/html',
+                    version_number=1,
+                    is_active=True,
+                    content_source=template_html,
+                    content_hash=hashlib.sha256(template_html.encode('utf-8')).hexdigest(),
+                    description=f"DataTable view for {report.name}",
+                    is_published=True,
+                    sort_order=0,
+                    cache_duration=0
+                )
+
+                self.session.add(fragment)
+                self.session.commit()
+
+                self.output_success(f"Created page at /{page_slug}")
+                
+                # Show action summary
+                if custom_actions is not None:
+                    if custom_actions:
+                        self.output_info(f"Actions configured: {custom_actions}")
+                    else:
+                        self.output_info("No actions configured (explicitly disabled)")
+
+            return 0
+
+        except Exception as e:
+            self.session.rollback()
+            self.output_error(f"Error: {e}")
+            if self.verbose:
+                import traceback
+                traceback.print_exc()
+            return 1
+
+    # ... rest of the class methods remain the same ...
+
+    def test_form_metadata(self, model_name, generate_html=False, output_file=None,
+                          create_page=False, prefix="", raw_form=False, debug=False,
                           form_mode="both", show_required_badge=True, show_optional_badge=True):
         """
         Test the Miner's handle_form_metadata function and optionally generate HTML
-        
+
         Args:
             model_name: Name of the model
             generate_html: Whether to generate HTML form
@@ -81,7 +259,7 @@ class FormsCLI(BaseCLI):
             self.output_info("\nAvailable models:")
             self.list_models()
             return 1
-        
+
         self.log_info(f"Testing handle_form_metadata for {model_name}")
 
         try:
@@ -94,7 +272,7 @@ class FormsCLI(BaseCLI):
             if debug and result.get('success'):
                 # Debug field requirements
                 metadata = result['metadata']
-                generator = FormGenerator(metadata, prefix=prefix, 
+                generator = FormGenerator(metadata, prefix=prefix,
                                         show_required_badge=show_required_badge,
                                         show_optional_badge=show_optional_badge)
                 generator.debug_field_requirements()
@@ -175,7 +353,7 @@ class FormsCLI(BaseCLI):
 
             if result.get('success'):
                 metadata = result['metadata']
-                
+
                 # Generate page with two forms
                 html = []
                 html.append('{% block title %}Multiple Forms Demo - ' + model_name + '{% endblock %}')
@@ -185,7 +363,7 @@ class FormsCLI(BaseCLI):
                 html.append('  <div class="row">')
                 html.append('    <div class="col-md-6">')
                 html.append('      <h3>Form 1 - Create New</h3>')
-                
+
                 # First form with prefix "form1_"
                 generator1 = FormGenerator(metadata, prefix="form1_",
                                          show_required_badge=show_required_badge,
@@ -196,11 +374,11 @@ class FormsCLI(BaseCLI):
                     include_wrapper=False
                 )
                 html.append(form1)
-                
+
                 html.append('    </div>')
                 html.append('    <div class="col-md-6">')
                 html.append('      <h3>Form 2 - Create Another</h3>')
-                
+
                 # Second form with prefix "form2_"
                 generator2 = FormGenerator(metadata, prefix="form2_",
                                          show_required_badge=show_required_badge,
@@ -211,7 +389,7 @@ class FormsCLI(BaseCLI):
                     include_wrapper=False
                 )
                 html.append(form2)
-                
+
                 html.append('    </div>')
                 html.append('  </div>')
                 html.append('</div>')
@@ -232,9 +410,9 @@ class FormsCLI(BaseCLI):
                 html.append('});')
                 html.append('</script>')
                 html.append('{% endblock %}')
-                
+
                 print('\n'.join(html))
-                
+
             return 0
 
         except Exception as e:
@@ -260,128 +438,28 @@ class FormsCLI(BaseCLI):
             self.output_warning("No models found")
 
 
-    def create_report_datatable_page(self, report_slug):
-        """Create a page with the DataTable template for a report"""
-        
-        from .list_generator_class import ReportDataTableGenerator
-        from app.models import Page, PageFragment, Template
-        import hashlib
-        from datetime import datetime
-        
-        try:
-            # Generate the DataTable template string
-            generator = ReportDataTableGenerator(self.session, self.logger)
-            
-            # Load report to get info
-            report = generator.load_report_by_slug(report_slug)
-            
-            # Generate the template HTML
-            template_html = generator.generate_jinja_template(report_slug)
-            
-            # Create page directly
-            page_slug = f"f/{report_slug}"
-            
-            # Check if page exists
-            existing_page = self.session.query(Page).filter_by(slug=page_slug).first()
-            
-            if existing_page:
-                self.output_warning(f"Page already exists at /{page_slug}")
-                
-                # Update the fragment
-                fragment = self.session.query(PageFragment).filter_by(
-                    page_id=existing_page.id,
-                    fragment_key='main_content',
-                    is_active=True
-                ).first()
-                
-                if fragment:
-                    fragment.content_source = template_html
-                    fragment.content_hash = hashlib.sha256(template_html.encode('utf-8')).hexdigest()
-                    fragment.updated_at = datetime.utcnow()
-                    self.session.commit()
-                    self.output_success(f"Updated page fragment for /{page_slug}")
-                else:
-                    self.output_error("No active fragment found to update")
-                    return 1
-            else:
-                # Get default template
-                template = self.session.query(Template).first()
-                if not template:
-                    self.output_error("No templates found in database")
-                    return 1
-                
-                # Create new page
-                page = Page(
-                    name=f"{report.name} Report",
-                    title=report.display or report.name,
-                    slug=page_slug,
-                    template_id=template.id,
-                    meta_description=report.description or f"View {report.name} data",
-                    published=True,
-                    requires_auth=True,
-                    cache_duration=0,
-                    sort_order=999
-                )
-                
-                self.session.add(page)
-                self.session.flush()
-                
-                # Create fragment
-                fragment = PageFragment(
-                    page_id=page.id,
-                    fragment_type='content',
-                    fragment_name='Main Content',
-                    fragment_key='main_content',
-                    content_type='text/html',
-                    version_number=1,
-                    is_active=True,
-                    content_source=template_html,
-                    content_hash=hashlib.sha256(template_html.encode('utf-8')).hexdigest(),
-                    description=f"DataTable view for {report.name}",
-                    is_published=True,
-                    sort_order=0,
-                    cache_duration=0
-                )
-                
-                self.session.add(fragment)
-                self.session.commit()
-                
-                self.output_success(f"Created page at /{page_slug}")
-            
-            return 0
-            
-        except Exception as e:
-            self.session.rollback()
-            self.output_error(f"Error: {e}")
-            if self.verbose:
-                import traceback
-                traceback.print_exc()
-            return 1
-
-
-
 def main():
     """Entry point"""
     parser = argparse.ArgumentParser(description=CLI_DESCRIPTION)
     parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
     parser.add_argument('--no-icons', action='store_true', help='Disable icons')
-    
+
     # Create subparsers for different commands
     subparsers = parser.add_subparsers(dest='command', help='Command to run')
-    
+
     # List command
     list_parser = subparsers.add_parser('list', help='List all available models')
-    
+
     # Generate command
     generate_parser = subparsers.add_parser('generate', help='Generate form HTML')
     generate_parser.add_argument('model', help='Model name')
     generate_parser.add_argument('--output', '-o', help='Save form to file')
-    generate_parser.add_argument('--create-page', '-p', action='store_true', 
+    generate_parser.add_argument('--create-page', '-p', action='store_true',
                                help='Create page and fragment in database')
     generate_parser.add_argument('--prefix', default='', help='Prefix for form element IDs')
-    generate_parser.add_argument('--raw-form', action='store_true', 
+    generate_parser.add_argument('--raw-form', action='store_true',
                                help='Generate only form without wrapper/scripts')
-    generate_parser.add_argument('--mode', choices=['create', 'edit', 'both'], default='both', 
+    generate_parser.add_argument('--mode', choices=['create', 'edit', 'both'], default='both',
                                help='Form mode: create-only, edit-only, or both (default: both)')
     generate_parser.add_argument('--no-required-badge', action='store_true',
                                help='Hide "Required" badges on form fields')
@@ -389,7 +467,7 @@ def main():
                                help='Hide "Optional" badges on form fields')
     generate_parser.add_argument('--no-badges', action='store_true',
                                help='Hide both "Required" and "Optional" badges')
-    
+
     # Debug command
     debug_parser = subparsers.add_parser('debug', help='Debug model metadata')
     debug_parser.add_argument('model', help='Model name')
@@ -399,11 +477,11 @@ def main():
                             help='Hide "Optional" badges on form fields')
     debug_parser.add_argument('--no-badges', action='store_true',
                             help='Hide both "Required" and "Optional" badges')
-    
+
     # Test command (for testing form metadata)
     test_parser = subparsers.add_parser('test', help='Test form metadata output')
     test_parser.add_argument('model', help='Model name')
-    
+
     # Multiple command (demo multiple forms)
     multiple_parser = subparsers.add_parser('multiple', help='Demo multiple forms on one page')
     multiple_parser.add_argument('model', help='Model name')
@@ -414,10 +492,12 @@ def main():
     multiple_parser.add_argument('--no-badges', action='store_true',
                                help='Hide both "Required" and "Optional" badges')
 
-    report_parser = subparsers.add_parser('report-datatable', 
+    # Enhanced report-datatable command
+    report_parser = subparsers.add_parser('report-datatable',
                                         help='Create a DataTable page for a report')
     report_parser.add_argument('report_slug', help='Slug of the report')
-
+    report_parser.add_argument('--data-url', '-u',
+                            help='Override data URL for the table')
 
     args = parser.parse_args()
 
@@ -435,12 +515,12 @@ def main():
         if args.command == 'list':
             cli.list_models()
             return 0
-            
+
         elif args.command == 'generate':
             # Handle badge flags
             show_required = True
             show_optional = True
-            
+
             if hasattr(args, 'no_badges') and args.no_badges:
                 show_required = False
                 show_optional = False
@@ -449,11 +529,11 @@ def main():
                     show_required = False
                 if hasattr(args, 'no_optional_badge') and args.no_optional_badge:
                     show_optional = False
-            
+
             return cli.test_form_metadata(
-                args.model, 
+                args.model,
                 generate_html=True,  # Always generate HTML for this command
-                output_file=args.output, 
+                output_file=args.output,
                 create_page=args.create_page,
                 prefix=args.prefix,
                 raw_form=args.raw_form,
@@ -462,12 +542,12 @@ def main():
                 show_required_badge=show_required,
                 show_optional_badge=show_optional
             )
-            
+
         elif args.command == 'debug':
             # Handle badge flags
             show_required = True
             show_optional = True
-            
+
             if hasattr(args, 'no_badges') and args.no_badges:
                 show_required = False
                 show_optional = False
@@ -476,7 +556,7 @@ def main():
                     show_required = False
                 if hasattr(args, 'no_optional_badge') and args.no_optional_badge:
                     show_optional = False
-                    
+
             return cli.test_form_metadata(
                 args.model,
                 generate_html=False,
@@ -484,7 +564,7 @@ def main():
                 show_required_badge=show_required,
                 show_optional_badge=show_optional
             )
-            
+
         elif args.command == 'test':
             # Just output the JSON metadata
             return cli.test_form_metadata(
@@ -492,12 +572,12 @@ def main():
                 generate_html=False,
                 debug=False
             )
-            
+
         elif args.command == 'multiple':
             # Handle badge flags
             show_required = True
             show_optional = True
-            
+
             if hasattr(args, 'no_badges') and args.no_badges:
                 show_required = False
                 show_optional = False
@@ -506,16 +586,18 @@ def main():
                     show_required = False
                 if hasattr(args, 'no_optional_badge') and args.no_optional_badge:
                     show_optional = False
-                    
+
             return cli.test_multiple_forms(
                 args.model,
                 show_required_badge=show_required,
                 show_optional_badge=show_optional
             )
-            
 
         elif args.command == 'report-datatable':
-            return cli.create_report_datatable_page(args.report_slug)
+            return cli.create_report_datatable_page_with_actions(
+                args.report_slug,
+                data_url=args.data_url
+            )
 
         else:
             parser.print_help()

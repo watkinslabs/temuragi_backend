@@ -23,54 +23,45 @@ CLI_DESCRIPTION = "Database Init"
 
 
 class DatabaseCLI(BaseCLI):
-    def __init__(self, verbose=False, show_icons=True, table_format=None, db_config=None):
+    def __init__(self, verbose=False, show_icons=True, table_format=None):
         """Initialize CLI with database connection and logging"""
-        # Initialize parent with logging
+        # Initialize parent with database connection enabled
         super().__init__(
             name="database",
             log_file="logs/database_cli.log",
-            connect_db=False,  # We'll handle DB connection manually
+            connect_db=True,  # Let base class handle DB connection
             verbose=verbose,
             show_icons=show_icons,
             table_format=table_format
         )
 
         self.log_info("Starting database CLI initialization")
-
-        try:
-            # Create database engine and session
-            if db_config:
-                self.engine = create_engine(db_config)
-                self.log_debug(f"Using provided database config")
-            else:
-                self.engine = create_engine(config['DATABASE_URI'])
-                self.log_debug("Using config DATABASE_URI")
-
-            session_factory = sessionmaker(bind=self.engine)
-            self.session = session_factory()
-            self.log_info("Database connection established successfully")
-
-        except Exception as e:
-            self.log_error(f"Failed to initialize database CLI: {e}")
-            raise
+        
+        # Create engine from the session's bind for operations that need it
+        if self.session and self.session.bind:
+            self.engine = self.session.bind
+            self.log_info("Engine reference created from session")
+        else:
+            # Create engine directly if session doesn't have one
+            self.engine = create_engine(config['DATABASE_URI'])
+            self.log_info("Engine created directly from DATABASE_URI")
 
     def discover_models_with_initial_data(self):
-        """Discover all models that have create_initial_data method using register_db functions"""
+        """Discover all models that have create_initial_data method using base class methods"""
         self.log_info("Discovering models with initial data methods")
 
         try:
-            from app.register.database import  get_all_models
-            
+            from app.register.database import get_all_models
+
             self.output_info("Discovering and importing models...")
-     
-            
+
             # Get all models from the registry
             all_models = get_all_models()
-            
+
             self.output_info("Checking models for initial data methods...")
-            
+
             models_with_initial_data = []
-            
+
             # Check each model in the registry for create_initial_data method
             for name, model_class in all_models.items():
                 # Skip table name aliases (only process actual class names)
@@ -87,11 +78,11 @@ class DatabaseCLI(BaseCLI):
                                 'method': method
                             })
                             self.log_debug(f"Found {name}.create_initial_data() in {model_class.__module__}")
-            
+
             self.log_info(f"Found {len(models_with_initial_data)} models with create_initial_data methods")
-            
+
             return models_with_initial_data
-            
+
         except Exception as e:
             self.log_error(f"Error discovering models: {e}")
             self.output_error(f"Error discovering models: {e}")
@@ -104,7 +95,7 @@ class DatabaseCLI(BaseCLI):
         try:
             # Get tables with row counts
             query = text("""
-                SELECT 
+                SELECT
                     t.table_name,
                     COALESCE(s.n_tup_ins, 0) as estimated_rows
                 FROM information_schema.tables t
@@ -113,29 +104,29 @@ class DatabaseCLI(BaseCLI):
                 AND t.table_type = 'BASE TABLE'
                 ORDER BY t.table_name
             """)
-            
+
             results = self.session.execute(query).fetchall()
-            
+
             if not results:
                 self.output_warning("No tables found in database")
                 return 0
-            
+
             headers = ['Table Name', 'Est. Rows']
             rows = []
             total_tables = 0
             total_rows = 0
-            
+
             for table_name, row_count in results:
                 rows.append([table_name, f"{row_count:,}"])
                 total_tables += 1
                 total_rows += row_count or 0
-            
+
             self.output_info("Current Database Tables:")
             self.output_table(rows, headers=headers)
             self.output_info(f"Summary: {total_tables} tables, {total_rows:,} total rows")
-            
+
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error listing tables: {e}")
             self.output_error(f"Error listing tables: {e}")
@@ -150,34 +141,34 @@ class DatabaseCLI(BaseCLI):
             result = self.session.execute(text("""
                 SELECT t.table_name, t.table_schema, pg_tables.tableowner
                 FROM information_schema.tables t
-                LEFT JOIN pg_tables ON t.table_name = pg_tables.tablename 
+                LEFT JOIN pg_tables ON t.table_name = pg_tables.tablename
                     AND t.table_schema = pg_tables.schemaname
                 WHERE t.table_schema = current_schema()
                 AND t.table_type = 'BASE TABLE'
                 ORDER BY t.table_name
             """))
-            
+
             table_info = [(row[0], row[1], row[2]) for row in result.fetchall()]
-            
+
             if not table_info:
                 self.output_warning("No tables found to drop")
                 return 0
-            
+
             self.output_info(f"Found {len(table_info)} tables to drop:")
             for table_name, schema, owner in table_info:
                 owner_info = f" (owner: {owner})" if owner else ""
                 self.log_debug(f"Table: {table_name}{owner_info}")
-            
+
             # Get current user for comparison
             current_user_result = self.session.execute(text("SELECT current_user"))
             current_user = current_user_result.scalar()
             self.log_info(f"Current database user: {current_user}")
-            
+
             # Drop tables, handling permission errors
             self.output_info("Dropping tables with CASCADE...")
             dropped_count = 0
             permission_errors = []
-            
+
             for table_name, schema, owner in table_info:
                 try:
                     self.session.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
@@ -194,33 +185,33 @@ class DatabaseCLI(BaseCLI):
                     else:
                         self.output_error(f"Failed to drop {table_name}: {e}")
                         self.log_error(f"Failed to drop {table_name}: {e}")
-            
+
             self.session.commit()
-            
+
             # Summary report
             self.output_info(f"Drop Summary:")
             self.output_info(f"  Successfully dropped: {dropped_count} tables")
-            
+
             if permission_errors:
                 self.output_warning(f"  Permission denied: {len(permission_errors)} tables")
                 self.output_info("Tables requiring elevated privileges:")
                 for table_name, owner in permission_errors:
                     self.output_info(f"    - {table_name} (owner: {owner})")
-                
+
                 self.output_info(f"To drop these tables, either:")
                 self.output_info(f"  1. Connect as superuser or table owner")
                 self.output_info(f"  2. Have the owner grant DROP privileges")
                 self.output_info(f"  3. Use: ALTER TABLE {permission_errors[0][0]} OWNER TO {current_user};")
-            
+
             # Verify remaining tables
             result = self.session.execute(text("""
-                SELECT COUNT(*) 
-                FROM information_schema.tables 
+                SELECT COUNT(*)
+                FROM information_schema.tables
                 WHERE table_schema = current_schema()
                 AND table_type = 'BASE TABLE'
             """))
             remaining = result.scalar()
-            
+
             if remaining == 0:
                 self.output_success("All tables dropped successfully!")
                 return 0
@@ -230,7 +221,7 @@ class DatabaseCLI(BaseCLI):
             else:
                 self.output_error(f"{remaining} tables still remain")
                 return 1
-                
+
         except Exception as e:
             self.log_error(f"Error dropping tables: {e}")
             self.output_error(f"Error dropping tables: {e}")
@@ -243,28 +234,28 @@ class DatabaseCLI(BaseCLI):
 
         try:
             self.output_info("Attempting forced table drop (requires elevated privileges)...")
-            
+
             # Get current user
             current_user_result = self.session.execute(text("SELECT current_user"))
             current_user = current_user_result.scalar()
-            
+
             # Get all tables
             result = self.session.execute(text("""
-                SELECT table_name 
-                FROM information_schema.tables 
+                SELECT table_name
+                FROM information_schema.tables
                 WHERE table_schema = current_schema()
                 AND table_type = 'BASE TABLE'
                 ORDER BY table_name
             """))
-            
+
             table_names = [row[0] for row in result.fetchall()]
-            
+
             if not table_names:
                 self.output_warning("No tables found to drop")
                 return 0
-            
+
             self.output_info(f"Attempting to take ownership and drop {len(table_names)} tables...")
-            
+
             for table_name in table_names:
                 try:
                     # Try to change ownership first
@@ -272,32 +263,32 @@ class DatabaseCLI(BaseCLI):
                     self.log_debug(f"Changed owner: {table_name}")
                 except Exception as e:
                     self.output_warning(f"Could not change owner for {table_name}: {e}")
-                
+
                 try:
                     # Now try to drop
                     self.session.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
                     self.log_debug(f"Dropped: {table_name}")
                 except Exception as e:
                     self.output_error(f"Still failed to drop {table_name}: {e}")
-            
+
             self.session.commit()
-            
+
             # Check what remains
             result = self.session.execute(text("""
-                SELECT COUNT(*) 
-                FROM information_schema.tables 
+                SELECT COUNT(*)
+                FROM information_schema.tables
                 WHERE table_schema = current_schema()
                 AND table_type = 'BASE TABLE'
             """))
             remaining = result.scalar()
-            
+
             if remaining == 0:
                 self.output_success("Force drop completed successfully!")
                 return 0
             else:
                 self.output_warning(f"{remaining} tables still remain after force attempt")
                 return 1
-                
+
         except Exception as e:
             self.log_error(f"Error in force drop: {e}")
             self.output_error(f"Error in force drop: {e}")
@@ -309,30 +300,14 @@ class DatabaseCLI(BaseCLI):
         self.log_info("Creating database tables")
 
         try:
-            from app.register.database import  create_all_tables
-            
-            # Mock app for logging
-            class MockApp:
-                def __init__(self):
-                    import logging
-                    self.logger = logging.getLogger('cli')
-                    handler = logging.StreamHandler()
-                    formatter = logging.Formatter('%(levelname)s: %(message)s')
-                    handler.setFormatter(formatter)
-                    self.logger.addHandler(handler)
-                    self.logger.setLevel(logging.INFO)
-            
-            app = MockApp()
-            
-            self.output_info("Discovering and importing models...")
-            
-            
+            from app.register.database import create_all_tables
+
             self.output_info("Creating database tables...")
-            create_all_tables(app, self.engine)
-            
+            create_all_tables(self.app, self.engine)
+
             self.output_success("Tables created successfully!")
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error creating tables: {e}")
             self.output_error(f"Error creating tables: {e}")
@@ -344,25 +319,25 @@ class DatabaseCLI(BaseCLI):
 
         try:
             self.output_info("Rebuilding database tables...")
-            
+
             # Step 1: Drop all tables
             self.output_info("STEP 1: Dropping existing tables")
             drop_result = self.drop_tables()
-            
+
             if drop_result != 0:
                 self.output_error("Failed to drop tables, aborting rebuild")
                 return 1
-            
+
             self.output_info("STEP 2: Creating fresh tables")
             create_result = self.create_tables()
-            
+
             if create_result == 0:
                 self.output_success("Database rebuild completed successfully!")
                 return 0
             else:
                 self.output_error("Failed to recreate tables")
                 return 1
-                
+
         except Exception as e:
             self.log_error(f"Error during rebuild: {e}")
             self.output_error(f"Error during rebuild: {e}")
@@ -374,34 +349,34 @@ class DatabaseCLI(BaseCLI):
 
         try:
             self.output_info("Setting up complete database environment...")
-            
+
             # Step 1: Create database users/roles
             self.output_info("STEP 1: Creating database users and roles")
             users_result = self.create_database_users()
-            
+
             # Step 2: Create all tables
             self.output_info("STEP 2: Creating database tables")
             tables_result = self.create_tables()
-            
+
             if tables_result != 0:
                 self.output_error("Failed to create tables, aborting setup")
                 return 1
-            
+
             # Step 3: Set up table permissions
             self.output_info("STEP 3: Setting up table permissions")
             perms_result = self.setup_table_permissions()
-            
+
             # Step 4: Insert seed data
             self.output_info("STEP 4: Inserting seed data")
             seed_result = self.insert_seed_data()
-            
+
             if all(result == 0 for result in [tables_result, perms_result, seed_result]):
                 self.output_success("Complete database setup finished successfully!")
                 return 0
             else:
                 self.output_warning("Setup completed with some warnings")
                 return 1
-                
+
         except Exception as e:
             self.log_error(f"Error during database setup: {e}")
             self.output_error(f"Error during database setup: {e}")
@@ -417,7 +392,7 @@ class DatabaseCLI(BaseCLI):
                 ('app_user', 'Standard application user'),
                 ('app_readonly', 'Read-only user for reports'),
             ]
-            
+
             for username, description in users_to_create:
                 try:
                     # Check if user exists
@@ -425,20 +400,20 @@ class DatabaseCLI(BaseCLI):
                         text("SELECT 1 FROM pg_roles WHERE rolname = :username"),
                         {"username": username}
                     )
-                    
+
                     if result.fetchone():
                         self.log_debug(f"User {username} already exists")
                     else:
                         # Create user with login capability
                         self.session.execute(text(f"CREATE USER {username} WITH LOGIN"))
                         self.log_info(f"Created user: {username} ({description})")
-                
+
                 except Exception as e:
                     self.log_warning(f"Could not create user {username}: {e}")
-            
+
             self.session.commit()
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error creating users: {e}")
             self.output_error(f"Error creating users: {e}")
@@ -452,44 +427,50 @@ class DatabaseCLI(BaseCLI):
         try:
             # Get all tables
             result = self.session.execute(text("""
-                SELECT table_name 
-                FROM information_schema.tables 
+                SELECT table_name
+                FROM information_schema.tables
                 WHERE table_schema = current_schema()
                 AND table_type = 'BASE TABLE'
             """))
-            
+
             tables = [row[0] for row in result.fetchall()]
-            
+
             if not tables:
                 self.output_warning("No tables found to set permissions on")
                 return 0
-            
+
             # Permission sets
             permissions = [
                 ('app_admin', 'ALL', 'Full administrative access'),
                 ('app_user', 'SELECT, INSERT, UPDATE, DELETE', 'Standard CRUD operations'),
                 ('app_readonly', 'SELECT', 'Read-only access'),
             ]
-            
+
             for username, perms, description in permissions:
                 self.log_debug(f"Setting {description.lower()} for {username}")
-                
+
                 for table in tables:
                     try:
                         self.session.execute(text(f"GRANT {perms} ON {table} TO {username}"))
                     except Exception as e:
                         self.log_warning(f"Failed to grant {perms} on {table} to {username}: {e}")
-                
+
                 self.log_info(f"Permissions set for {username}")
-            
+
             self.session.commit()
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error setting permissions: {e}")
             self.output_error(f"Error setting permissions: {e}")
             self.session.rollback()
             return 1
+
+    def insert_seed_data(self):
+        """Insert seed data - placeholder for now"""
+        self.log_info("Inserting seed data")
+        self.output_warning("Seed data insertion not implemented yet")
+        return 0
 
     def preview_model_order(self):
         """Preview global model loading order with range information"""
@@ -497,23 +478,20 @@ class DatabaseCLI(BaseCLI):
 
         try:
             from app.register.database import preview_model_registry
-            
-            self.output_info("Loading models and previewing registry...")
-            
-            # Discover and import models to populate registry
-            
-            
+
+            self.output_info("Previewing model registry...")
+
             # Preview the registry
             registry = preview_model_registry()
-            
+
             if not registry:
                 self.output_warning("No models found in registry")
                 return 1
-            
+
             # Create a summary of the models
             model_classes = {}
             table_aliases = {}
-            
+
             for name, model_class in registry.items():
                 if hasattr(model_class, '__tablename__'):
                     if name == model_class.__name__:
@@ -522,29 +500,29 @@ class DatabaseCLI(BaseCLI):
                     elif name == model_class.__tablename__:
                         # This is a table name alias
                         table_aliases[name] = model_class
-            
+
             # Display model information
             self.output_info("Model Classes in Registry:")
             headers = ['Class Name', 'Table Name', 'Module', 'Dependencies']
             rows = []
-            
+
             for name, model_class in sorted(model_classes.items()):
                 table = model_class.__tablename__
                 module = model_class.__module__.split('.')[-1]
                 deps = getattr(model_class, '__depends_on__', None)
                 deps_str = str(deps) if deps else ''
-                
+
                 rows.append([name, table, module, deps_str])
-            
+
             self.output_table(rows, headers=headers)
-            
+
             self.output_info(f"Summary:")
             self.output_info(f"  Model Classes: {len(model_classes)}")
             self.output_info(f"  Table Aliases: {len(table_aliases)}")
             self.output_info(f"  Total Registry: {len(registry)} entries")
-            
+
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error previewing model order: {e}")
             self.output_error(f"Error previewing model order: {e}")
@@ -557,25 +535,25 @@ class DatabaseCLI(BaseCLI):
         try:
             self.output_warning(f"Dropping database: {database_name}")
             self.output_warning("WARNING: This will permanently delete the entire database!")
-            
+
             # Confirm action
             confirm = input("Type 'DROP DATABASE' to confirm: ")
             if confirm != 'DROP DATABASE':
                 self.output_info("Operation cancelled")
                 return 1
-            
+
             # Close current session
             self.session.close()
-            
+
             # Create connection to postgres database for admin operations
             from urllib.parse import urlparse
             db_url = config['DATABASE_URI']
             parsed = urlparse(db_url)
-            
+
             # Connect to postgres database instead of target database
             admin_url = f"postgresql://{parsed.username}:{parsed.password}@{parsed.hostname}:{parsed.port}/postgres"
             admin_engine = create_engine(admin_url, isolation_level='AUTOCOMMIT')
-            
+
             with admin_engine.connect() as conn:
                 # Terminate existing connections to the database
                 self.output_info(f"Terminating connections to {database_name}...")
@@ -584,14 +562,14 @@ class DatabaseCLI(BaseCLI):
                     FROM pg_stat_activity
                     WHERE datname = :db_name AND pid <> pg_backend_pid()
                 """), {"db_name": database_name})
-                
+
                 # Drop the database
                 self.output_info(f"Dropping database {database_name}...")
                 conn.execute(text(f'DROP DATABASE IF EXISTS "{database_name}"'))
-                
+
             self.output_success(f"Database '{database_name}' dropped successfully!")
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error dropping database: {e}")
             self.output_error(f"Error dropping database: {e}")
@@ -604,43 +582,43 @@ class DatabaseCLI(BaseCLI):
         try:
             # Close current session
             self.session.close()
-            
+
             # Create connection to postgres database for admin operations
             from urllib.parse import urlparse
             db_url = config['DATABASE_URI']
             parsed = urlparse(db_url)
-            
+
             # Connect to postgres database instead of target database
             admin_url = f"postgresql://{parsed.username}:{parsed.password}@{parsed.hostname}:{parsed.port}/postgres"
             admin_engine = create_engine(admin_url, isolation_level='AUTOCOMMIT')
-            
+
             with admin_engine.connect() as conn:
                 # Check if database already exists
                 result = conn.execute(text("""
                     SELECT 1 FROM pg_database WHERE datname = :db_name
                 """), {"db_name": database_name})
-                
+
                 if result.fetchone():
                     self.output_warning(f"Database '{database_name}' already exists")
                     return 1
-                
+
                 # Create the database
                 owner_clause = f' OWNER "{owner}"' if owner else ''
                 create_sql = f'CREATE DATABASE "{database_name}"{owner_clause}'
-                
+
                 self.log_info(f"Creating database with SQL: {create_sql}")
                 conn.execute(text(create_sql))
-                
+
             self.output_success(f"Database '{database_name}' created successfully!")
-            
+
             # Reconnect to the new database
             new_db_url = f"postgresql://{parsed.username}:{parsed.password}@{parsed.hostname}:{parsed.port}/{database_name}"
             self.engine = create_engine(new_db_url)
             session_factory = sessionmaker(bind=self.engine)
             self.session = session_factory()
-            
+
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error creating database: {e}")
             self.output_error(f"Error creating database: {e}")
@@ -652,23 +630,23 @@ class DatabaseCLI(BaseCLI):
 
         try:
             self.output_info(f"Recreating database: {database_name}")
-            
+
             # Step 1: Drop existing database
             self.output_info("STEP 1: Dropping existing database")
             drop_result = self.drop_database(database_name)
-            
+
             # Continue even if drop fails (database might not exist)
-            
+
             self.output_info("STEP 2: Creating fresh database")
             create_result = self.create_database(database_name, owner)
-            
+
             if create_result == 0:
                 self.output_success(f"Database '{database_name}' recreated successfully!")
                 return 0
             else:
                 self.output_error(f"Failed to recreate database '{database_name}'")
                 return 1
-                
+
         except Exception as e:
             self.log_error(f"Error during database recreation: {e}")
             self.output_error(f"Error during database recreation: {e}")
@@ -680,52 +658,52 @@ class DatabaseCLI(BaseCLI):
 
         try:
             self.output_info("Creating initial data from model methods...")
-            
+
             models_with_data = self.discover_models_with_initial_data()
-            
+
             if not models_with_data:
                 self.output_warning("No models found with create_initial_data method")
                 return 0
-            
+
             self.output_info(f"Found {len(models_with_data)} models with initial data methods:")
             for model_info in models_with_data:
                 self.log_debug(f"Model: {model_info['class_name']} ({model_info['table_name']})")
-            
+
             self.output_info("Creating initial data...")
-            
+
             success_count = 0
             error_count = 0
-            
+
             for model_info in models_with_data:
                 model_class = model_info['class']
                 model_name = model_info['class_name']
                 table_name = model_info['table_name']
-                
+
                 # Apply filter if specified
                 if model_filter and model_filter.lower() not in model_name.lower():
                     continue
-                
+
                 try:
                     self.log_debug(f"Processing {model_name} ({table_name})")
-                    
+
                     # Check if method expects session parameter
                     sig = inspect.signature(model_class.create_initial_data)
                     if 'session' in sig.parameters:
                         result = model_class.create_initial_data(session=self.session)
                     else:
                         result = model_class.create_initial_data()
-                    
+
                     if result is False:
                         self.output_warning(f"{model_name}: create_initial_data returned False")
                     else:
                         self.log_info(f"{model_name}: Initial data created")
                         success_count += 1
-                    
+
                 except Exception as e:
                     self.log_error(f"{model_name}: Error - {e}")
                     self.output_error(f"{model_name}: Error - {e}")
                     error_count += 1
-            
+
             # Commit all changes
             try:
                 self.session.commit()
@@ -735,19 +713,19 @@ class DatabaseCLI(BaseCLI):
                 self.output_error(f"Error committing changes: {e}")
                 self.session.rollback()
                 return 1
-            
+
             # Summary
             self.output_info(f"Summary:")
             self.output_info(f"  Success: {success_count} models")
             self.output_info(f"  Errors:  {error_count} models")
-            
+
             if error_count == 0:
                 self.output_success("All initial data created successfully!")
                 return 0
             else:
                 self.output_warning(f"Completed with {error_count} errors")
                 return 1
-                
+
         except Exception as e:
             self.log_error(f"Error creating initial data: {e}")
             self.output_error(f"Error creating initial data: {e}")
@@ -760,37 +738,37 @@ class DatabaseCLI(BaseCLI):
 
         try:
             models_with_data = self.discover_models_with_initial_data()
-            
+
             if not models_with_data:
                 self.output_warning("No models found with create_initial_data method")
                 return 0
-            
+
             self.output_info("Models with Initial Data Support:")
-            
+
             headers = ['Model', 'Table', 'Module', 'Method Info']
             rows = []
-            
+
             for model_info in models_with_data:
                 model_class = model_info['class']
                 method = getattr(model_class, 'create_initial_data')
-                
+
                 # Get method signature info
                 sig = inspect.signature(method)
                 params = list(sig.parameters.keys())
                 method_info = f"({', '.join(params)})"
-                
+
                 rows.append([
                     model_info['class_name'],
                     model_info['table_name'],
                     model_info['module_path'].split('.')[-1],  # Just the last part
                     method_info
                 ])
-            
+
             self.output_table(rows, headers=headers)
             self.output_info(f"Total: {len(models_with_data)} models support initial data creation")
-            
+
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error listing models: {e}")
             self.output_error(f"Error listing models: {e}")
@@ -835,23 +813,17 @@ class DatabaseCLI(BaseCLI):
             self.output_error(f"Error during complete database setup: {e}")
             return 1
 
-    def close(self):
-        """Clean up database session"""
-        self.log_debug("Closing database CLI")
-        super().close()
-
     def list_models(self):
         """List all discovered models and their details"""
         self.log_info("Listing discovered models")
 
         try:
-            from app.register.classes  import  _model_registry
+            from app.register.database import get_all_models
 
             self.output_info("Discovering and importing models...")
 
-
             # Get all models from the registry
-            all_models = _model_registry
+            all_models = get_all_models()
 
             if not all_models:
                 self.output_warning("No models found in registry")
@@ -880,11 +852,11 @@ class DatabaseCLI(BaseCLI):
                 for name, model_class in sorted(model_classes.items()):
                     table_name = model_class.__tablename__
                     module = model_class.__module__
-                    
+
                     # Get dependencies
                     deps = getattr(model_class, '__depends_on__', None)
                     deps_str = str(deps) if deps else 'None'
-                    
+
                     # Check for common methods
                     methods = []
                     if hasattr(model_class, 'create_initial_data'):
@@ -893,7 +865,7 @@ class DatabaseCLI(BaseCLI):
                         methods.append('__str__')
                     if hasattr(model_class, '__repr__'):
                         methods.append('__repr__')
-                    
+
                     methods_str = ', '.join(methods) if methods else 'None'
 
                     rows.append([name, table_name, module, deps_str, methods_str])
@@ -926,11 +898,11 @@ class DatabaseCLI(BaseCLI):
 
         try:
             self.output_info("=== DEBUG MODEL DISCOVERY ===")
-            
+
             # Check config
             try:
                 from app.config import config
-                scan_paths = config['SYSTEM_SCAN_PATHS']
+                scan_paths = config.get('SYSTEM_SCAN_PATHS', [])
                 self.output_success(f"✓ SYSTEM_SCAN_PATHS found: {scan_paths}")
             except KeyError:
                 self.output_error("✗ SYSTEM_SCAN_PATHS not found in config")
@@ -938,58 +910,32 @@ class DatabaseCLI(BaseCLI):
             except Exception as e:
                 self.output_error(f"✗ Error importing config: {e}")
                 return 1
-            
+
             # Check current working directory and __package__
             import os
-            from app.register import database as db_module
-            
             self.output_info(f"Current working directory: {os.getcwd()}")
-            self.output_info(f"Database module __package__: {db_module.__package__}")
-            self.output_info(f"Database module __file__: {db_module.__file__}")
-            
-            # Check each scan path
-            root_pkg = db_module.__package__
-            base_dir_relative_to_register = os.path.dirname(db_module.__file__)
-            
-            for scan_path in scan_paths:
-                self.output_info(f"\n--- Checking scan path: {scan_path} ---")
-                base_dir = os.path.join(base_dir_relative_to_register, scan_path)
-                abs_path = os.path.abspath(base_dir)
-                self.output_info(f"Relative path: {base_dir}")
-                self.output_info(f"Absolute path: {abs_path}")
-                self.output_info(f"Path exists: {os.path.exists(abs_path)}")
-                
-                if os.path.exists(abs_path):
-                    self.output_info("Contents:")
-                    model_count = 0
-                    for root, dirs, files in os.walk(abs_path):
-                        model_files = [f for f in files if f.endswith('_model.py')]
-                        if model_files:
-                            rel_root = os.path.relpath(root, abs_path)
-                            display_path = rel_root if rel_root != '.' else '/'
-                            self.output_info(f"  {display_path}: {model_files}")
-                            model_count += len(model_files)
-                    
-                    if model_count == 0:
-                        self.output_warning(f"  No *_model.py files found in {scan_path}")
+
+            # Try to use base class method to get models
+            try:
+                model = self.get_model('User')
+                if model:
+                    self.output_success("✓ Can retrieve models through base class method")
                 else:
-                    self.output_warning(f"  Path does not exist: {abs_path}")
+                    self.output_warning("⚠ Base class get_model returned None for 'User'")
+            except Exception as e:
+                self.output_error(f"✗ Error using base class get_model: {e}")
+
+            # Check registry state using base class methods
+            from app.register.database import get_all_models
+            all_models = get_all_models()
+            self.output_info(f"\n--- Registry State ---")
+            self.output_info(f"Total models in registry: {len(all_models)}")
             
-            # Check current registry state before discovery
-            from app.register.database import _model_registry
-            self.output_info(f"\n--- Registry State (before discovery) ---")
-            self.output_info(f"_model_registry size: {len(_model_registry)}")
-            
-            # Try discovery
-            self.output_info(f"\n--- Running Discovery ---")
-        
-            
-            # Check registry state after discovery
-            self.output_info(f"\n--- Registry State (after discovery) ---")
-            self.output_info(f"_model_registry size: {len(_model_registry)}")
-            if _model_registry:
-                self.output_info("Registry contents:")
-                for name, cls in _model_registry.items():
+            if all_models:
+                self.output_info("Sample models in registry:")
+                for i, (name, cls) in enumerate(all_models.items()):
+                    if i >= 5:  # Show first 5 only
+                        break
                     self.output_info(f"  {name}: {cls} (from {cls.__module__})")
             
             self.output_info("=== END DEBUG ===")
@@ -1001,6 +947,7 @@ class DatabaseCLI(BaseCLI):
             import traceback
             traceback.print_exc()
             return 1
+
 
 def main():
     """CLI entry point"""
@@ -1094,10 +1041,10 @@ def main():
             return cli.list_tables()
         elif args.command == 'list-models':
             return cli.list_models()
-        
+
         elif args.command == 'debug-discovery':
             return cli.debug_model_discovery()
-        
+
         elif args.command == 'preview-order':
             return cli.preview_model_order()
 

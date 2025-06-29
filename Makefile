@@ -166,7 +166,8 @@ site-config:
 	@python -m app.cli form generate --no-optional-badge --create-page --prefix site_config_ --mode both SiteConfig
 
 report:
-	@python -m app.cli model_report generate Report -c SYSTEM --slug 'report2/list' --name 'Manage Report Defiunitions' --description 'Template metadata specific configurations' --system
-	@python -m app.cli form report-datatable report2/list
+	@-python -m app.cli model_report generate Report -c SYSTEM --slug 'report2/list' --name 'Manage Report Defiunitions' --description 'Template metadata specific configurations' --system
+	@-python -m app.cli form report-datatable report2/list
+	@python -m app.cli form generate --no-optional-badge --create-page --prefix report_ --mode both Report
 	
 	

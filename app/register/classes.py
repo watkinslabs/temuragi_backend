@@ -27,6 +27,7 @@ def register_classes():
                 base_directories=config['SYSTEM_SCAN_PATHS'],
                 patterns=[
                     "*_class.py",
+                    "*_service.py",
                     "*_model.py",
                 ],
                 base_dir=config['BASE_DIR']

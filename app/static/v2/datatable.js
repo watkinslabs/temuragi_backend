@@ -1,20 +1,17 @@
 class DynamicDataTable {
-    constructor(container_id, model_name,report_name, api_url, options = {}) {
+    constructor(container_id, model_name, report_name, api_url, options = {}) {
         this.container_id = container_id;
         this.model_name = model_name;
         this.options = {
             page_length: 25,
             show_search: true,
             show_column_search: false,  // New option for column filtering
-            show_create_button: true,
             columns: {},  // Changed from custom_columns
             excluded_columns: ['password_hash', 'created_by', 'updated_by', 'deleted_at'],
             column_order: [],  // Deprecated - kept for backward compatibility
-            actions: ['edit', 'delete'],
+            actions: [],  // No default actions
             table_title: null,
             table_description: null,
-            create_url: null,
-            edit_url: null,
             api_url: api_url, 
             ...options
         };
@@ -54,7 +51,16 @@ class DynamicDataTable {
             .filter(([name, config]) => config.searchable === true)
             .map(([name]) => name);
     }
- 
+    
+    _get_page_actions() {
+        // Get actions with mode='page' (default to 'row' if not specified)
+        return this.options.actions.filter(action => action.mode === 'page');
+    }
+    
+    _get_row_actions() {
+        // Get actions with mode='row' or no mode specified (default)
+        return this.options.actions.filter(action => !action.mode || action.mode === 'row');
+    }
 
     show_notification(message, type) {
         // Use the real toast system
@@ -121,6 +127,7 @@ class DynamicDataTable {
         const container = $(`#${this.container_id}`);
         const title = this.options.table_title || `${this.model_name} Management`;
         const description = this.options.table_description || `Manage ${this.model_name.toLowerCase()} records`;
+        const page_actions = this._get_page_actions();
         
         let html = `
             <!-- Header -->
@@ -135,15 +142,22 @@ class DynamicDataTable {
                         </div>
         `;
         
-        if (this.options.show_create_button) {
-            html += `<div><a class="btn btn-light text-dark fw-medium" 
-                            id="${this.model_name.toLowerCase()}_create_btn"
-                            hx-post="${this.options.create_url}"
-                            hx-target="#main-content"
-                            hx-swap="innerHTML"
-                            hx-indicator=".htmx-indicator">
-                                <i class="fas fa-plus me-2"></i>New ${this.model_name}
-                            </a></div>`;
+        // Add page actions if any exist
+        if (page_actions.length > 0) {
+            html += '<div class="btn-group">';
+            page_actions.forEach(action => {
+                html += `
+                    <a class="btn btn-${action.color || 'light'} text-${action.color === 'light' ? 'dark' : 'white'} fw-medium" 
+                        id="${this.model_name.toLowerCase()}_${action.name}_btn"
+                        hx-post="${action.url}"
+                        hx-target="#main-content"
+                        hx-swap="innerHTML"
+                        hx-indicator=".htmx-indicator">
+                        <i class="${action.icon} me-2"></i>${action.title || action.name}
+                    </a>
+                `;
+            });
+            html += '</div>';
         }
         
         html += `
@@ -378,13 +392,12 @@ class DynamicDataTable {
                 htmx.process(container[0]);
             }, 10);
         }
-        
-      
     }
     
     init_datatable() {
         const ordered_columns = this._get_ordered_columns();
         const searchable_columns = this._get_searchable_columns();
+        const row_actions = this._get_row_actions();
 
         // Build column definitions for DataTable
         const column_defs = ordered_columns.map(col => ({
@@ -396,8 +409,8 @@ class DynamicDataTable {
             render: this._get_column_renderer(col)
         }));
 
-        // Add actions column if needed
-        if (this.options.actions.length > 0) {
+        // Add actions column if row actions exist
+        if (row_actions.length > 0) {
             column_defs.push({
                 data: null,
                 title: 'Actions',
@@ -426,7 +439,7 @@ class DynamicDataTable {
                     }));
 
                     // Add actions column if present
-                    if (this.options.actions.length > 0) {
+                    if (row_actions.length > 0) {
                         all_columns.push({
                             data: null,
                             name: 'actions',
@@ -600,40 +613,18 @@ class DynamicDataTable {
     }
     
     _render_actions(row) {
+        const row_actions = this._get_row_actions();
+        if (row_actions.length === 0) return '';
+        
         let actions_html = '<div class="btn-group btn-group-sm">';
         
-        this.options.actions.forEach(action => {
-            if (typeof action === 'string') {
-                // Standard actions
-                switch (action) {
-                    case 'edit':
-                        actions_html += `
-                            <button class="btn btn-primary" onclick="window.${this.report_name.toLowerCase()}.handle_action('edit', '${row.id}')" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>`;
-                        break;
-                    case 'delete':
-                        actions_html += `
-                            <button class="btn btn-danger" onclick="window.${this.report_name.toLowerCase()}.handle_action('delete', '${row.id}')" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>`;
-                        break;
-                    case 'copy':
-                        actions_html += `
-                            <button class="btn btn-secondary" onclick="window.${this.report_name.toLowerCase()}.handle_action('copy', '${row.id}')" title="Copy">
-                                <i class="fas fa-copy"></i>
-                            </button>`;
-                        break;
-                }
-            } else if (typeof action === 'object') {
-                // Custom actions
-                actions_html += `
-                    <button class="btn btn-${action.color || 'secondary'}" 
-                        onclick="window.${this.report_name.toLowerCase()}.handle_action('${action.name}', '${row.id}')" 
-                        title="${action.title || action.name}">
-                        <i class="${action.icon}"></i>
-                    </button>`;
-            }
+        row_actions.forEach(action => {
+            actions_html += `
+                <button class="btn btn-${action.color || 'secondary'}" 
+                    onclick="window.${this.report_name.toLowerCase()}.handle_action('${action.name}', '${row.id}')" 
+                    title="${action.title || action.name}">
+                    <i class="${action.icon}"></i>
+                </button>`;
         });
         
         actions_html += '</div>';
@@ -769,58 +760,50 @@ class DynamicDataTable {
         htmx.trigger(temp_link, 'click');
     }
 
-    handle_action(action, id) {
-        // Check for custom handlers first
-        if (this.options.custom_handlers && this.options.custom_handlers[action]) {
-            this.options.custom_handlers[action](id);
+    handle_action(action_name, id) {
+        // Find the action configuration
+        const action = this.options.actions.find(a => a.name === action_name);
+        
+        if (!action) {
+            console.error(`Action '${action_name}' not found in configuration`);
             return;
         }
         
-        // Default handlers
-        switch (action) {
-            case 'edit':
-                if (this.options.edit_url) {
-                    this.trigger_htmx_request({
-                        url: this.options.edit_url,
-                        data: { id: id }
-                    });
+        // Check for custom handler first
+        if (action.handler && typeof action.handler === 'function') {
+            action.handler(id);
+            return;
+        }
+        
+        // If action has a URL, use HTMX to trigger it
+        if (action.url) {
+            // Add confirmation for destructive actions
+            if (action.confirm) {
+                if (!confirm(action.confirm)) {
+                    return;
                 }
-                break;
-                
-            case 'delete':
-                if (confirm(`Are you sure you want to delete this ${this.model_name}?`)) {
-                    this.trigger_htmx_request({
-                        url: this.options.delete_url,
-                        data: { id: id },
-                        on_success: () => {
-                            this.show_notification(`${this.model_name} deleted successfully`, 'success');
+            }
+            
+            this.trigger_htmx_request({
+                url: action.url,
+                data: { id: id },
+                on_success: () => {
+                    if (action.on_success) {
+                        if (typeof action.on_success === 'function') {
+                            action.on_success();
+                        } else if (action.on_success === 'reload') {
                             this.table.ajax.reload();
                         }
-                    });
+                    }
+                },
+                on_error: () => {
+                    if (action.on_error && typeof action.on_error === 'function') {
+                        action.on_error();
+                    }
                 }
-                break;
-                
-            case 'copy':
-                if (this.options.copy_url) {
-                    this.trigger_htmx_request({
-                        url: this.options.copy_url,
-                        data: { id: id },
-                        on_success: () => {
-                            this.show_notification(`${this.model_name} copied successfully`, 'success');
-                            this.table.ajax.reload();
-                        }
-                    });
-                }
-                break;
-                
-            case 'view':
-                if (this.options.view_url) {
-                    this.trigger_htmx_request({
-                        url: this.options.view_url,
-                        data: { id: id }
-                    });
-                }
-                break;
+            });
+        } else {
+            console.error(`Action '${action_name}' has no URL or handler defined`);
         }
     }
     

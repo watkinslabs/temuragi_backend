@@ -25,6 +25,7 @@ replicate = "*"
 dotenv = "*"
 pyodbc = "*"
 anthropic = "*"
+keyring = "*"
 
 [dev-packages]
 

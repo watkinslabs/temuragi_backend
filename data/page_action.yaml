@@ -1,0 +1,49 @@
+# PageAction Template (Template)
+# Template file - edit values before importing
+# 
+# INSTRUCTIONS:
+# 1. AUTO-GENERATED fields are optional - uncomment to set specific values
+# 2. Update foreign key UUIDs to reference existing records
+# 3. Edit all other values as needed
+# 4. Foreign key constraints must be satisfied before import
+# Template file - edit values before importing
+# Exported from template CLI
+
+PageAction:
+  meta:
+    tablename: page_actions
+    schema: public
+  data:
+    - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+      name: edit
+      icon: fas fa-edit
+      color: #12F
+      display: Edit
+      url: /v2/reports/edit
+      url_for: 
+      method: POST
+      target: #main_content
+      mode: row
+      headers: null
+      payload: id
+      confirm: false
+      confirm_message: Edit This report
+      order_index: 1
+      is_active: true
+    - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+      name: delete
+      icon: fas fa-edit
+      color: #12F
+      display: Delete
+      mode: page
+      url: /v2/reports/edit
+      url_for: 
+      method: POST
+      target: #main_content
+      headers: null
+      payload: id
+      confirm: false
+      confirm_message: Edit This report
+      order_index: 1
+      is_active: true
+            

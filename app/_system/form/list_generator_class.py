@@ -268,9 +268,9 @@ class ReportDataTableGenerator:
         return filters
 
     def generate_datatable_config(self, report_slug: str,
-                                 data_url: Optional[str] = None,
-                                 show_actions: bool = False,
-                                 custom_actions: Optional[List[Dict]] = None) -> Dict[str, Any]:
+                             data_url: Optional[str] = None,
+                             show_actions: bool = False,
+                             custom_actions: Optional[List[Dict]] = None) -> Dict[str, Any]:
         """
         Generate DataTable configuration from a Report record
 
@@ -283,14 +283,50 @@ class ReportDataTableGenerator:
         Returns:
             Dictionary containing the complete configuration
         """
-        # Load the report
+        # Load the report with page_actions
         report = self.load_report_by_slug(report_slug)
 
         self._log(f"Generating DataTable config for report: {report.name}")
 
+        # Convert page_actions to DataTable format
+        actions = []
+        if report.page_actions:
+            self._log(f"Found {len(report.page_actions)} page actions for report")
+            for action in sorted(report.page_actions, key=lambda a: a.order_index):
+                action_config = {
+                    'name': action.name,
+                    'mode': action.mode or 'row',  # Default to 'row' if not specified
+                    'url': action.url or action.url_for,
+                    'icon': action.icon,
+                    'color': action.color,
+                    'title': action.display,
+                }
+                
+                # Add confirmation if needed
+                if action.confirm and action.confirm_message:
+                    action_config['confirm'] = action.confirm_message
+                
+                # Add method if not GET
+                if action.method and action.method != 'GET':
+                    action_config['method'] = action.method.lower()
+                
+                # Add target if not _self
+                if action.target and action.target != '_self':
+                    action_config['target'] = action.target
+                
+                actions.append(action_config)
+                self._log(f"Added action: {action.name} (mode: {action.mode})")
+        
+        # Merge with custom_actions if provided
+        if custom_actions:
+            self._log(f"Merging {len(custom_actions)} custom actions")
+            actions.extend(custom_actions)
+
         # Determine model name and data URL based on report type
         model_name = None
         actual_data_url = data_url  # Store the passed-in override
+
+        # ... rest of the method continues as before ...
         
         if report.is_model:
             self._log(f"Report {report.slug} is marked as model report", level='info')
@@ -364,6 +400,7 @@ class ReportDataTableGenerator:
             'category': report.category,
             'tags': report.tags,
             'is_model': report.is_model,
+            'actions': actions,  
         }
 
         # Add actions if requested
@@ -389,110 +426,196 @@ class ReportDataTableGenerator:
 
         # Create safe variable name by replacing hyphens with underscores
         safe_var_name = config['report_slug'].replace('-', '_').replace('/', '__')
-        
+
         template = f'''<!-- Report DataTable: {config['report_name']} -->
-<div id="report_table_container"></div>
+    <div id="report_table_container"></div>
 
-<script>
-    $(document).ready(function() {{
-        // Create report table instance
-        window.report_{safe_var_name}_table = new DynamicDataTable('report_table_container', '{config['model_name']}','report_{safe_var_name}_table', '{config['data_url']}', {{
-            table_title: '{config['table_title']}',
-            table_description: '{config['table_description']}',
-            report_slug: '{config['report_slug']}',
-            id: '{config['id']}',
-            responsive: true,
-                responsive: {{
-                    details: {{
-                        type: 'column',  // or 'inline', 'column-control'
-                        target: 'tr'
-                    }}
-                }},
+    <script>
+        $(document).ready(function() {{
+            // Create report table instance
+            window.report_{safe_var_name}_table = new DynamicDataTable('report_table_container', '{config['model_name']}','report_{safe_var_name}_table', '{config['data_url']}', {{
+                table_title: '{config['table_title']}',
+                table_description: '{config['table_description']}',
+                report_slug: '{config['report_slug']}',
+                id: '{config['id']}',
+                responsive: true,
+                    responsive: {{
+                        details: {{
+                            type: 'column',  // or 'inline', 'column-control'
+                            target: 'tr'
+                        }}
+                    }},
 
-            // Column definitions from report
-            columns: {columns_js},
+                // Column definitions from report
+                columns: {columns_js},
 
-            // Report features
-            is_searchable: {str(config['is_searchable']).lower()},
-            is_ajax: {str(config['is_ajax']).lower()},
-            is_download_csv: {str(config['is_download_csv']).lower()},
-            is_download_xlsx: {str(config['is_download_xlsx']).lower()},'''
+                // Report features
+                is_searchable: {str(config['is_searchable']).lower()},
+                is_ajax: {str(config['is_ajax']).lower()},
+                is_download_csv: {str(config['is_download_csv']).lower()},
+                is_download_xlsx: {str(config['is_download_xlsx']).lower()},'''
 
-        if config.get('actions'):
+        # Handle custom actions more intelligently
+        if config.get('actions') is not None:
+            # Use the actions from the report (and any custom additions)
+            actions_js = json.dumps(config['actions'])
             template += f'''
 
-            // Actions
-            actions: {json.dumps(config['actions'])},'''
+                // Actions from report configuration
+                actions: {actions_js},'''
+        else:
+            # No actions at all
+            template += f'''
+
+                // No actions configured
+                actions: [],'''
+
 
         if config.get('custom_filters'):
             template += f'''
 
-            // Custom filters from report variables
-            custom_filters: {filters_js},'''
+                // Custom filters from report variables
+                custom_filters: {filters_js},'''
 
         if config.get('is_model') and config.get('model_name'):
-            template += f'''
+            # Only add model URLs if we have actions enabled
+            if config.get('custom_actions') is None or config.get('custom_actions'):
+                template += f'''
 
-            // Model-based URLs
-            create_url: "{{{{ model_url('{config['model_name']}.create') }}}}",
-            edit_url: "{{{{ model_url('{config['model_name']}.edit') }}}}",'''
-
- 
-
-        if config.get('custom_actions'):
-            template += f'''
-
-            // Custom actions
-            custom_actions: {self._dict_to_js_object(config['custom_actions'], indent=16)},'''
+                // Model-based URLs
+                create_url: "{{{{ model_url('{config['model_name']}.create') }}}}",
+                edit_url: "{{{{ model_url('{config['model_name']}.edit') }}}}",'''
 
         template += f'''
 
-            // Additional options
-            pageLength: 25,
-            responsive: true,
-            processing: true,
-            serverSide: {str(config['is_ajax']).lower()},
+                // Additional options
+                pageLength: 25,
+                responsive: true,
+                processing: true,
+                serverSide: {str(config['is_ajax']).lower()},
 
-            // Custom initialization
-            init_complete: function(table) {{
-                console.log('Report table initialized: {config['report_slug']}');
+                // Custom initialization
+                init_complete: function(table) {{
+                    console.log('Report table initialized: {config['report_slug']}');
 
-                // Add export buttons if enabled
-                if ({str(config['is_download_csv']).lower()} || {str(config['is_download_xlsx']).lower()}) {{
-                    const exportButtons = [];
-                    if ({str(config['is_download_csv']).lower()}) {{
-                        exportButtons.push({{
-                            text: '<i class="fas fa-file-csv"></i> CSV',
-                            className: 'btn btn-sm btn-outline-secondary',
-                            action: function() {{
-                                window.location.href = '{config['data_url']}?format=csv';
-                            }}
+                    // Add export buttons if enabled
+                    if ({str(config['is_download_csv']).lower()} || {str(config['is_download_xlsx']).lower()}) {{
+                        const exportButtons = [];
+                        if ({str(config['is_download_csv']).lower()}) {{
+                            exportButtons.push({{
+                                text: '<i class="fas fa-file-csv"></i> CSV',
+                                className: 'btn btn-sm btn-outline-secondary',
+                                action: function() {{
+                                    window.location.href = '{config['data_url']}?format=csv';
+                                }}
+                            }});
+                        }}
+                        if ({str(config['is_download_xlsx']).lower()}) {{
+                            exportButtons.push({{
+                                text: '<i class="fas fa-file-excel"></i> Excel',
+                                className: 'btn btn-sm btn-outline-secondary',
+                                action: function() {{
+                                    window.location.href = '{config['data_url']}?format=xlsx';
+                                }}
+                            }});
+                        }}
+
+                        new $.fn.dataTable.Buttons(table, {{
+                            buttons: exportButtons
                         }});
+                        table.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
                     }}
-                    if ({str(config['is_download_xlsx']).lower()}) {{
-                        exportButtons.push({{
-                            text: '<i class="fas fa-file-excel"></i> Excel',
-                            className: 'btn btn-sm btn-outline-secondary',
-                            action: function() {{
-                                window.location.href = '{config['data_url']}?format=xlsx';
-                            }}
-                        }});
-                    }}
-
-                    new $.fn.dataTable.Buttons(table, {{
-                        buttons: exportButtons
-                    }});
-                    table.buttons().container().appendTo($('.dataTables_wrapper .col-md-6:eq(0)'));
                 }}
-            }}
-        }});
+            }});
 
-        // Initialize the table
-        window.report_{safe_var_name}_table.init();
-    }});
-</script>'''
+            // Initialize the table
+            window.report_{safe_var_name}_table.init();
+        }});
+    </script>'''
 
         return template
+
+    def _process_custom_actions(self, actions: List) -> str:
+        """
+        Process custom actions into JavaScript format
+        
+        Actions can be:
+        - Simple strings: ['edit', 'delete']
+        - Dicts with properties: [{'name': 'edit', 'url': '/custom/edit', 'icon': 'fa-edit'}]
+        """
+        processed_actions = []
+        
+        for action in actions:
+            if isinstance(action, str):
+                # Simple action name
+                processed_actions.append({
+                    'name': action,
+                    'icon': self._get_default_icon(action),
+                    'class': self._get_default_class(action)
+                })
+            elif isinstance(action, dict):
+                # Complex action with properties
+                processed = {
+                    'name': action.get('name', 'action'),
+                    'icon': action.get('icon', self._get_default_icon(action.get('name', ''))),
+                    'class': action.get('class', self._get_default_class(action.get('name', ''))),
+                }
+                
+                # Add optional properties
+                if 'url' in action:
+                    processed['url'] = action['url']
+                if 'label' in action:
+                    processed['label'] = action['label']
+                if 'method' in action:
+                    processed['method'] = action['method']
+                if 'confirm' in action:
+                    processed['confirm'] = action['confirm']
+                if 'callback' in action:
+                    processed['callback'] = action['callback']
+                    
+                processed_actions.append(processed)
+        
+        return self._dict_to_js_object(processed_actions, indent=16)
+
+    def _get_default_icon(self, action_name: str) -> str:
+        """Get default icon for common action names"""
+        icons = {
+            'view': 'fa-eye',
+            'edit': 'fa-edit',
+            'delete': 'fa-trash',
+            'create': 'fa-plus',
+            'copy': 'fa-copy',
+            'duplicate': 'fa-clone',
+            'export': 'fa-download',
+            'print': 'fa-print',
+            'archive': 'fa-archive',
+            'restore': 'fa-undo',
+            'lock': 'fa-lock',
+            'unlock': 'fa-unlock',
+            'approve': 'fa-check',
+            'reject': 'fa-times',
+            'email': 'fa-envelope',
+            'share': 'fa-share',
+        }
+        return icons.get(action_name.lower(), 'fa-cog')
+
+    def _get_default_class(self, action_name: str) -> str:
+        """Get default button class for common action names"""
+        classes = {
+            'view': 'btn-info',
+            'edit': 'btn-primary',
+            'delete': 'btn-danger',
+            'create': 'btn-success',
+            'copy': 'btn-secondary',
+            'duplicate': 'btn-secondary',
+            'export': 'btn-outline-primary',
+            'print': 'btn-outline-secondary',
+            'archive': 'btn-warning',
+            'restore': 'btn-success',
+            'approve': 'btn-success',
+            'reject': 'btn-danger',
+        }
+        return classes.get(action_name.lower(), 'btn-secondary')
 
     def _dict_to_js_object(self, data: Any, indent: int = 0) -> str:
         """Convert Python dict to JavaScript object notation"""

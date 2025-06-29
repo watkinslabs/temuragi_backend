@@ -33,13 +33,11 @@ def sanitize_identifier(name: str, prefix_for_numeric: str = '_', is_table_name:
     """
     # Python reserved keywords
     reserved_words = {
-        'False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await',
-        'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except',
-        'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is',
-        'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return',
-        'try', 'while', 'with', 'yield', 'type', 'match', 'case'
-    }
-    
+        'and','as','assert','async', 'await','break','class','continue','def','del','elif','else','except','False',
+        'finally','for','from','global','if','import','in','is','lambda','match', 'None','nonlocal','not','or',
+        'pass','raise','return','True','try','while','with','yield' }
+
+
     # First, handle empty names
     if not name:
         return prefix_for_numeric + 'unnamed'
@@ -96,8 +94,20 @@ def main():
     parser.add_argument('-c', '--connection', help='Connection string (DSN=TEST_DNS;UID=USER;PWD=PASSWORD)')
     parser.add_argument('-p', '--prefix', default='_', help='Prefix for tables/columns starting with numbers (default: _)')
     parser.add_argument('-b', '--bind-key',  help='Virtual Database Connection to bind tables to (default: dev)',default='dev')
-    
+    parser.add_argument('-s', '--shorten-columns', action='store_true', help='Shorten column names to last segment after underscore')
+    parser.add_argument('-l', '--lowercase-columns', action='store_true', help='Convert column names to lowercase')
+    parser.add_argument('-n', '--snake-case', action='store_true', help='Convert CamelCase column names to snake_case')
+    parser.add_argument('-S', '--shorten-override',  help='Override table name to use for column shortening')
+    parser.add_argument('-N', '--rename-column', action='append', nargs=2, metavar=('OLD_NAME', 'NEW_NAME'), 
+                       help='Rename a specific column (can be used multiple times)')
+
     args = parser.parse_args()
+    
+    # Convert rename_column list to dictionary
+    column_renames = {}
+    if args.rename_column:
+        for old_name, new_name in args.rename_column:
+            column_renames[old_name] = new_name
     
     # Strip schema prefix from table name if provided
     table_name = args.table
@@ -118,9 +128,29 @@ def main():
     
     # Create generator
     if output_dir:
-        generator = mssql_model_generator(args.connection, output_dir, numeric_table_prefix=args.prefix,bind_key=args.bind_key)
+        generator = mssql_model_generator(
+            args.connection, 
+            output_dir, 
+            numeric_table_prefix=args.prefix,
+            bind_key=args.bind_key,
+            shorten_columns=args.shorten_columns,
+            lowercase_columns=args.lowercase_columns,
+            snake_case=args.snake_case,
+            shorten_override=args.shorten_override,
+            column_renames=column_renames
+        )
     else:
-        generator = mssql_model_generator(args.connection, '.', numeric_table_prefix=args.prefix,bind_key=args.bind_key)
+        generator = mssql_model_generator(
+            args.connection, 
+            '.', 
+            numeric_table_prefix=args.prefix,
+            bind_key=args.bind_key,
+            shorten_columns=args.shorten_columns,
+            lowercase_columns=args.lowercase_columns,
+            snake_case=args.snake_case,
+            shorten_override=args.shorten_override,
+            column_renames=column_renames
+        )
     
     logger.info(f"Database(s): {args.database}")
     if table_name:
@@ -129,6 +159,9 @@ def main():
         logger.info(f"Output file: {output_file}")
     else:
         logger.info(f"Output directory: {generator.output_dir}")
+    logger.info(f"Column options: shorten={args.shorten_columns}, lowercase={args.lowercase_columns}, snake_case={args.snake_case}")
+    if column_renames:
+        logger.info(f"Column renames: {column_renames}")
     
     try:
         # Connect to database
@@ -148,7 +181,7 @@ def main():
             ddl = generator.get_table_ddl(table_name)
             
             # Generate model programmatically
-            model_code = generator.generate_model_programmatically(table_name, ddl, database_name)
+            model_code, status = generator.generate_model_programmatically(table_name, ddl, database_name)
             
             # Save model
             if output_file:
@@ -158,7 +191,7 @@ def main():
                 logger.info(f"Saved model to {output_file}")
             else:
                 # Save to directory structure
-                generator.save_model(database_name, "dbo", table_name, model_code)
+                generator.save_model(database_name, "dbo", table_name, model_code, status)
         else:
             # Process all tables in database(s)
             generator.process_database(args.database)
@@ -168,13 +201,21 @@ def main():
         generator.disconnect()
 
 class mssql_model_generator:
-    def __init__(self, connection_string: str, output_dir: str = "generated_models",numeric_table_prefix='_',bind_key='dev'):
+    def __init__(self, connection_string: str, output_dir: str = "generated_models", 
+         numeric_table_prefix='_', bind_key='dev', shorten_columns=False, 
+         lowercase_columns=False, snake_case=False, shorten_override=None,
+         column_renames=None):
         self.connection_string = connection_string
         self.output_dir = Path(output_dir)
         self.connection = None
         self.numeric_table_prefix = numeric_table_prefix
-        self.bind_key=bind_key
-        self.header="""import re
+        self.bind_key = bind_key
+        self.shorten_columns = shorten_columns
+        self.lowercase_columns = lowercase_columns
+        self.snake_case = snake_case
+        self.shorten_override = shorten_override
+        self.column_renames = column_renames or {}
+        self.header = """import re
 from datetime import datetime
 from sqlalchemy import (
     Column, String, Integer, Boolean, DateTime, Time, Date, Text, 
@@ -255,6 +296,7 @@ from app.base.model import Base
             
         cursor.close()
         
+         
     def get_table_ddl(self, table_name: str) -> str:
         """Generate DDL for a specific table - simplified for SQL Server 2008 R2 compatibility"""
         cursor = self.connection.cursor()
@@ -286,7 +328,7 @@ from app.base.model import Base
         AND c.TABLE_NAME = ?
         ORDER BY c.ORDINAL_POSITION
         """
-        
+
         try:
             cursor.execute(column_query, table_name)
             columns = cursor.fetchall()
@@ -445,6 +487,7 @@ from app.base.model import Base
         cursor.close()
         return ddl
 
+ 
     def save_model(self, database_name: str, schema_name: str, table_name: str, model_code: str, status: str = 'GOOD'):
         """Save generated model to appropriate directory structure
         
@@ -473,7 +516,8 @@ from app.base.model import Base
         with open(file_path, 'w') as f:
             f.write(model_code)
             
-        logger.info(f"Saved model to {file_path} (status: {status})")   
+        logger.info(f"Saved model to {file_path} (status: {status})")
+        
     def switch_database(self, database_name: str):
         """Switch to a different database"""
         try:
@@ -537,6 +581,32 @@ from app.base.model import Base
                     logger.error(f"Error processing database {database_name}: {e}")
                     continue
                     
+    def _camel_to_snake(self, name: str) -> str:
+        """Convert CamelCase to snake_case
+        
+        Examples:
+            vendorInv -> vendor_inv
+            FirstName -> first_name
+            CustomerID -> customer_id
+            XMLParser -> xml_parser
+            IOError -> io_error
+            PODETAILID -> podetailid (all caps stays together)
+        """
+        # First, handle the transition from lowercase to uppercase
+        # This is the most common case: vendorInv -> vendor_Inv
+        s1 = re.sub('([a-z])([A-Z])', r'\1_\2', name)
+        
+        # Handle transition from number to uppercase
+        # Example: address1Line -> address1_Line
+        s2 = re.sub('([0-9])([A-Z])', r'\1_\2', s1)
+        
+        # Handle multiple capitals followed by a lowercase letter
+        # Example: XMLParser -> XML_Parser, HTMLElement -> HTML_Element
+        s3 = re.sub('([A-Z]+)([A-Z][a-z])', r'\1_\2', s2)
+        
+        # Convert to lowercase
+        return s3.lower()
+    
     def _build_column_definition(self, col: dict, is_primary_key: bool) -> str:
         """Build SQLAlchemy column definition from column info"""
         
@@ -625,7 +695,7 @@ from app.base.model import Base
             Tuple of (model_code, status) where status is 'GOOD', 'PATCH', or 'BAD'
         """
 
-         # Create class name as Database_Schema_TableName
+        # Create class name as Database_Schema_TableName
         # Sanitize each part separately then combine
         safe_db = sanitize_identifier(database_name, self.numeric_table_prefix, is_table_name=False)
         safe_table = sanitize_identifier(table_name, self.numeric_table_prefix, is_table_name=False)
@@ -639,8 +709,6 @@ from app.base.model import Base
         primary_keys = []
         status = 'GOOD'  # Default status
         
-        # DEBUG: Show column extraction
-        print("\nDEBUG: Extracting columns...")
         
         # Extract column definitions from DDL line by line
         lines = ddl.split('\n')
@@ -681,7 +749,7 @@ from app.base.model import Base
                         # Get the rest of the line after the data type
                         rest_start = simple_match.end()
                     else:
-                        print(f"DEBUG: Could not parse column name from: {line}")
+                        logger.debug(f"Could not parse column name from: {line}")
                         continue
                     
                     # Extract the rest of the line for type params and modifiers
@@ -702,7 +770,6 @@ from app.base.model import Base
                     if 'NOT NULL' in rest_of_line:
                         nullable = False
                     
-                    print(f"DEBUG: Found column: {col_name} {data_type}({type_params}) nullable={nullable}")
                     
                     columns.append({
                         'name': col_name,
@@ -713,9 +780,14 @@ from app.base.model import Base
                     })
                         
                 except Exception as e:
-                    print(f"DEBUG: Error parsing line '{line}': {e}")
+                    logger.debug(f"Error parsing line '{line}': {e}")
         
-        print(f"\nDEBUG: Total columns found: {len(columns)}")
+        logger.debug(f"Total columns found: {len(columns)}")
+        
+        # If no columns found, log the DDL for debugging
+        if len(columns) == 0:
+            logger.error(f"No columns found for table {table_name}. DDL preview:")
+            logger.error(ddl[:500] + "..." if len(ddl) > 500 else ddl)
         
         # Extract primary key columns
         pk_pattern = r'CONSTRAINT\s+\[?[^\]]+\]?\s+PRIMARY KEY\s*\(([^)]+)\)'
@@ -723,9 +795,9 @@ from app.base.model import Base
         if pk_match:
             pk_cols = pk_match.group(1)
             primary_keys = [col.strip().strip('[]') for col in pk_cols.split(',')]
-            print(f"DEBUG: Found PRIMARY KEY constraint with columns: {primary_keys}")
+            logger.debug(f"Found PRIMARY KEY constraint with columns: {primary_keys}")
         else:
-            print("DEBUG: No PRIMARY KEY constraint found - checking for IDENTITY columns")
+            logger.debug("No PRIMARY KEY constraint found - checking for IDENTITY columns")
             # Look for IDENTITY columns in the DDL
             identity_pattern = r'\[([^\]]+)\]\s+\w+(?:\([^)]+\))?\s+IDENTITY(?:\([^)]+\))?'
             identity_match = re.search(identity_pattern, ddl)
@@ -733,9 +805,9 @@ from app.base.model import Base
                 identity_col = identity_match.group(1)
                 primary_keys = [identity_col]
                 status = 'PATCH'  # Mark as patched
-                print(f"DEBUG: Found IDENTITY column '{identity_col}' - using as primary key (PATCH)")
+                logger.debug(f"Found IDENTITY column '{identity_col}' - using as primary key (PATCH)")
             else:
-                print("DEBUG: No IDENTITY column found either - marking as BAD")
+                logger.debug("No IDENTITY column found either - marking as BAD")
                 status = 'BAD'
         
         # Extract unique constraints from comments
@@ -829,27 +901,34 @@ from app.base.model import Base
         
         model_lines.append("")  # Empty line before columns
         
+        # Track used names for conflict resolution
+        used_names = {}
+        
         # Create a mapping to track sanitized names for primary keys
         sanitized_pk_names = {}
         for pk in primary_keys:
-            sanitized_pk_names[pk] = sanitize_identifier(pk, self.numeric_table_prefix, is_table_name=False)
+            safe_pk_name = self._process_column_name(pk, used_names, table_name)
+            sanitized_pk_names[pk] = safe_pk_name
+        
+        # Reset used_names for actual column processing
+        used_names = {}
         
         # Add columns
         for col in columns:
-            # Sanitize column name
-            safe_col_name = sanitize_identifier(col['name'], self.numeric_table_prefix, is_table_name=False)
+            # Process column name
+            safe_col_name = self._process_column_name(col['name'], used_names, table_name)
+            
             
             col_def = self._build_column_definition(col, col['name'] in primary_keys)
             
-            # If we renamed the column, we need to specify the actual DB column name
-            if safe_col_name != col['name']:
-                # Add the key parameter to map to the actual column name
-                if col_def.endswith(')'):
-                    # Insert key parameter before the closing paren
-                    col_def = col_def[:-1] + f", key='{col['name']}')"
-                else:
-                    # No closing paren (like for simple Column(Integer))
-                    col_def += f", key='{col['name']}')"
+            # Always add the name parameter to map to the actual DB column name
+            # (This ensures we always have the correct mapping, even if names match)
+            if col_def.endswith(')'):
+                # Insert name parameter before the closing paren
+                col_def = col_def[:-1] + f", name='{col['name']}')"
+            else:
+                # No closing paren (like for simple Column(Integer))
+                col_def += f", name='{col['name']}')"
             
             model_lines.append(f"    {safe_col_name} = {col_def}")
         
@@ -860,7 +939,7 @@ from app.base.model import Base
             # Use original primary key names in the display
             pk_parts = []
             for pk in primary_keys:
-                safe_pk = sanitized_pk_names.get(pk, sanitize_identifier(pk, self.numeric_table_prefix, is_table_name=False))
+                safe_pk = sanitized_pk_names.get(pk, self._process_column_name(pk, {}, table_name))
                 pk_parts.append(f"{pk}={{self.{safe_pk}}}")
             pk_str = ', '.join(pk_parts)
             # Use original table name in repr for readability
@@ -870,6 +949,85 @@ from app.base.model import Base
         
         return '\n'.join(model_lines), status
     
+    def _process_column_name(self, col_name: str, used_names: Dict[str, int], table_name: str = None) -> str:
+        """Process column name based on shorten and lowercase flags
+        
+        Args:
+            col_name: Original column name
+            used_names: Dictionary tracking used names for conflict resolution
+            table_name: Table name to help identify prefixes to remove
+            
+        Returns:
+            Processed column name
+        """
+        processed_name = col_name
+        
+        # Check if this column has a rename specified
+        if col_name in self.column_renames:
+            processed_name = self.column_renames[col_name]
+            logger.debug(f"Renamed column '{col_name}' to '{processed_name}'")
+        
+        # Apply shortening if enabled
+        if self.shorten_columns:
+            # Use override table name if specified, otherwise use actual table name
+            effective_table_name = self.shorten_override if self.shorten_override else table_name
+            
+            if effective_table_name:
+                # Convert both to uppercase for comparison
+                col_upper = processed_name.upper()
+                table_upper = effective_table_name.upper()
+                
+                # Try different prefix patterns
+                # 1. Try exact match with underscore: "BKAP_POL_" from "BKAP_POL_PQTY"
+                if col_upper.startswith(table_upper + '_'):
+                    processed_name = processed_name[len(table_upper) + 1:]
+                    logger.debug(f"Removed prefix '{table_upper}_' from column")
+                # 2. Try without underscore: "BKAPPOL" from "BKAPPOLPQTY" 
+                elif col_upper.replace('_', '').startswith(table_upper.replace('_', '')):
+                    # Find where the prefix ends in the original column
+                    table_no_underscore = table_upper.replace('_', '')
+                    col_chars = []
+                    matched_chars = 0
+                    
+                    for i, char in enumerate(col_upper):
+                        if char != '_':
+                            col_chars.append(char)
+                            if matched_chars < len(table_no_underscore) and col_chars[-1] == table_no_underscore[matched_chars]:
+                                matched_chars += 1
+                                if matched_chars == len(table_no_underscore):
+                                    # Found the end of the match
+                                    # Skip any trailing underscores
+                                    end_pos = i + 1
+                                    while end_pos < len(processed_name) and processed_name[end_pos] == '_':
+                                        end_pos += 1
+                                    if end_pos < len(processed_name):
+                                        processed_name = processed_name[end_pos:]
+                                        logger.debug(f"Removed prefix matching '{table_upper}' pattern from column")
+                                    break
+        
+        # Apply snake_case conversion if enabled (after shortening)
+        if self.snake_case:
+            processed_name = self._camel_to_snake(processed_name)
+
+        # Apply lowercase if enabled (might be redundant with snake_case)
+        if self.lowercase_columns and not self.snake_case:
+            processed_name = processed_name.lower()
+        
+        # Sanitize the name
+        safe_name = sanitize_identifier(processed_name, self.numeric_table_prefix, is_table_name=False)
+        
+        # Handle naming conflicts
+        base_name = safe_name
+        if base_name in used_names:
+            used_names[base_name] += 1
+            safe_name = f"{base_name}_{used_names[base_name]}"
+        else:
+            used_names[base_name] = 1
+        
+        # Debug output
+        logger.debug(f"Column name processing: '{col_name}' -> '{processed_name}' -> '{safe_name}' (snake={self.snake_case}, lower={self.lowercase_columns}, shorten={self.shorten_columns}, override={self.shorten_override}, renamed={col_name in self.column_renames})")
+        
+        return safe_name
 
 if __name__ == "__main__":
     main()

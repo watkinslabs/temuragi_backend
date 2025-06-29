@@ -22,11 +22,13 @@ class RoutingSession(Session):
         # Pass the bind to parent class
         super().__init__(bind=self._default_bind, **options)
     
+    # In your RoutingSession.get_bind method, add logging:
     def get_bind(self, mapper=None, clause=None):
         """Return the engine for the given model based on its __bind_key__"""
         if mapper is not None:
             model_class = mapper.class_
             bind_key = getattr(model_class, '__bind_key__', None)
+            
             
             if bind_key:
                 # Get or create engine for this bind key
@@ -72,6 +74,7 @@ class DynamicDatabaseRegistry:
     
     def get_or_create_engine(self, bind_key):
         """Get or create an engine for the given bind key"""
+        
         if not bind_key:
             return self.main_engine
         
@@ -79,20 +82,24 @@ class DynamicDatabaseRegistry:
         if bind_key in self._dynamic_engines:
             return self._dynamic_engines[bind_key]
         
+        
         # Look up connection from database
+        main_session = None
         try:
             # Use a separate session to query the main database
             main_session = sessionmaker(bind=self.main_engine)()
             
             # Import here to avoid circular imports
-            from app.models.connection import Connection
+            from app.models import Connection
+            
+            # List all available connections first
+            all_connections = main_session.query(Connection).all()
             
             connection = main_session.query(Connection).filter_by(name=bind_key).first()
-            main_session.close()
             
             if not connection:
-                self._app.logger.warning(f"No connection found for bind_key: {bind_key}")
                 return None
+            
             
             # Get the connection string with credentials
             connection_string = connection.get_connection_string()
@@ -100,57 +107,40 @@ class DynamicDatabaseRegistry:
             # Create the engine
             engine = create_engine(connection_string, pool_size=5, max_overflow=10)
             
+            with engine.connect() as conn:
+                result = conn.execute(text("SELECT 1"))
+            
             # Cache it
             self._dynamic_engines[bind_key] = engine
-            
             self._app.logger.info(f"Created dynamic engine for bind_key: {bind_key}")
             
             return engine
             
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             self._app.logger.error(f"Failed to create engine for bind_key {bind_key}: {e}")
             return None
-    
+        finally:
+            if main_session:
+                main_session.close()
+
     def create_all_tables(self, base_model, app):
         """Create tables for all models in their respective databases"""
         
-        # Group models by their bind key
-        models_by_bind = defaultdict(list)
+        # Verify we have metadata
+        if not hasattr(base_model, 'metadata'):
+            app.logger.error(f"Base model has no metadata attribute: {base_model}")
+            raise AttributeError("Base model must have metadata attribute")
         
-        from .classes import _class_registry
+        # Just create ALL tables in the main database, regardless of bind_key
+        app.logger.info("Creating all tables in main database")
         
-        for name, model_class in _class_registry.items():
-            if (hasattr(model_class, '__tablename__') and
-                hasattr(model_class, '__name__') and
-                name == model_class.__name__):
-                
-                bind_key = getattr(model_class, '__bind_key__', None)
-                models_by_bind[bind_key].append(model_class)
+        # Create all tables defined in the metadata
+        base_model.metadata.create_all(self.main_engine, checkfirst=True)
         
-        # First, create tables for models without bind_key (main database)
-        if None in models_by_bind:
-            main_models = models_by_bind[None]
-            app.logger.info(f"Creating {len(main_models)} tables in main database")
-            
-            tables_to_create = [model.__table__ for model in main_models]
-            base_model.metadata.create_all(self.main_engine, tables=tables_to_create, checkfirst=True)
-            
-            self._log_tables(self.main_engine, 'main', app)
+        self._log_tables(self.main_engine, 'main', app)
         
-        # Then create tables for models with bind_key (dynamic databases)
-        for bind_key, models in models_by_bind.items():
-            if bind_key is not None:  # Skip None, we handled it above
-                engine = self.get_or_create_engine(bind_key)
-                if engine:
-                    app.logger.info(f"Creating {len(models)} tables for bind_key '{bind_key}'")
-                    
-                    tables_to_create = [model.__table__ for model in models]
-                    base_model.metadata.create_all(engine, tables=tables_to_create, checkfirst=True)
-                    
-                    self._log_tables(engine, bind_key, app)
-                else:
-                    app.logger.warning(f"Skipping table creation for bind_key '{bind_key}' - no engine available")
-    
     def _log_tables(self, engine, db_name, app):
         """Log tables in a database"""
         try:
@@ -197,42 +187,6 @@ def register_db(app: Flask):
         g.db_registry = db_registry
 
 
-def create_all_tables(app, engine=None):
-    """Create database tables from all loaded models"""
-    try:
-        # Find BaseModel
-        base_paths = [
-            'app.base.model',
-            'app._system.base',
-            'app.base'
-        ]
-        
-        BaseModel = None
-        for path in base_paths:
-            try:
-                module = importlib.import_module(path)
-                BaseModel = getattr(module, 'BaseModel', None)
-                if BaseModel:
-                    break
-            except ImportError:
-                continue
-        
-        if not BaseModel:
-            raise ImportError("BaseModel not found")
-        
-        app.logger.info("Creating database tables for all configured databases...")
-        
-        from .classes import _class_registry, get_model
-        app.get_model = get_model
-        
-        # Use the registry to create tables in all databases
-        db_registry.create_all_tables(BaseModel, app)
-        
-        app.logger.info("All database tables created successfully")
-        
-    except Exception as e:
-        app.logger.error(f"Failed to create tables: {e}")
-        raise
 
 
 # Utility functions for manual engine management if needed
@@ -249,3 +203,55 @@ def refresh_dynamic_engine(bind_key):
         del db_registry._dynamic_engines[bind_key]
     
     return db_registry.get_or_create_engine(bind_key)
+
+def create_all_tables(app, engine=None):
+    """Debug version of create_all_tables with extensive logging"""
+    from app.base.model import Base
+    from sqlalchemy import MetaData
+    
+    if Base and hasattr(Base, 'metadata') and Base.metadata is not None:
+        try:
+            # Create a new metadata instance for filtered tables
+            filtered_metadata = MetaData()
+            
+            # Track what we're doing
+            total_tables = len(Base.metadata.tables)
+            filtered_count = 0
+            
+            # Iterate through all tables in the original metadata
+            for table_name, table in Base.metadata.tables.items():
+                # Find the model class for this table
+                model_class = None
+                for mapper in Base.registry.mappers:
+                    if mapper.class_.__table__.name == table.name:
+                        model_class = mapper.class_
+                        break
+                
+                # Check if model has NO __bind_key__ or it's None
+                if model_class:
+                    if not hasattr(model_class, '__bind_key__') or model_class.__bind_key__ is None:
+                        # Copy table to filtered metadata
+                        table.tometadata(filtered_metadata)
+                        filtered_count += 1
+                        app.logger.debug(f"   - Including table '{table_name}' (no bind_key)")
+                    else:
+                        app.logger.debug(f"   - Skipping table '{table_name}' (has bind_key='{model_class.__bind_key__}')")
+                else:
+                    # No model class found, include it by default
+                    table.tometadata(filtered_metadata)
+                    filtered_count += 1
+                    app.logger.debug(f"   - Including table '{table_name}' (no model class found)")
+            
+            app.logger.info(f"   - Filtered {filtered_count} tables from {total_tables} total")
+            
+            # Only create tables if we have any to create
+            if filtered_count > 0:
+                filtered_metadata.create_all(engine, checkfirst=True)
+                app.logger.info(f"   - Created {filtered_count} tables successfully")
+            else:
+                app.logger.info("   - No tables to create (all models have bind_key set)")
+                
+        except Exception as e:
+            raise
+    else:
+        app.logger.error("   - CANNOT CREATE TABLES: Base or metadata is invalid")

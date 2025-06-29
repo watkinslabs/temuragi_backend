@@ -22,7 +22,8 @@ from .register.classes import register_classes
 def create_app():
     
     app = Flask(__name__)
-      
+    app.extensions={}
+    
     app.config.update(config)
     register_logger(app)
     

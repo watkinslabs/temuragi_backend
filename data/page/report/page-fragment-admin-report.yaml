@@ -30,7 +30,7 @@ PageFragment:
             <script>
                 $(document).ready(function() {
                     // Create global reference for action handlers
-                    window.report_table = new DynamicDataTable('dynamic_table_container', 'Report', '{{ url_for('miner.data') }}', {
+                    window.report_table = new DynamicDataTable('dynamic_table_container', 'Report', 'report_table', '{{ url_for('miner.data') }}', {
                         table_title: 'Report Management',
                         table_description: 'Create and manage SQL reports with dynamic parameters',
                         columns: {

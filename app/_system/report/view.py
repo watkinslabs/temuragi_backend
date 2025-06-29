@@ -4,7 +4,7 @@ HTML page routes for report viewing and editing
 """
 
 from flask import Blueprint, render_template_string, g, request
-from app.classes import ReportService
+from app.classes import ReportService, TemplateRenderer
 
 # Create blueprint for report pages
 bp = Blueprint('report', __name__, url_prefix='/reports')
@@ -19,6 +19,15 @@ def get_service():
 # PAGE ROUTES (HTML VIEWS)
 # =====================================================================
 
+
+@bp.route('/', methods=['GET', 'POST'])
+def list():
+    # Get database session from Flask g context
+    session = g.session
+    slug="report"
+    renderer = TemplateRenderer(session)
+    rendered_content = renderer.render_page(slug)
+    return rendered_content
 
 @bp.route('/<report_id>', methods=['POST'])
 def view_report(report_id):

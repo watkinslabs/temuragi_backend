@@ -9,4 +9,6 @@ bp = Blueprint('miner', __name__, url_prefix='/api')
 def data():
     """Route handler that delegates to Miner service"""
     miner = Miner(current_app)
+    miner=  current_app.extensions['Miner']
+    
     return miner.data_endpoint()
