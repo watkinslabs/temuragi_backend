@@ -15,7 +15,7 @@ TemplateFragment:
       version_label: v1.0.0
       is_active: true
       template_source: |
-            <p>&copy; 2025 Documentation Site. All rights reserved.</p>
+            <p>{{ site.footer_text }}</p>
       template_hash: null
       variables_schema: |
         {

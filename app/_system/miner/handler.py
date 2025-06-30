@@ -33,8 +33,7 @@ class DataBrokerError(MinerError):
 class BaseDataHandler:
     """Base class for specialized data handlers"""
     
-    def __init__(self, session, auth_context, logger=None):
-        self.session = session
+    def __init__(self, auth_context, logger=None):
         self.auth_context = auth_context
         self.logger = logger
         self.user_id = auth_context.get('user_id') if auth_context else None

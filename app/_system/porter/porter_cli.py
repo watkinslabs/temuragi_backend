@@ -34,11 +34,11 @@ class PorterCLI(BaseCLI):
 
         try:
             # Initialize exporter and importer
-            self.exporter = ComponentExporter(self.session, self)
-            self.importer = ComponentImporter(self.session, self, self.get_model)
+            self.exporter = ComponentExporter(self)
+            self.importer = ComponentImporter(self, self.get_model)
             
             # Initialize dependency resolver
-            self.dependency_resolver = ImportDependencyResolver(self.session, self, self.get_model)
+            self.dependency_resolver = ImportDependencyResolver( self, self.get_model)
 
             self.log_info("Porter CLI initialized successfully")
 

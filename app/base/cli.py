@@ -12,13 +12,16 @@ from app.register.classes import register_classes, get_class, get_model
 _cli_registry_initialized = False
 _cli_db_initialized = False
 
+    
+from app.register.database import db_registry,register_db
+
+
 class AppBase:
-    session=None
     logger=None
 
     def __init__(self):
         pass
-    
+
 
 class BaseCLI:
     """
@@ -39,6 +42,7 @@ class BaseCLI:
             table_format: Table format for tabulate (overrides config)
             console_logging: Also log to console (useful for debugging)
         """
+        
         self.name = name
         self.verbose = verbose
         self.show_icons = show_icons
@@ -46,11 +50,6 @@ class BaseCLI:
         self.session = None
         self.initialization_errors = []
         self.app=AppBase()
-
-        # Configure table format from config or parameter
-        self.table_format = table_format or config.get('CLI_TABLE_FORMAT', 'simple')
-
-        # Icon mapping for output types
         self._icons = {
             'success': '✓',
             'error': '✗',
@@ -59,16 +58,19 @@ class BaseCLI:
             'debug': '🔍'
         } if show_icons else {}
 
-        # Setup logging first
-        try:
-            self._setup_logger(log_level, log_file)
-            self.log_info(f"CLI instance '{self.name}' initializing")
-            self.log_debug(f"Table format set to: {self.table_format}")
-            self.log_debug(f"Verbose mode: {self.verbose}")
-            self.log_debug(f"Console logging: {self.console_logging}")
-        except Exception as e:
-            self.initialization_errors.append(f"Logger setup failed: {e}")
-            print(f"ERROR: Failed to setup logger: {e}")
+        self._setup_logger(log_level, log_file)
+        register_db(self.app)
+        if db_registry==None:
+            print ("FDSFSD")
+        # Configure table format from config or parameter
+        self.table_format = table_format or config.get('CLI_TABLE_FORMAT', 'simple')
+
+
+        self.log_info(f"CLI instance '{self.name}' initializing")
+        self.log_debug(f"Table format set to: {self.table_format}")
+        self.log_debug(f"Verbose mode: {self.verbose}")
+        self.log_debug(f"Console logging: {self.console_logging}")
+        #self.db_session=db_registry._routing_session()
 
         if name != "tmcli":  # Don't setup for the master CLI itself
 
@@ -133,7 +135,6 @@ class BaseCLI:
         self.logger.handlers.clear()
         self.logger.addHandler(file_handler)
 
-        self.app.logger=self.logger
 
         # Add console handler if requested
         if self.console_logging:
@@ -149,6 +150,7 @@ class BaseCLI:
         self.logger.info(f"Logger configured - Level: {logging.getLevelName(log_level)}, File: {log_file}")
         if self.console_logging:
             self.logger.info("Console logging enabled")
+        self.app.logger=self.logger
 
     def _setup_class_registry(self):
         """Setup class registry for CLI usage - only register once per process"""
@@ -180,7 +182,6 @@ class BaseCLI:
             engine = create_engine(config['DATABASE_URI'])
             session_factory = sessionmaker(bind=engine)
             self.session = session_factory()
-            self.app.session=self.session
             self.log_info("Database session created successfully")
             
             # Verify models are available (they should be loaded by autoloader)

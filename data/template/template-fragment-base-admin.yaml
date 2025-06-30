@@ -74,7 +74,20 @@ TemplateFragment:
             .auth-loading.hidden {
             display: none;
             }
-
+            .logo_wrapper {
+                display: flex;
+                align-items: center;
+                height: 70px;
+            }
+            .header_brand {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            .header_logo{
+                width: auto;
+                height:66px;
+            }
             /* HTMX loading indicator */
             .htmx-loading::before {
             content: "";

@@ -10,6 +10,15 @@ logger = logging.getLogger(__name__)
 
 
 
+@bp.route('dashboard/<slug>', methods=['GET', 'POST'])
+def render_dashboard(slug):
+    # Create template renderer
+    renderer = TemplateRenderer()
+    rendered_content = renderer.render_page("home",menu_name=slug)
+
+    
+    return rendered_content
+
 
 @bp.route('<slug>/list', methods=['GET', 'POST'])
 def render_dynamic_list(slug):
@@ -18,15 +27,13 @@ def render_dynamic_list(slug):
     Handles both GET and POST requests for forms.
     """
     try:
-        # Get database session from Flask g context
-        session = g.session
         slug="f/"+slug.lower()+"/list"
         logger.info(f"Rendering page with slug: {slug}")
         
         print(f"Successfully rendered page: {slug}")
         
         # Create template renderer
-        renderer = TemplateRenderer(session)
+        renderer = TemplateRenderer()
         rendered_content = renderer.render_page(slug)
 
         
@@ -108,8 +115,6 @@ def render_dynamic_manage(slug):
     Handles both GET and POST requests for forms.
     """
     try:
-        # Get database session from Flask g context
-        session = g.session
         slug="f/"+slug.lower()+"/manage"
         logger.info(f"Rendering page with slug: {slug}")
         try:
@@ -120,7 +125,7 @@ def render_dynamic_manage(slug):
         
         
         # Create template renderer
-        renderer = TemplateRenderer(session)
+        renderer = TemplateRenderer()
         if data:
             rendered_content = renderer.render_page(slug,id=data['id'])
         else:

@@ -9,6 +9,7 @@ from app.utils import jsonify
 
 
 from app.register.classes import get_model
+from app.register.database import db_registry
 
 from .handler import  (
         MinerError,
@@ -28,6 +29,8 @@ class Miner:
         self.app = app
         self.logger = None
         self.data_handlers = {}  # Registry for specialized data handlers
+        self.db_session=db_registry._routing_session()
+
         if app:
             self.init_app(app)
 
@@ -75,7 +78,6 @@ class Miner:
         try:
             # Initialize handler with context
             handler = handler_class(
-                session=g.session,
                 auth_context=context or g.auth_context,
                 logger=self.logger
             )
@@ -216,7 +218,7 @@ class Miner:
             if not user_token_model:
                 raise MinerError('Authentication system unavailable', 'SystemError', 500)
 
-            token_obj = user_token_model.validate_token(g.session, auth_token)
+            token_obj = user_token_model.validate_token(auth_token)
             if not token_obj:
                 raise MinerError('Invalid or expired token', 'AuthenticationError', 401)
 
@@ -389,7 +391,7 @@ class Miner:
         # Import here to avoid circular imports
         from app.classes  import RbacPermissionChecker
         
-        checker = RbacPermissionChecker(g.session)
+        checker = RbacPermissionChecker()
         
         # Check permission with automatic auditing
         granted = checker.check_api_permission(
@@ -412,7 +414,7 @@ class Miner:
             audit_log_model = get_model('ApiAuditLog')
             if audit_log_model:
                 audit_log_model.log_permission_check(
-                    g.session, user_id, permission_name, False, 
+                    user_id, permission_name, False, 
                     f'Access denied for permission: {permission_name}'
                 )
         except Exception as e:
@@ -441,7 +443,7 @@ class Miner:
         try:
             audit_log_model = get_model('ApiAuditLog')
             if audit_log_model:
-                audit_log_model.log_api_request(g.session, **audit_data)
+                audit_log_model.log_api_request(**audit_data)
         except Exception as e:
             self.logger.warning(f"Audit logging failed: {e}")
 
@@ -641,7 +643,7 @@ class Miner:
         
         # Build query
         column = getattr(model_class, filter_column)
-        instance = g.session.query(model_class).filter(column == filter_value).first()
+        instance = self.db_session.query(model_class).filter(column == filter_value).first()
         
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
@@ -673,8 +675,8 @@ class Miner:
 
         # Create new instance
         instance = model_class(**filtered_data)
-        g.session.add(instance)
-        g.session.commit()
+        self.db_session.add(instance)
+        self.db_session.commit()
 
 
         pk_value = self._get_instance_pk_value(instance)
@@ -728,7 +730,7 @@ class Miner:
         
         # Find record
         column = getattr(model_class, filter_column)
-        instance = g.session.query(model_class).filter(column == filter_value).first()
+        instance = self.db_session.query(model_class).filter(column == filter_value).first()
         
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
@@ -749,7 +751,7 @@ class Miner:
                     setattr(instance, field, value)
                     fields_updated.append(field)
         
-        g.session.commit()
+        self.db_session.commit()
         
         # Update audit data
         audit_data['records_returned'] = 1
@@ -801,7 +803,7 @@ class Miner:
         
         # Find record
         column = getattr(model_class, filter_column)
-        instance = g.session.query(model_class).filter(column == filter_value).first()
+        instance = self.db_session.query(model_class).filter(column == filter_value).first()
         
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
@@ -810,15 +812,15 @@ class Miner:
         audit_data['filter_used'] = {filter_column: filter_value}
         
         if hard_delete:
-            g.session.delete(instance)
+            self.db_session.delete(instance)
         else:
             # Soft delete if model supports it
             if hasattr(instance, 'soft_delete'):
                 instance.soft_delete()
             else:
-                g.session.delete(instance)
+                self.db_session.delete(instance)
         
-        g.session.commit()
+        self.db_session.commit()
         
         delete_type = 'permanently deleted' if hard_delete else 'deactivated'
         
@@ -866,7 +868,7 @@ class Miner:
         slim = data.get('slim', False)
         
         # Start building query
-        query = g.session.query(model_class)
+        query = self.db_session.query(model_class)
         
         # Apply active filter unless explicitly including inactive
         if hasattr(model_class, 'is_active') and not include_inactive:
@@ -883,7 +885,7 @@ class Miner:
         # Get total count before filtering (for DataTables recordsTotal)
         pk_field = self._get_primary_key_field(model_class)
         pk_column = getattr(model_class, pk_field)
-        total_query = g.session.query(func.count(pk_column))
+        total_query = self.db_session.query(func.count(pk_column))
         if hasattr(model_class, 'is_active') and not include_inactive:
             total_query = total_query.filter(model_class.is_active == True)
         records_total = total_query.scalar() or 0
@@ -891,7 +893,7 @@ class Miner:
         # Get filtered count (for DataTables recordsFiltered) - using subquery approach
         # Create a subquery from the current query without ordering
         subquery = query.order_by(None).subquery()
-        records_filtered = g.session.query(func.count()).select_from(subquery).scalar() or 0
+        records_filtered = self.db_session.query(func.count()).select_from(subquery).scalar() or 0
         
         # Apply sorting
         query = self._apply_sorting(query, model_class, sort_by, sort_order)
@@ -939,7 +941,7 @@ class Miner:
         pk_attr = getattr(model_class, pk_field)
 
         # Start building query
-        query = g.session.query(func.count(pk_attr))
+        query = self.db_session.query(func.count(pk_attr))
 
         # Apply active filter unless explicitly including inactive
         if hasattr(model_class, 'is_active') and not include_inactive:

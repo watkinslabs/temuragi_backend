@@ -374,15 +374,10 @@ def create_master_cli(**kwargs):
 
 def main():
     """Main entry point for master CLI"""
-    try:
-        master_cli = create_master_cli()
-        result = master_cli.execute()
-        master_cli.close()
-        return result
-
-    except Exception as e:
-        print(f"Critical error in master CLI: {e}")
-        return 1
+    master_cli = create_master_cli()
+    result = master_cli.execute()
+    master_cli.close()
+    return result
 
 if __name__ == '__main__':
     sys.exit(main())

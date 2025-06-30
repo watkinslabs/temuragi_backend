@@ -5,7 +5,7 @@
 # Connection configuration
 DSN='DSN=mssql-dev;UID=webuser;PWD=!w21eb1;'
 CONN='PR_MSSQL'
-OUTPUT='app/user/'
+OUTPUT='app/user/test/'
 
 #    "JADVDATA locations s l"
 #    "JADVDATA po_log s l"
@@ -29,16 +29,19 @@ OUTPUT='app/user/'
 #    "GCANADA BKICLOC s l"
 #    "GCANADA BKPOERD s l"
 #    "GCANADA BKSYMSTR s l  -S BKSY"
-#    
-
+#    PartsTrader orders
+#    PartsTrader parked_orders
+#    PartsTrader parked_order_parts
+#    PartsTrader repairers
+#    PartsTrader requesters
+#   "GPACIFIC BKICVNXF s l"
+#  "GPACIFIC BKAPVEND s l"
+  
+#
 
 TABLES=(
-    PartsTrader orders
-    PartsTrader parked_orders
-    PartsTrader parked_order_parts
-    PartsTrader repairers
-    PartsTrader requesters
-    
+  "GPACIFIC BKARCUST s l"
+  "GPACIFIC BKPHONE s l"
 )
 
 # Process each entry

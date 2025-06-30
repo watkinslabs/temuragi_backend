@@ -17,7 +17,18 @@ from .register.template_hooks import register_hooks
 from .register.database import register_db
 from .register.classes import register_classes
 
+app=None
 
+def set_app(instance):
+    """Set the global app instance"""
+    global app
+    app = instance
+
+def get_app():
+    """Get the global app instance"""
+    if app is None:
+        raise RuntimeError("app not initialized yet")
+    return app
 
 def create_app():
     

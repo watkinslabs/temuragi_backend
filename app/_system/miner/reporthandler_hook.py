@@ -1,6 +1,3 @@
-import functools
-from typing import Optional, List
-from flask import g, session, request, current_app
 
 __depends_on__=['Miner']
 def register_report_handler(app):

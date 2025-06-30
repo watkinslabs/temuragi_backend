@@ -12,6 +12,7 @@ User:
     password_hash: 7d4b472911945bab8842373697ca869b9ebd84e741029ad812c888552c78a081
     salt: 48c15a1f39b9aa5ecebd1543f85bc917
     failed_login_attempts: 0
+    landing_page: /v2/f/dashboard/ADMIN
     is_locked: false
     role_id: 00000000-0000-0000-0000-000000000111
     id: 11111111-1111-1111-1111-111111111111

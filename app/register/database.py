@@ -53,7 +53,7 @@ class DynamicDatabaseRegistry:
         self._app = app
         
         # Main/default database
-        main_uri = app.config.get('DATABASE_URI')
+        main_uri = config.get('DATABASE_URI')
         if not main_uri:
             raise ValueError("DATABASE_URI not configured")
         
@@ -169,25 +169,17 @@ def register_db(app: Flask):
     app.db_session = db_registry.init_app(app)
     
     # Setup session cleanup
-    @app.teardown_appcontext
-    def cleanup_sessions(exc=None):
-        app.db_session.remove()
-        
-        # Also clean up any dynamic sessions if needed
-        for engine in db_registry._dynamic_engines.values():
-            engine.dispose()
-    
-    # Make session available in request context
-    @app.before_request
-    def setup_request_context():
-        if not hasattr(g, 'session'):
-            g.session = app.db_session
-        
-        # Also make the registry available for direct access if needed
-        g.db_registry = db_registry
+    try:
+        @app.teardown_appcontext
+        def cleanup_sessions(exc=None):
+            app.db_session.remove()
+            
+            # Also clean up any dynamic sessions if needed
+            for engine in db_registry._dynamic_engines.values():
+                engine.dispose()
 
-
-
+    except:
+        pass
 
 # Utility functions for manual engine management if needed
 def get_engine_for_bind_key(bind_key=None):

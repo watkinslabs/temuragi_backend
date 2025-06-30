@@ -45,7 +45,7 @@ class SerializableMixin:
         return self.to_dict()
 
 
-# Create a base class that combines declarative base functionality with SerializableMixin
+
 class DeclarativeBase:
     pass
 

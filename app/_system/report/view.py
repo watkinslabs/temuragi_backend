@@ -9,10 +9,11 @@ from app.classes import ReportService, TemplateRenderer
 # Create blueprint for report pages
 bp = Blueprint('report', __name__, url_prefix='/reports')
 
+from app.register.database import db_registry
 
 def get_service():
     """Get report service instance"""
-    return ReportService(g.session)
+    return ReportService()
 
 
 # =====================================================================
@@ -22,10 +23,8 @@ def get_service():
 
 @bp.route('/', methods=['GET', 'POST'])
 def list():
-    # Get database session from Flask g context
-    session = g.session
     slug="report"
-    renderer = TemplateRenderer(session)
+    renderer = TemplateRenderer()
     rendered_content = renderer.render_page(slug)
     return rendered_content
 
@@ -36,10 +35,11 @@ def view_report(report_id):
     """Render individual report page"""
     try:
         service = get_service()
-        
+        db_session=db_registry._routing_session()
+
         # Get the report
         from app.models import Report
-        report = g.session.query(Report).filter_by(id=report_id).first()
+        report = db_session.query(Report).filter_by(id=report_id).first()
         
         if not report:
             return "<h1>Report not found</h1>", 404
@@ -48,7 +48,7 @@ def view_report(report_id):
         if report.report_template:
             # Use template renderer with the report's template
             from app.classes import TemplateRenderer
-            renderer = TemplateRenderer(g.session)
+            renderer = TemplateRenderer()
             
             # Create context for the template
             context = {
@@ -82,7 +82,7 @@ def view_report(report_id):
 def create():
     """Render report creation page"""
     from app.classes import TemplateRenderer
-    renderer = TemplateRenderer(g.session)
+    renderer = TemplateRenderer()
     
     # Pass empty report_id for create mode
     context = {
@@ -99,6 +99,7 @@ def edit():
     """Render report edit page"""
     try:
         service = get_service()
+        db_session=db_registry._routing_session()
         
         report_id = request.get_json().get('id')
         
@@ -107,14 +108,14 @@ def edit():
         
             
         from app.models import Report
-        report = g.session.query(Report).filter_by(id=report_id).first()
+        report = db_session.query(Report).filter_by(id=report_id).first()
         
         if not report:
             return "<h1>Report not found</h1>", 404
         
         # Get template renderer
         from app.classes import TemplateRenderer
-        renderer = TemplateRenderer(g.session)
+        renderer = TemplateRenderer()
         
         # Pass report info to template
         context = {
@@ -149,17 +150,17 @@ def delete():
         
         # Get the report
         from app.models import Report
-        report = g.session.query(Report).filter_by(id=report_id).first()
+        report = db_session.query(Report).filter_by(id=report_id).first()
         
         if not report:
             return {'success': False, 'error': 'Report not found'}, 404
         
         # Delete the report
-        g.session.delete(report)
-        g.session.commit()
+        db_session.delete(report)
+        db_session.commit()
         
         return {'success': True, 'message': f'Report "{report.name}" deleted successfully'}
         
     except Exception as e:
-        g.session.rollback()
+        db_session.rollback()
         return {'success': False, 'error': str(e)}, 500

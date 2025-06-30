@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from flask import current_app, has_app_context
 
 from app.base.model import BaseModel
-
+from app.register.database import db_registry
 
 class TemplateFragment(BaseModel):
     """
@@ -18,33 +18,6 @@ class TemplateFragment(BaseModel):
     Only one version of each template_file_path can be active at a time, but multiple different
     template_file_paths can be active simultaneously for a single template.
 
-    Columns:
-    - template_id: Foreign key to templates table
-    - fragment_type: Semantic type (base, header, footer, nav, loop, container, etc.)
-    - fragment_name: Human readable name for admin interface
-    - fragment_key: Unique programmatic identifier for code access
-    - template_file_path: Path to the actual Jinja2 template file
-    - compiled_file_path: Path to the compiled template file (.pyc)
-    - content_type: MIME type (text/html, text/plain, etc.)
-    - version_number: Version number for this specific template_file_path
-    - version_label: Optional human-readable version label
-    - is_active: Whether this version of this template_file_path is active
-    - template_source: Complete template source code content
-    - template_hash: SHA256 hash of template content for change detection
-    - variables_schema: JSON schema of expected template variables
-    - sample_data: Example data for testing/preview
-    - required_context: Context variables this fragment needs
-    - dependencies: Other fragments this depends on
-    - css_dependencies: CSS files needed for this fragment
-    - js_dependencies: JavaScript files needed for this fragment
-    - description: What this fragment does
-    - usage_notes: Implementation notes for developers
-    - preview_template: How to render for preview/admin
-    - sort_order: Display order within fragment type
-    - is_partial: Can be included in other fragments
-    - cache_strategy: Fragment-specific caching rules
-    - cache_duration: How long to cache this template (seconds)
-    - last_compiled: When the template was last compiled
     """
     __depends_on__ = ['Template']  # Depends on Template
     __tablename__ = 'template_fragments'
@@ -217,13 +190,14 @@ class TemplateFragment(BaseModel):
         return False
 
     @classmethod
-    def get_next_version_number(cls, session, template_id, template_file_path):
+    def get_next_version_number(cls, template_id, template_file_path):
         """Get the next version number for a given template and template_file_path"""
         logger = cls._get_logger()
         logger.debug(f"Getting next version number for template {template_id}, file {template_file_path}")
-        
+        db_session=db_registry._routing_session()
+
         from sqlalchemy import func
-        max_version = session.query(func.max(cls.version_number))\
+        max_version = db_session.query(func.max(cls.version_number))\
                            .filter_by(template_id=template_id,
                                     template_file_path=template_file_path)\
                            .scalar()
@@ -233,12 +207,13 @@ class TemplateFragment(BaseModel):
         return next_version
 
     @classmethod
-    def get_active_version(cls, session, template_id, template_file_path):
+    def get_active_version(cls, template_id, template_file_path):
         """Get the currently active version for a specific template and template_file_path"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         #logger.debug(f"Getting active version for template {template_id}, file {template_file_path}")
         
-        fragment = session.query(cls)\
+        fragment = db_session.query(cls)\
                          .filter_by(template_id=template_id,
                                    template_file_path=template_file_path,
                                    is_active=True)\
@@ -252,12 +227,13 @@ class TemplateFragment(BaseModel):
         return fragment
 
     @classmethod
-    def get_active_by_key(cls, session, template_id, fragment_key):
+    def get_active_by_key(cls, template_id, fragment_key):
         """Get active fragment by template and fragment_key"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         #logger.debug(f"Getting active fragment by key: template {template_id}, fragment {fragment_key}")
         
-        fragment = session.query(cls)\
+        fragment = db_session.query(cls)\
                          .filter_by(template_id=template_id,
                                    fragment_key=fragment_key,
                                    is_active=True)\
@@ -271,12 +247,13 @@ class TemplateFragment(BaseModel):
         return fragment
 
     @classmethod
-    def get_fragments_by_type(cls, session, template_id, fragment_type):
+    def get_fragments_by_type(cls, template_id, fragment_type):
         """Get all active fragments of a specific type, ordered by sort_order"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting fragments by type '{fragment_type}' for template {template_id}")
         
-        fragments = session.query(cls)\
+        fragments = db_session.query(cls)\
                           .filter_by(template_id=template_id,
                                     fragment_type=fragment_type,
                                     is_active=True)\
@@ -287,12 +264,13 @@ class TemplateFragment(BaseModel):
         return fragments
 
     @classmethod
-    def get_all_active_for_template(cls, session, template_id):
+    def get_all_active_for_template(cls, template_id):
         """Get all active content pieces for a template (all active template_file_paths)"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting all active fragments for template {template_id}")
         
-        fragments = session.query(cls)\
+        fragments = db_session.query(cls)\
                           .filter_by(template_id=template_id, is_active=True)\
                           .order_by(cls.fragment_type, cls.sort_order)\
                           .all()
@@ -307,18 +285,19 @@ class TemplateFragment(BaseModel):
         return fragments
 
     @classmethod
-    def set_active_version(cls, session, fragment_id):
+    def set_active_version(cls, fragment_id):
         """Set a specific version as active (deactivates other versions of same template_file_path)"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.info(f"Setting active version for fragment UUID {fragment_id}")
         
-        fragment = session.query(cls).filter_by(id=fragment_id).first()
+        fragment = db_session.query(cls).filter_by(id=fragment_id).first()
         if not fragment:
             logger.error(f"Fragment with UUID {fragment_id} not found")
             raise ValueError(f"Fragment with UUID {fragment_id} not found")
 
         # Deactivate all other versions for this template and template_file_path combination
-        updated_count = session.query(cls)\
+        updated_count = db_session.query(cls)\
                               .filter_by(template_id=fragment.template_id,
                                         template_file_path=fragment.template_file_path)\
                               .update({'is_active': False})
@@ -328,19 +307,20 @@ class TemplateFragment(BaseModel):
         # Activate this version
         fragment.is_active = True
         fragment.last_compiled = datetime.datetime.now(datetime.timezone.utc)
-        session.commit()
+        db_session.commit()
         
         logger.info(f"Activated fragment '{fragment.fragment_key}' version {fragment.version_number}")
         return fragment
 
     @classmethod
-    def set_active_version_by_file_and_version(cls, session, template_id,
+    def set_active_version_by_file_and_version(cls, template_id,
                                               template_file_path, version_number):
         """Set active version by template, template_file_path, and version number"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.info(f"Setting active version: template {template_id}, file {template_file_path}, version {version_number}")
         
-        fragment = session.query(cls)\
+        fragment = db_session.query(cls)\
                          .filter_by(template_id=template_id,
                                    template_file_path=template_file_path,
                                    version_number=version_number)\
@@ -351,13 +331,14 @@ class TemplateFragment(BaseModel):
             raise ValueError(f"Fragment not found for template {template_id}, "
                            f"file {template_file_path}, version {version_number}")
 
-        return cls.set_active_version(session, fragment.id)
+        return cls.set_active_version(db_session, fragment.id)
 
-    def activate(self, session):
+    def activate(self):
         """Activate this version (convenience method)"""
+        db_session=db_registry._routing_session()
         logger = self._get_logger()
         logger.info(f"Activating fragment '{self.fragment_key}' version {self.version_number}")
-        return self.__class__.set_active_version(session, self.id)
+        return self.__class__.set_active_version(db_session, self.id)
 
     def update_content_and_hash(self, new_content):
         """Update template source and recalculate hash"""
@@ -404,8 +385,9 @@ class TemplateFragment(BaseModel):
         """Get sample data as a dict, handling None values"""
         return self.sample_data if self.sample_data else {}
 
-    def validate_dependencies(self, session):
+    def validate_dependencies(self):
         """Validate that all declared dependencies exist"""
+        db_session=db_registry._routing_session()
         logger = self._get_logger()
         dependencies = self.get_dependencies_list()
         
@@ -417,7 +399,7 @@ class TemplateFragment(BaseModel):
         
         missing_deps = []
         for dep_key in dependencies:
-            dep_fragment = self.__class__.get_active_by_key(session, self.template_id, dep_key)
+            dep_fragment = self.__class__.get_active_by_key(db_session, self.template_id, dep_key)
             if not dep_fragment:
                 missing_deps.append(dep_key)
         
@@ -429,12 +411,13 @@ class TemplateFragment(BaseModel):
         return True
 
     @classmethod
-    def get_file_version_history(cls, session, template_id, template_file_path):
+    def get_file_version_history(cls,  template_id, template_file_path):
         """Get all versions for a specific template and template_file_path, ordered by version"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting version history for template {template_id}, file {template_file_path}")
         
-        versions = session.query(cls)\
+        versions = db_session.query(cls)\
                          .filter_by(template_id=template_id,
                                    template_file_path=template_file_path)\
                          .order_by(cls.version_number.desc())\
@@ -444,13 +427,14 @@ class TemplateFragment(BaseModel):
         return versions
 
     @classmethod
-    def get_template_structure(cls, session, template_id):
+    def get_template_structure(cls, template_id):
         """Get a summary of all files and their active versions for a template"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting template structure for template {template_id}")
         
         # Get all unique template_file_paths with their active version info
-        active_files = session.query(
+        active_files = db_session.query(
             cls.template_file_path,
             cls.fragment_type,
             cls.fragment_key,
@@ -476,12 +460,13 @@ class TemplateFragment(BaseModel):
         return active_files
 
     @classmethod
-    def find_circular_dependencies(cls, session, template_id):
+    def find_circular_dependencies(cls, template_id):
         """Check for circular dependencies within template fragments"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Checking for circular dependencies in template {template_id}")
         
-        fragments = cls.get_all_active_for_template(session, template_id)
+        fragments = cls.get_all_active_for_template(db_session, template_id)
         
         # Build dependency graph
         dependency_graph = {}

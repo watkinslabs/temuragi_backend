@@ -19,7 +19,7 @@ class ReportDataTableGenerator:
         # Import and create ReportService instance
         try:
             from app.classes import ReportService
-            self.report_service = ReportService(session, logger=logger)
+            self.report_service = ReportService(logger=logger)
         except Exception as e:
             self._log(f"Failed to import ReportService: {e}", level='error')
             self.report_service = None

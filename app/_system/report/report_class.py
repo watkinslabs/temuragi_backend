@@ -4,7 +4,6 @@ from typing import Optional, List, Dict, Any, Union, Tuple
 from uuid import UUID
 from datetime import datetime
 from sqlalchemy import text, func
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 try:
@@ -13,7 +12,6 @@ try:
 except Exception as ex:
     pass
 
-#from .metadata_extractor_class import QueryMetadataExtractor
 try:
     from app.models import (
         Report, ReportColumn, ReportVariable, ReportExecution,
@@ -22,6 +20,9 @@ try:
     )
 except Exception as ex:
     pass
+
+
+from app.register.database import db_registry
 
 class ReportService:
     """
@@ -33,9 +34,9 @@ class ReportService:
                         'ReportSchedule',  'Connection', 'DataType', 
                         'VariableType', 'DatabaseType', 'Template' ]
 
-    def __init__(self, session: Session, logger: Optional[logging.Logger] = None):
+    def __init__(self,  logger: Optional[logging.Logger] = None):
         
-        self.session = session
+        self.db_session=db_registry._routing_session()
         self.logger = logger or logging.getLogger(__name__)
         self.metadata_extractor = QueryMetadataExtractor(logger=self.logger)
 
@@ -53,7 +54,7 @@ class ReportService:
         self.logger.info(f"Creating report template: {name}")
 
         # Validate template exists
-        template = self.session.query(Template).filter_by(id=template_id).first()
+        template = self.db_session.query(Template).filter_by(id=template_id).first()
         if not template:
             raise ValueError(f"Template {template_id} not found")
 
@@ -72,14 +73,14 @@ class ReportService:
             custom_js=custom_js
         )
 
-        self.session.add(report_template)
+        self.db_session.add(report_template)
 
         try:
-            self.session.commit()
+            self.db_session.commit()
             self.logger.info(f"Report template created: {name} ({report_template.id})")
             return report_template
         except IntegrityError as e:
-            self.session.rollback()
+            self.db_session.rollback()
             self.logger.error(f"Failed to create report template {name}: {e}")
             raise ValueError(f"Report template with name '{name}' already exists")
 
@@ -87,8 +88,8 @@ class ReportService:
         """Get report template by UUID or name"""
         if isinstance(template_id, str) and not self._is_valid_id(template_id):
             # Try by name
-            return self.session.query(ReportTemplate).filter_by(name=template_id).first()
-        return self.session.query(ReportTemplate).filter_by(id=template_id).first()
+            return self.db_session.query(ReportTemplate).filter_by(name=template_id).first()
+        return self.db_session.query(ReportTemplate).filter_by(id=template_id).first()
 
     def update_report_template(self, template_id: UUID, **kwargs) -> ReportTemplate:
         """Update report template"""
@@ -102,7 +103,7 @@ class ReportService:
             if hasattr(report_template, key):
                 setattr(report_template, key, value)
 
-        self.session.commit()
+        self.db_session.commit()
         self.logger.info(f"Report template updated: {report_template.name}")
         return report_template
 
@@ -113,25 +114,25 @@ class ReportService:
             raise ValueError(f"Report template {template_id} not found")
 
         # Check for dependent reports
-        report_count = self.session.query(Report).filter_by(report_template_id=template_id).count()
+        report_count = self.db_session.query(Report).filter_by(report_template_id=template_id).count()
         if report_count > 0 and not force:
             raise ValueError(f"Cannot delete template with {report_count} dependent reports")
 
         self.logger.info(f"Deleting report template: {report_template.name}")
 
         try:
-            self.session.delete(report_template)
-            self.session.commit()
+            self.db_session.delete(report_template)
+            self.db_session.commit()
             self.logger.info(f"Report template deleted: {report_template.name}")
             return True
         except Exception as e:
-            self.session.rollback()
+            self.db_session.rollback()
             self.logger.error(f"Failed to delete report template: {e}")
             raise
 
     def list_report_templates(self) -> List[ReportTemplate]:
         """List all report templates"""
-        return self.session.query(ReportTemplate).order_by(ReportTemplate.name).all()
+        return self.db_session.query(ReportTemplate).order_by(ReportTemplate.name).all()
 
     # =====================================================================
     # REPORT OPERATIONS
@@ -147,10 +148,10 @@ class ReportService:
 
         # Generate slug if needed
         if not slug:
-            slug = Report.generate_slug(name, self.session)
+            slug = Report.generate_slug(name)
 
         # Validate connection exists
-        connection = self.session.query(Connection).filter_by(id=connection_id).first()
+        connection = self.db_session.query(Connection).filter_by(id=connection_id).first()
         if not connection:
             raise ValueError(f"Connection {connection_id} not found")
 
@@ -162,7 +163,7 @@ class ReportService:
 
         # Validate model if provided
         if model_id:
-            model = self.session.query(Model).filter_by(id=model_id).first()
+            model = self.db_session.query(Model).filter_by(id=model_id).first()
             if not model:
                 raise ValueError(f"Model {model_id} not found")
 
@@ -181,21 +182,21 @@ class ReportService:
             **kwargs
         )
 
-        self.session.add(report)
+        self.db_session.add(report)
 
         try:
-            self.session.commit()
+            self.db_session.commit()
 
             # Create permissions
             if not report.permissions_created:
-                report.create_permissions(self.session)
+                report.create_permissions()
                 report.permissions_created = True
-                self.session.commit()
+                self.db_session.commit()
 
             self.logger.info(f"Report created: {slug} ({report.id})")
             return report
         except IntegrityError as e:
-            self.session.rollback()
+            self.db_session.rollback()
             self.logger.error(f"Failed to create report {slug}: {e}")
             raise ValueError(f"Report with slug '{slug}' already exists")
 
@@ -204,8 +205,8 @@ class ReportService:
         try:
             if isinstance(model_id, str) and not self._is_valid_id(model_id):
                 # Try by name
-                return self.session.query(Model).filter_by(name=model_id).first()
-            return self.session.query(Model).filter_by(id=model_id).first()
+                return self.db_session.query(Model).filter_by(name=model_id).first()
+            return self.db_session.query(Model).filter_by(id=model_id).first()
         except:
             # Model class might not be available
             return None
@@ -215,8 +216,8 @@ class ReportService:
         """Get report by UUID or slug"""
         if isinstance(report_id, str) and not self._is_valid_id(report_id):
             # Try by slug
-            return self.session.query(Report).filter_by(slug=report_id).first()
-        return self.session.query(Report).filter_by(id=report_id).first()
+            return self.db_session.query(Report).filter_by(slug=report_id).first()
+        return self.db_session.query(Report).filter_by(id=report_id).first()
 
     def update_report(self, report_id: UUID, **kwargs) -> Report:
         """Update report with validation"""
@@ -229,7 +230,7 @@ class ReportService:
         # Handle slug changes carefully
         if 'slug' in kwargs and kwargs['slug'] != report.slug:
             # Check if new slug exists
-            existing = self.session.query(Report).filter_by(slug=kwargs['slug']).first()
+            existing = self.db_session.query(Report).filter_by(slug=kwargs['slug']).first()
             if existing:
                 raise ValueError(f"Report with slug '{kwargs['slug']}' already exists")
 
@@ -240,9 +241,9 @@ class ReportService:
 
         # Update permissions if name changed
         if 'name' in kwargs or 'display' in kwargs:
-            report.update_permission_descriptions(self.session)
+            report.update_permission_descriptions()
 
-        self.session.commit()
+        self.db_session.commit()
         self.logger.info(f"Report updated: {report.slug}")
         return report
 
@@ -257,16 +258,16 @@ class ReportService:
         try:
             # Delete permissions first
             if report.permissions_created:
-                report.delete_permissions(self.session)
+                report.delete_permissions()
 
             # Delete report (cascade will handle related records)
-            self.session.delete(report)
-            self.session.commit()
+            self.db_session.delete(report)
+            self.db_session.commit()
 
             self.logger.info(f"Report deleted: {report.slug}")
             return True
         except Exception as e:
-            self.session.rollback()
+            self.db_session.rollback()
             self.logger.error(f"Failed to delete report: {e}")
             raise
 
@@ -275,7 +276,7 @@ class ReportService:
                     is_public: Optional[bool] = None,
                     user_id: Optional[UUID] = None) -> List[Report]:
         """List reports with optional filtering"""
-        query = self.session.query(Report)
+        query = self.db_session.query(Report)
 
         if category:
             query = query.filter_by(category=category)
@@ -288,7 +289,7 @@ class ReportService:
 
         # Filter by user permissions if user_id provided
         if user_id:
-            return Report.get_user_reports(self.session, user_id)
+            return Report.get_user_reports( user_id)
 
         return reports
 
@@ -299,7 +300,7 @@ class ReportService:
         if not report:
             raise ValueError(f"Report {report_id} not found")
 
-        return report.duplicate(self.session, new_name, new_slug)
+        return report.duplicate( new_name, new_slug)
 
     # =====================================================================
     # REPORT COLUMN OPERATIONS
@@ -313,7 +314,7 @@ class ReportService:
             raise ValueError(f"Report {report_id} not found")
 
         # Get next order index
-        max_order = self.session.query(func.max(ReportColumn.order_index))\
+        max_order = self.db_session.query(func.max(ReportColumn.order_index))\
                                .filter_by(report_id=report_id).scalar()
         order_index = (max_order or -1) + 1
 
@@ -326,15 +327,15 @@ class ReportService:
             **kwargs
         )
 
-        self.session.add(column)
-        self.session.commit()
+        self.db_session.add(column)
+        self.db_session.commit()
 
         self.logger.info(f"Added column '{name}' to report {report.slug}")
         return column
 
     def update_report_column(self, column_id: UUID, **kwargs) -> ReportColumn:
         """Update a report column"""
-        column = self.session.query(ReportColumn).filter_by(id=column_id).first()
+        column = self.db_session.query(ReportColumn).filter_by(id=column_id).first()
         if not column:
             raise ValueError(f"Report column {column_id} not found")
 
@@ -342,27 +343,27 @@ class ReportService:
             if hasattr(column, key):
                 setattr(column, key, value)
 
-        self.session.commit()
+        self.db_session.commit()
         return column
 
     def delete_report_column(self, column_id: UUID) -> bool:
         """Delete a report column"""
-        column = self.session.query(ReportColumn).filter_by(id=column_id).first()
+        column = self.db_session.query(ReportColumn).filter_by(id=column_id).first()
         if not column:
             raise ValueError(f"Report column {column_id} not found")
 
-        self.session.delete(column)
-        self.session.commit()
+        self.db_session.delete(column)
+        self.db_session.commit()
         return True
 
     def reorder_columns(self, report_id: UUID, column_order: List[UUID]) -> bool:
         """Reorder report columns"""
         for index, column_id in enumerate(column_order):
-            self.session.query(ReportColumn)\
+            self.db_session.query(ReportColumn)\
                        .filter_by(id=column_id, report_id=report_id)\
                        .update({'order_index': index})
 
-        self.session.commit()
+        self.db_session.commit()
         return True
 
     # =====================================================================
@@ -378,7 +379,7 @@ class ReportService:
             raise ValueError(f"Report {report_id} not found")
 
         # Get next order index
-        max_order = self.session.query(func.max(ReportVariable.order_index))\
+        max_order = self.db_session.query(func.max(ReportVariable.order_index))\
                                .filter_by(report_id=report_id).scalar()
         order_index = (max_order or -1) + 1
 
@@ -391,15 +392,15 @@ class ReportService:
             **kwargs
         )
 
-        self.session.add(variable)
-        self.session.commit()
+        self.db_session.add(variable)
+        self.db_session.commit()
 
         self.logger.info(f"Added variable '{name}' to report {report.slug}")
         return variable
 
     def update_report_variable(self, variable_id: UUID, **kwargs) -> ReportVariable:
         """Update a report variable"""
-        variable = self.session.query(ReportVariable).filter_by(id=variable_id).first()
+        variable = self.db_session.query(ReportVariable).filter_by(id=variable_id).first()
         if not variable:
             raise ValueError(f"Report variable {variable_id} not found")
 
@@ -407,17 +408,17 @@ class ReportService:
             if hasattr(variable, key):
                 setattr(variable, key, value)
 
-        self.session.commit()
+        self.db_session.commit()
         return variable
 
     def delete_report_variable(self, variable_id: UUID) -> bool:
         """Delete a report variable"""
-        variable = self.session.query(ReportVariable).filter_by(id=variable_id).first()
+        variable = self.db_session.query(ReportVariable).filter_by(id=variable_id).first()
         if not variable:
             raise ValueError(f"Report variable {variable_id} not found")
 
-        self.session.delete(variable)
-        self.session.commit()
+        self.db_session.delete(variable)
+        self.db_session.commit()
         return True
 
     # =====================================================================
@@ -434,7 +435,7 @@ class ReportService:
         self.logger.info(f"Executing report: {report.slug}")
 
         # Check permissions if user provided
-        if user_id and not Report.check_permission(self.session, user_id, report.slug, 'execute'):
+        if user_id and not Report.check_permission( user_id, report.slug, 'execute'):
             raise PermissionError(f"User does not have permission to execute report {report.slug}")
 
         # Get database connection
@@ -449,7 +450,6 @@ class ReportService:
         start_time = datetime.utcnow()
 
         try:
-            # Create database session for report
             from sqlalchemy import create_engine
             engine = create_engine(connection_string)
 
@@ -469,8 +469,8 @@ class ReportService:
                 parameters_used=request_data.get('vars', {}),
                 status='success'
             )
-            self.session.add(execution)
-            self.session.commit()
+            self.db_session.add(execution)
+            self.db_session.commit()
 
             self.logger.info(f"Report {report.slug} executed successfully in {execution_time}ms")
             return result
@@ -487,8 +487,8 @@ class ReportService:
                 status='error',
                 error_message=str(e)
             )
-            self.session.add(execution)
-            self.session.commit()
+            self.db_session.add(execution)
+            self.db_session.commit()
 
             self.logger.error(f"Report {report.slug} execution failed: {e}")
             raise
@@ -522,7 +522,7 @@ class ReportService:
     def get_report_execution_history(self, report_id: UUID,
                                    limit: int = 100) -> List[ReportExecution]:
         """Get execution history for a report"""
-        return self.session.query(ReportExecution)\
+        return self.db_session.query(ReportExecution)\
                           .filter_by(report_id=report_id)\
                           .order_by(ReportExecution.executed_at.desc())\
                           .limit(limit)\
@@ -539,7 +539,7 @@ class ReportService:
         if not report:
             raise ValueError(f"Report {report_id} not found")
 
-        return report.assign_to_role(self.session, role_id, actions)
+        return report.assign_to_role( role_id, actions)
 
     def remove_report_from_role(self, report_id: UUID, role_id: UUID,
                                actions: Optional[List[str]] = None) -> Tuple[bool, str]:
@@ -548,7 +548,7 @@ class ReportService:
         if not report:
             raise ValueError(f"Report {report_id} not found")
 
-        return report.remove_from_role(self.session, role_id, actions)
+        return report.remove_from_role( role_id, actions)
 
     def get_report_roles(self, report_id: UUID, action: str = 'view') -> List[Any]:
         """Get all roles with access to a report"""
@@ -556,12 +556,12 @@ class ReportService:
         if not report:
             raise ValueError(f"Report {report_id} not found")
 
-        return report.get_roles_with_access(self.session, action)
+        return report.get_roles_with_access( action)
 
     def check_user_permission(self, user_id: UUID, report_slug: str,
                             action: str = 'view') -> bool:
         """Check if user has permission for report action"""
-        return Report.check_permission(self.session, user_id, report_slug, action)
+        return Report.check_permission( user_id, report_slug, action)
 
     # =====================================================================
     # DATA TYPE AND VARIABLE TYPE OPERATIONS
@@ -569,21 +569,21 @@ class ReportService:
 
     def list_data_types(self) -> List[DataType]:
         """List all available data types"""
-        return self.session.query(DataType)\
+        return self.db_session.query(DataType)\
                           .filter_by(is_active=True)\
                           .order_by(DataType.display)\
                           .all()
 
     def list_variable_types(self) -> List[VariableType]:
         """List all available variable types"""
-        return self.session.query(VariableType)\
+        return self.db_session.query(VariableType)\
                           .filter_by(is_active=True)\
                           .order_by(VariableType.display)\
                           .all()
 
     def list_database_types(self) -> List[DatabaseType]:
         """List all available database types"""
-        return self.session.query(DatabaseType)\
+        return self.db_session.query(DatabaseType)\
                           .filter_by(is_active=True)\
                           .order_by(DatabaseType.display)\
                           .all()
@@ -594,13 +594,13 @@ class ReportService:
 
     def list_connections(self) -> List[Connection]:
         """List all database connections"""
-        return self.session.query(Connection)\
+        return self.db_session.query(Connection)\
                           .order_by(Connection.name)\
                           .all()
 
     def test_connection(self, connection_id: UUID) -> Tuple[bool, str]:
         """Test a database connection"""
-        connection = self.session.query(Connection).filter_by(id=connection_id).first()
+        connection = self.db_session.query(Connection).filter_by(id=connection_id).first()
         if not connection:
             raise ValueError(f"Connection {connection_id} not found")
 
@@ -652,7 +652,7 @@ class ReportService:
             'template': report.report_template,
             'column_count': len(report.columns),
             'variable_count': len(report.variables),
-            'last_execution': self.session.query(ReportExecution)\
+            'last_execution': self.db_session.query(ReportExecution)\
                                          .filter_by(report_id=report_id)\
                                          .order_by(ReportExecution.executed_at.desc())\
                                          .first()
@@ -660,28 +660,28 @@ class ReportService:
 
     def get_dashboard_stats(self) -> Dict[str, Any]:
         """Get dashboard statistics for reports"""
-        total_reports = self.session.query(Report).count()
-        public_reports = self.session.query(Report).filter_by(is_public=True).count()
+        total_reports = self.db_session.query(Report).count()
+        public_reports = self.db_session.query(Report).filter_by(is_public=True).count()
 
         # Execution stats
-        total_executions = self.session.query(ReportExecution).count()
-        successful_executions = self.session.query(ReportExecution)\
+        total_executions = self.db_session.query(ReportExecution).count()
+        successful_executions = self.db_session.query(ReportExecution)\
                                            .filter_by(status='success').count()
 
         # Recent executions
-        recent_executions = self.session.query(ReportExecution)\
+        recent_executions = self.db_session.query(ReportExecution)\
                                       .order_by(ReportExecution.executed_at.desc())\
                                       .limit(10)\
                                       .all()
 
         # Reports by category
-        categories = self.session.query(
+        categories = self.db_session.query(
             Report.category,
             func.count(Report.id)
         ).group_by(Report.category).all()
 
         # Connection usage
-        connection_usage = self.session.query(
+        connection_usage = self.db_session.query(
             Connection.name,
             func.count(Report.id)
         ).join(Report).group_by(Connection.name).all()
@@ -701,7 +701,7 @@ class ReportService:
             'recent_executions': recent_executions,
             'categories': dict(categories),
             'connections': dict(connection_usage),
-            'templates': self.session.query(ReportTemplate).count()
+            'templates': self.db_session.query(ReportTemplate).count()
         }
 
     def export_report_definition(self, report_id: UUID) -> Dict[str, Any]:
@@ -838,7 +838,7 @@ class ReportService:
             List of column metadata dictionaries
         """
         # Get connection details
-        connection = self.session.query(Connection).filter_by(id=connection_id).first()
+        connection = self.db_session.query(Connection).filter_by(id=connection_id).first()
         if not connection:
             raise ValueError(f"Connection {connection_id} not found")
         

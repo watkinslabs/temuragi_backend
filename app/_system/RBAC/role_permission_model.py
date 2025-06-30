@@ -2,10 +2,14 @@ from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, T
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
+from flask import g
+
 from app.base.model import BaseModel
 
 from app.classes import Permission
 from app.models import User
+
+from app.register.database import db_registry
 
 class RolePermission(BaseModel):
     """
@@ -36,15 +40,16 @@ class RolePermission(BaseModel):
     )
 
     @classmethod
-    def grant_permission(cls, session, role_id, permission_name):
+    def grant_permission(cls,  role_id, permission_name):
         """Grant a permission to a role"""
+        db_session=db_registry._routing_session()
         # Direct usage now!
-        permission = Permission.find_by_name(session, permission_name)
+        permission = Permission.find_by_name(permission_name)
         if not permission:
             return False, f"Permission not found: {permission_name}"
 
         # Check if already granted
-        existing = session.query(cls).filter(
+        existing = db_session.query(cls).filter(
             cls.role_id == role_id,
             cls.permission_id == permission.id
         ).first()
@@ -58,21 +63,21 @@ class RolePermission(BaseModel):
             permission_id=permission.id
         )
 
-        session.add(role_permission)
-        session.commit()
+        db_session.add(role_permission)
+        db_session.commit()
 
         return True, role_permission
 
     @classmethod
-    def revoke_permission(cls, session, role_id, permission_name):
+    def revoke_permission(cls, role_id, permission_name):
         """Revoke a permission from a role"""
-        # Direct usage
-        permission = Permission.find_by_name(session, permission_name)
+        db_session=db_registry._routing_session()
+        permission = Permission.find_by_name( permission_name)
         if not permission:
             return False, f"Permission not found: {permission_name}"
 
         # Find role permission
-        role_permission = session.query(cls).filter(
+        role_permission = db_session.query(cls).filter(
             cls.role_id == role_id,
             cls.permission_id == permission.id
         ).first()
@@ -80,26 +85,26 @@ class RolePermission(BaseModel):
         if not role_permission:
             return False, f"Permission not granted: {permission_name}"
 
-        session.delete(role_permission)
-        session.commit()
+        db_session.delete(role_permission)
+        db_session.commit()
 
         return True, f"Permission revoked: {permission_name}"
 
     @classmethod
-    def user_has_permission(cls, session, user_id, permission_name):
+    def user_has_permission(cls, user_id, permission_name):
         """Check if a user has a specific permission through their role"""
-        # Direct model usage
-        user = session.query(User).filter(User.id == user_id).first()
+        db_session=db_registry._routing_session()
+        user = db_session.query(User).filter(User.id == user_id).first()
         if not user or not user.role_id:
             return False
 
         # Find permission
-        permission = Permission.find_by_name(session, permission_name)
+        permission = Permission.find_by_name(permission_name)
         if not permission:
             return False
 
         # Check if role has permission
-        role_permission = session.query(cls).filter(
+        role_permission = db_session.query(cls).filter(
             cls.role_id == user.role_id,
             cls.permission_id == permission.id
         ).first()
@@ -107,14 +112,14 @@ class RolePermission(BaseModel):
         return role_permission is not None
 
     @classmethod
-    def get_user_permissions(cls, session, user_id):
+    def get_user_permissions(cls, user_id):
         """Get all permissions for a user through their role"""
-        # Direct model usage
-        user = session.query(User).filter(User.id == user_id).first()
+        self.db_session=db_registry._routing_session()
+        user = db_session.query(User).filter(User.id == user_id).first()
         if not user or not user.role_id:
             return []
 
-        permissions = session.query(Permission).join(cls).filter(
+        permissions = db_session.query(Permission).join(cls).filter(
             cls.role_id == user.role_id
         ).order_by(Permission.service, Permission.action).all()
 

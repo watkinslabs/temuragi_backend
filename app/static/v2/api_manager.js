@@ -70,6 +70,11 @@ class ApiManager {
             if (tokens.api_token) {
                 headers.Authorization = `Bearer ${tokens.api_token}`;
             }
+            
+            // Add user ID header
+            if (tokens.user_id) {
+                headers['X-User-ID'] = tokens.user_id;
+            }
         }
 
         const csrf_token = document.querySelector('meta[name="csrf-token"]')?.content || window.csrf_token;

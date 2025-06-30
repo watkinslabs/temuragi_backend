@@ -6,27 +6,12 @@ from sqlalchemy.orm import relationship
 from flask import current_app, has_app_context
 
 from app.base.model import BaseModel
-
+from app.register.database import db_registry
 
 class Template(BaseModel):
     """
     Template model for defining reusable page structures and layouts.
-
-    Columns:
-    - name: Unique identifier for the template (kebab-case)
-    - display_name: Human-readable template name
-    - description: Description of template purpose and usage
-    - theme_id: Foreign key to themes table
-    - menu_type_id: Foreign key to menu table (which menu to display)
-    - layout_type: Layout style (full-width, sidebar-left, sidebar-right, centered)
-    - container_class: CSS class for main container
-    - sidebar_enabled: Whether template includes sidebar navigation
-    - header_type: Header style (fixed, static, minimal, none)
-    - footer_type: Footer style (fixed, static, minimal, none)
-    - breadcrumbs_enabled: Whether to show breadcrumb navigation
-    - is_admin_template: Whether this template requires admin access
-    - is_default_template: Whether this is the default template for new pages
-    """
+"""
     __depends_on__ = ['Theme', 'Menu','Module']
     __tablename__ = 'templates'
 
@@ -109,8 +94,9 @@ class Template(BaseModel):
         logger.debug(f"Template name '{self.name}' passed validation")
         return True
 
-    def validate_references(self, session):
+    def validate_references(self):
         """Validate all foreign key references exist"""
+        db_session=db_registry._routing_session()
         logger = self._get_logger()
         logger.debug(f"Validating references for template '{self.name}'")
         
@@ -119,7 +105,7 @@ class Template(BaseModel):
         # Validate theme reference
         if self.theme_id:
             from app.models import Theme
-            theme = session.query(Theme).filter_by(id=self.theme_id).first()
+            theme = db_session.query(Theme).filter_by(id=self.theme_id).first()
             if not theme:
                 error_msg = f"Referenced theme {self.theme_id} does not exist"
                 validation_errors.append(error_msg)
@@ -130,7 +116,7 @@ class Template(BaseModel):
         # Validate menu reference
         if self.menu_type_id:
             from app.models import Menu
-            menu = session.query(Menu).filter_by(id=self.menu_type_id).first()
+            menu = db_session.query(Menu).filter_by(id=self.menu_type_id).first()
             if not menu:
                 error_msg = f"Referenced menu {self.menu_type_id} does not exist"
                 validation_errors.append(error_msg)
@@ -141,7 +127,7 @@ class Template(BaseModel):
         # Validate module reference
         if self.module_id:
             from app.models import Module
-            module = session.query(Module).filter_by(id=self.module_id).first()
+            module = db_session.query(Module).filter_by(id=self.module_id).first()
             if not module:
                 error_msg = f"Referenced module {self.module_id} does not exist"
                 validation_errors.append(error_msg)
@@ -156,11 +142,12 @@ class Template(BaseModel):
         logger.debug(f"All references validated for template '{self.name}'")
         return True
 
-    def get_fragment_count(self, session):
+    def get_fragment_count(self):
         """Get count of active fragments for this template"""
+        db_session=db_registry._routing_session()
         from app.models import TemplateFragment
         
-        count = session.query(TemplateFragment).filter_by(
+        count = db_session.query(TemplateFragment).filter_by(
             template_id=self.id,
             is_active=True
         ).count()
@@ -169,14 +156,15 @@ class Template(BaseModel):
         logger.debug(f"Template '{self.name}' has {count} active fragments")
         return count
 
-    def get_fragment_summary(self, session):
+    def get_fragment_summary(self):
         """Get summary of fragments by type"""
+        db_session=db_registry._routing_session()
         from app.models import TemplateFragment
         
         logger = self._get_logger()
         logger.debug(f"Getting fragment summary for template '{self.name}'")
         
-        fragments = session.query(TemplateFragment).filter_by(
+        fragments = db_session.query(TemplateFragment).filter_by(
             template_id=self.id,
             is_active=True
         ).all()
@@ -190,13 +178,14 @@ class Template(BaseModel):
         logger.info(f"Template '{self.name}' fragment summary: {summary}")
         return summary
 
-    def has_base_fragment(self, session):
+    def has_base_fragment(self):
         """Check if template has a base fragment"""
+        db_session=db_registry._routing_session()
         from app.models import TemplateFragment
         
         logger = self._get_logger()
         
-        base_fragment = session.query(TemplateFragment).filter_by(
+        base_fragment = db_session.query(TemplateFragment).filter_by(
             template_id=self.id,
             fragment_type='base',
             is_active=True
@@ -210,31 +199,33 @@ class Template(BaseModel):
         
         return has_base
 
-    def get_pages_count(self, session):
+    def get_pages_count(self):
         """Get count of pages using this template"""
+        db_session=db_registry._routing_session()
         from app.models import Page
         
-        count = session.query(Page).filter_by(template_id=self.id).count()
+        count = db_session.query(Page).filter_by(template_id=self.id).count()
         
         logger = self._get_logger()
         logger.debug(f"Template '{self.name}' is used by {count} pages")
         return count
 
-    def set_as_default(self, session):
+    def set_as_default(self):
         """Set this template as the default template"""
+        db_session=db_registry._routing_session()
         logger = self._get_logger()
         logger.info(f"Setting template '{self.name}' as default")
         
         # Remove default flag from all other templates in same module
         if self.module_id:
-            session.query(Template).filter_by(
+            db_session.query(Template).filter_by(
                 module_id=self.module_id,
                 is_default_template=True
             ).update({'is_default_template': False})
             logger.debug(f"Removed default flag from other templates in module {self.module_id}")
         else:
             # System templates
-            session.query(Template).filter_by(
+            db_session.query(Template).filter_by(
                 module_id=None,
                 is_default_template=True
             ).update({'is_default_template': False})
@@ -244,15 +235,16 @@ class Template(BaseModel):
         self.is_default_template = True
         
         try:
-            session.commit()
+            db_session.commit()
             logger.info(f"Template '{self.name}' set as default successfully")
         except Exception as e:
             logger.error(f"Failed to set template '{self.name}' as default: {e}")
-            session.rollback()
+            db_session.rollback()
             raise
 
-    def clone_template(self, session, new_name, new_display_name=None):
+    def clone_template(self, new_name, new_display_name=None):
         """Create a clone of this template with all its fragments"""
+        db_session=db_registry._routing_session()
         logger = self._get_logger()
         logger.info(f"Cloning template '{self.name}' to '{new_name}'")
         
@@ -275,12 +267,12 @@ class Template(BaseModel):
             is_default_template=False  # Clones are never default
         )
         
-        session.add(new_template)
-        session.flush()  # Get the UUID
+        db_session.add(new_template)
+        db_session.flush()  # Get the UUID
         
         # Clone all fragments
         from app.models import TemplateFragment
-        fragments = session.query(TemplateFragment).filter_by(
+        fragments = db_session.query(TemplateFragment).filter_by(
             template_id=self.id,
             is_active=True
         ).all()
@@ -313,25 +305,26 @@ class Template(BaseModel):
                 cache_duration=fragment.cache_duration,
                 change_description=f"Cloned from {self.name}"
             )
-            session.add(new_fragment)
+            db_session.add(new_fragment)
             cloned_count += 1
         
         try:
-            session.commit()
+            db_session.commit()
             logger.info(f"Template '{self.name}' cloned successfully to '{new_name}' with {cloned_count} fragments")
             return new_template
         except Exception as e:
             logger.error(f"Failed to clone template '{self.name}': {e}")
-            session.rollback()
+            db_session.rollback()
             raise
 
-    def get_dependent_pages(self, session, published_only=True):
+    def get_dependent_pages(self,  published_only=True):
         """Get all pages that depend on this template"""
+        db_session=db_registry._routing_session()
         from app.models import Page
         
         logger = self._get_logger()
         
-        query = session.query(Page).filter_by(template_id=self.id)
+        query = db_session.query(Page).filter_by(template_id=self.id)
         if published_only:
             query = query.filter_by(published=True)
         
@@ -345,8 +338,9 @@ class Template(BaseModel):
         logger.debug(f"Template '{self.name}' has {len(pages)} dependent pages")
         return pages
 
-    def validate_template_integrity(self, session):
+    def validate_template_integrity(self):
         """Comprehensive validation of template integrity"""
+        db_session=db_registry._routing_session()
         logger = self._get_logger()
         logger.info(f"Validating integrity of template '{self.name}'")
         
@@ -358,26 +352,26 @@ class Template(BaseModel):
         except ValueError as e:
             issues.append(f"Invalid name format: {e}")
         
-        if not self.validate_references(session):
+        if not self.validate_references():
             issues.append("Invalid foreign key references")
         
         # Check for base fragment
-        if not self.has_base_fragment(session):
+        if not self.has_base_fragment():
             issues.append("Missing base fragment")
         
         # Check fragment dependencies
         from app.models import TemplateFragment
-        if not TemplateFragment.find_circular_dependencies(session, self.id):
+        if not TemplateFragment.find_circular_dependencies( self.id):
             issues.append("Circular dependencies detected in fragments")
         
         # Validate each fragment
-        fragments = session.query(TemplateFragment).filter_by(
+        fragments = db_session.query(TemplateFragment).filter_by(
             template_id=self.id,
             is_active=True
         ).all()
         
         for fragment in fragments:
-            if not fragment.validate_dependencies(session):
+            if not fragment.validate_dependencies():
                 issues.append(f"Fragment '{fragment.fragment_key}' has missing dependencies")
         
         if issues:
@@ -390,12 +384,13 @@ class Template(BaseModel):
         return True
 
     @classmethod
-    def get_by_name(cls, session, name, module_id=None):
+    def get_by_name(cls, name, module_id=None):
         """Get template by name with optional module scoping"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting template by name: '{name}', module: {module_id}")
         
-        query = session.query(cls).filter_by(name=name)
+        query = db_session.query(cls).filter_by(name=name)
         if module_id:
             query = query.filter_by(module_id=module_id)
         
@@ -409,12 +404,13 @@ class Template(BaseModel):
         return template
 
     @classmethod
-    def get_default_template(cls, session, module_id=None, admin_only=False):
+    def get_default_template(cls, module_id=None, admin_only=False):
         """Get the default template for a module or system"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting default template: module={module_id}, admin_only={admin_only}")
         
-        query = session.query(cls).filter_by(
+        query = db_session.query(cls).filter_by(
             module_id=module_id,
             is_default_template=True
         )
@@ -434,12 +430,13 @@ class Template(BaseModel):
         return template
 
     @classmethod
-    def get_templates_by_type(cls, session, layout_type=None, is_admin=None, module_id=None):
+    def get_templates_by_type(cls,  layout_type=None, is_admin=None, module_id=None):
         """Get templates filtered by type and other criteria"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting templates: layout={layout_type}, admin={is_admin}, module={module_id}")
         
-        query = session.query(cls)
+        query = db_session.query(cls)
         
         if layout_type:
             query = query.filter_by(layout_type=layout_type)
@@ -457,6 +454,7 @@ class Template(BaseModel):
 
     def get_render_context(self):
         """Get template context for rendering"""
+        db_session=db_registry._routing_session()
         logger = self._get_logger()
         logger.debug(f"Getting render context for template '{self.name}'")
         

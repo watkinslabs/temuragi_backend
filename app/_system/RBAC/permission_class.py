@@ -1,5 +1,5 @@
 import time
-from flask import request, session as flask_session, g
+from flask import request, g
 from functools import wraps
 from datetime import datetime, timezone
 
@@ -11,8 +11,7 @@ class RbacPermissionChecker:
     Use this for ALL permission checks across the entire system
     """
     __depends_on_ = []
-    def __init__(self, session):
-        self.session = session
+    def __init__(self):
         self.role_permission_model = get_model('RolePermission')
         self.rbac_audit_model = get_model('RbacAuditLog')
         self.user_model = get_model('User')
@@ -44,7 +43,6 @@ class RbacPermissionChecker:
             'request_method': context.get('request_method'),
             'ip_address': context.get('ip_address'),
             'user_agent': context.get('user_agent'),
-            'session_id': context.get('session_id'),
             'token_id': context.get('token_id'),
             'request_id': context.get('request_id'),
             'context_data': context.get('context_data')
@@ -62,7 +60,7 @@ class RbacPermissionChecker:
             else:
                 # First check exact permission
                 granted = self.role_permission_model.user_has_permission(
-                    self.session, user_id, permission_name
+                    user_id, permission_name
                 )
                 
                 # If not granted, check wildcard permissions
@@ -126,7 +124,7 @@ class RbacPermissionChecker:
         # Check each wildcard pattern
         for pattern in wildcard_patterns:
             if self.role_permission_model.user_has_permission(
-                self.session, user_id, pattern
+                user_id, pattern
             ):
                 return True
         
@@ -180,7 +178,6 @@ class RbacPermissionChecker:
                 'request_method': request.method,
                 'ip_address': request.remote_addr,
                 'user_agent': request.headers.get('User-Agent'),
-                'session_id': flask_session.get('session_id') if flask_session else None
             })
         
         return self.check_permission(user_id, permission_name, **context)
@@ -242,10 +239,10 @@ class RbacPermissionChecker:
         """Log the permission check"""
         try:
             if self.rbac_audit_model:
-                self.rbac_audit_model.log_permission_check(self.session, **audit_context)
+                self.rbac_audit_model.log_permission_check( **audit_context)
         except Exception as e:
             # Don't let audit logging break the main flow
-            print(f"RBAC audit logging failed: {e}")
+            print(f"Permission Checker RBAC audit logging failed: {e}")
 
 
 class RbacMiddleware:
@@ -266,17 +263,16 @@ class RbacMiddleware:
         @app.before_request
         def setup_rbac():
             """Setup RBAC checker for each request"""
-            if hasattr(g, 'session'):
-                g.rbac = RbacPermissionChecker(g.session)
+            g.rbac = RbacPermissionChecker()
 
 
 # Convenience functions for common permission checks
-def check_model_permission(user_id, model_name, action, session, record_id=None):
+def check_model_permission(user_id, model_name, action,  record_id=None):
     """
     Check permission for model operations
     """
     permission_name = f"{model_name.lower()}:{action}"
-    checker = RbacPermissionChecker(session)
+    checker = RbacPermissionChecker()
     
     # Determine interface type
     interface_type = 'api' if hasattr(g, 'auth_context') else 'web'
@@ -310,11 +306,9 @@ def require_model_permission(model_name, action):
             if not user_id:
                 raise PermissionError("Authentication required")
             
-            session = getattr(g, 'session', None)
-            if not session:
-                raise RuntimeError("Database session not available")
             
-            if not check_model_permission(user_id, model_name, action, session):
+            
+            if not check_model_permission(user_id, model_name, action):
                 raise PermissionError(f"Permission denied: {permission_name}")
             
             return func(*args, **kwargs)

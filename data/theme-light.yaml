@@ -574,7 +574,7 @@ Theme:
     warning_color: '#ffc107'
     danger_color: '#dc3545'
     info_color: '#0dcaf0'
-    background_color: '#f5f5f5'
+    background_color: ' linear-gradient(135deg, #e9f4ff 0%, #cbe3ff 50%, #a7ceff 100%  )'
     surface_color: '#d4e9ff'
     text_color: '#212529'
     text_muted_color: '#07355e'

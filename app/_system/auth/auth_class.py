@@ -1,18 +1,18 @@
 import uuid
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import session, g, current_app, jsonify
-from sqlalchemy.orm import Session
+from flask import  g, current_app, jsonify
 
 from app.register.classes import get_model
+from app.register.database import db_registry
 
 class AuthService:
     """Authentication service for handling user auth operations"""
     __depends_on__=[]
     
-    def __init__(self, db_session: Session):
+    def __init__(self):
         
-        self.db_session = db_session
+        self.db_session=db_registry._routing_session()
         self.lockout_threshold = 5  # Failed attempts before lockout
         self.lockout_duration = 30  # Minutes
         self.User = get_model('User')
@@ -20,17 +20,16 @@ class AuthService:
 
     def login(self, identity: str, password: str, remember: bool = False) -> dict:
         """
-        Authenticate user and create session
+        Authenticate user 
 
         Args:
             identity: Username or email
             password: User password
-            remember: Whether to remember user session
             
         Returns:
             dict: {'success': bool, 'message': str, 'user': User or None}
         """
-        user = self.User.find_by_identity(self.db_session, identity)
+        user = self.User.find_by_identity(identity)
 
         if not user:
             return {'success': False, 'message': 'Invalid username or password', 'user': None}
@@ -64,18 +63,12 @@ class AuthService:
         user.locked_until = None
         user.last_login_date = datetime.utcnow()
 
-        # Create session
-        session['user_id'] = str(user.id)
-        session['username'] = user.username
-        session['role_id'] = str(user.role_id) if user.role_id else None
-
-        if remember:
-            session.permanent = True
-            current_app.permanent_session_lifetime = timedelta(days=30)
-
+        
         self.db_session.commit()
-
-        return {'success': True, 'message': 'Login successful', 'user': user}
+        #from pprint import pprint
+        #pprint(user)
+        user_obj={'id':user.id,'landing_page':user.landing_page}
+        return {'success': True, 'message': 'Login successful', 'user': user_obj}
 
     def login_api(self, identity: str, password: str, remember: bool = False, application: str = 'web') -> dict:
         """
@@ -99,28 +92,25 @@ class AuthService:
         user = login_result['user']
         
         # Clean up expired tokens for this user before creating new ones
-        self._cleanup_user_tokens(user.id)
+        self._cleanup_user_tokens(user['id'])
         
         # Check for existing valid refresh token for this application
-        existing_refresh = self._get_valid_refresh_token(user.id, application)
-        
+        existing_refresh = self._get_valid_refresh_token(user['id'], application)
+        print(existing_refresh)
+        from pprint import pprint
+        pprint(user)
         if existing_refresh:
             # Reuse existing refresh token and create new access token
             try:
-                access_token = existing_refresh.refresh_access_token(self.db_session)
+                access_token = existing_refresh.refresh_access_token()
                 
                 return {
                     'success': True,
                     'message': 'Login successful',
                     'api_token': access_token.token,
                     'refresh_token': existing_refresh.token,
-                    'user_id': str(user.id),
-                    'user_info': {
-                        'username': user.username,
-                        'email': user.email,
-                        'full_name': getattr(user, 'full_name', None),
-                        'role': str(user.role_id) if user.role_id else None
-                    },
+                    'user_id': str(user['id']),
+                    'landing_page': str(user['landing_page']),
                     'expires_in': access_token.expires_in_seconds(),
                     'redirect_url': '/v2/'
                 }
@@ -131,11 +121,10 @@ class AuthService:
         # Create new token pair
         try:
             # Revoke any remaining active tokens for this application
-            self._revoke_application_tokens(user.id, application)
+            self._revoke_application_tokens(user['id'], application)
             
             tokens = self.UserToken.create_token_pair(
-                session=self.db_session,
-                user_id=user.id,
+                user_id=user['id'],
                 name=f"{application} login",
                 application=application,
                 is_system_temporary=False
@@ -146,13 +135,8 @@ class AuthService:
                 'message': 'Login successful',
                 'api_token': tokens['access_token'].token,
                 'refresh_token': tokens['refresh_token'].token,
-                'user_id': str(user.id),
-                'user_info': {
-                    'username': user.username,
-                    'email': user.email,
-                    'full_name': getattr(user, 'full_name', None),
-                    'role': str(user.role_id) if user.role_id else None
-                },
+                'user_id': str(user['id']),
+                'landing_page': str(user['landing_page']),
                 'expires_in': tokens['access_token'].expires_in_seconds(),
                 'redirect_url': '/v2/'
             }
@@ -177,7 +161,7 @@ class AuthService:
             dict: New access token or error
         """
         # Validate refresh token
-        token_obj = self.UserToken.validate_refresh_token(self.db_session, refresh_token)
+        token_obj = self.UserToken.validate_refresh_token(refresh_token)
         
         if not token_obj:
             return {
@@ -187,7 +171,7 @@ class AuthService:
         
         try:
             # Create new access token
-            new_access_token = token_obj.refresh_access_token(self.db_session)
+            new_access_token = token_obj.refresh_access_token()
             
             return {
                 'success': True,
@@ -213,7 +197,7 @@ class AuthService:
         Returns:
             dict: Validation result with user info
         """
-        token_obj = self.UserToken.validate_access_token(self.db_session, token)
+        token_obj = self.UserToken.validate_access_token( token)
         
         if not token_obj:
             return {
@@ -250,7 +234,7 @@ class AuthService:
             dict: {'success': bool, 'message': str}
         """
         if access_token:
-            token_obj = self.UserToken.find_by_token(self.db_session, access_token)
+            token_obj = self.UserToken.find_by_token(access_token)
             if token_obj:
                 # Revoke the token and any linked tokens
                 token_obj.revoke()
@@ -269,7 +253,7 @@ class AuthService:
             self.db_session.commit()
         
         # Also clear session if exists
-        session.clear()
+        self.db_session.clear()
         
         return {'success': True, 'message': 'Logged out successfully'}
    
@@ -287,11 +271,11 @@ class AuthService:
             dict: {'success': bool, 'message': str, 'user': User or None}
         """
         # Check if username exists
-        if self.User.find_by_identity(self.db_session, username):
+        if self.User.find_by_identity(username):
             return {'success': False, 'message': 'Username already exists', 'user': None}
         
         # Check if email exists
-        if self.User.find_by_email(self.db_session, email):
+        if self.User.find_by_email(email):
             return {'success': False, 'message': 'Email already registered', 'user': None}
         
         # Create new user
@@ -316,20 +300,12 @@ class AuthService:
         Returns:
             User or None
         """
-        user_id = session.get('user_id')
+        user_id = self.db_session.get('user_id')
         if not user_id:
             return None
         
-        return self.User.find_by_id(self.db_session, user_id)
+        return self.User.find_by_id(user_id)
     
-    def is_authenticated(self) -> bool:
-        """
-        Check if user is authenticated
-        
-        Returns:
-            bool: True if authenticated
-        """
-        return 'user_id' in session
     
     def change_password(self, user_id: str, current_password: str, new_password: str) -> dict:
         """
@@ -343,7 +319,7 @@ class AuthService:
         Returns:
             dict: {'success': bool, 'message': str}
         """
-        user = self.User.find_by_id(self.db_session, user_id)
+        user = self.User.find_by_id(user_id)
         
         if not user:
             return {'success': False, 'message': 'User not found'}
@@ -367,7 +343,7 @@ class AuthService:
         Returns:
             dict: {'success': bool, 'message': str}
         """
-        user = self.User.find_by_id(self.db_session, user_id)
+        user = self.User.find_by_id(user_id)
         
         if not user:
             return {'success': False, 'message': 'User not found'}
@@ -390,7 +366,7 @@ class AuthService:
         Returns:
             dict: {'success': bool, 'message': str}
         """
-        user = self.User.find_by_id(self.db_session, user_id)
+        user = self.User.find_by_id( user_id)
         
         if not user:
             return {'success': False, 'message': 'User not found'}
@@ -402,7 +378,7 @@ class AuthService:
         
         return {'success': True, 'message': 'Account unlocked successfully'}
     
-    def _cleanup_user_tokens(self, user_id: uuid.UUID) -> None:
+    def _cleanup_user_tokens(self, user_id: str) -> None:
         """
         Clean up expired tokens for a user
         
@@ -512,70 +488,3 @@ class AuthService:
                 'tokens_deleted': 0
             }
 
-
-def login_required(f):
-    """
-    Decorator to require authentication for views
-    
-    Usage:
-        @login_required
-        def protected_view():
-            # Only authenticated users can access
-            pass
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            from flask import redirect, url_for, flash
-            flash('Please log in to access this page', 'warning')
-            return redirect(url_for('auth.login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def api_login_required(f):
-    """
-    Decorator to require API token authentication
-    
-    Usage:
-        @api_login_required
-        def protected_api_endpoint():
-            # Only authenticated API users can access
-            pass
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        from flask import request
-        
-        # Get token from Authorization header
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
-            return jsonify({'error': 'Missing or invalid authorization header'}), 401
-        
-        token = auth_header.split(' ')[1]
-        
-        # Validate token
-        auth_service = get_auth_service()
-        validation_result = auth_service.validate_api_token(token)
-        
-        if not validation_result['success']:
-            return jsonify({'error': validation_result['message']}), 401
-        
-        # Store user info in g for access in the view
-        g.current_user_id = validation_result['user_id']
-        g.current_user_info = validation_result['user_info']
-        g.token_info = validation_result['token_info']
-        
-        return f(*args, **kwargs)
-    
-    return decorated_function
-
-
-def get_auth_service() -> AuthService:
-    """
-    Helper to get auth service with current db session
-    
-    Returns:
-        AuthService instance
-    """
-    return AuthService(g.session)

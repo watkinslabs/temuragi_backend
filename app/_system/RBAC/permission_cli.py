@@ -355,9 +355,7 @@ class PermissionCLI(BaseCLI):
                 self.output_error(f"Role not found: {role_name}")
                 return 1
 
-            success, result = self.role_permission_model.grant_permission(
-                self.session, role.id, permission_name
-            )
+            success, result = self.role_permission_model.grant_permission(role.id, permission_name)
 
             if success:
                 role_permission = result
@@ -480,7 +478,7 @@ class PermissionCLI(BaseCLI):
                 return 1
 
             has_permission = self.role_permission_model.user_has_permission(
-                self.session, user.id, permission_name
+                 user.id, permission_name
             )
 
             status = "GRANTED" if has_permission else "DENIED"

@@ -9,21 +9,11 @@ from .handler import  (
         )
 
 from app.models import Report, ReportQueryExecutor
+from app.register.database import db_registry
 
 class ReportDataHandler(BaseDataHandler):
     """Handler for Report models that executes SQL queries"""
     __depends_on__ = ['Miner', 'Report', 'ReportQueryExecutor']
-    
-    def _get_db_connection(self, connection_model):
-        """Create a new database connection from Connection model"""
-        try:
-            connection_string = connection_model.get_connection_string()
-            engine = create_engine(connection_string)
-            return engine.connect()
-        except ValueError as e:
-            raise MinerError(str(e), 'ConnectionError', 400)
-        except Exception as e:
-            raise MinerError(f'Failed to connect to database: {str(e)}', 'ConnectionError', 500)
     
     def handle_list(self, data):
         """Execute report with DataTables parameters"""
@@ -31,8 +21,9 @@ class ReportDataHandler(BaseDataHandler):
         report_id = data.get('report_id')
         if not report_id:
             raise MinerError('report_id is required', 'ValidationError', 400)
-        
-        report = self.session.query(Report).filter(
+
+        db_session=db_registry._routing_session()
+        report = db_session.query(Report).filter(
                 or_(Report.id == report_id, Report.slug == report_id)
             ).first()
         
@@ -51,7 +42,6 @@ class ReportDataHandler(BaseDataHandler):
         # The data from Miner already has DataTables format
         # Just pass it through to the executor
         result = executor.execute_report(
-            self._get_db_connection(report.connection), 
             report, 
             data  # Pass the whole data dict
         )

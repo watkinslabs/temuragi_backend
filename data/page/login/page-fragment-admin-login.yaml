@@ -24,406 +24,141 @@ PageFragment:
     version_label: v1.0
     is_active: true
     content_source: |
-        {% block title %}Login - {{ site_name }}{% endblock %}
+     {% block title %}Login - {{ site_name }}{% endblock %}
 
         {% block custom_css %}
         <style>
-            
-            :root {
-                    --primary-dark: #0f1419;
-                    --primary-blue: #0062ff;
-                    --secondary-blue: #054ada;
-                    --gray-100: #f5f7fa;
-                    --gray-200: #e9ecef;
-                    --gray-300: #dee2e6;
-                    --gray-400: #ced4da;
-                    --gray-500: #8b92a8;
-                    --gray-600: #6c757d;
-                    --gray-700: #495057;
-                    --gray-800: #343a40;
-                    --gray-900: #212529;
-                    --success: #198754;
-                    --danger: #dc3545;
-                    --warning: #ffc107;
-                }
+            /* Minimal custom styles - using Bootstrap variables */
+            body {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--theme-background);
+            }
 
-                * {
-                    box-sizing: border-box;
-                }
+            .login-container {
+                max-width: 480px;
+                width: 100%;
+                padding: 2rem;
+            }
 
-                body {
-                    background: linear-gradient(135deg, #0072ff 0%, #00c6ff 100%);
-                    min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                    color: var(--gray-900);
-                    position: relative;
-                    overflow: hidden;
-                }
+            .card {
+                border: none;
+                box-shadow: var(--bs-box-shadow);
+            }
 
-                /* Subtle background pattern */
-                body::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background-position: 0 0, 0 15px, 15px -15px, -15px 0px;
-                    opacity: 0.03;
-                    z-index: 0;
-                }
+            .card-header {
+                background: var(--bs-primary);
+                border-bottom: none;
+                padding: 2rem;
+                text-align: center;
+            }
 
-                .login-container {
-                    max-width: 480px;
-                    width: 100%;
-                    padding: 2rem;
-                    position: relative;
-                    z-index: 1;
-                }
+            .logo-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
 
-                .card {
-                    border: none;
-                    border-radius: 12px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.08);
-                    background: white;
-                    overflow: hidden;
-                }
+            .site-logo {
+                height:100px;
+                width: auto;
+                object-fit: contain;
+            }
 
-                .card-header {
-                    background: var(--primary-dark);
-                    border-bottom: none;
-                    padding: 2rem;
-                    text-align: center;
-                }
+            .logo-container h2 {
+                color: white;
+                font-weight: 300;
+                font-size: 1.75rem;
+                margin: 0;
+            }
 
-                .logo-container h2 {
-                    color: white;
-                    font-weight: 300;
-                    font-size: 1.75rem;
-                    margin: 0;
-                    letter-spacing: -0.5px;
-                }
+            .security-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
 
-                .logo-icon {
-                    width: 48px;
-                    height: 48px;
-                    margin: 0 auto 1rem;
-                    background: white;
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 24px;
-                    color: var(--primary-dark);
-                }
+            .card-body {
+                padding: 2.5rem 2rem;
+            }
 
-                .security-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    color: var(--gray-500);
-                    font-size: 0.75rem;
-                    margin-top: 1rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
+            .form-floating {
+                margin-bottom: 1rem;
+            }
 
-                .security-badge i {
-                    color: var(--success);
-                }
+            .password-field-wrapper {
+                position: relative;
+            }
 
-                .card-body {
-                    padding: 2.5rem 2rem;
-                }
+            .password-toggle {
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                color: var(--bs-secondary);
+                z-index: 10;
+                padding: 0.25rem;
+            }
 
-                /* SSO Section */
-                .sso-section {
-                    margin-bottom: 2rem;
-                }
+            .remember-forgot {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+            }
 
-                .sso-button {
-                    width: 100%;
-                    padding: 0.875rem;
-                    border: 1px solid var(--gray-300);
-                    background: white;
-                    color: var(--gray-800);
-                    border-radius: 8px;
-                    font-weight: 500;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 0.75rem;
-                    transition: all 0.2s ease;
-                    text-decoration: none;
-                    position: relative;
-                    overflow: hidden;
-                }
+            .btn-login {
+                width: 100%;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-weight: 500;
+            }
 
-                .sso-button:hover {
-                    background: var(--gray-100);
-                    border-color: var(--gray-400);
-                    color: var(--gray-900);
-                    transform: translateY(-1px);
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
+            .login-footer {
+                text-align: center;
+                margin-top: 2rem;
+                color: var(--bs-secondary);
+                font-size: 0.75rem;
+            }
 
-                .sso-button:active {
-                    transform: translateY(0);
-                    box-shadow: none;
-                }
+            .loading-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(255, 255, 255, 0.9);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
 
-                .sso-button i {
-                    font-size: 1.25rem;
-                }
+            [data-bs-theme="dark"] .loading-overlay {
+                background: rgba(0, 0, 0, 0.9);
+            }
 
-                /* Divider */
-                .auth-divider {
-                    position: relative;
-                    text-align: center;
-                    margin: 2rem 0;
-                }
+            .loading-overlay.active {
+                display: flex;
+            }
 
-                .auth-divider::before {
-                    content: '';
-                    position: absolute;
-                    top: 50%;
-                    left: 0;
-                    right: 0;
-                    height: 1px;
-                    background: var(--gray-300);
-                }
+            .spinner-border {
+                margin-right: 0.5rem;
+                display: none;
+            }
 
-                .auth-divider span {
-                    background: white;
-                    padding: 0 1rem;
-                    position: relative;
-                    color: var(--gray-600);
-                    font-size: 0.875rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                }
-
-                /* Form Styling */
-                .form-floating {
-                    margin-bottom: 1rem;
-                }
-
-                .form-control {
-                    border-radius: 8px;
-                    border: 1px solid var(--gray-300);
-                    font-size: 0.95rem;
-                    padding: 0.75rem 1rem;
-                    transition: all 0.2s ease;
-                }
-
-                .form-control:focus {
-                    box-shadow: 0 0 0 3px rgba(0, 98, 255, 0.1);
-                    border-color: var(--primary-blue);
-                }
-
-                .form-floating > label {
-                    padding: 0.75rem 1rem;
-                    color: var(--gray-600);
-                }
-
-                /* Remember and Forgot */
-                .remember-forgot {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 1.5rem;
-                }
-
-                .form-check-input {
-                    border-radius: 4px;
-                }
-
-                .form-check-input:checked {
-                    background-color: var(--primary-blue);
-                    border-color: var(--primary-blue);
-                }
-
-                .form-check-label {
-                    color: var(--gray-700);
-                    font-size: 0.875rem;
-                }
-
-                .forgot-link {
-                    color: var(--primary-blue);
-                    text-decoration: none;
-                    font-size: 0.875rem;
-                    transition: color 0.2s ease;
-                }
-
-                .forgot-link:hover {
-                    color: var(--secondary-blue);
-                    text-decoration: underline;
-                }
-
-                /* Login Button */
-                .btn-login {
-                    background: var(--primary-blue);
-                    color: white;
-                    border: none;
-                    border-radius: 2px;
-                    padding: 0.875rem;
-                    font-weight: 500;
-                    width: 100%;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    transition: all 0.2s ease;
-                    position: relative;
-                    overflow: hidden;
-                }
-
-                .btn-login::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-                    transition: left 0.5s ease;
-                }
-
-                .btn-login:hover {
-                    background: var(--secondary-blue);
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 8px rgba(0, 98, 255, 0.3);
-                }
-
-                .btn-login:hover::before {
-                    left: 100%;
-                }
-
-                .btn-login:active {
-                    transform: translateY(0);
-                    box-shadow: none;
-                }
-
-                .btn-login:disabled {
-                    background: var(--gray-500);
-                    cursor: not-allowed;
-                    transform: none;
-                }
-
-                .spinner-border {
-                    width: 1rem;
-                    height: 1rem;
-                    margin-right: 0.5rem;
-                    display: none;
-                }
-
-                .btn-login.loading .spinner-border {
-                    display: inline-block;
-                }
-
-                /* Alerts */
-                .alert {
-                    border-radius: 2px;
-                    padding: 0.75rem 1rem;
-                    margin-bottom: 1.5rem;
-                    border: none;
-                    font-size: 0.875rem;
-                }
-
-                .alert-danger {
-                    background: #fef2f2;
-                    color: #991b1b;
-                }
-
-                .alert-success {
-                    background: #f0fdf4;
-                    color: #166534;
-                }
-
-                /* Footer */
-                .login-footer {
-                    text-align: center;
-                    margin-top: 2rem;
-                    color: var(--gray-600);
-                    font-size: 0.75rem;
-                }
-
-                .login-footer a {
-                    color: var(--gray-600);
-                    text-decoration: none;
-                    margin: 0 0.5rem;
-                }
-
-                .login-footer a:hover {
-                    color: var(--gray-800);
-                    text-decoration: underline;
-                }
-
-                /* Enterprise touches */
-                .compliance-badges {
-                    display: flex;
-                    justify-content: center;
-                    gap: 1rem;
-                    margin-top: 1rem;
-                    opacity: 0.6;
-                }
-
-                .compliance-badges img {
-                    height: 24px;
-                    filter: grayscale(100%);
-                    opacity: 0.7;
-                }
-
-                /* Password visibility toggle */
-                .password-toggle {
-                    position: absolute;
-                    right: 1rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    cursor: pointer;
-                    color: var(--gray-500);
-                    z-index: 10;
-                    padding: 0.25rem;
-                }
-
-                .password-toggle:hover {
-                    color: var(--gray-700);
-                }
-
-                .password-field-wrapper {
-                    position: relative;
-                }
-
-                /* Loading overlay */
-                .loading-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(255, 255, 255, 0.9);
-                    display: none;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                }
-
-                .loading-overlay.active {
-                    display: flex;
-                }
-
-                /* Responsive */
-                @media (max-width: 576px) {
-                    .login-container {
-                        padding: 1rem;
-                    }
-                    
-                    .card-body {
-                        padding: 1.5rem;
-                    }
-                }
-            </style>
+            .btn-login.loading .spinner-border {
+                display: inline-block;
+            }
+        </style>
         {% endblock %}
 
         {% block content %}
@@ -431,10 +166,18 @@ PageFragment:
             <div class="card">
                 <div class="card-header">
                     <div class="logo-container">
-                        <div class="logo-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h2>{{ site_name }}</h2>
+                        {% if site.logo_desktop or site.logo_desktop_dark %}
+                            <img 
+                                src="{{ site.logo_desktop }}" 
+                                alt="{{ site.name }} logo" 
+                                class="site-logo"
+                                id="site_logo"
+                                data-logo-light="{{ site.logo_desktop }}"
+                                data-logo-dark="{{ site.logo_desktop_dark }}"
+                            >
+                        {% endif %}
+                        <h2>{{ site.name }}</h2>
+                        
                         <div class="security-badge">
                             <i class="fas fa-lock"></i>
                             <span>Secure Authentication</span>
@@ -449,18 +192,6 @@ PageFragment:
                     </div>
                     
                     <div id="login-alerts"></div>
-                    
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                    <i class="fas fa-{{ 'exclamation-circle' if category == 'danger' else 'check-circle' }}"></i>
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
                     
                     <!-- Local Login Form -->
                     <form id="login-form" novalidate>
@@ -494,9 +225,9 @@ PageFragment:
                                     Remember me
                                 </label>
                             </div>
-                            <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">Forgot password?</a>
+                            <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link text-decoration-none">Forgot password?</a>
                         </div>
-                        <button type="submit" class="btn btn-login" id="login-button">
+                        <button type="submit" class="btn btn-primary btn-login" id="login-button">
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                             <span class="button-text">Sign In</span>
                         </button>
@@ -508,18 +239,62 @@ PageFragment:
             <div class="login-footer">
                 <div>&copy; {{ current_year }} {{ site_name }}. All rights reserved.</div>
                 <div>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Security</a>
-                </div>
-                <div class="compliance-badges">
-                    <!-- Add compliance badge images here if needed -->
+                    <a href="#" class="text-decoration-none">Privacy Policy</a>
+                    <a href="#" class="text-decoration-none">Terms of Service</a>
+                    <a href="#" class="text-decoration-none">Security</a>
                 </div>
             </div>
         </div>
         {% endblock %}
+
         {% block custom_js %}
         <script>
+        // Updated toggle_theme function to handle logo switching
+        function toggle_theme() {
+            const toggle = document.getElementById('dark_mode_toggle');
+            const html = document.documentElement;
+            const logo = document.getElementById('site_logo');
+
+            if (toggle.checked) {
+                html.setAttribute('data-theme', 'dark');
+                html.setAttribute('data-bs-theme', 'dark');
+                localStorage.setItem('theme_preference', 'dark');
+                
+                // Switch to dark logo if available
+                if (logo && logo.dataset.logoDark) {
+                    logo.src = logo.dataset.logoDark;
+                }
+            } else {
+                html.setAttribute('data-theme', 'light');
+                html.setAttribute('data-bs-theme', 'light');
+                localStorage.setItem('theme_preference', 'light');
+                
+                // Switch to light logo if available
+                if (logo && logo.dataset.logoLight) {
+                    logo.src = logo.dataset.logoLight;
+                }
+            }
+        }
+
+        // Apply theme on page load
+        function apply_theme_on_load() {
+            const saved_theme = localStorage.getItem('theme_preference') || 'light';
+            const html = document.documentElement;
+            const logo = document.getElementById('site_logo');
+            
+            html.setAttribute('data-theme', saved_theme);
+            html.setAttribute('data-bs-theme', saved_theme);
+            
+            // Set the appropriate logo
+            if (logo) {
+                if (saved_theme === 'dark' && logo.dataset.logoDark) {
+                    logo.src = logo.dataset.logoDark;
+                } else if (logo.dataset.logoLight) {
+                    logo.src = logo.dataset.logoLight;
+                }
+            }
+        }
+
         // Show alert message
         function show_alert(message, type = 'danger') {
             const alert_html = `
@@ -661,17 +436,15 @@ PageFragment:
                     localStorage.setItem('refresh_token', data.refresh_token);
                     localStorage.setItem('user_id', data.user_id);
                     
-                    // Optional: Store additional user info if provided
-                    if (data.user_info) {
-                        localStorage.setItem('user_info', JSON.stringify(data.user_info));
-                    }
-                    
                     // Show success message briefly
                     show_alert('Login successful! Redirecting...', 'success');
+                    // Set cookie with the ID
+                    document.cookie = `user_id=${data.user_id}; path=/; SameSite=Strict`;
+                    document.cookie = `landing_page=${data.landing_page}; path=/; SameSite=Strict`;
                     
                     // Redirect to main app
                     setTimeout(() => {
-                        window.location.href = data.redirect_url || '/';
+                        window.location.href = data.landing_page|| '/';
                     }, 500);
                     
                 } else {
@@ -707,6 +480,9 @@ PageFragment:
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Apply theme first
+            apply_theme_on_load();
+            
             // ALWAYS reset form state first
             reset_form_state();
             

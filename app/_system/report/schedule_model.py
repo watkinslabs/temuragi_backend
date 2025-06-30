@@ -55,33 +55,3 @@ class ReportSchedule(BaseModel):
         return f"<ReportSchedule {self.schedule_type} for report {self.report_id}>"
 
 
-    @classmethod
-    def create_initial_data(cls, session):
-        """Create sample report schedules"""
-        # Get the user activity report
-        from app.classes import Report
-        user_report = session.query(Report).filter_by(name='user_activity_report').first()
-        if not user_report:
-            return
-        
-        # Check if we already have schedules
-        existing = session.query(cls).first()
-        if existing:
-            return
-        
-        # Create a weekly schedule for the user activity report
-        schedule = cls(
-            report_id=user_report.id,
-            schedule_type='weekly',
-            day_of_week=1,  # Monday
-            time_of_day='09:00',
-            delivery_method='email',
-            recipient_emails='admin@example.com',
-            attachment_format='xlsx',
-            parameters={
-                'start_date': "CURRENT_DATE - INTERVAL '7 days'",
-                'end_date': 'CURRENT_DATE'
-            },
-            is_enabled=False  # Disabled by default
-        )
-        session.add(schedule)

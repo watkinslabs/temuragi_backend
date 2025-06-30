@@ -1,6 +1,5 @@
 import functools
-from typing import Optional, List
-from flask import g, session, request
+from flask import g
 
 
 # Global permission registry for auto-discovery
@@ -24,9 +23,7 @@ def _check_permission(permission_name: str) -> bool:
     
     try:
         
-        return RolePermission.user_has_permission(
-            g.session, user.id, permission_name
-        )
+        return RolePermission.user_has_permission(user.id, permission_name)
     except Exception:
         return True  # Fail open on errors
 
@@ -83,8 +80,6 @@ def auto_create_permissions():
     try:
         from flask import current_app
         
-        
-        session = current_app.db_session()
         created = 0
         
         for perm_name in _DISCOVERED_PERMISSIONS:
@@ -93,10 +88,10 @@ def auto_create_permissions():
                 service, action = parts[0], parts[1]
                 resource = parts[2] if len(parts) > 2 else None
                 
-                existing = Permission.find_by_name(session, perm_name)
+                existing = Permission.find_by_name(perm_name)
                 if not existing:
                     success, result = Permission.create_permission(
-                        session, service, action, resource,
+                        service, action, resource,
                         "Auto-discovered permission"
                     )
                     if success:

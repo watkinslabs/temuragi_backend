@@ -1,6 +1,12 @@
 import logging
 from jinja2 import Environment as JinjaEnvironment, BaseLoader, TemplateNotFound, pass_context
 from flask import current_app, has_app_context, request, g
+import uuid
+
+from app.register.database import db_registry
+
+from pprint import pprint
+
 
 
 # Place this class definition above your TemplateRenderer class
@@ -44,8 +50,9 @@ class ContextAwareEnvironment(JinjaEnvironment):
     __depends_on__=[]
     
     def __init__(self, renderer, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
+        super().__init__(*args, **kwargs)
+        self.db_session=db_registry._routing_session()
         self._renderer = renderer
         self._context_renderer = renderer
 
@@ -124,11 +131,11 @@ class ContextAwareEnvironment(JinjaEnvironment):
 class DbLoader(BaseLoader):
     __depends_on__=[]
     
-    def __init__(self, session):
-        self.session = session
+    def __init__(self):
         self._logger = self._get_logger()
         self._recursion_depth = 0
         self._max_recursion = 5
+        self.db_session=db_registry._routing_session()
 
     @staticmethod
     def _get_logger():
@@ -154,9 +161,9 @@ class DbLoader(BaseLoader):
         from app.models import PageFragment, TemplateFragment
 
         if fragment_type == 'template_fragment':
-            fragment = TemplateFragment.get_active_by_key(self.session, id, fragment_key)
+            fragment = TemplateFragment.get_active_by_key( id, fragment_key)
         elif fragment_type == 'page_fragment':
-            fragment = PageFragment.get_active_by_key(self.session, id, fragment_key)
+            fragment = PageFragment.get_active_by_key( id, fragment_key)
         else:
             raise TemplateNotFound(template)
 
@@ -172,7 +179,7 @@ class DbLoader(BaseLoader):
             source = getattr(fragment, 'template_source', None) or fragment.content_source
 
         def uptodate():
-            current_fragment = type(fragment).get_active_by_key(self.session, id, fragment_key)
+            current_fragment = type(fragment).get_active_by_key( id, fragment_key)
             if not current_fragment:
                 return False
 
@@ -196,14 +203,33 @@ class TemplateRenderer:
     """Dynamic template render engine for Flask"""
     __depends_on__ = ['ContextAwareEnvironment', 'DbLoader', 'MenuBuilder','Template', 'TemplateFragment','Page','PageFragment']
 
-    def __init__(self, session):
-        self.session = session
+    def __init__(self):
         self._logger = self._get_logger()
         self._jinja_env = None
         self._recursion_depth = 0
         self._max_recursion = 5
         self._context_stack = []
-    
+        from app.models import SiteConfig,User
+        from app.classes import MenuBuilder
+        self.db_session=db_registry._routing_session()
+
+        self.data={ 'site': None, 'user': None,'menus': []  }
+        
+
+        user_id = request.cookies.get('user_id')
+        if user_id:
+            user_id=uuid.UUID(user_id)
+        
+        try:
+            self.data['site'] = self.db_session.query(SiteConfig).filter_by(published=True).one()
+            if user_id:
+                self.data['user'] = self.db_session.query(User).filter_by(id= user_id).one()
+                menu_builder = MenuBuilder()
+                self.data['menus'] = menu_builder.get_available_menus(user_id)
+        except Exception as ex:
+            pass
+
+
     @staticmethod
     def _get_logger():
         if has_app_context():
@@ -215,7 +241,7 @@ class TemplateRenderer:
     def jinja_env(self):
         """Lazy initialize Jinja2 environment"""
         if self._jinja_env is None:
-            loader = DbLoader(self.session)
+            loader = DbLoader()
             self._jinja_env = ContextAwareEnvironment(
                     renderer=self,
                     loader=loader,
@@ -256,14 +282,22 @@ class TemplateRenderer:
 
             self._jinja_env.globals['include_page_fragment'] = self._include_fragment
             self._jinja_env.globals['include_template_fragment'] = self._include_template_fragment
-            self._jinja_env.globals['theme_css'] = lambda theme_id_or_name=None: self.theme_css(self.session, theme_id_or_name)
-            self._jinja_env.globals['get_flashed_messages'] = self._get_flashed_messages
+            self._jinja_env.globals['theme_css'] = lambda theme_id_or_name=None: self.theme_css( theme_id_or_name)
             self._jinja_env.globals['url_for'] = self._url_for
             self._jinja_env.globals['model_url'] = self._model_url
-            self._jinja_env.globals['render_menu'] = self._render_menu
+            @pass_context
+            def render_menu_wrapper(context, menu_name=None, user_id=None, **kwargs):
+                if menu_name is None:
+                    menu_name = context.get('menu_name')
+                if user_id is None:
+                    user_id = context.get('user_id')
+                return self._render_menu(menu_name, user_id, **kwargs)
+
+            self._jinja_env.globals['render_menu'] = render_menu_wrapper
 
         return self._jinja_env
 
+    
     def _model_url(self,endpoint):
 
         model,action=endpoint.split('.')
@@ -297,25 +331,6 @@ class TemplateRenderer:
             self._logger.error(f"url_for failed for '{endpoint}': {type(e).__name__}: {e}")
             return "/not_found"
     
-    def _get_flashed_messages(self, with_categories=False, category_filter=()):
-            """
-            Get flashed messages from Flask session.
-            Mimics Flask's get_flashed_messages functionality.
-            """
-            from flask import session
-            
-            flashes = session.pop('_flashes', [])
-            
-            if category_filter:
-                # Filter by categories if specified
-                flashes = [f for f in flashes if f[0] in category_filter]
-            
-            if with_categories:
-                # Return tuples of (category, message)
-                return flashes
-            else:
-                # Return just the messages
-                return [f[1] for f in flashes]    
     
     def _context_include(self, context, fragment_key, **kwargs):
         """Context-aware include that passes template context to fragments"""
@@ -403,7 +418,7 @@ class TemplateRenderer:
         
         # Default or fallback: try page fragment
         from app.models import PageFragment
-        fragment = PageFragment.get_active_by_key(self.session, target_id, fragment_key)
+        fragment = PageFragment.get_active_by_key( target_id, fragment_key)
         
         if not fragment:
             #self._logger.warning(f"Page fragment not found: {target_id}:{fragment_key}")
@@ -418,7 +433,7 @@ class TemplateRenderer:
             if fragment.template_fragment_key:
                 # Get the page's template for template fragment lookup
                 from app.models import Page
-                page = self.session.query(Page).filter_by(id=target_id).first()
+                page = self.db_session.query(Page).filter_by(id=target_id).first()
                 if page and page.template_id:
                     template_name = f"template_fragment:{page.template_id}:{fragment.template_fragment_key}"
                     try:
@@ -470,10 +485,10 @@ class TemplateRenderer:
         try:
             # If it's a valid UUID string, use it as UUID
             page_id = uuid.UUID(str(page_identifier))
-            page = self.session.query(Page).filter_by(id=page_id).first()
+            page = self.db_session.query(Page).filter_by(id=page_id).first()
         except ValueError:
             # Not a UUID, treat as slug
-            page = self.session.query(Page).filter_by(slug=page_identifier).first()
+            page = self.db_session.query(Page).filter_by(slug=page_identifier).first()
         
         if not page:
             raise ValueError(f"Page not found: {page_identifier}")
@@ -487,7 +502,7 @@ class TemplateRenderer:
     def _load_template(self, template_id):
         """Load template"""
         from app.models import Template
-        template = self.session.query(Template).filter_by(id=template_id).first()
+        template = self.db_session.query(Template).filter_by(id=template_id).first()
         
         if not template:
             raise ValueError(f"Template not found: {template_id}")
@@ -497,7 +512,7 @@ class TemplateRenderer:
     def _load_theme(self, theme_id):
         """Load theme"""
         from app.models import Theme
-        theme = self.session.query(Theme).filter_by(id=theme_id).first()
+        theme = self.db_session.query(Theme).filter_by(id=theme_id).first()
         
         if not theme:
             raise ValueError(f"Theme not found: {theme_id}")
@@ -510,6 +525,8 @@ class TemplateRenderer:
         
         # Add passed data at root level
         context.update(data)
+        
+        context.update(**self.data)
         
         # Add page object (read-write for page/fragments)
         context['page'] = {
@@ -549,20 +566,18 @@ class TemplateRenderer:
         # Get template base fragment
         template_base = None
         if page_template:
-            template_base = TemplateFragment.get_active_by_key(
-                self.session, page_template.id, 'base'
+            template_base = TemplateFragment.get_active_by_key( page_template.id, 'base'
             )
         
         if not template_base and theme_template:
-            template_base = TemplateFragment.get_active_by_key(
-                self.session, theme_template.id, 'base'
+            template_base = TemplateFragment.get_active_by_key( theme_template.id, 'base'
             )
         
         if not template_base:
             raise ValueError("No base template found")
         
         # Get all active page fragments
-        page_fragments = PageFragment.get_all_active_for_page(self.session, page_id)
+        page_fragments = PageFragment.get_all_active_for_page( page_id)
         
         # Build extended template source
         extends_line = f"template_fragment:{template_base.template_id}:base"
@@ -589,7 +604,7 @@ class TemplateRenderer:
         import re
         
         # Get all active page fragments
-        page_fragments = PageFragment.get_all_active_for_page(self.session, page_id)
+        page_fragments = PageFragment.get_all_active_for_page( page_id)
         
         # Build content template
         content_parts = []
@@ -663,7 +678,7 @@ class TemplateRenderer:
                 rendered_content = template.render(**context)
             
             # Increment view count
-            page.increment_view_count(self.session)
+            page.increment_view_count()
 
             # Apply theme's HTML compression settings if theme exists
             if theme and any([theme.consolidate_css, theme.consolidate_js, 
@@ -688,13 +703,12 @@ class TemplateRenderer:
         finally:
             self._context_stack = []  # Clean up context stack
 
-    def theme_css(self, session, theme_id_or_name=None):
+    def theme_css(self, theme_id_or_name=None):
         """
         Generate complete CSS for a theme including variables and custom styles.
         Can be called in templates like {{ theme_css() }}
         
         Args:
-            session: SQLAlchemy session
             theme_id_or_name: Theme UUID string, name, or None for default theme
             
         Returns:
@@ -708,7 +722,7 @@ class TemplateRenderer:
             # Get the theme
             theme = None
             if theme_id_or_name:
-                theme = session.query(Theme).filter(
+                theme = self.db_session.query(Theme).filter(
                     or_(
                         Theme.id == theme_id_or_name,
                         Theme.name == theme_id_or_name
@@ -716,10 +730,10 @@ class TemplateRenderer:
                 ).first()
             
             if not theme:
-                theme = session.query(Theme).filter_by(is_default=True).first()
+                theme =self.db_session.query(Theme).filter_by(is_default=True).first()
                 
             if not theme:
-                theme = session.query(Theme).first()
+                theme =self.db_session.query(Theme).first()
                 
             if not theme:
                 return "/* No theme found */"
@@ -841,6 +855,7 @@ class TemplateRenderer:
                     # Log but don't fail
                     self._logger.warning(f"Failed to parse theme CSS variables: {e}")
                     pass
+            
             # Build the complete CSS
             css_output = []
             
@@ -869,6 +884,43 @@ class TemplateRenderer:
                 "h1, h2, h3, h4, h5, h6 {",
                 "  font-family: var(--theme-font-heading);",
                 "  font-weight: var(--theme-font-weight-bold);",
+                "}"
+            ])
+            
+            # Logo handling for dark/light themes
+            css_output.extend([
+                "",
+                "/* Logo switching for dark/light themes */",
+                ".logo_light {",
+                "  display: block;",
+                "}",
+                "",
+                ".logo_dark {",
+                "  display: none;",
+                "}",
+                "",
+                "/* Hide broken/missing images */",
+                ".logo_light:not([src]), .logo_light[src=''], .logo_light[src='None'],",
+                ".logo_dark:not([src]), .logo_dark[src=''], .logo_dark[src='None'] {",
+                "  display: none !important;",
+                "}",
+                "",
+                "/* Bootstrap dark theme */",
+                "[data-bs-theme='dark'] .logo_light {",
+                "  display: none;",
+                "}",
+                "",
+                "[data-bs-theme='dark'] .logo_dark {",
+                "  display: block;",
+                "}",
+                "",
+                "/* Legacy data-theme attribute support */",
+                "[data-theme='dark'] .logo_light {",
+                "  display: none;",
+                "}",
+                "",
+                "[data-theme='dark'] .logo_dark {",
+                "  display: block;",
                 "}"
             ])
             
@@ -952,6 +1004,15 @@ class TemplateRenderer:
                         f"    --theme-sidebar: {theme.sidebar_color_dark or theme.sidebar_color};",
                         f"    --theme-component: {theme.component_color_dark or theme.component_color};",
                         "  }",
+                        "  ",
+                        "  /* Auto dark mode logo switching */",
+                        "  :root:not([data-theme]) .logo_light {",
+                        "    display: none;",
+                        "  }",
+                        "  ",
+                        "  :root:not([data-theme]) .logo_dark {",
+                        "    display: block;",
+                        "  }",
                         "}",
                         "",
                         "/* Manual dark theme override */",
@@ -1023,9 +1084,9 @@ class TemplateRenderer:
             return Markup("\n".join(css_output))
             
         except Exception as e:
-            return f"/* Error generating theme CSS: {e} */"        
-
-    def _render_menu(self, menu_name='ADMIN', user_id=None, **kwargs):
+            return f"/* Error generating theme CSS: {e} */"
+    
+    def _render_menu(self, menu_name=None, user_id=None, **kwargs):
         """
         Render menu directly in templates using {{ render_menu('ADMIN') }}
         """
@@ -1034,12 +1095,13 @@ class TemplateRenderer:
         from markupsafe import Markup
         
         try:
+            
             # Save current context state
             saved_context_stack = self._context_stack.copy()
             saved_recursion_depth = self._recursion_depth
             
             # Get menu structure
-            menu_builder = MenuBuilder(self.session)
+            menu_builder = MenuBuilder()
             menu_structure = menu_builder.get_menu_structure(menu_name, user_id)
             
             if not menu_structure:
@@ -1048,11 +1110,11 @@ class TemplateRenderer:
 
             # Try to find a template for this menu type
             template_name = f"menu_{menu_name.lower()}"
-            template = self.session.query(Template).filter_by(name=template_name).first()
+            template = self.db_session.query(Template).filter_by(name=template_name).first()
             
             # Fallback to generic sidebar_menu template
             if not template:
-                template = self.session.query(Template).filter_by(name='sidebar_menu').first()
+                template = self.db_session.query(Template).filter_by(name='sidebar_menu').first()
             if template:
                 # Push menu template context
                 self._push_context('template', template.id, 'base')
@@ -1090,9 +1152,8 @@ class TemplateRenderer:
 def render_template(page_identifier, **data):
     """Convenience function for rendering templates"""
     
-    session = g.session
     try:
-        engine = TemplateRenderer(session)
+        engine = TemplateRenderer()
         return engine.render_template(page_identifier, **data)
     finally:
-        session.close()
+        pass

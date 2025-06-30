@@ -1,14 +1,13 @@
-import re
-import json
 from abc import ABC, abstractmethod
 from sqlalchemy import text
-from flask import session
 
+from app.register.database import db_registry 
 
 class ReportQueryGenerator(ABC):
     """Abstract base class for report query generation"""
     __depends_on__ = []  
-
+    def __init__(self):
+        self.db_session=db_registry._routing_session()
 
     @abstractmethod
     def build_paginated_query(self, base_query, columns, filters, order_by, limit, offset):
@@ -163,8 +162,9 @@ class ReportQueryExecutor:
             raise ValueError(f"Unsupported database type: {db_type}")
         self.generator = generator_class()
         self.db_type = db_type.lower()
-    
-    def execute_report(self, db_session, report, request_data):
+        self.db_session=None
+
+    def execute_report(self,  report, request_data):
         """Execute a report with the given parameters"""
         # Extract parameters from request
         draw = int(request_data.get('draw', 1))
@@ -239,33 +239,37 @@ class ReportQueryExecutor:
                 base_query, column_names, filters, order_by, length, start
             )
 
-            results = db_session.execute(text(paginated_query), vars_form).fetchall()
+            engine=db_registry.get_or_create_engine(report.connection.name)
+            if engine:
+                with engine.connect() as conn:
+                    print(conn)
+                    results =conn.execute(text(paginated_query), vars_form).fetchall()
 
-            # Convert results to list of dicts
-            data_rows = []
-            for row in results:
-                data_rows.append(dict(row._mapping))
+                    # Convert results to list of dicts
+                    data_rows = []
+                    for row in results:
+                        data_rows.append(dict(row._mapping))
 
-            # Get total count
-            count_query = self.generator.build_count_query(base_query)
-            count_result = db_session.execute(text(count_query), vars_form).fetchone()
-            total_rows = count_result.count if count_result else 0
+                    # Get total count
+                    count_query = self.generator.build_count_query(base_query)
+                    count_result = conn.execute(text(count_query), vars_form).fetchone()
+                    total_rows = count_result.count if count_result else 0
 
-            # Get filtered count
-            filtered_count = total_rows
-            if filters:
-                filtered_query = self.generator.build_count_query(base_query, filters)
-                filtered_result = db_session.execute(text(filtered_query), vars_form).fetchone()
-                filtered_count = filtered_result.count if filtered_result else 0
+                    # Get filtered count
+                    filtered_count = total_rows
+                    if filters:
+                        filtered_query = self.generator.build_count_query(base_query, filters)
+                        filtered_result = conn.execute(text(filtered_query), vars_form).fetchone()
+                        filtered_count = filtered_result.count if filtered_result else 0
 
-            return {
-                "success": True,
-                "draw": draw,
-                "recordsTotal": total_rows,
-                "recordsFiltered": filtered_count,
-                "data": data_rows,
-                "headers": column_names
-            }
+                    return {
+                        "success": True,
+                        "draw": draw,
+                        "recordsTotal": total_rows,
+                        "recordsFiltered": filtered_count,
+                        "data": data_rows,
+                        "headers": column_names
+                    }
 
         except Exception as e:
             return {
@@ -277,7 +281,7 @@ class ReportQueryExecutor:
                 "error": str(e)
             }
     
-    def test_query(self, db_session, query, params=None):
+    def test_query(self, query, params=None):
         """Test a query and return column information"""
         try:
             # Execute query with LIMIT 1 to get column info
@@ -286,7 +290,7 @@ class ReportQueryExecutor:
             else:
                 test_query = f"SELECT * FROM ({query}) AS test LIMIT 1"
             
-            result = db_session.execute(text(test_query), params or {}).first()
+            result = self.db_session.execute(text(test_query), params or {}).first()
             
             columns = []
             if result:

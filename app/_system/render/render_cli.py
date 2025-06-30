@@ -148,7 +148,7 @@ class RenderCLI(BaseCLI):
             
             from app.classes import TemplateRenderer
             # Create renderer and render page
-            renderer = TemplateRenderer(self.session)
+            renderer = TemplateRenderer()
             rendered_content = renderer.render_template(page.id, **data)
 
             # Output result

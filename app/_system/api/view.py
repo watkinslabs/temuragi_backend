@@ -18,7 +18,7 @@ def login():
             remember = data.get('remember', False)
             
             # Get auth service and perform API login
-            auth = AuthService(g.session)
+            auth = AuthService()
             result = auth.login_api(identity, password, remember, application='web')
             
             if result['success']:
@@ -36,7 +36,7 @@ def validate():
     
     token = auth_header.split(' ')[1]
     
-    auth = AuthService(g.session)
+    auth = AuthService()
     result = auth.validate_api_token(token)
     
     if result['success']:
@@ -57,7 +57,7 @@ def refresh():
     if not refresh_token:
         return jsonify({'error': 'refresh_token is required'}), 400
     
-    auth = AuthService(g.session)
+    auth = AuthService()
     result = auth.refresh_token(refresh_token)
     
     if result['success']:
@@ -75,13 +75,13 @@ def logout():
         access_token = data.get('access_token')
         user_id = data.get('user_id')
         
-        auth = AuthService(g.session)
+        auth = AuthService()
         result = auth.logout_api(access_token, user_id)
         
         return jsonify(result), 200
     
     # Traditional logout (GET or non-JSON POST)
-    auth = AuthService(g.session)
+    auth = AuthService()
     result = auth.logout()
     flash(result['message'], 'info')
     return redirect(url_for('auth.login'))
@@ -95,7 +95,7 @@ def status():
         return jsonify({'authenticated': False}), 200
     
     token = auth_header.split(' ')[1]
-    auth = AuthService(g.session)
+    auth = AuthService()
     result = auth.validate_api_token(token)
     
     return jsonify({

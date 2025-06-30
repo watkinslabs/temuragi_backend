@@ -7,6 +7,7 @@ from flask import current_app, has_app_context
 
 from app.base.model import BaseModel
 
+from app.register.database import db_registry
 
 class Page(BaseModel):
     """
@@ -131,18 +132,20 @@ class Page(BaseModel):
         logger.debug(f"Page '{self.slug}' is visible")
         return True
 
-    def increment_view_count(self, session):
+    def increment_view_count(self):
         """Increment the view count for this page"""
         logger = self._get_logger()
         old_count = self.view_count
         self.view_count += 1
         
         try:
-            session.commit()
+            db_session=db_registry._routing_session()
+
+            db_session.commit()
             logger.debug(f"Page '{self.slug}' view count incremented: {old_count} -> {self.view_count}")
         except Exception as e:
             logger.error(f"Failed to increment view count for page '{self.slug}': {e}")
-            session.rollback()
+            db_session.rollback()
             raise
 
     def update_seo_metadata(self, meta_description=None, meta_keywords=None, 
@@ -174,10 +177,11 @@ class Page(BaseModel):
         
         logger.info(f"Updated SEO metadata for page '{self.slug}': {', '.join(updates)}")
 
-    def publish(self, session, publish_date=None):
+    def publish(self, publish_date=None):
         """Publish the page with optional future publish date"""
         logger = self._get_logger()
-        
+        db_session=db_registry._routing_session()
+
         if publish_date:
             self.publish_date = publish_date
             self.published = True
@@ -188,29 +192,31 @@ class Page(BaseModel):
             logger.info(f"Page '{self.slug}' published immediately")
         
         try:
-            session.commit()
+            db_session.commit()
             logger.info(f"Page '{self.slug}' publish status committed to database")
         except Exception as e:
             logger.error(f"Failed to publish page '{self.slug}': {e}")
-            session.rollback()
+            db_session.rollback()
             raise
 
-    def unpublish(self, session):
+    def unpublish(self):
         """Unpublish the page"""
         logger = self._get_logger()
         logger.info(f"Unpublishing page '{self.slug}'")
+
+        db_session=db_registry._routing_session()
         
         self.published = False
         
         try:
-            session.commit()
+            db_session.commit()
             logger.info(f"Page '{self.slug}' unpublished successfully")
         except Exception as e:
             logger.error(f"Failed to unpublish page '{self.slug}': {e}")
-            session.rollback()
+            db_session.rollback()
             raise
 
-    def set_expiration(self, session, expire_date):
+    def set_expiration(self, expire_date):
         """Set expiration date for the page"""
         logger = self._get_logger()
         
@@ -218,17 +224,21 @@ class Page(BaseModel):
         self.expire_date = expire_date
         
         logger.info(f"Page '{self.slug}' expiration updated: {old_expire} -> {expire_date}")
+
+        db_session=db_registry._routing_session()
         
         try:
-            session.commit()
+            db_session.commit()
         except Exception as e:
             logger.error(f"Failed to set expiration for page '{self.slug}': {e}")
-            session.rollback()
+            db_session.rollback()
             raise
 
-    def validate_template_exists(self, session):
+    def validate_template_exists(self):
         """Ensure referenced template exists"""
         logger = self._get_logger()
+
+        db_session=db_registry._routing_session()
         
         if not self.template_id:
             logger.warning(f"Page '{self.slug}' has no template assigned")
@@ -237,7 +247,7 @@ class Page(BaseModel):
         logger.debug(f"Validating template {self.template_id} for page '{self.slug}'")
         
         from app.models import Template
-        template = session.query(Template).filter_by(id=self.template_id).first()
+        template = db_session.query(Template).filter_by(id=self.template_id).first()
         
         if not template:
             logger.error(f"Template {self.template_id} not found for page '{self.slug}'")
@@ -247,12 +257,14 @@ class Page(BaseModel):
         return True
 
     @classmethod
-    def get_by_slug(cls, session, slug, include_unpublished=False):
+    def get_by_slug(cls, slug, include_unpublished=False):
         """Get page by slug with optional unpublished inclusion"""
         logger = cls._get_logger()
         logger.debug(f"Getting page by slug: '{slug}', include_unpublished={include_unpublished}")
+
+        db_session=db_registry._routing_session()
         
-        query = session.query(cls).filter_by(slug=slug)
+        query = db_session.query(cls).filter_by(slug=slug)
         
         if not include_unpublished:
             query = query.filter_by(published=True)
@@ -270,12 +282,14 @@ class Page(BaseModel):
         return page
 
     @classmethod
-    def get_published_pages(cls, session, module_id=None, featured_only=False, limit=None):
+    def get_published_pages(cls, module_id=None, featured_only=False, limit=None):
         """Get published pages with optional filtering"""
         logger = cls._get_logger()
         logger.debug(f"Getting published pages: module={module_id}, featured_only={featured_only}, limit={limit}")
+
+        db_session=db_registry._routing_session()
         
-        query = session.query(cls).filter_by(published=True)
+        query = db_session.query(cls).filter_by(published=True)
         
         if module_id:
             query = query.filter_by(module_id=module_id)
@@ -297,18 +311,22 @@ class Page(BaseModel):
         return visible_pages
 
     @classmethod
-    def get_featured_pages(cls, session, limit=5):
+    def get_featured_pages(cls, limit=5):
         """Get featured pages"""
-        return cls.get_published_pages(session, featured_only=True, limit=limit)
+        db_session=db_registry._routing_session()
+
+        return cls.get_published_pages(db_session, featured_only=True, limit=limit)
 
     @classmethod
-    def search_pages(cls, session, search_term, published_only=True):
+    def search_pages(cls, search_term, published_only=True):
         """Search pages by title, name, or slug"""
+        db_session=db_registry._routing_session()
+
         logger = cls._get_logger()
         logger.debug(f"Searching pages for term: '{search_term}', published_only={published_only}")
         
         search_pattern = f"%{search_term}%"
-        query = session.query(cls).filter(
+        query = db_session.query(cls).filter(
             (cls.title.ilike(search_pattern)) |
             (cls.name.ilike(search_pattern)) |
             (cls.slug.ilike(search_pattern))
@@ -329,12 +347,13 @@ class Page(BaseModel):
         return pages
 
     @classmethod
-    def get_pages_by_template(cls, session, template_id, published_only=True):
+    def get_pages_by_template(cls, template_id, published_only=True):
         """Get all pages using a specific template"""
+        db_session=db_registry._routing_session()
         logger = cls._get_logger()
         logger.debug(f"Getting pages by template: {template_id}, published_only={published_only}")
         
-        query = session.query(cls).filter_by(template_id=template_id)
+        query = db_session.query(cls).filter_by(template_id=template_id)
         
         if published_only:
             query = query.filter_by(published=True)
@@ -349,11 +368,12 @@ class Page(BaseModel):
         logger.info(f"Found {len(pages)} pages using template {template_id}")
         return pages
 
-    def get_fragment_count(self, session):
+    def get_fragment_count(self):
         """Get count of active fragments for this page"""
         from app.models import PageFragment
+        db_session=db_registry._routing_session()
         
-        count = session.query(PageFragment).filter_by(
+        count = db_session.query(PageFragment).filter_by(
             page_id=self.id,
             is_active=True
         ).count()
@@ -362,15 +382,17 @@ class Page(BaseModel):
         logger.debug(f"Page '{self.slug}' has {count} active fragments")
         return count
 
-    def has_required_fragments(self, session, required_fragments=None):
+    def has_required_fragments(self, required_fragments=None):
         """Check if page has all required fragments"""
+        db_session=db_registry._routing_session()
+
         if not required_fragments:
             return True
         
         logger = self._get_logger()
         from app.models import PageFragment
         
-        existing_fragments = session.query(PageFragment.fragment_key).filter_by(
+        existing_fragments = db_session.query(PageFragment.fragment_key).filter_by(
             page_id=self.id,
             is_active=True
         ).all()

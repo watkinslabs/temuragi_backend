@@ -35,7 +35,7 @@ class ReportCLI(BaseCLI):
         try:
             from app.classes  import ReportService
 
-            self.service = ReportService(self.session, logger=self.logger)
+            self.service = ReportService(logger=self.logger)
             self.log_info("Report service initialized successfully")
         except Exception as e:
             self.log_error(f"Failed to initialize report service: {e}")

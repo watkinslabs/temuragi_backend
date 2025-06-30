@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID, CIDR
 from sqlalchemy.orm import relationship
 
 from app.base.model import BaseModel
-
+from app.register.database import db_registry
 
 class Firewall(BaseModel):
     """Model for storing IP whitelist/blacklist patterns with order priority"""
@@ -47,8 +47,9 @@ class Firewall(BaseModel):
             return False, f"Invalid IP pattern"
     
     @classmethod
-    def create_initial_data(cls, session):
+    def create_initial_data(cls):
         """Create initial firewall rules"""
+        db_session=db_registry._routing_session()
         initial_rules = [
             ('99.64.82.20', 'allow', 'High priority admin IP', True, 10),
             ('10.6.0.0/24', 'allow', 'Lab Network', True, 10),
@@ -56,7 +57,7 @@ class Firewall(BaseModel):
         ]
         
         for ip_pattern, ip_type, description, active, order in initial_rules:
-            existing = session.query(cls).filter_by(ip_pattern=ip_pattern).first()
+            existing = db_session.query(cls).filter_by(ip_pattern=ip_pattern).first()
             if not existing:
                 firewall_rule = cls(
                     ip_pattern=ip_pattern,
@@ -65,16 +66,17 @@ class Firewall(BaseModel):
                     is_active=active,
                     order=order
                 )
-                session.add(firewall_rule)
+                db_session.add(firewall_rule)
         
     @classmethod
-    def get_all_patterns(cls, db_session):
+    def get_all_patterns(cls):
+        db_session=db_registry._routing_session()
         """Get all IP patterns ordered by priority (order) and pattern"""
         patterns = db_session.query(cls).filter(cls.is_active == True).order_by(cls.order, cls.ip_pattern).all()
         return patterns
 
     @classmethod
-    def get_active_patterns(cls, db_session, pattern_type=None):
+    def get_active_patterns(cls, pattern_type=None):
         """Get active IP patterns with optional type filter"""
         query = db_session.query(cls).filter(cls.is_active == True)
         
@@ -84,25 +86,28 @@ class Firewall(BaseModel):
         return query.order_by(cls.order, cls.ip_pattern).all()
 
     @classmethod
-    def find_by_pattern(cls, db_session, pattern):
+    def find_by_pattern(cls, pattern):
         """Find IP filter by exact pattern"""
+        db_session=db_registry._routing_session()
         return db_session.query(cls).filter(cls.ip_pattern == pattern).first()
 
     @classmethod
-    def find_by_id(cls, db_session, pattern_id):
+    def find_by_id(cls, pattern_id):
         """Find IP filter by ID"""
+        db_session=db_registry._routing_session()
         return db_session.query(cls).filter(cls.id == pattern_id).first()
 
     @classmethod
-    def add_pattern(cls, db_session, ip_pattern, ip_type, description=None, order=100):
+    def add_pattern(cls, ip_pattern, ip_type, description=None, order=100):
         """Add a new IP pattern if it doesn't exist and it's valid"""
+        db_session=db_registry._routing_session()
         # First validate the IP pattern
         is_valid, validation_message = cls.validate_ip_pattern(ip_pattern)
         if not is_valid:
             return False, "Invalid IP format"
         
         # Check if pattern already exists
-        existing = cls.find_by_pattern(db_session, ip_pattern)
+        existing = cls.find_by_pattern( ip_pattern)
         if existing:
             if not existing.active:
                 # Reactivate the existing pattern
@@ -132,8 +137,9 @@ class Firewall(BaseModel):
             return False, f"Database error"
 
     @classmethod
-    def update_pattern(cls, db_session, pattern_id, ip_type=None, description=None, active=None, order=None):
+    def update_pattern(cls, pattern_id, ip_type=None, description=None, active=None, order=None):
         """Update an IP pattern"""
+        db_session=db_registry._routing_session()
         pattern = cls.find_by_id(db_session, pattern_id)
         if not pattern:
             return False, "Pattern not found"
@@ -159,9 +165,10 @@ class Firewall(BaseModel):
             return False, "Database error"
 
     @classmethod
-    def delete_pattern(cls, db_session, pattern_id):
+    def delete_pattern(cls, pattern_id):
         """Soft delete an IP pattern by ID (mark as inactive)"""
-        pattern = cls.find_by_id(db_session, pattern_id)
+        db_session=db_registry._routing_session()
+        pattern = cls.find_by_id( pattern_id)
         if not pattern:
             return False, "Pattern not found"
         
@@ -174,9 +181,10 @@ class Firewall(BaseModel):
             return False, "Database error"
             
     @classmethod
-    def hard_delete_pattern(cls, db_session, pattern_id):
+    def hard_delete_pattern(cls,  pattern_id):
         """Permanently delete an IP pattern by ID"""
-        pattern = cls.find_by_id(db_session, pattern_id)
+        db_session=db_registry._routing_session()
+        pattern = cls.find_by_id( pattern_id)
         if not pattern:
             return False, "Pattern not found"
         
@@ -189,7 +197,7 @@ class Firewall(BaseModel):
             return False, "Database error"
 
     @classmethod
-    def check_ip_access(cls, db_session, ip_address):
+    def check_ip_access(cls, ip_address):
         """Check if an IP address should be allowed access based on rule order
         
         Returns:
@@ -197,6 +205,7 @@ class Firewall(BaseModel):
                 - allowed (bool): True if access is allowed, False if blocked
                 - reason (str): Description of why access was allowed/blocked
         """
+        db_session=db_registry._routing_session()
         # Get all active patterns ordered by priority (lower order value = higher priority)
         patterns = db_session.query(cls).filter(cls.is_active == True).order_by(cls.order).all()
         

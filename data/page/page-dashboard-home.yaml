@@ -4,16 +4,16 @@ Page:
     tablename: pages
     schema: public
   data:
-    name: about
-    title: About Us
-    slug: Home
+    name: dashboard
+    title: Dashboard
+    slug: /f/menu/<slug>
     template_id: 00000000-0000-0000-0000-000000000002
-    meta_description: Learn about our company, mission, and values.
-    meta_keywords: about, company, mission, values, team
-    og_title: About Us
-    og_description: Learn about our company, mission, and values.
-    og_image: /assets/images/og-about.jpg
-    canonical_url: /about
+    meta_description: Menu Landing Page
+    meta_keywords: dasbboard
+    og_title: Dashboard
+    og_description: 
+    og_image: 
+    canonical_url: 
     published: true
     featured: false
     sort_order: 2

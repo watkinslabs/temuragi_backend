@@ -20,7 +20,21 @@ TemplateFragment:
             <span>Documentation Portal | Latest Updates | Support</span>
         </div>
         <header class="header">
-            <h1>Documentation Site</h1>
+              <div class="header_brand">
+                 <div class="logo_wrapper">
+                  <img 
+                      src="{{ site.logo_desktop }}" 
+                      alt="{{ site.name }} logo" 
+                      class="header_logo logo_light"
+                  >
+                  <img 
+                      src="{{ site.logo_desktop_dark }}" 
+                      alt="{{ site.name }} logo" 
+                      class="header_logo logo_dark"
+                  >
+              </div>
+                <h1>{{ site.name }}</h1>
+            </div>
             <div class="header_actions">
                 <div class="nine_dot_menu">
                     <button class="nine_dot_btn" onclick="toggle_nine_dot_dropdown()">
@@ -37,8 +51,16 @@ TemplateFragment:
                                 <span class="toggle_label">Dark Mode</span>
                             </div>
                         </div>
+                        {% if menus %}
                         <div class="dropdown_section">
+                            <h4>Menus</h4>
+                            {% for menu in menus %}
+                            <a href="{{ menu['slug'] }}" class="dropdown_link">
+                                <i class="{{ menu['icon'] }}"></i> {{ menu.display }}
+                            </a>
+                            {% endfor %}
                         </div>
+                        {% endif %}
                         <div class="dropdown_section">
                           <h4>Account</h4>
                                   <a href="#" class="dropdown_link" onclick="window.logout(); return false;">

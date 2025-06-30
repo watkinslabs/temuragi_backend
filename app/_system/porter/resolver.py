@@ -6,8 +6,8 @@ import yaml
 class ImportDependencyResolver:
     __depends_on__ = ['ComponentImporter']
 
-    def __init__(self, session, output_manager, model_registry_getter):
-        self.session = session
+    def __init__(self,  output_manager, model_registry_getter):
+        
         self.output_manager = output_manager
         self.get_model = model_registry_getter
 
@@ -218,7 +218,7 @@ class ImportDependencyResolver:
 
                     # Use existing importer
                     from .importer import ComponentImporter
-                    importer = ComponentImporter(self.session, self.output_manager, self.get_model)
+                    importer = ComponentImporter( self.output_manager, self.get_model)
 
                     result = importer.import_yaml_file(
                         file_path=file_path,

@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 import secrets
 
 from app.base.model import BaseModel
-
+from app.register.database import db_registry
 
 class UserToken(BaseModel):
     """
@@ -66,8 +66,9 @@ class UserToken(BaseModel):
         return secrets.token_hex(32)
 
     @classmethod
-    def create_access_token(cls, session, user_id, name=None, application=None, refresh_token_id=None, is_system_temporary=False):
+    def create_access_token(cls, user_id, name=None, application=None, refresh_token_id=None, is_system_temporary=False):
         """Create access token with 15 minute expiration"""
+        db_session=db_registry._routing_session()
         expires_at = datetime.now(timezone.utc) + timedelta(minutes=cls.ACCESS_TOKEN_LIFETIME_MINUTES)
         
         token_value = cls.generate_token()
@@ -82,13 +83,14 @@ class UserToken(BaseModel):
             is_system_temporary=is_system_temporary
         )
 
-        session.add(user_token)
-        session.commit()
+        db_session.add(user_token)
+        db_session.commit()
         return user_token
 
     @classmethod
-    def create_refresh_token(cls, session, user_id, name=None, application=None, is_system_temporary=False):
+    def create_refresh_token(cls, user_id, name=None, application=None, is_system_temporary=False):
         """Create refresh token with 1 day expiration"""
+        db_session=db_registry._routing_session()
         expires_at = datetime.now(timezone.utc) + timedelta(days=cls.REFRESH_TOKEN_LIFETIME_DAYS)
         
         token_value = cls.generate_token()
@@ -102,19 +104,20 @@ class UserToken(BaseModel):
             is_system_temporary=is_system_temporary
         )
 
-        session.add(user_token)
-        session.commit()
+        db_session.add(user_token)
+        db_session.commit()
         return user_token
 
     @classmethod
-    def create_token_pair(cls, session, user_id, name=None, application=None, is_system_temporary=False):
+    def create_token_pair(cls, user_id, name=None, application=None, is_system_temporary=False):
         """Create both access and refresh tokens linked together"""
+        db_session=db_registry._routing_session()
         # Create refresh token first
-        refresh_token = cls.create_refresh_token(session, user_id, name, application, is_system_temporary)
+        refresh_token = cls.create_refresh_token( user_id, name, application, is_system_temporary)
         
         # Create access token linked to refresh token
         access_token = cls.create_access_token(
-            session, user_id, name, application, 
+             user_id, name, application, 
             refresh_token_id=refresh_token.id, 
             is_system_temporary=is_system_temporary
         )
@@ -125,13 +128,14 @@ class UserToken(BaseModel):
         }
 
     @classmethod
-    def create_user_token(cls, session, user_id, name=None, application=None, expires_in_days=None, is_system_temporary=False):
+    def create_user_token(cls,  user_id, name=None, application=None, expires_in_days=None, is_system_temporary=False):
         """Legacy method - creates access token for backward compatibility"""
-        return cls.create_access_token(session, user_id, name, application, is_system_temporary=is_system_temporary)
+        return cls.create_access_token( user_id, name, application, is_system_temporary=is_system_temporary)
 
     @classmethod
-    def create_service_token(cls, session, name=None, application=None, expires_in_days=None, is_system_temporary=False):
+    def create_service_token(cls, name=None, application=None, expires_in_days=None, is_system_temporary=False):
         """Create service token with custom expiration (defaults to no expiration)"""
+        db_session=db_registry._routing_session()
         token_value = cls.generate_token()
         expires_at = None
         if expires_in_days is not None:
@@ -147,18 +151,20 @@ class UserToken(BaseModel):
             is_system_temporary=is_system_temporary
         )
 
-        session.add(user_token)
-        session.commit()
+        db_session.add(user_token)
+        db_session.commit()
         return user_token
 
     @classmethod
-    def find_by_token(cls, session, token):
-        return session.query(cls).filter(cls.token == token).first()
+    def find_by_token(cls,token):
+        db_session=db_registry._routing_session()
+        return db_session.query(cls).filter(cls.token == token).first()
 
     @classmethod
-    def validate_token(cls, session, token):
+    def validate_token(cls, token):
         """Validate any token type"""
-        user_token = cls.find_by_token(session, token)
+        db_session=db_registry._routing_session()
+        user_token = cls.find_by_token(token)
         if not user_token or not user_token.is_active:
             return None
 
@@ -167,27 +173,30 @@ class UserToken(BaseModel):
                 return None
 
         user_token.last_used_at = datetime.now(timezone.utc)
-        session.commit()
+        db_session.commit()
         return user_token
 
     @classmethod
-    def validate_access_token(cls, session, token):
+    def validate_access_token(cls, token):
         """Validate specifically access tokens"""
-        user_token = cls.validate_token(session, token)
+        db_session=db_registry._routing_session()
+        user_token = cls.validate_token( token)
         if user_token and user_token.token_type == 'access':
             return user_token
         return None
 
     @classmethod
-    def validate_refresh_token(cls, session, token):
+    def validate_refresh_token(cls,  token):
         """Validate specifically refresh tokens"""
-        user_token = cls.validate_token(session, token)
+        db_session=db_registry._routing_session()
+        user_token = cls.validate_token( token)
         if user_token and user_token.token_type == 'refresh':
             return user_token
         return None
 
-    def refresh_access_token(self, session):
+    def refresh_access_token(self):
         """Create new access token from refresh token"""
+        db_session=db_registry._routing_session()
         if self.token_type != 'refresh':
             raise ValueError("Can only refresh from refresh tokens")
         
@@ -195,7 +204,7 @@ class UserToken(BaseModel):
             raise ValueError("Refresh token is expired")
         
         # Revoke existing access tokens for this refresh token
-        existing_access_tokens = session.query(UserToken).filter(
+        existing_access_tokens = db_session.query(UserToken).filter(
             UserToken.refresh_token_id == self.id,
             UserToken.is_active == True
         ).all()
@@ -205,7 +214,6 @@ class UserToken(BaseModel):
         
         # Create new access token
         return self.__class__.create_access_token(
-            session=session,
             user_id=self.user_id,
             name=self.name,
             application=self.application,
@@ -241,13 +249,14 @@ class UserToken(BaseModel):
 
     def revoke(self):
         """Revoke token and any linked tokens"""
+        db_session=db_registry._routing_session()
         self.soft_delete()
         
         # If this is a refresh token, revoke all linked access tokens
         if self.token_type == 'refresh':
             from sqlalchemy.orm import sessionmaker
             session = sessionmaker.object_session(self)
-            if session:
+            if db_session:
                 linked_tokens = session.query(UserToken).filter(
                     UserToken.refresh_token_id == self.id,
                     UserToken.is_active == True

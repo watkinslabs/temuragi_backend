@@ -13,39 +13,3 @@ class DataType(BaseModel):
     name = Column(String, unique=True, nullable=False)
     display = Column(String, nullable=False)
 
-
-
-    @classmethod
-    def create_initial_data(cls, session):
-        """Create initial data types"""
-        initial_types = [
-            ('string', 'String', True),
-            ('number', 'Number', True),
-            ('integer', 'Integer', True),
-            ('boolean', 'Boolean', True),
-            ('date', 'Date', True),
-            ('datetime', 'DateTime', True),
-            ('time', 'Time', True),
-            ('json', 'JSON', True),
-            ('array', 'Array', True),
-            ('money', 'Money', True),
-            # New types specifically useful for reports
-            ('decimal', 'Decimal', True),
-            ('percentage', 'Percentage', True),
-            ('email', 'Email', True),
-            ('url', 'URL', True),
-            ('id', 'UUID', True),
-            ('ip_address', 'IP Address', True),
-            ('color', 'Color', True),
-            ('file', 'File', True),
-            ('image', 'Image', True),
-            ('markdown', 'Markdown', True),
-            ('html', 'HTML', True),
-            ('code', 'Code', True)
-        ]
-        
-        for name, display, active in initial_types:
-            existing = session.query(cls).filter_by(name=name).first()
-            if not existing:
-                data_type = cls(name=name, display=display, is_active=active)
-                session.add(data_type)

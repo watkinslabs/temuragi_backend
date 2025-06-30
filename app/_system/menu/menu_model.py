@@ -4,6 +4,9 @@ from sqlalchemy.orm import relationship, backref
 
 
 from app.base.model import BaseModel
+from app.register.database import get_engine_for_bind_key
+
+db_session=get_engine_for_bind_key()
 
 class Menu(BaseModel):
 
@@ -12,20 +15,9 @@ class Menu(BaseModel):
 
     name = Column(String(50), unique=True, nullable=False)
     display = Column(String(100), nullable=False)
+    slug = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
+    icon = Column(Text, nullable=True)
 
     tiers = relationship("MenuTier", back_populates="menu", cascade="all, delete-orphan")
 
-    @classmethod
-    def create_initial_data(cls, session):
-        """Create initial menus"""
-        initial_types = [
-            ('MAIN', 'Main Navigation', 'Top-level application navigation'),
-            ('ADMIN', 'System', 'System Setup and integration'),
-        ]
-
-        for name, display, description in initial_types:
-            existing = session.query(cls).filter_by(name=name).first()
-            if not existing:
-                menu_type = cls(name=name, display=display, description=description)
-                session.add(menu_type)

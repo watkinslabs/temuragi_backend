@@ -1,7 +1,3 @@
-import functools
-from typing import Optional, List
-from flask import g, session, request, current_app
-
 
 def register_miner(app):
     """Setup Miner Data API"""

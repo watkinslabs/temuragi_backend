@@ -5,11 +5,6 @@ from .firewall_log_model import FirewallLog
 
 bp = Blueprint('firewall', __name__, url_prefix="/firewall", template_folder="tpl")
 
-@bp.before_request
-def bind_session():
-    """Ensure session is available for every request in this blueprint"""
-    if not hasattr(g, 'session'):
-        g.session = current_app.db_session
 
 @bp.teardown_request
 def close_session(exc):
@@ -21,8 +16,7 @@ def close_session(exc):
 @bp.route('/', methods=['GET'])
 def home():
     """Main IP filter management page"""
-    db_session = g.session
-    ip_patterns = Firewall.get_all_patterns(db_session)
+    ip_patterns = Firewall.get_all_patterns()
     return render_template('firewall/home.html', ip_patterns=ip_patterns)
 
 @bp.route('/add', methods=['POST'])
@@ -57,8 +51,7 @@ def add_pattern():
         flash('Invalid IP type', 'error')
         return redirect(url_for('firewall.home'))
     
-    db_session = g.session
-    success, message = Firewall.add_pattern(db_session, ip_pattern, ip_type)
+    success, message = Firewall.add_pattern( ip_pattern, ip_type)
     
     # Clean the message to remove any potential JavaScript issues
     clean_message = message.replace("'", "").replace('"', "")
@@ -69,8 +62,7 @@ def add_pattern():
 @bp.route('/delete/<uuid:pattern_id>', methods=['POST'])
 def delete_pattern(pattern_id):
     """Delete an IP pattern"""
-    db_session = g.session
-    success, message = Firewall.delete_pattern(db_session, pattern_id)
+    success, message = Firewall.delete_pattern( pattern_id)
     
     # Clean the message to remove any potential JavaScript issues
     clean_message = message.replace("'", "").replace('"', "")
@@ -97,8 +89,7 @@ def view_logs():
     elif status_param == 'blocked':
         status = False
     
-    db_session = g.session
-    logs_data, total_count = FirewallLog.get_request_logs(db_session, ip_address, status, days)
+    logs_data, total_count = FirewallLog.get_request_logs(ip_address, status, days)
     
     # Format logs to match template expectations
     logs = []
@@ -126,10 +117,9 @@ def view_stats():
     except ValueError:
         days = 7
     
-    db_session = g.session
-    top_blocked_raw = FirewallLog.get_top_blocked_ips(db_session, days)
-    top_allowed_raw = FirewallLog.get_top_allowed_ips(db_session, days)
-    daily_stats = FirewallLog.get_daily_stats(db_session, days)
+    top_blocked_raw = FirewallLog.get_top_blocked_ips(days)
+    top_allowed_raw = FirewallLog.get_top_allowed_ips(days)
+    daily_stats = FirewallLog.get_daily_stats( days)
     
     # Format data to match template expectations
     top_blocked = [{'ip_address': ip, 'count': count} for ip, count in top_blocked_raw]

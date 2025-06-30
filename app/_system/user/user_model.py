@@ -10,11 +10,14 @@ from sqlalchemy.orm import relationship
 
 from app.base.model import BaseModel
 
+from app.register.database import db_registry
+
 class User(BaseModel):
     """User model"""
     __depends_on__ = ['Role'] 
     __tablename__ = 'users'
 
+    landing_page = Column(String( 200), unique=False, nullable=False)
     username = Column(String(100), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     role_id = Column(
@@ -53,20 +56,25 @@ class User(BaseModel):
         return True
 
     @classmethod
-    def find_by_identity(cls, db_session, identity):
+    def find_by_identity(cls,  identity):
         """Find a user by username or email"""
+        db_session=db_registry._routing_session()
+
         return db_session.query(cls).filter(
+            
             (cls.username == identity) | (cls.email == identity)
         ).first()
 
     @classmethod
-    def find_by_email(cls, db_session, email):
+    def find_by_email(cls,  email):
         """Find a user by email"""
+        db_session=db_registry._routing_session()
         return db_session.query(cls).filter(cls.email == email).first()
 
     @classmethod
-    def find_by_id(cls, db_session, user_id):
+    def find_by_id(cls,  user_id):
         """Find a user by UUID"""
+        db_session=db_registry._routing_session()
         return db_session.query(cls).filter(cls.id == user_id).first()
 
     def set_password(self, password):

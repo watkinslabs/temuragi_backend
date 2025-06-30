@@ -2,13 +2,15 @@ import yaml
 from pathlib import Path
 from collections import OrderedDict
 
+from app.register.database import db_registry
 
 class ComponentExporter:
     """Unified model object export utility"""
 
-    def __init__(self, session, output_manager):
-        """Initialize with database session and output manager"""
-        self.session = session
+    def __init__(self,  output_manager):
+        """Initialize with database self.db_session and output manager"""
+        self.db_session=db_registry._routing_session()
+
         self.output_manager = output_manager
 
         # Fields to comment out in template mode
@@ -300,7 +302,7 @@ class ComponentExporter:
                     foreign_key_mappings = {}
                 
                 # Build query
-                query = self.session.query(model_class)
+                query = self.db_session.query(model_class)
                 
                 # Apply filters if provided
                 if filter_conditions:

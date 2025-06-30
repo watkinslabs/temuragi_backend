@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
 from app.base.model import Base
+from app.register.database import db_registry
 
 class FirewallLog(Base):
     """Model for logging IP access requests"""
@@ -22,10 +23,11 @@ class FirewallLog(Base):
     request_data = Column(Text, nullable=True)  # Optional: Store additional request data as JSON
 
     @classmethod
-    def log_request(cls, db_session, ip_address, status, request_path=None, 
+    def log_request(cls,  ip_address, status, request_path=None, 
                    user_agent=None, request_method=None, referer=None, 
                    matched_rule=None, request_data=None):
         """Log an IP request with status and metadata"""
+        db_session=db_registry._routing_session()
         log_entry = cls(
             ip_address=ip_address,
             status=status,
@@ -46,9 +48,10 @@ class FirewallLog(Base):
             return False, f'Error logging request: {str(e)}'
 
     @classmethod
-    def get_request_logs(cls, db_session, ip_address=None, status=None, days=7, 
+    def get_request_logs(cls,  ip_address=None, status=None, days=7, 
                         path=None, limit=1000, offset=0):
         """Get IP request logs with filtering and pagination"""
+        db_session=db_registry._routing_session()
         # Calculate date range
         end_date = datetime.datetime.utcnow()
         start_date = end_date - datetime.timedelta(days=days)
@@ -75,9 +78,10 @@ class FirewallLog(Base):
         return results, total_count
 
     @classmethod
-    def get_top_blocked_ips(cls, db_session, days=7, limit=20):
+    def get_top_blocked_ips(cls, days=7, limit=20):
         """Get top blocked IPs in the past days"""
-        # Calculate date range
+        db_session=db_registry._routing_session()
+
         end_date = datetime.datetime.utcnow()
         start_date = end_date - datetime.timedelta(days=days)
         
@@ -97,9 +101,10 @@ class FirewallLog(Base):
         return results
 
     @classmethod
-    def get_top_allowed_ips(cls, db_session, days=7, limit=20):
+    def get_top_allowed_ips(cls, days=7, limit=20):
         """Get top allowed IPs in the past days"""
-        # Calculate date range
+        db_session=db_registry._routing_session()
+
         end_date = datetime.datetime.utcnow()
         start_date = end_date - datetime.timedelta(days=days)
         
@@ -119,9 +124,9 @@ class FirewallLog(Base):
         return results
 
     @classmethod
-    def get_daily_stats(cls, db_session, days=7):
+    def get_daily_stats(cls, days=7):
         """Get daily statistics for allowed/blocked requests"""
-        # Calculate date range
+        db_session=db_registry._routing_session()
         end_date = datetime.datetime.utcnow()
         start_date = end_date - datetime.timedelta(days=days)
         
@@ -141,9 +146,9 @@ class FirewallLog(Base):
         return results
         
     @classmethod
-    def get_path_stats(cls, db_session, days=7, limit=10):
+    def get_path_stats(cls,  days=7, limit=10):
         """Get statistics for most accessed paths"""
-        # Calculate date range
+        db_session=db_registry._routing_session()
         end_date = datetime.datetime.utcnow()
         start_date = end_date - datetime.timedelta(days=days)
         
@@ -164,8 +169,9 @@ class FirewallLog(Base):
         return results
         
     @classmethod
-    def clean_old_logs(cls, db_session, days_to_keep=30):
+    def clean_old_logs(cls, days_to_keep=30):
         """Delete logs older than the specified number of days"""
+        db_session=db_registry._routing_session()
         cutoff_date = datetime.datetime.utcnow() - datetime.timedelta(days=days_to_keep)
         
         try:

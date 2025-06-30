@@ -1,13 +1,15 @@
 import yaml
 from pathlib import Path
 
+from app.register.database import db_registry
 
 class ComponentImporter:
     """Unified model object import utility"""
     
-    def __init__(self, session, output_manager, model_registry_getter):
+    def __init__(self,  output_manager, model_registry_getter):
         """Initialize with database session, output manager, and model getter"""
-        self.session = session
+        self.db_session=db_registry._routing_session()
+
         self.output_manager = output_manager
         self.get_model = model_registry_getter
         

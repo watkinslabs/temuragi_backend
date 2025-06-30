@@ -10,10 +10,11 @@ import io
 # Create blueprint
 bp = Blueprint('report_api', __name__, url_prefix='/api/reports')
 
+from app.register.database import db_registry
 
 def get_service():
     """Get report service instance"""
-    return ReportService(g.session)
+    return ReportService()
 
 
 def json_response(data=None, error=None, status=200):
@@ -783,8 +784,8 @@ def analyze_query():
         if not connection_id:
             return json_response(error="connection_id is required", status=400)
         
-        # Get connection to determine database type
-        connection = service.session.query(Connection).filter_by(id=connection_id).first()
+        db_session=db_registry._routing_session()
+        connection = db_session.query(Connection).filter_by(id=connection_id).first()
         if not connection:
             return json_response(error="Connection not found", status=404)
         

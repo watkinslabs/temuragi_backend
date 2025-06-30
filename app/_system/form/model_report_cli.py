@@ -50,7 +50,7 @@ class ModelReportCLI(BaseCLI):
                 self.model_available = False
                 self.log_warning("Model class not available - model associations will be skipped")
 
-            self.service = ReportService(self.session, logger=self.logger)
+            self.service = ReportService(logger=self.logger)
             self.log_info("Report service initialized successfully")
             
             # Cache data types and variable types

@@ -18,18 +18,18 @@ class SiteConfig(BaseModel):
     published = Column(Boolean, default=False, nullable=False)
     
     # Basic site information
-    site_name = Column(String(255), nullable=False)
-    site_tagline = Column(String(500), nullable=True, default='')
-    site_description = Column(Text, nullable=True, default='')
-    site_url = Column(String(500), nullable=False)
+    name = Column(String(255), nullable=False)
+    tagline = Column(String(500), nullable=True, default='')
+    description = Column(Text, nullable=True, default='')
+    url = Column(String(500), nullable=False)
     admin_email = Column(String(255), nullable=False)
     
     # Branding/Visual
-    logo_desktop_url = Column(String(500), nullable=True)
-    logo_mobile_url = Column(String(500), nullable=True)
-    favicon_url = Column(String(500), nullable=True)
-    primary_color = Column(String(7), nullable=True)  # Hex color
-    secondary_color = Column(String(7), nullable=True)  # Hex color
+    logo_desktop_dark = Column(String(500), nullable=True)
+    logo_mobile_dark = Column(String(500), nullable=True)
+    logo_desktop = Column(String(500), nullable=True)
+    logo_mobile = Column(String(500), nullable=True)
+    favicon = Column(String(500), nullable=True)
     
     # Footer/Contact
     footer_text = Column(Text, nullable=True, default='')
@@ -57,15 +57,9 @@ class SiteConfig(BaseModel):
         Index('ix_site_configs_name', 'name'),
     )
     
-    @validates('primary_color', 'secondary_color')
-    def validate_hex_color(self, key, value):
-        """Validate hex color format"""
-        if value and not re.match(r'^#[0-9A-Fa-f]{6}$', value):
-            raise ValueError(f"{key} must be a valid hex color (e.g., #FFFFFF)")
-        return value
     
-    @validates('site_url', 'logo_desktop_url', 'logo_mobile_url', 'favicon_url')
-    def validate_url(self, key, value):
+    #@validates('url', 'logo_desktop', 'logo_mobile', 'favicon')
+    def validate(self, key, value):
         """Basic URL validation"""
         if value and not (value.startswith('http://') or value.startswith('https://') or value.startswith('/')):
             raise ValueError(f"{key} must be a valid URL or path")

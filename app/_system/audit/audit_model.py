@@ -3,8 +3,13 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime, timezone, timedelta
 import json
+from flask import g 
 
 from app.base.model import BaseModel
+from app.register.database import db_registry
+
+
+        
 
 
 class RbacAuditLog(BaseModel):
@@ -45,8 +50,6 @@ class RbacAuditLog(BaseModel):
     ip_address = Column(String(45), nullable=True)  # IPv4/IPv6
     user_agent = Column(Text, nullable=True)
 
-    # Session context
-    session_id = Column(String(100), nullable=True)  # Web session ID
     request_id = Column(String(100), nullable=True)  # Unique request identifier
 
     # Additional context data
@@ -73,13 +76,12 @@ class RbacAuditLog(BaseModel):
     )
 
     @classmethod
-    def log_permission_check(cls, session, **kwargs):
+    def log_permission_check(cls, **kwargs):
         """
         Log a permission check
 
         Usage:
         RbacAuditLog.log_permission_check(
-            session=session,
             user_id=user.id,
             permission_name="users:read",
             permission_granted=True,
@@ -91,22 +93,23 @@ class RbacAuditLog(BaseModel):
         """
         try:
             audit_entry = cls(**kwargs)
-            session.add(audit_entry)
-            session.commit()
+            db_session=db_registry._routing_session()
+
+            db_session.add(audit_entry)
+            db_session.commit()
             return audit_entry
         except Exception as e:
-            session.rollback()
+            db_session.rollback()
             # Don't let audit logging break the main request
             print(f"RBAC audit logging failed: {e}")
             return None
 
     @classmethod
-    def log_api_permission_check(cls, session, user_id, permission_name, granted,
+    def log_api_permission_check(cls, user_id, permission_name, granted,
                                 resource_name=None, action=None, context=None,
                                 token_id=None, ip_address=None, user_agent=None):
         """Log permission check from API"""
         return cls.log_permission_check(
-            session=session,
             user_id=user_id,
             token_id=token_id,
             permission_name=permission_name,
@@ -122,12 +125,11 @@ class RbacAuditLog(BaseModel):
         )
 
     @classmethod
-    def log_web_permission_check(cls, session, user_id, permission_name, granted,
+    def log_web_permission_check(cls, user_id, permission_name, granted,
                                 endpoint=None, method=None, ip_address=None,
-                                user_agent=None, session_id=None, context=None):
+                                user_agent=None,  context=None):
         """Log permission check from web interface"""
         return cls.log_permission_check(
-            session=session,
             user_id=user_id,
             permission_name=permission_name,
             permission_granted=granted,
@@ -137,16 +139,14 @@ class RbacAuditLog(BaseModel):
             request_method=method,
             ip_address=ip_address,
             user_agent=user_agent,
-            session_id=session_id,
             context_data=context
         )
 
     @classmethod
-    def log_cli_permission_check(cls, session, user_id, permission_name, granted,
+    def log_cli_permission_check(cls, user_id, permission_name, granted,
                                 cli_command=None, resource_name=None, action=None, context=None):
         """Log permission check from CLI"""
         return cls.log_permission_check(
-            session=session,
             user_id=user_id,
             permission_name=permission_name,
             permission_granted=granted,
@@ -160,31 +160,37 @@ class RbacAuditLog(BaseModel):
         )
 
     @classmethod
-    def get_recent_activity(cls, session, hours=24, limit=50):
+    def get_recent_activity(cls, hours=24, limit=50):
         """Get recent RBAC activity"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours)
+        
+        db_session=db_registry._routing_session()
 
-        return session.query(cls)\
+        return db_session.query(cls)\
             .filter(cls.created_at >= cutoff_date)\
             .order_by(cls.created_at.desc())\
             .limit(limit).all()
 
     @classmethod
-    def get_security_alerts(cls, session, hours=24):
+    def get_security_alerts(cls, hours=24):
         """Get recent permission denials and security events"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours)
+        
+        db_session=db_registry._routing_session()
 
-        return session.query(cls).filter(
+        return db_session.query(cls).filter(
             cls.created_at >= cutoff_date,
             cls.permission_granted == False  # Only denied permissions
         ).order_by(cls.created_at.desc()).all()
 
     @classmethod
-    def get_performance_stats(cls, session, interface_type=None, hours=24):
+    def get_performance_stats(cls, interface_type=None, hours=24):
         """Get permission check performance statistics"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours)
 
-        query = session.query(
+        db_session=db_registry._routing_session()
+
+        query = db_session.query(
             cls.interface_type,
             cls.permission_name,
             func.count(cls.id).label('total_checks'),
@@ -209,11 +215,13 @@ class RbacAuditLog(BaseModel):
         ).all()
 
     @classmethod
-    def get_user_permission_activity(cls, session, user_id, days=30):
+    def get_user_permission_activity(cls, user_id, days=30):
         """Get user permission activity summary"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
-        return session.query(
+        db_session=db_registry._routing_session()
+        
+        return db_session.query(
             cls.permission_name,
             cls.interface_type,
             cls.resource_type,
@@ -228,11 +236,13 @@ class RbacAuditLog(BaseModel):
         ).all()
 
     @classmethod
-    def get_user_recent_activity(cls, session, user_id, days=1, limit=10):
+    def get_user_recent_activity(cls, user_id, days=1, limit=10):
         """Get recent detailed activity for a user"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
-        return session.query(cls)\
+        db_session=db_registry._routing_session()
+
+        return db_session.query(cls)\
             .filter(
                 cls.user_id == user_id,
                 cls.created_at >= cutoff_date
@@ -241,11 +251,13 @@ class RbacAuditLog(BaseModel):
             .limit(limit).all()
 
     @classmethod
-    def get_permission_usage_stats(cls, session, days=7):
+    def get_permission_usage_stats(cls, days=7):
         """Get permission usage statistics"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+        
+        db_session=db_registry._routing_session()
 
-        return session.query(
+        return db_session.query(
             cls.permission_name,
             cls.interface_type,
             func.count(cls.id).label('total_checks'),
@@ -262,11 +274,13 @@ class RbacAuditLog(BaseModel):
         ).all()
 
     @classmethod
-    def get_denial_analysis(cls, session, hours=24):
+    def get_denial_analysis(cls, hours=24):
         """Get permission denial analysis"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours)
+        
+        db_session=db_registry._routing_session()
 
-        denial_summary = session.query(
+        denial_summary = db_session.query(
             cls.permission_name,
             cls.interface_type,
             cls.access_denied_reason,
@@ -282,7 +296,7 @@ class RbacAuditLog(BaseModel):
             func.count(cls.id).desc()
         ).all()
 
-        recent_denials = session.query(cls)\
+        recent_denials = db_session.query(cls)\
             .filter(
                 cls.created_at >= cutoff_date,
                 cls.permission_granted == False
@@ -293,11 +307,13 @@ class RbacAuditLog(BaseModel):
         return denial_summary, recent_denials
 
     @classmethod
-    def get_suspicious_activity(cls, session, hours=24, min_denials=5):
+    def get_suspicious_activity(cls, hours=24, min_denials=5):
         """Get users with suspicious activity (many permission denials)"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(hours=hours)
+        
+        db_session=db_registry._routing_session()
 
-        return session.query(
+        return db_session.query(
             cls.user_id,
             func.count(cls.id).label('total_denials'),
             func.count(func.distinct(cls.permission_name)).label('unique_permissions'),
@@ -316,24 +332,28 @@ class RbacAuditLog(BaseModel):
         ).all()
 
     @classmethod
-    def cleanup_old_logs(cls, session, days=90):
+    def cleanup_old_logs(cls, days=90):
         """Clean up old audit logs and return count"""
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+        
+        db_session=db_registry._routing_session()
 
         # Count logs to be deleted
-        old_count = session.query(func.count(cls.id))\
+        old_count = db_session.query(func.count(cls.id))\
             .filter(cls.created_at < cutoff_date).scalar()
 
         return old_count, cutoff_date
 
     @classmethod
-    def delete_old_logs(cls, session, cutoff_date):
+    def delete_old_logs(cls, cutoff_date):
         """Actually delete old logs"""
-        deleted = session.query(cls)\
+        db_session=db_registry._routing_session()
+
+        deleted = db_session.query(cls)\
             .filter(cls.created_at < cutoff_date)\
             .delete()
 
-        session.commit()
+        db_session.commit()
         return deleted
 
     def to_dict(self):
@@ -353,7 +373,6 @@ class RbacAuditLog(BaseModel):
             'endpoint': self.endpoint,
             'request_method': self.request_method,
             'ip_address': self.ip_address,
-            'session_id': self.session_id,
             'context_data': self.context_data,
             'check_duration_ms': self.check_duration_ms,
             'created_at': self.created_at.isoformat() if self.created_at else None

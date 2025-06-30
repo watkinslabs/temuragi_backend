@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 from app.base.model import BaseModel
 
+from app.register.database import db_registry
 
 class Permission(BaseModel):
     """
@@ -29,15 +30,16 @@ class Permission(BaseModel):
     )
 
     @classmethod
-    def create_permission(cls, session, service, action, resource=None, description=None):
+    def create_permission(cls, service, action, resource=None, description=None):
         """Create a new permission with 3-position name format"""
+        db_session=db_registry._routing_session()
         if not resource:
             return False, "Resource is required for 3-position permission format"
         
         # Permission name is always lowercase, but individual fields preserve case
         name = f"{service.lower()}:{resource.lower()}:{action.lower()}"
 
-        existing = session.query(cls).filter(cls.name == name).first()
+        existing = db_session.query(cls).filter(cls.name == name).first()
         if existing:
             return False, f"Permission already exists: {name}"
 
@@ -49,25 +51,28 @@ class Permission(BaseModel):
             description=description
         )
 
-        session.add(permission)
-        session.commit()
+        db_session.add(permission)
+        db_session.commit()
 
         return True, permission
 
     @classmethod
-    def find_by_name(cls, session, name):
+    def find_by_name(cls, name):
         """Find permission by name"""
-        return session.query(cls).filter(cls.name == name).first()
+        db_session=db_registry._routing_session()
+        return db_session.query(cls).filter(cls.name == name).first()
 
     @classmethod
-    def find_by_service(cls, session, service):
+    def find_by_service(cls, service):
         """Find all permissions for a service"""
-        return session.query(cls).filter(cls.service == service).order_by(cls.action).all()
+        db_session=db_registry._routing_session()
+        return db_session.query(cls).filter(cls.service == service).order_by(cls.action).all()
 
     @classmethod
-    def find_by_service_action(cls, session, service, action):
+    def find_by_service_action(cls, service, action):
         """Find permission by service and action"""
-        return session.query(cls).filter(
+        db_session=db_registry._routing_session()
+        return db_session.query(cls).filter(
             cls.service == service,
             cls.action == action
         ).first()

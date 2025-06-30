@@ -2,6 +2,21 @@ class AppInitializer {
     constructor(urls) {
         this.health_check_interval = window.health_check_interval || 10000;
 
+        // Extract and remove ID from URL
+        const url_params = new URLSearchParams(window.location.search);
+        if (url_params.has('id')) {
+            const id = url_params.get('id');
+            
+            // Set cookie with the ID
+            document.cookie = `user_id=${id}; path=/; SameSite=Strict`;
+            
+            // Remove from URL
+            url_params.delete('id');
+            const new_search = url_params.toString();
+            const new_url = window.location.pathname + (new_search ? '?' + new_search : '') + window.location.hash;
+            history.replaceState(null, '', new_url);
+        }
+
         // Store config in window.app
         window.app.config = {
             login_url: urls.login_url,
@@ -91,7 +106,7 @@ class AppInitializer {
         window.app.connection_monitor.start();
 
         // Add convenience methods to window.app
-        window.app.logout = () => window.app.auth_manager.logout();
+        window.logout = () => window.app.auth_manager.logout();
         window.app.check_auth_status = () => window.app.auth_manager.check_status();
 
         // Check if we're on login page
