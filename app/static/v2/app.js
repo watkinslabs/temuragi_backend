@@ -128,13 +128,24 @@ class AppInitializer {
 
     }
 
+        
     setup_htmx_indicators() {
         document.body.addEventListener('htmx:beforeRequest', function(evt) {
             document.body.classList.add('htmx-loading');
+            
+            // Check if target is main_content
+            if (evt.detail.target && evt.detail.target.id === 'main_content') {
+                evt.detail.target.classList.add('htmx-loading-blur');
+            }
         });
 
         document.body.addEventListener('htmx:afterRequest', function(evt) {
             document.body.classList.remove('htmx-loading');
+            
+            // Remove blur from main_content if it was the target
+            if (evt.detail.target && evt.detail.target.id === 'main_content') {
+                evt.detail.target.classList.remove('htmx-loading-blur');
+            }
         });
 
         // Process new content after HTMX swaps
@@ -145,24 +156,42 @@ class AppInitializer {
                 tables.forEach(table => {
                     htmx.process(table.parentElement);
                 });
-            }
+        }
 
-            // Handle nav active states if needed
-            if (evt.detail.elt && evt.detail.elt.classList.contains('nav_item')) {
-                document.querySelectorAll('.nav_item[aria-current="page"]').forEach(el => {
-                    el.removeAttribute('aria-current');
-                });
-                evt.detail.elt.setAttribute('aria-current', 'page');
-            }
-        });
+        // Handle nav active states if needed
+        if (evt.detail.elt && evt.detail.elt.classList.contains('nav_item')) {
+            document.querySelectorAll('.nav_item[aria-current="page"]').forEach(el => {
+                el.removeAttribute('aria-current');
+            });
+            evt.detail.elt.setAttribute('aria-current', 'page');
+        }
+    });
 
-        // Also process after settle (when all animations are done)
-        document.body.addEventListener('htmx:afterSettle', function(evt) {
-            if (evt.detail.target) {
-                htmx.process(evt.detail.target);
-            }
-        });
-    }
+    // Also process after settle (when all animations are done)
+    document.body.addEventListener('htmx:afterSettle', function(evt) {
+        if (evt.detail.target) {
+            htmx.process(evt.detail.target);
+        }
+    });
+    
+    // Handle errors - remove blur if request fails
+    document.body.addEventListener('htmx:responseError', function(evt) {
+        document.body.classList.remove('htmx-loading');
+        
+        if (evt.detail.target && evt.detail.target.id === 'main_content') {
+            evt.detail.target.classList.remove('htmx-loading-blur');
+        }
+    });
+    
+    // Handle timeout - remove blur if request times out
+    document.body.addEventListener('htmx:timeout', function(evt) {
+        document.body.classList.remove('htmx-loading');
+        
+        if (evt.detail.target && evt.detail.target.id === 'main_content') {
+            evt.detail.target.classList.remove('htmx-loading-blur');
+        }
+    });
+}
 
     setup_visibility_handler() {
         document.addEventListener('visibilitychange', async () => {

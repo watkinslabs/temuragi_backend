@@ -299,7 +299,32 @@ TemplateFragment:
                 font-size: 1.5rem;
             }
             }
+            #main_content {
+                transition: filter 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            }
 
+            #main_content.htmx-loading-blur {
+                filter: blur(3px);
+                opacity: 0.7;
+                pointer-events: none; /* Prevent interaction during load */
+            }
+
+            /* Optional: Add a loading overlay */
+            #main_content.htmx-loading-blur::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(255, 255, 255, 0.1);
+                z-index: 1;
+            }
+
+            /* Ensure main_content has position relative for overlay */
+            #main_content {
+                position: relative;
+            }
             </style>
         </head>
         <body>

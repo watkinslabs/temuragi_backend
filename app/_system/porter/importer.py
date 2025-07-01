@@ -7,7 +7,7 @@ class ComponentImporter:
     """Unified model object import utility"""
     
     def __init__(self,  output_manager, model_registry_getter):
-        """Initialize with database session, output manager, and model getter"""
+        """Initialize output manager, and model getter"""
         self.db_session=db_registry._routing_session()
 
         self.output_manager = output_manager
@@ -277,7 +277,7 @@ class ComponentImporter:
             # Check for existing record if UUID provided
             existing_record = None
             if 'id' in import_data and update_existing:
-                existing_record = self.session.query(model_class).filter(
+                existing_record = self.db_session.query(model_class).filter(
                     model_class.id == import_data['id']
                 ).first()
             
@@ -312,7 +312,7 @@ class ComponentImporter:
                 for prop_name, value in property_data.items():
                     setattr(existing_record, prop_name, value)
                 
-                self.session.commit()
+                self.db_session.commit()
                 self.output_manager.output_success(f"Updated {model_class.__name__} record: {existing_record.id}")
                 return 0
             else:
@@ -323,14 +323,14 @@ class ComponentImporter:
                 for prop_name, value in property_data.items():
                     setattr(new_record, prop_name, value)
                 
-                self.session.add(new_record)
-                self.session.commit()
+                self.db_session.add(new_record)
+                self.db_session.commit()
                 
                 self.output_manager.output_success(f"Created {model_class.__name__} record: {new_record.id}")
                 return 0
                 
         except Exception as e:
-            self.session.rollback()
+            self.db_session.rollback()
             self.output_manager.log_error(f"Error importing record: {e}")
             self.output_manager.output_error(f"Failed to import record: {e}")
             return 1

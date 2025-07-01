@@ -129,7 +129,7 @@ class PermissionCLI(BaseCLI):
 
         try:
             # Check if permission already exists
-            existing = self.permission_model.find_by_name(self.session, permission_name)
+            existing = self.permission_model.find_by_name( permission_name)
             if existing:
                 self.log_warning(f"Permission already exists: {permission_name}")
                 self.output_error(f"Permission already exists: {permission_name}")
@@ -169,7 +169,7 @@ class PermissionCLI(BaseCLI):
         self.log_info(f"Deleting permission {permission_name} ({delete_type} delete)")
 
         try:
-            permission = self.permission_model.find_by_name(self.session, permission_name)
+            permission = self.permission_model.find_by_name( permission_name)
             if not permission:
                 self.log_warning(f"Permission not found: {permission_name}")
                 self.output_error(f"Permission not found: {permission_name}")
@@ -209,7 +209,7 @@ class PermissionCLI(BaseCLI):
         self.log_info(f"Showing details for permission {permission_name}")
 
         try:
-            permission = self.permission_model.find_by_name(self.session, permission_name)
+            permission = self.permission_model.find_by_name( permission_name)
             if not permission:
                 self.log_warning(f"Permission not found: {permission_name}")
                 self.output_error(f"Permission not found: {permission_name}")
@@ -471,7 +471,7 @@ class PermissionCLI(BaseCLI):
                 return 1
 
             # Find user
-            user = user_model.find_by_identity(self.session, user_identity)
+            user = user_model.find_by_identity( user_identity)
             if not user:
                 self.log_warning(f"User not found: {user_identity}")
                 self.output_error(f"User not found: {user_identity}")
