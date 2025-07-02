@@ -9,7 +9,7 @@ from sqlalchemy import text
 
 # Add app path
 sys.path.append('/web/temuragi')
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 CLI_DESCRIPTION = "Menu configuration"
 

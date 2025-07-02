@@ -36,12 +36,17 @@ OUTPUT='app/user/test/'
 #    PartsTrader requesters
 #   "GPACIFIC BKICVNXF s l"
 #  "GPACIFIC BKAPVEND s l"
-  
-#
+#  "GPACIFIC BKARCUST s l"
+#  "GPACIFIC BKPHONE s l"
+#"JADVDATA BKZIP s l"
+#  "GCANADA BKICVNXF s l"
+#  "GCANADA BKAPVEND s l"
+#  "GCANADA BKARCUST s l"
+#  "GCANADA BKPHONE s l"
 
 TABLES=(
-  "GPACIFIC BKARCUST s l"
-  "GPACIFIC BKPHONE s l"
+    "PartsTrader parked_orders_po"
+    "PartsTrader parked_orders_so"
 )
 
 # Process each entry

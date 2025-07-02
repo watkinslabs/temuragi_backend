@@ -9,7 +9,7 @@ import json
 from datetime import datetime, date
 import argparse
 from pprint import pprint
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 from app.register.classes import get_model, _class_registry
 
 from .form_class import FormGenerator

@@ -12,7 +12,7 @@ from collections import defaultdict
 # Add your app path to import the model and config
 sys.path.append('/web/temuragi')
 
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 CLI_DESCRIPTION = "Get Route info"
 

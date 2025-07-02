@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from tabulate import tabulate
 from collections import defaultdict
 
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 CLI_DESCRIPTION = "Analyze API audit logs for security, performance, and usage monitoring"
 

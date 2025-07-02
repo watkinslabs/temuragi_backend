@@ -7,7 +7,7 @@ import sys
 import argparse
 from collections import defaultdict, deque
 sys.path.append('/web/temuragi')
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 
 CLI_DESCRIPTION = "Class dependency management and inspection"

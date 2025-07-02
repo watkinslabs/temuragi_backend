@@ -1,7 +1,7 @@
 from sqlalchemy import or_, create_engine
 
 
-from .handler import  (
+from .handler_class import  (
         MinerError,
         MinerPermissionError,
         DataBrokerError,

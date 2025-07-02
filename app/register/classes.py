@@ -51,7 +51,10 @@ def get_model(name: str) -> Optional[Any]:
     Returns:
         The class object or None if not found
     """
-    return _model_registry.get(name)
+    model= _model_registry.get(name)
+    if model==None:
+        print(f"Model: {name} not found")
+    return model
 
 
 def get_class(name: str) -> Optional[Any]:

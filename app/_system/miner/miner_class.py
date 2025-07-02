@@ -11,7 +11,7 @@ from app.utils import jsonify
 from app.register.classes import get_model
 from app.register.database import db_registry
 
-from .handler import  (
+from .handler_class import  (
         MinerError,
         MinerPermissionError,
         DataBrokerError,
@@ -95,10 +95,14 @@ class Miner:
                 'transform': 'handle_transform',
                 'import': 'handle_import',
                 'export': 'handle_export',
-                'list': 'handle_list'
+                'list': 'handle_list',
+                'get': 'handle_get',
+                'read': 'handle_read'
             }
             
             method_name = method_map.get(operation)
+            if None == method_name :
+                self.logger.error(f"{operation}: not supported")
             # Direct debugging
             self.logger.debug(f"Testing method access for '{method_name}':")
             self.logger.debug(f"  method_name type: {type(method_name)}")

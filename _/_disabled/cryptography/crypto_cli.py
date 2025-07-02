@@ -14,7 +14,7 @@ from datetime import datetime
 import base64
 from cryptography.fernet import Fernet
 
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 from app.config import config
 
 CLI_DESCRIPTION = "Manage database credential encryption"

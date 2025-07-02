@@ -1,7 +1,20 @@
-#!/usr/bin/env python3
+def close(self):
+        """Clean up resources"""
+        # Check if we have the full BaseCLI functionality
+        if hasattr(super(), 'close') and self._backend_initialized:
+            super().close()
+        else:
+            # Basic cleanup
+            self.log_info("Closing CLI instance")
+            if hasattr(self, 'backend') and self.backend:
+                try:
+                    self.backend.close()
+                except Exception:
+                    pass#!/usr/bin/env python3
 """
 tmcli - Temuragi CLI Entry Point
 Automatically discovers and loads all *_cli.py modules from the project
+Also provides base authentication commands for remote backend
 Usage: tmcli <module_name> [args...]
 """
 
@@ -10,6 +23,7 @@ import sys
 import importlib
 import inspect
 import argparse
+import getpass
 from pathlib import Path
 from app.base.cli import BaseCLI
 
@@ -189,14 +203,70 @@ class TMasterCLI(BaseCLI):
 
     def __init__(self, base_path=None, **kwargs):
         """Initialize master CLI with discovery capabilities"""
-        super().__init__(
-            name="tmcli",
-            connect_db=False,  # Don't connect DB for master CLI
-            **kwargs
-        )
+        # For the master CLI, we'll handle backend initialization more carefully
+        # since some commands don't need a backend at all
+        self.base_path = base_path
+        self.discovery = None
+        self.parser = None
+        self._backend_initialized = False
+        self.initialization_errors = []  # Initialize this early
+        
+        # Store kwargs for delayed initialization
+        self._init_kwargs = kwargs.copy()
+        # Remove backend_type from kwargs if present to avoid duplicate
+        self._init_kwargs.pop('backend_type', None)
+        
+        # Initialize without backend first
+        try:
+            super().__init__(
+                name="tmcli",
+                backend_type="remote",
+                **self._init_kwargs
+            )
+            self._backend_initialized = True
+        except Exception as e:
+            # If backend init fails, continue without it for non-backend commands
+            self.name = "tmcli"
+            self.verbose = kwargs.get('verbose', False)
+            self.console_logging = kwargs.get('console_logging', False)
+            self.backend = None
+            self._setup_basic_logging()
+            self.log_warning(f"Backend initialization failed: {e}")
+            self.log_info("Some commands may not be available")
         
         self.discovery = CLIDiscovery(base_path, self)
-        self.parser = None
+    
+    def _setup_basic_logging(self):
+        """Setup basic logging when full BaseCLI init fails"""
+        import logging
+        self.logger = logging.getLogger(f'cli_{self.name}')
+        self.logger.setLevel(logging.INFO)
+        
+        # Add console handler
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+        
+        # Add output methods
+        self.output = lambda msg, t='info': print(msg)
+        self.output_info = lambda msg: print(f"ℹ {msg}")
+        self.output_success = lambda msg: print(f"✓ {msg}")
+        self.output_error = lambda msg: print(f"✗ {msg}")
+        self.output_warning = lambda msg: print(f"⚠ {msg}")
+        
+    def _ensure_backend(self):
+        """Ensure backend is initialized for commands that need it"""
+        if self._backend_initialized:
+            return True
+            
+        # Commands that don't need backend
+        no_backend_commands = ['list', 'debug', 'configure']
+        if len(sys.argv) > 1 and sys.argv[1] in no_backend_commands:
+            return False
+            
+        self.output_error("Backend not initialized. Please run 'tmcli configure' first.")
+        return False
 
     def discover_modules(self, verbose=False):
         """Discover available CLI modules"""
@@ -213,20 +283,26 @@ class TMasterCLI(BaseCLI):
         self.output_info("Available CLI Modules:")
         self.output("=" * 60)
 
+        # Add built-in commands first
+        self.output_info("\nBuilt-in Commands:")
+        self.output(f"  {'login':15} - Login to remote API")
+        self.output(f"  {'logout':15} - Logout and clear stored credentials")
+        self.output(f"  {'whoami':15} - Show current user information")
+        self.output(f"  {'configure':15} - Configure API settings")
+        self.output(f"  {'list':15} - List all available CLI modules")
+        
+        # Then show discovered modules
+        self.output_info("\nDiscovered Modules:")
         for cli_name in sorted(modules.keys()):
             description = self.discovery.get_cli_description(cli_name)
             self.output(f"  {cli_name:15} - {description}")
 
-        self.output(f"\nUsage: tmcli <module_name> [args...]")
+        self.output(f"\nUsage: tmcli <command> [args...]")
 
     def run_cli_module(self, cli_name, args=None):
         """Run a specific CLI module"""
         if args is None:
             args = []
-
-        #self.log_operation_start(f"Running CLI module: {cli_name}")
-        #self.output_info(f"Original sys.argv: {sys.argv}")
-        #self.output_info(f"Passing args to {cli_name}: {args}")
 
         cli_func = self.discovery.load_cli_module(cli_name)
         if not cli_func:
@@ -254,16 +330,131 @@ class TMasterCLI(BaseCLI):
             self.output_error(f"Error running {cli_name}: {e}")
             return 1
 
+    def handle_login(self, username=None, password=None):
+        """Handle login command"""
+        if not self._ensure_backend():
+            return False
+            
+        self.output_info("Login to Remote API")
+        
+        # Get credentials if not provided
+        if not username:
+            username = input("Username: ")
+        if not password:
+            password = getpass.getpass("Password: ")
+        
+        try:
+            if self.authenticate(username=username, password=password):
+                self.output_success("Login successful!")
+                
+                # Show user info if available
+                if hasattr(self.backend, 'user_id') and self.backend.user_id:
+                    self.output_info(f"User ID: {self.backend.user_id}")
+                
+                return True
+            else:
+                self.output_error("Login failed!")
+                return False
+                
+        except Exception as e:
+            self.output_error(f"Login error: {e}")
+            return False
+
+    def handle_logout(self):
+        """Handle logout command"""
+        if not self._ensure_backend():
+            return False
+            
+        try:
+            if hasattr(self, 'logout') and callable(self.logout):
+                if self.logout():
+                    self.output_success("Logged out successfully")
+                    return True
+                else:
+                    self.output_error("Logout failed")
+                    return False
+            else:
+                self.output_warning("Logout not available")
+                return False
+        except Exception as e:
+            self.output_error(f"Logout error: {e}")
+            return False
+
+    def handle_whoami(self):
+        """Show current user information"""
+        if not self._ensure_backend():
+            return False
+            
+        if not hasattr(self, 'is_authenticated') or not self.is_authenticated():
+            self.output_warning("Not logged in")
+            return True
+        
+        self.output_info("Current User Information:")
+        
+        if hasattr(self.backend, 'user_id'):
+            self.output(f"  User ID: {self.backend.user_id or 'Unknown'}")
+        
+        if hasattr(self.backend, 'api_token') and self.backend.api_token:
+            self.output(f"  Token: ***{self.backend.api_token[-8:]}")
+        
+        if hasattr(self.backend, 'base_url'):
+            self.output(f"  API URL: {self.backend.base_url}")
+        
+        return True
+
+    def handle_configure(self):
+        """Configure API settings"""
+        self.output_info("API Configuration")
+        self.output("=" * 40)
+        
+        # Load existing config if any
+        config_file = Path.home() / '.config' / 'tmcli' / 'config.yaml'
+        current_config = {}
+        
+        if config_file.exists():
+            try:
+                import yaml
+                with open(config_file, 'r') as f:
+                    current_config = yaml.safe_load(f) or {}
+            except Exception:
+                pass
+        
+        # Get current URL from config
+        current_url = current_config.get('base_url', 'https://temuragi.watkinslabs.com')
+        
+        # Prompt for new URL
+        url = input(f"API Base URL [{current_url}]: ").strip() or current_url
+        
+        # Create config directory
+        config_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Save configuration
+        import yaml
+        config = {
+            'base_url': url.rstrip('/')
+        }
+        
+        with open(config_file, 'w') as f:
+            yaml.dump(config, f)
+        
+        self.output_success(f"Configuration saved to {config_file}")
+        self.output_info(f"API URL: {url}")
+        self.output_info("\nYou may need to restart tmcli for changes to take effect.")
+        
+        return True
+
     def create_dynamic_parser(self):
         """Create argument parser with dynamic subcommands"""
         parser = argparse.ArgumentParser(
-            description='Master CLI - Recursive CLI Module Loader',
+            description='Master CLI - Recursive CLI Module Loader with Authentication',
             formatter_class=argparse.RawDescriptionHelpFormatter,
             epilog="""
 Examples:
+  tmcli login                   # Login to remote API
+  tmcli whoami                  # Show current user
   tmcli list                    # List available CLI modules
-  tmcli menu status             # Run menu CLI with 'status' command
-  tmcli firewall list --all     # Run firewall CLI with arguments
+  tmcli po pull 12345 PACIFIC   # Run po CLI with arguments
+  tmcli logout                  # Logout from API
             """
         )
 
@@ -283,12 +474,27 @@ Examples:
         # Discover CLI modules silently
         self.discover_modules(verbose=False)
 
-        subparsers = parser.add_subparsers(dest='cli_module', help='Available CLI modules')
+        subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-        # Add 'list' command
+        # Add built-in commands
+        # Login
+        login_parser = subparsers.add_parser('login', help='Login to remote API')
+        login_parser.add_argument('--username', '-u', help='Username (will prompt if not provided)')
+        login_parser.add_argument('--password', '-p', help='Password (will prompt if not provided)')
+        
+        # Logout
+        subparsers.add_parser('logout', help='Logout and clear stored credentials')
+        
+        # Whoami
+        subparsers.add_parser('whoami', help='Show current user information')
+        
+        # Configure
+        subparsers.add_parser('configure', help='Configure API settings')
+        
+        # List
         subparsers.add_parser('list', help='List all available CLI modules')
 
-        # Add 'debug' command for verbose discovery
+        # Debug
         subparsers.add_parser('debug', help='Show detailed module discovery info')
 
         # Add discovered CLI modules as subcommands
@@ -332,24 +538,42 @@ Examples:
         if args.debug or args.log_level:
             self._apply_log_level(args.debug, args.log_level)
 
-        if not args.cli_module:
+        if not args.command:
             self.parser.print_help()
             return 1
 
-        if args.cli_module == 'list':
+        # Handle built-in commands
+        if args.command == 'login':
+            username = getattr(args, 'username', None)
+            password = getattr(args, 'password', None)
+            return 0 if self.handle_login(username, password) else 1
+            
+        elif args.command == 'logout':
+            return 0 if self.handle_logout() else 1
+            
+        elif args.command == 'whoami':
+            return 0 if self.handle_whoami() else 1
+            
+        elif args.command == 'configure':
+            return 0 if self.handle_configure() else 1
+            
+        elif args.command == 'list':
             self.list_available_clis()
             return 0
 
-        if args.cli_module == 'debug':
+        elif args.command == 'debug':
             self.output_info("Debug mode - verbose discovery:")
             self.discover_modules(verbose=True)
             return 0
 
-        return self.run_cli_module(args.cli_module, unknown_args)
-
+        # Otherwise, run the discovered CLI module
+        return self.run_cli_module(args.command, unknown_args)
 
     def _apply_log_level(self, debug_mode, log_level_name):
         """Apply log level using BaseCLI's logging infrastructure"""
+        if not hasattr(self, '_setup_logger'):
+            return
+            
         if debug_mode:
             # Re-setup logger with debug mode
             self._setup_logger(log_level=10)  # DEBUG level
@@ -366,6 +590,28 @@ Examples:
                 self._setup_logger(log_level=level_map[log_level_name])
                 if log_level_name == 'DEBUG':
                     self.verbose = True
+    
+    # Add missing log methods for basic logging
+    def log_info(self, msg):
+        if hasattr(self, 'logger'):
+            self.logger.info(msg)
+    
+    def log_warning(self, msg):
+        if hasattr(self, 'logger'):
+            self.logger.warning(msg)
+    
+    def log_error(self, msg):
+        if hasattr(self, 'logger'):
+            self.logger.error(msg)
+    
+    def log_operation_end(self, op, success=True, details=None):
+        msg = f"Operation {op} {'succeeded' if success else 'failed'}"
+        if details:
+            msg += f": {details}"
+        if success:
+            self.log_info(msg)
+        else:
+            self.log_error(msg)
                     
 def create_master_cli(**kwargs):
     """Factory function to create master CLI instance"""

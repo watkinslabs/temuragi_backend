@@ -9,7 +9,7 @@ import json
 import sys
 from tabulate import tabulate
 
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 CLI_DESCRIPTION = "Test API endpoints with authentication tokens"
 

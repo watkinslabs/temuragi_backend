@@ -1,5 +1,5 @@
 import logging
-from jinja2 import Environment as JinjaEnvironment, BaseLoader, TemplateNotFound, pass_context
+from jinja2 import Environment as JinjaEnvironment, BaseLoader, TemplateNotFound, pass_context, Undefined
 from flask import current_app, has_app_context, request, g
 import uuid
 
@@ -7,7 +7,131 @@ from app.register.database import db_registry
 
 from pprint import pprint
 
-
+class SilentUndefined(Undefined):
+    """
+    A truly silent undefined that handles all cases including format operations.
+    """
+    def _fail_with_undefined_error(self, *args, **kwargs):
+        """Override to prevent raising exceptions"""
+        return None
+    
+    def __str__(self):
+        return ""
+    
+    def __repr__(self):
+        return ""
+    
+    def __unicode__(self):
+        return ""
+    
+    def __bool__(self):
+        return False
+    
+    def __iter__(self):
+        return iter([])
+    
+    def __len__(self):
+        return 0
+    
+    def __nonzero__(self):
+        return False
+    
+    def __eq__(self, other):
+        return isinstance(other, Undefined)
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+    
+    def __hash__(self):
+        return id(type(self))
+    
+    def __call__(self, *args, **kwargs):
+        return self
+    
+    def __getattr__(self, name):
+        if name == '__name__':
+            return self._undefined_name
+        return self
+    
+    def __getitem__(self, key):
+        return self
+    
+    def __int__(self):
+        return 0
+    
+    def __float__(self):
+        return 0.0
+    
+    def __complex__(self):
+        return 0j
+    
+    def __pos__(self):
+        return 0
+    
+    def __neg__(self):
+        return 0
+    
+    def __abs__(self):
+        return 0
+    
+    def __add__(self, other):
+        return other
+    
+    def __radd__(self, other):
+        return other
+    
+    def __sub__(self, other):
+        return -other
+    
+    def __rsub__(self, other):
+        return other
+    
+    def __mul__(self, other):
+        return 0
+    
+    def __rmul__(self, other):
+        return 0
+    
+    def __div__(self, other):
+        return 0
+    
+    def __rdiv__(self, other):
+        return 0
+    
+    def __truediv__(self, other):
+        return 0
+    
+    def __rtruediv__(self, other):
+        return 0
+    
+    def __floordiv__(self, other):
+        return 0
+    
+    def __rfloordiv__(self, other):
+        return 0
+    
+    def __mod__(self, other):
+        # This is important for string formatting
+        return ""
+    
+    def __rmod__(self, other):
+        # This handles the format operation - just return the original string
+        return str(other)
+    
+    def __divmod__(self, other):
+        return (0, 0)
+    
+    def __rdivmod__(self, other):
+        return (0, 0)
+    
+    def __pow__(self, other):
+        return 0
+    
+    def __rpow__(self, other):
+        return 0
+    
+    def __contains__(self, item):
+        return False
 
 # Place this class definition above your TemplateRenderer class
 class ContextWrapper:
@@ -50,7 +174,9 @@ class ContextAwareEnvironment(JinjaEnvironment):
     __depends_on__=[]
     
     def __init__(self, renderer, *args, **kwargs):
-
+        # Set the undefined handler before calling super().__init__
+        kwargs['undefined'] = SilentUndefined
+        
         super().__init__(*args, **kwargs)
         self.db_session=db_registry._routing_session()
         self._renderer = renderer
@@ -1148,7 +1274,245 @@ class TemplateRenderer:
             # Restore context state
             self._context_stack = saved_context_stack
             self._recursion_depth = saved_recursion_depth
+
+
+
+
+
+    def _debug_template_source(self, template_source, context, error_line=None):
+        """Debug helper to show template source with line numbers"""
+        lines = template_source.split('\n')
+        
+        self._logger.error("=== TEMPLATE SOURCE DEBUG ===")
+        self._logger.error(f"Total lines: {len(lines)}")
+        
+        # Show context of error line if specified
+        if error_line:
+            start = max(0, error_line - 10)
+            end = min(len(lines), error_line + 10)
             
+            self._logger.error(f"\n--- Lines {start+1} to {end} (Error at line {error_line}) ---")
+            for i in range(start, end):
+                line_num = i + 1
+                marker = ">>>" if line_num == error_line else "   "
+                self._logger.error(f"{marker} {line_num:4d}: {lines[i]}")
+        else:
+            # Show all lines
+            for i, line in enumerate(lines, 1):
+                self._logger.error(f"{i:4d}: {line}")
+        
+        self._logger.error("=== END TEMPLATE SOURCE ===\n")
+    
+    def _debug_context(self, context, focus_vars=None):
+        """Debug helper to inspect template context"""
+        self._logger.error("=== TEMPLATE CONTEXT DEBUG ===")
+        
+        if focus_vars:
+            self._logger.error("Focused variables:")
+            for var in focus_vars:
+                if var in context:
+                    value = context[var]
+                    self._logger.error(f"  {var}: {type(value).__name__} = {repr(value)}")
+                else:
+                    self._logger.error(f"  {var}: NOT IN CONTEXT")
+        else:
+            # Show all context variables
+            for key, value in sorted(context.items()):
+                if key.startswith('_'):
+                    continue  # Skip internal vars
+                    
+                value_repr = repr(value)
+                if len(value_repr) > 100:
+                    value_repr = value_repr[:100] + "..."
+                    
+                self._logger.error(f"  {key}: {type(value).__name__} = {value_repr}")
+        
+        self._logger.error("=== END CONTEXT ===\n")
+    
+    def _render_page_fragments_only_debug(self, page_id, context):
+        """Debug version of _render_page_fragments_only with error tracking"""
+        from app.models import PageFragment
+        import re
+        import traceback
+        
+        try:
+            # Get all active page fragments
+            page_fragments = PageFragment.get_all_active_for_page(page_id)
+            
+            # Build content template
+            content_parts = []
+            for fragment in page_fragments:
+                content = fragment.content_source.strip()
+                
+                # If content has {% block %} declarations, extract the content
+                if '{% block content %}' in content:
+                    # Extract content between block tags
+                    match = re.search(r'{%\s*block\s+content\s*%}(.*?){%\s*endblock\s*%}', content, re.DOTALL)
+                    if match:
+                        content = match.group(1).strip()
+                
+                content_parts.append(content)
+            
+            # Combine and render
+            content_template_source = "\n".join(content_parts)
+            
+            # Debug log the template source
+            self._logger.error(f"\n=== RENDERING PAGE {page_id} ===")
+            self._debug_template_source(content_template_source, context)
+            
+            # Create template and render
+            template = self.jinja_env.from_string(content_template_source)
+            
+            # Wrap render in try-catch to capture exact error location
+            try:
+                return template.render(**context)
+            except TypeError as e:
+                # Extract line number from traceback
+                tb = traceback.extract_tb(e.__traceback__)
+                for frame in tb:
+                    if frame.filename == "<template>":
+                        error_line = frame.lineno
+                        self._logger.error(f"\n!!! TypeError at line {error_line}: {str(e)}")
+                        
+                        # Show template source around error
+                        self._debug_template_source(content_template_source, context, error_line)
+                        
+                        # Try to identify problematic variables
+                        error_msg = str(e)
+                        if "format" in error_msg:
+                            self._logger.error("\n!!! Format operation detected in error")
+                            # Look for format operations near error line
+                            lines = content_template_source.split('\n')
+                            if 0 <= error_line - 1 < len(lines):
+                                error_line_content = lines[error_line - 1]
+                                self._logger.error(f"Error line content: {repr(error_line_content)}")
+                                
+                                # Extract variable names from format operations
+                                import re
+                                format_patterns = [
+                                    r'{{\s*"[^"]*"\s*\|\s*format\s*\(\s*([^)]+)\s*\)',  # {{ "..." | format(var) }}
+                                    r'{{\s*([^|]+)\s*\|\s*format\s*\(',  # {{ var | format(...) }}
+                                    r'%\s*([a-zA-Z_][a-zA-Z0-9_.]*)',  # old-style % formatting
+                                ]
+                                
+                                potential_vars = []
+                                for pattern in format_patterns:
+                                    matches = re.findall(pattern, error_line_content)
+                                    potential_vars.extend(matches)
+                                
+                                if potential_vars:
+                                    self._logger.error(f"Potential problem variables: {potential_vars}")
+                                    self._debug_context(context, potential_vars)
+                        
+                        break
+                
+                raise  # Re-raise the error
+                
+        except Exception as e:
+            self._logger.error(f"Debug render failed: {type(e).__name__}: {str(e)}")
+            raise
+    
+    def render_template_debug(self, page_identifier, fragment_only=None, debug=False, **data):
+        """Main render function with htmx support and debug mode"""
+        #self._logger.info(f"Rendering page: {page_identifier}")
+        self._reset_recursion()
+        self._context_stack = []  # Clear context stack
+        
+        # Check for debug flag in request args
+        if request and request.args.get('debug') == '1':
+            debug = True
+        
+        try:
+            # Load page
+            page = self._load_page(page_identifier)
+            
+            # Push initial page context
+            self._push_context('page', str(page.id))
+            
+            # Determine if we should render fragments only
+            if fragment_only is None:
+                # Auto-detect from request header
+                fragment_only = request.headers.get('HX-Request') == 'true'
+            
+            # Load page template
+            page_template = None
+            if page.template_id:
+                page_template = self._load_template(page.template_id)
+            
+            # Load theme template
+            theme_template = None
+            theme = None
+            if page_template and page_template.theme_id:
+                theme = self._load_theme(page_template.theme_id)
+                # Assume theme has a default template or get from theme.default_template_id
+                if hasattr(theme, 'default_template_id') and theme.default_template_id:
+                    theme_template = self._load_template(theme.default_template_id)
+            
+            # Build context
+            context = self._build_context(page, page_template, theme, **data)
+            context['is_htmx_request'] = fragment_only
+            
+            if debug:
+                self._logger.error(f"\n=== DEBUG MODE ENABLED for page: {page_identifier} ===")
+                self._debug_context(context)
+            
+            if fragment_only:
+                # Use debug version if debug mode is on
+                if debug:
+                    rendered_content = self._render_page_fragments_only_debug(str(page.id), context)
+                else:
+                    rendered_content = self._render_page_fragments_only(str(page.id), context)
+            else:
+                # Create extended template with auto-extension
+                extended_template_source = self._create_extended_template(str(page.id), page_template, theme_template)
+                
+                if debug:
+                    self._logger.error("\n=== EXTENDED TEMPLATE SOURCE ===")
+                    self._debug_template_source(extended_template_source, context)
+                
+                # Render the extended template
+                template = self.jinja_env.from_string(extended_template_source)
+                rendered_content = template.render(**context)
+            
+            # Increment view count
+            page.increment_view_count()
+
+            # Apply theme's HTML compression settings if theme exists
+            if theme and any([theme.consolidate_css, theme.consolidate_js, 
+                            theme.minify_css, theme.minify_js, theme.minify_html]):
+                from app.classes import HTMLCompressor
+                compressor = HTMLCompressor()
+                rendered_content = compressor.clean_html(
+                    rendered_content,
+                    consolidate_css=theme.consolidate_css,
+                    consolidate_js=theme.consolidate_js,
+                    minify_css=theme.minify_css,
+                    minify_js=theme.minify_js,
+                    minify_html=theme.minify_html)
+
+
+            #self._logger.info(f"Successfully rendered page: {page.slug}")
+            return rendered_content
+            
+        except Exception as e:
+            self._logger.error(f"Failed to render page {page_identifier}: {e}")
+            raise
+        finally:
+            self._context_stack = []  # Clean up context stack
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def render_template(page_identifier, **data):
     """Convenience function for rendering templates"""
     

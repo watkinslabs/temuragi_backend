@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Add app path
 sys.path.append('/web/temuragi')
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 try:
     from app.config import config

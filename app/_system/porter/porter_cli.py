@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.append('/web/temuragi')
 
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 from .exporter import ComponentExporter
 from .importer import ComponentImporter
 from .resolver import ImportDependencyResolver
@@ -36,7 +36,7 @@ class PorterCLI(BaseCLI):
             # Initialize exporter and importer
             self.exporter = ComponentExporter(self)
             self.importer = ComponentImporter(self, self.get_model)
-            
+
             # Initialize dependency resolver
             self.dependency_resolver = ImportDependencyResolver( self, self.get_model)
 
@@ -45,6 +45,86 @@ class PorterCLI(BaseCLI):
         except Exception as e:
             self.log_error(f"Failed to initialize Porter CLI: {e}")
             raise
+
+    def import_yaml(self, file_path, dry_run=False, update_existing=False, 
+                   replace_existing=False, match_field=None):
+        """Import YAML file"""
+        mode = "replace" if replace_existing else ("update" if update_existing else "create")
+        self.log_info(f"Importing from {file_path} (mode={mode}, dry_run={dry_run})")
+
+        try:
+            return self.importer.import_yaml_file(
+                file_path=file_path,
+                dry_run=dry_run,
+                update_existing=update_existing,
+                replace_existing=replace_existing,
+                match_field=match_field
+            )
+
+        except Exception as e:
+            self.log_error(f"Error importing {file_path}: {e}")
+            self.output_error(f"Import failed: {e}")
+            return 1
+
+    def import_directory(self, directory_path, dry_run=False, update_existing=False,
+                        replace_existing=False, match_field=None):
+        """Import all YAML files from directory in dependency order"""
+        mode = "replace" if replace_existing else ("update" if update_existing else "create")
+        self.log_info(f"Importing directory {directory_path} (mode={mode}, dry_run={dry_run})")
+
+        try:
+            # Get ordered files
+            ordered_files = self.dependency_resolver.resolve_import_order(directory_path)
+            
+            if not ordered_files:
+                self.output_error("No YAML files found in directory")
+                return 1
+
+            # Display import order
+            self.output_info("Import order resolved:")
+            for i, file_path in enumerate(ordered_files, 1):
+                model_name = self.dependency_resolver.get_model_from_file(file_path)
+                rel_path = file_path.relative_to(Path(directory_path))
+                display_name = f"{model_name} ({rel_path})" if model_name else str(rel_path)
+                self.output_info(f"  {i}. {display_name}")
+
+            self.output_info(f"\nFound {len(ordered_files)} files to import")
+
+            # Import each file in order - using same importer instance to preserve UUID mappings
+            total_success = 0
+            total_failed = 0
+
+            for i, file_path in enumerate(ordered_files, 1):
+                self.output_info(f"\n[{i}/{len(ordered_files)}] Processing: {file_path.name}")
+                
+                result = self.importer.import_yaml_file(
+                    file_path=file_path,
+                    dry_run=dry_run,
+                    update_existing=update_existing,
+                    replace_existing=replace_existing,
+                    match_field=match_field
+                )
+                
+                if result == 0:
+                    total_success += 1
+                else:
+                    total_failed += 1
+
+            # Summary
+            if dry_run:
+                self.output_info(f"\nDRY RUN SUMMARY: {total_success} files validated, {total_failed} failed")
+            else:
+                if total_failed == 0:
+                    self.output_success(f"\nSUCCESS: Imported all {total_success} files")
+                else:
+                    self.output_warning(f"\nPARTIAL SUCCESS: Imported {total_success} files, {total_failed} failed")
+
+            return 0 if total_failed == 0 else 1
+
+        except Exception as e:
+            self.log_error(f"Error importing directory {directory_path}: {e}")
+            self.output_error(f"Directory import failed: {e}")
+            return 1
 
     def explore_model(self, model_name):
         """Interactive explorer for a specific model"""
@@ -63,12 +143,12 @@ class PorterCLI(BaseCLI):
             # Show model info
             columns = [col.name for col in model_class.__table__.columns]
             self.output_info(f"Columns: {', '.join(columns)}")
-            
+
             # Show dependencies if available
             depends_on = getattr(model_class, '__depends_on__', [])
             if depends_on:
                 self.output_info(f"Depends on: {', '.join(depends_on)}")
-            
+
             print()
 
             current_objects = None
@@ -323,41 +403,10 @@ class PorterCLI(BaseCLI):
             self.output_error(f"Export failed: {e}")
             return 1
 
-    def import_yaml(self, file_path, dry_run=False, update_existing=False):
-        """Import YAML file"""
-        self.log_info(f"Importing from {file_path} (dry_run={dry_run}, update={update_existing})")
-
-        try:
-            return self.importer.import_yaml_file(
-                file_path=file_path,
-                dry_run=dry_run,
-                update_existing=update_existing
-            )
-
-        except Exception as e:
-            self.log_error(f"Error importing {file_path}: {e}")
-            self.output_error(f"Import failed: {e}")
-            return 1
-
-    def import_directory(self, directory_path, dry_run=False, update_existing=False):
-        """Import all YAML files from directory in dependency order"""
-        self.log_info(f"Importing directory {directory_path} (dry_run={dry_run}, update={update_existing})")
-        
-        try:
-            return self.dependency_resolver.import_directory_ordered(
-                directory_path=directory_path,
-                dry_run=dry_run,
-                update_existing=update_existing
-            )
-        except Exception as e:
-            self.log_error(f"Error importing directory {directory_path}: {e}")
-            self.output_error(f"Directory import failed: {e}")
-            return 1
-
     def analyze_dependencies(self, directory_path):
         """Analyze dependencies in a directory of YAML files"""
         self.log_info(f"Analyzing dependencies in {directory_path}")
-        
+
         try:
             return self.dependency_resolver.analyze_directory_dependencies(directory_path)
         except Exception as e:
@@ -368,24 +417,24 @@ class PorterCLI(BaseCLI):
     def resolve_import_order(self, directory_path):
         """Show the resolved import order for directory"""
         self.log_info(f"Resolving import order for {directory_path}")
-        
+
         try:
             ordered_files = self.dependency_resolver.resolve_import_order(directory_path)
-            
+
             if not ordered_files:
                 self.output_error("No files found or dependency resolution failed")
                 return 1
-            
+
             self.output_success(f"Import order for {len(ordered_files)} files:")
-            
+
             for i, file_path in enumerate(ordered_files, 1):
                 model_name = self.dependency_resolver.get_model_from_file(file_path)
                 rel_path = file_path.relative_to(Path(directory_path))
                 display_name = f"{model_name} ({rel_path})" if model_name else str(rel_path)
                 self.output_info(f"  {i}. {display_name}")
-            
+
             return 0
-            
+
         except Exception as e:
             self.log_error(f"Error resolving import order: {e}")
             self.output_error(f"Order resolution failed: {e}")
@@ -540,24 +589,24 @@ class PorterCLI(BaseCLI):
             return 1
 
     def export_all(self, model_name, output_file, template_mode=False,
-                    filter_field=None, filter_value=None, order_by=None, 
+                    filter_field=None, filter_value=None, order_by=None,
                     limit=None, header_title=None, header_description=None):
             """Export all model objects to a single YAML file"""
             self.log_info(f"Exporting all {model_name} objects to {output_file}")
-            
+
             try:
                 # Get model class
                 model_class = self.get_model(model_name)
                 if not model_class:
                     self.output_error(f"Model '{model_name}' not found")
                     return 1
-                
+
                 # Build filter conditions if provided
                 filter_conditions = None
                 if filter_field and filter_value:
                     filter_conditions = {filter_field: filter_value}
                     self.log_info(f"Applying filter: {filter_field}={filter_value}")
-                
+
                 # Export all objects
                 return self.exporter.export_all_model_objects(
                     model_class=model_class,
@@ -569,7 +618,7 @@ class PorterCLI(BaseCLI):
                     order_by=order_by,
                     limit=limit
                 )
-                
+
             except Exception as e:
                 self.log_error(f"Error exporting all {model_name}: {e}")
                 self.output_error(f"Export failed: {e}")
@@ -602,13 +651,17 @@ def main():
     import_parser = subparsers.add_parser('import', help='Import YAML file')
     import_parser.add_argument('file', help='YAML file path')
     import_parser.add_argument('--dry-run', action='store_true', help='Validate without importing')
-    import_parser.add_argument('--update', action='store_true', help='Update existing records')
+    import_parser.add_argument('--update', action='store_true', help='Update existing records by UUID')
+    import_parser.add_argument('--replace', action='store_true', help='Replace existing records by name')
+    import_parser.add_argument('--match-field', help='Field to match for replace (default: auto-detect)')
 
     # Import directory command
     import_dir_parser = subparsers.add_parser('import-dir', help='Import all YAML files from directory')
     import_dir_parser.add_argument('directory', help='Directory containing YAML files')
     import_dir_parser.add_argument('--dry-run', action='store_true', help='Validate without importing')
-    import_dir_parser.add_argument('--update', action='store_true', help='Update existing records')
+    import_dir_parser.add_argument('--update', action='store_true', help='Update existing records by UUID')
+    import_dir_parser.add_argument('--replace', action='store_true', help='Replace existing records by name')
+    import_dir_parser.add_argument('--match-field', help='Field to match for replace (default: auto-detect)')
 
     # Analyze dependencies command
     analyze_parser = subparsers.add_parser('analyze', help='Analyze dependencies in directory')
@@ -647,6 +700,7 @@ def main():
     export_all_parser.add_argument('--limit', type=int, help='Limit number of records')
     export_all_parser.add_argument('--title', help='Custom header title')
     export_all_parser.add_argument('--description', help='Custom header description')
+    
     args = parser.parse_args()
 
     if not args.command:
@@ -679,10 +733,32 @@ def main():
             )
 
         elif args.command == 'import':
-            return cli.import_yaml(args.file, args.dry_run, args.update)
+            # Validate mutually exclusive options
+            if args.update and args.replace:
+                cli.output_error("Cannot use both --update and --replace. Choose one.")
+                return 1
+                
+            return cli.import_yaml(
+                args.file, 
+                dry_run=args.dry_run, 
+                update_existing=args.update,
+                replace_existing=args.replace,
+                match_field=args.match_field
+            )
 
         elif args.command == 'import-dir':
-            return cli.import_directory(args.directory, args.dry_run, args.update)
+            # Validate mutually exclusive options
+            if args.update and args.replace:
+                cli.output_error("Cannot use both --update and --replace. Choose one.")
+                return 1
+                
+            return cli.import_directory(
+                args.directory, 
+                dry_run=args.dry_run, 
+                update_existing=args.update,
+                replace_existing=args.replace,
+                match_field=args.match_field
+            )
 
         elif args.command == 'analyze':
             return cli.analyze_dependencies(args.directory)
@@ -701,18 +777,20 @@ def main():
 
         elif args.command == 'template':
             return cli.generate_template(args.model, args.output)
+            
         elif args.command == 'export-all':
-                    return cli.export_all(
-                        args.model, 
-                        args.output,
-                        template_mode=args.template,
-                        filter_field=args.filter_field,
-                        filter_value=args.filter_value,
-                        order_by=args.order_by,
-                        limit=args.limit,
-                        header_title=args.title,
-                        header_description=args.description
-                    )
+            return cli.export_all(
+                args.model,
+                args.output,
+                template_mode=args.template,
+                filter_field=args.filter_field,
+                filter_value=args.filter_value,
+                order_by=args.order_by,
+                limit=args.limit,
+                header_title=args.title,
+                header_description=args.description
+            )
+            
     except KeyboardInterrupt:
         if cli:
             cli.log_info("Operation cancelled by user")

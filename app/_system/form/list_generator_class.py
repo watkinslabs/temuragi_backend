@@ -299,6 +299,7 @@ class ReportDataTableGenerator:
                     'action_type': action.action_type or 'htmx',  # Include action type
                     'url': action.url or action.url_for,
                     'icon': action.icon,
+                    'data_index': action.data_index,
                     'color': action.color,
                     'title': action.display,
                 }

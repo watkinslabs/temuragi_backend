@@ -9,7 +9,7 @@ import json
 import uuid
 from jinja2 import Environment
 sys.path.append('/web/temuragi')
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 
 CLI_DESCRIPTION = "Template and page rendering"

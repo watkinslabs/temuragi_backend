@@ -13,7 +13,7 @@ from datetime import datetime
 from urllib.parse import urlparse, quote_plus
 from sqlalchemy import text
 
-from app.base.cli import BaseCLI
+from app.base.cli_v1 import BaseCLI
 
 CLI_DESCRIPTION = "Manage database connections"
 

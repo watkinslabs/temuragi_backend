@@ -25,6 +25,7 @@ class PageAction(BaseModel):
     action_type = Column(String(50), nullable=False, default='htmx')  # htmx, api, javascript
     icon = Column(String(100))
     color = Column(String(50))
+    data_index= Column(Integer, default=0)
 
     url = Column(String(500), nullable=True)  # Made nullable since javascript actions won't need it
     url_for = Column(String(500))  # Template version with {{variables}}
