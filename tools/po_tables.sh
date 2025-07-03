@@ -43,11 +43,13 @@ OUTPUT='app/user/test/'
 #  "GCANADA BKAPVEND s l"
 #  "GCANADA BKARCUST s l"
 #  "GCANADA BKPHONE s l"
-
+#    "PartsTrader parked_orders_po"
+#   "PartsTrader parked_orders_so"
+#
 TABLES=(
-    "PartsTrader parked_orders_po"
-    "PartsTrader parked_orders_so"
-)
+         "GPACIFIC BKSYTERM s l"
+         "GCANADA BKSYTERM s l"
+ )
 
 # Process each entry
 for entry in "${TABLES[@]}"; do

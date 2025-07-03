@@ -20,9 +20,6 @@ class ComponentImporter:
             'created_at', 'updated_at', 'created_on', 'updated_on',
             'date_created', 'date_modified', 'timestamp', 'last_modified'
         }
-        
-        # Track UUID mappings across imports
-        self._uuid_mappings = {}  # old_uuid -> new_uuid
 
     def _load_yaml_file(self, file_path):
         """Load and parse YAML file"""
@@ -181,78 +178,6 @@ class ComponentImporter:
 
         return filtered_data
 
-    def _find_existing_record_by_unique_fields(self, model_class, data, match_field=None):
-        """Find existing record by unique fields (name, email, etc.)"""
-        # If specific match field is provided, use it
-        if match_field and match_field in data:
-            return self.db_session.query(model_class).filter(
-                getattr(model_class, match_field) == data[match_field]
-            ).first()
-        
-        # Otherwise, try common unique fields in order
-        unique_fields = ['name', 'email', 'username', 'slug', 'code', 'identifier']
-        
-        for field in unique_fields:
-            if field in data and hasattr(model_class, field):
-                existing = self.db_session.query(model_class).filter(
-                    getattr(model_class, field) == data[field]
-                ).first()
-                if existing:
-                    self.output_manager.log_debug(f"Found existing record by {field}: {data[field]}")
-                    return existing
-        
-        return None
-
-    def _find_all_matching_records(self, model_class, data, match_field=None):
-        """Find ALL records that might conflict, not just by primary unique field"""
-        matching_records = []
-        
-        # Special handling for PageFragment which has composite unique constraint
-        if model_class.__name__ == 'PageFragment':
-            # Check for the composite unique constraint: (page_id, fragment_key, is_active)
-            if all(field in data for field in ['page_id', 'fragment_key', 'is_active']):
-                existing = self.db_session.query(model_class).filter(
-                    model_class.page_id == data['page_id'],
-                    model_class.fragment_key == data['fragment_key'],
-                    model_class.is_active == data['is_active']
-                ).first()
-                if existing:
-                    matching_records.append(existing)
-                    self.output_manager.log_debug(f"Found PageFragment by composite key: page_id={data['page_id']}, fragment_key={data['fragment_key']}, is_active={data['is_active']}")
-        
-        # Check all unique constraints on the model
-        for constraint in model_class.__table__.constraints:
-            if hasattr(constraint, 'columns'):
-                # Check if all columns in this constraint match our data
-                matches_constraint = True
-                constraint_data = {}
-                
-                for col in constraint.columns:
-                    col_name = col.name
-                    if col_name in data:
-                        constraint_data[col_name] = data[col_name]
-                    else:
-                        matches_constraint = False
-                        break
-                
-                if matches_constraint and constraint_data:
-                    # Build query for this constraint
-                    query = self.db_session.query(model_class)
-                    for col_name, value in constraint_data.items():
-                        query = query.filter(getattr(model_class, col_name) == value)
-                    
-                    existing = query.first()
-                    if existing and existing not in matching_records:
-                        matching_records.append(existing)
-                        self.output_manager.log_debug(f"Found conflicting record by constraint: {constraint_data}")
-        
-        # Also check by common unique fields
-        existing_by_field = self._find_existing_record_by_unique_fields(model_class, data, match_field)
-        if existing_by_field and existing_by_field not in matching_records:
-            matching_records.append(existing_by_field)
-        
-        return matching_records
-
     def import_yaml_file(self, file_path, dry_run=False, update_existing=False, 
                         replace_existing=False, match_field=None):
         """
@@ -354,220 +279,6 @@ class ComponentImporter:
             self.output_manager.output_error(f"Failed to process {model_name}: {e}")
             return 1
 
-    def _import_single_record(self, model_class, data, dry_run, update_existing,
-                            replace_existing=False, match_field=None):
-        """Import a single record with improved update/replace logic"""
-        try:
-            # Filter and prepare data
-            import_data = self._filter_import_data(data, model_class)
-
-            if not import_data:
-                self.output_manager.output_warning("No valid data to import")
-                return 1
-
-            # Clear session to avoid state issues
-            self.db_session.expire_all()
-
-            # Special handling for fields that map to properties
-            property_mappings = {
-                '_credentials': 'credentials'
-            }
-
-            # Separate property-mapped fields from direct fields
-            property_data = {}
-            direct_data = {}
-
-            for key, value in import_data.items():
-                if key in property_mappings:
-                    property_data[property_mappings[key]] = value
-                else:
-                    direct_data[key] = value
-
-            # Check for existing record
-            existing_record = None
-            existing_by_uuid = None
-            existing_by_unique = None
-            
-            # First check by UUID if provided
-            if 'id' in direct_data:
-                existing_by_uuid = self.db_session.query(model_class).filter(
-                    model_class.id == direct_data['id']
-                ).first()
-                
-            # Also check by unique fields
-            existing_by_unique = self._find_existing_record_by_unique_fields(
-                model_class, direct_data, match_field
-            )
-            
-            # Determine which existing record to use based on mode
-            if replace_existing:
-                # For replace, prefer unique field matches over UUID
-                existing_record = existing_by_unique or existing_by_uuid
-            elif update_existing:
-                # For update, check both UUID and unique fields
-                existing_record = existing_by_uuid or existing_by_unique
-            else:
-                # For create-only mode, UUID takes precedence
-                existing_record = existing_by_uuid
-
-            if dry_run:
-                if existing_record:
-                    if replace_existing:
-                        action = "REPLACE (delete + create)"
-                    else:
-                        action = "UPDATE"
-                else:
-                    action = "CREATE"
-                self.output_manager.output_info(f"DRY RUN: Would {action} {model_class.__name__} record")
-                return 0
-
-            # Handle replace mode - delete existing record first
-            if replace_existing and existing_record:
-                try:
-                    old_id = existing_record.id
-                    identifier = self._get_record_identifier(existing_record)
-                    
-                    # Store the UUID mapping for child records
-                    self._uuid_replacements = getattr(self, '_uuid_replacements', {})
-                    new_uuid = direct_data.get('id', uuid.uuid4())
-                    self._uuid_replacements[str(old_id)] = new_uuid
-                    
-                    self.db_session.delete(existing_record)
-                    self.db_session.flush()  # Flush but don't commit yet
-                    
-                    self.output_manager.log_info(f"Deleted existing {model_class.__name__}: {identifier} (ID: {old_id})")
-                    
-                    # Use the provided ID or generate new one
-                    if 'id' not in direct_data:
-                        direct_data['id'] = new_uuid
-                    
-                    existing_record = None  # Clear so we create new record
-                    
-                except Exception as e:
-                    self.db_session.rollback()
-                    self.output_manager.output_error(f"Cannot delete existing record: {e}")
-                    self.output_manager.output_warning("Record may have foreign key dependencies")
-                    return 1
-
-            # For update mode or when record exists
-            if existing_record and not replace_existing:
-                if update_existing or (existing_by_uuid and direct_data.get('id') == existing_by_uuid.id):
-                    # Update existing record
-                    try:
-                        # Track UUID mapping if the incoming data has a different UUID than existing
-                        if 'id' in direct_data and direct_data['id'] != existing_record.id:
-                            self._uuid_mappings[str(direct_data['id'])] = existing_record.id
-                            self.output_manager.log_debug(f"Mapping UUID: {direct_data['id']} -> {existing_record.id}")
-                        
-                        # If we found by unique field but UUID doesn't match, update the found record
-                        if existing_by_unique and not existing_by_uuid:
-                            self.output_manager.log_info(f"Found existing record by unique field, updating it")
-                            existing_record = existing_by_unique
-                        
-                        # Update fields directly on the existing record
-                        for key, value in direct_data.items():
-                            if key != 'id':  # Don't update UUID
-                                setattr(existing_record, key, value)
-                        
-                        # Set property-mapped fields
-                        for prop_name, value in property_data.items():
-                            setattr(existing_record, prop_name, value)
-                        
-                        self.db_session.flush()
-                        self.db_session.commit()
-                        
-                        self.output_manager.output_success(f"Updated {model_class.__name__} record: {existing_record.id}")
-                        return 0
-                        
-                    except Exception as e:
-                        self.db_session.rollback()
-                        self.output_manager.log_error(f"Update failed: {e}")
-                        self.output_manager.output_error(f"Failed to update record: {e}")
-                        return 1
-                else:
-                    # Record exists but we're not in update mode
-                    if existing_by_unique:
-                        self.output_manager.output_error(f"Record already exists with same unique values. Use --update to modify or --replace to recreate.")
-                    else:
-                        self.output_manager.output_error(f"Record with UUID {direct_data.get('id')} already exists. Use --update to modify it.")
-                    return 1
-                        
-            else:
-                # Create new record
-                try:
-                    # Check for UUID mappings (for references to updated parent records)
-                    for field, value in list(direct_data.items()):
-                        if field.endswith('_id') and value:
-                            # Check both _uuid_replacements (for replace mode) and _uuid_mappings (for update mode)
-                            if hasattr(self, '_uuid_replacements') and str(value) in self._uuid_replacements:
-                                direct_data[field] = self._uuid_replacements[str(value)]
-                                self.output_manager.log_debug(f"Replaced UUID reference in {field}: {value} -> {direct_data[field]}")
-                            elif str(value) in self._uuid_mappings:
-                                direct_data[field] = self._uuid_mappings[str(value)]
-                                self.output_manager.log_debug(f"Mapped UUID reference in {field}: {value} -> {direct_data[field]}")
-                    
-                    # For new records, generate new UUID if not provided
-                    if 'id' not in direct_data:
-                        direct_data['id'] = uuid.uuid4()
-                    
-                    # Check for any conflicting records before creating
-                    conflicts = self._find_all_matching_records(model_class, direct_data)
-                    if conflicts:
-                        # In update mode, try to update the conflicting record instead
-                        if update_existing and len(conflicts) == 1:
-                            conflict = conflicts[0]
-                            self.output_manager.log_info(f"Found conflicting {model_class.__name__} record, updating it instead")
-                            
-                            # Update the conflicting record
-                            for key, value in direct_data.items():
-                                if key != 'id':  # Don't change the UUID
-                                    setattr(conflict, key, value)
-                            
-                            # Set property-mapped fields
-                            for prop_name, value in property_data.items():
-                                setattr(conflict, prop_name, value)
-                            
-                            self.db_session.flush()
-                            self.db_session.commit()
-                            
-                            self.output_manager.output_success(f"Updated {model_class.__name__} record: {conflict.id}")
-                            return 0
-                        else:
-                            # Not in update mode or multiple conflicts
-                            conflict_info = []
-                            for conflict in conflicts:
-                                conflict_info.append(f"{self._get_record_identifier(conflict)} (ID: {conflict.id})")
-                            self.output_manager.output_error(f"Cannot create {model_class.__name__}: conflicts with existing records: {', '.join(conflict_info)}")
-                            if not update_existing:
-                                self.output_manager.output_info("Use --update to modify existing or --replace to delete and recreate")
-                            return 1
-                    
-                    new_record = model_class(**direct_data)
-
-                    # Set property-mapped fields after creation
-                    for prop_name, value in property_data.items():
-                        setattr(new_record, prop_name, value)
-
-                    self.db_session.add(new_record)
-                    self.db_session.flush()
-                    self.db_session.commit()
-
-                    action = "Replaced" if replace_existing else "Created"
-                    self.output_manager.output_success(f"{action} {model_class.__name__} record: {new_record.id}")
-                    return 0
-                    
-                except Exception as e:
-                    self.db_session.rollback()
-                    self.output_manager.log_error(f"Failed to create record: {e}")
-                    self.output_manager.output_error(f"Failed to create record: {e}")
-                    return 1
-
-        except Exception as e:
-            self.db_session.rollback()
-            self.output_manager.log_error(f"Error importing record: {e}")
-            self.output_manager.output_error(f"Failed to import record: {e}")
-            return 1
-
     def _import_multiple_records(self, model_class, data_list, dry_run, update_existing,
                                replace_existing=False, match_field=None):
         """Import multiple records"""
@@ -611,3 +322,376 @@ class ComponentImporter:
                 if value:
                     return str(value)
         return str(record.id)[:8]
+    
+    def _import_single_record(self, model_class, data, dry_run, update_existing,
+                        replace_existing=False, match_field=None):
+        """Import a single record with improved update/replace logic"""
+        try:
+            # Filter and prepare data
+            import_data = self._filter_import_data(data, model_class)
+
+            if not import_data:
+                self.output_manager.output_warning("No valid data to import")
+                return 1
+
+            # Check for existing record
+            existing_record = None
+
+            # First check by UUID if updating
+            if 'id' in import_data and update_existing:
+                # Ensure UUID is properly formatted
+                record_uuid = import_data['id']
+                if isinstance(record_uuid, str):
+                    try:
+                        record_uuid = uuid.UUID(record_uuid)
+                    except ValueError:
+                        self.output_manager.log_error(f"Invalid UUID format: {record_uuid}")
+                        return 1
+                
+                existing_record = self.db_session.query(model_class).filter(
+                    model_class.id == record_uuid
+                ).first()
+                
+                if existing_record:
+                    self.output_manager.log_debug(f"Found existing record by UUID: {record_uuid}")
+
+            # If replacing, find by unique fields
+            if replace_existing and not existing_record:
+                existing_record = self._find_existing_record_by_unique_fields(
+                    model_class, import_data, match_field
+                )
+
+            if dry_run:
+                if existing_record:
+                    if replace_existing:
+                        action = "REPLACE (delete + create)"
+                    else:
+                        action = "UPDATE"
+                else:
+                    action = "CREATE"
+                self.output_manager.output_info(f"DRY RUN: Would {action} {model_class.__name__} record")
+                return 0
+
+            # Handle replace mode - delete existing record first
+            if replace_existing and existing_record:
+                try:
+                    record_id = existing_record.id
+                    identifier = self._get_record_identifier(existing_record)
+
+                    self.db_session.delete(existing_record)
+                    self.db_session.flush()  # Flush but don't commit yet
+
+                    self.output_manager.log_info(f"Deleted existing {model_class.__name__}: {identifier} (ID: {record_id})")
+
+                    # Don't use the old UUID for the new record
+                    if 'id' in import_data:
+                        del import_data['id']
+
+                    existing_record = None  # Clear so we create new record
+
+                except Exception as e:
+                    self.db_session.rollback()
+                    self.output_manager.output_error(f"Cannot delete existing record: {e}")
+                    self.output_manager.output_warning("Record may have foreign key dependencies")
+                    return 1
+
+            # Special handling for fields that map to properties
+            property_mappings = {
+                '_credentials': 'credentials'
+            }
+
+            # Separate property-mapped fields from direct fields
+            property_data = {}
+            direct_data = {}
+
+            for key, value in import_data.items():
+                if key in property_mappings:
+                    property_data[property_mappings[key]] = value
+                else:
+                    direct_data[key] = value
+
+            if existing_record and update_existing:
+                # Update existing record directly without merge
+                try:
+                    # Update fields directly on the existing record
+                    for key, value in direct_data.items():
+                        if key != 'id':  # Don't update UUID
+                            setattr(existing_record, key, value)
+                            self.output_manager.log_debug(f"Updated field {key} = {value}")
+
+                    # Set property-mapped fields
+                    for prop_name, value in property_data.items():
+                        setattr(existing_record, prop_name, value)
+                        self.output_manager.log_debug(f"Updated property {prop_name}")
+
+                    # Commit the changes
+                    self.db_session.commit()
+
+                    self.output_manager.output_success(f"Updated {model_class.__name__} record: {existing_record.id}")
+                    return 0
+
+                except Exception as e:
+                    self.db_session.rollback()
+                    self.output_manager.log_error(f"Failed to update record: {e}")
+                    self.output_manager.output_error(f"Update failed: {e}")
+                    return 1
+
+            else:
+                # Create new record
+                try:
+                    # For new records, generate new UUID if not provided
+                    if 'id' not in direct_data:
+                        direct_data['id'] = uuid.uuid4()
+                    elif isinstance(direct_data['id'], str):
+                        # Ensure UUID is properly formatted
+                        try:
+                            direct_data['id'] = uuid.UUID(direct_data['id'])
+                        except ValueError:
+                            self.output_manager.log_error(f"Invalid UUID format for new record: {direct_data['id']}")
+                            return 1
+
+                    new_record = model_class(**direct_data)
+
+                    # Set property-mapped fields after creation
+                    for prop_name, value in property_data.items():
+                        setattr(new_record, prop_name, value)
+
+                    self.db_session.add(new_record)
+                    self.db_session.commit()
+
+                    action = "Replaced" if replace_existing else "Created"
+                    self.output_manager.output_success(f"{action} {model_class.__name__} record: {new_record.id}")
+                    return 0
+
+                except Exception as e:
+                    self.db_session.rollback()
+                    self.output_manager.log_error(f"Failed to create record: {e}")
+                    self.output_manager.output_error(f"Failed to create record: {e}")
+                    return 1
+
+        except Exception as e:
+            self.db_session.rollback()
+            self.output_manager.log_error(f"Error importing record: {e}")
+            self.output_manager.output_error(f"Failed to import record: {e}")
+            return 1
+    
+    def _find_existing_record_by_unique_fields(self, model_class, data, match_field=None):
+        """Find existing record by unique fields or composite unique constraints"""
+        # If specific match field is provided, use it
+        if match_field and match_field in data:
+            return self.db_session.query(model_class).filter(
+                getattr(model_class, match_field) == data[match_field]
+            ).first()
+
+        # Check all unique constraints (single and composite)
+        if hasattr(model_class, '__table__'):
+            # Look for UniqueConstraint objects and unique indexes
+            constraints_to_check = []
+            
+            # Get UniqueConstraint objects
+            from sqlalchemy import UniqueConstraint
+            for constraint in model_class.__table__.constraints:
+                if isinstance(constraint, UniqueConstraint):
+                    constraints_to_check.append((constraint.name, [col.name for col in constraint.columns]))
+            
+            # Also check unique indexes (sometimes unique constraints are implemented as indexes)
+            for index in model_class.__table__.indexes:
+                if index.unique:
+                    constraints_to_check.append((index.name, [col.name for col in index.columns]))
+            
+            # Try each unique constraint
+            for constraint_name, constraint_columns in constraints_to_check:
+                # Check if we have all required fields in data
+                if all(col_name in data and data[col_name] is not None for col_name in constraint_columns):
+                    # Build filter conditions
+                    filters = []
+                    for col_name in constraint_columns:
+                        if hasattr(model_class, col_name):
+                            filters.append(getattr(model_class, col_name) == data[col_name])
+                    
+                    if filters and len(filters) == len(constraint_columns):
+                        existing = self.db_session.query(model_class).filter(*filters).first()
+                        if existing:
+                            self.output_manager.log_debug(
+                                f"Found existing record by unique constraint/index '{constraint_name}': "
+                                f"{', '.join([f'{col}={data[col]}' for col in constraint_columns])}"
+                            )
+                            return existing
+
+        # Try common unique fields in order
+        unique_fields = ['name', 'email', 'username', 'slug', 'code', 'identifier']
+
+        for field in unique_fields:
+            if field in data and hasattr(model_class, field):
+                existing = self.db_session.query(model_class).filter(
+                    getattr(model_class, field) == data[field]
+                ).first()
+                if existing:
+                    self.output_manager.log_debug(f"Found existing record by {field}: {data[field]}")
+                    return existing
+
+        return None
+
+
+    def _import_single_record(self, model_class, data, dry_run, update_existing,
+                            replace_existing=False, match_field=None):
+        """Import a single record with improved update/replace logic"""
+        try:
+            # Filter and prepare data
+            import_data = self._filter_import_data(data, model_class)
+
+            if not import_data:
+                self.output_manager.output_warning("No valid data to import")
+                return 1
+
+            # Check for existing record
+            existing_record = None
+
+            # First check by UUID if updating and UUID is provided
+            if 'id' in import_data and update_existing:
+                # Ensure UUID is properly formatted
+                record_uuid = import_data['id']
+                if isinstance(record_uuid, str):
+                    try:
+                        record_uuid = uuid.UUID(record_uuid)
+                    except ValueError:
+                        self.output_manager.log_error(f"Invalid UUID format: {record_uuid}")
+                        return 1
+                
+                existing_record = self.db_session.query(model_class).filter(
+                    model_class.id == record_uuid
+                ).first()
+                
+                if existing_record:
+                    self.output_manager.log_debug(f"Found existing record by UUID: {record_uuid}")
+
+            # Always check for existing records by unique constraints when updating
+            # This handles cases where records don't have UUIDs in the import file
+            if update_existing and not existing_record:
+                existing_record = self._find_existing_record_by_unique_fields(
+                    model_class, import_data, match_field
+                )
+                if existing_record:
+                    self.output_manager.log_info(
+                        f"Found existing {model_class.__name__} by unique constraints, will update"
+                    )
+
+            # If replacing, find by unique fields
+            if replace_existing and not existing_record:
+                existing_record = self._find_existing_record_by_unique_fields(
+                    model_class, import_data, match_field
+                )
+
+            if dry_run:
+                if existing_record:
+                    if replace_existing:
+                        action = "REPLACE (delete + create)"
+                    else:
+                        action = "UPDATE"
+                else:
+                    action = "CREATE"
+                self.output_manager.output_info(f"DRY RUN: Would {action} {model_class.__name__} record")
+                return 0
+
+            # Handle replace mode - delete existing record first
+            if replace_existing and existing_record:
+                try:
+                    record_id = existing_record.id
+                    identifier = self._get_record_identifier(existing_record)
+
+                    self.db_session.delete(existing_record)
+                    self.db_session.flush()  # Flush but don't commit yet
+
+                    self.output_manager.log_info(f"Deleted existing {model_class.__name__}: {identifier} (ID: {record_id})")
+
+                    # Don't use the old UUID for the new record
+                    if 'id' in import_data:
+                        del import_data['id']
+
+                    existing_record = None  # Clear so we create new record
+
+                except Exception as e:
+                    self.db_session.rollback()
+                    self.output_manager.output_error(f"Cannot delete existing record: {e}")
+                    self.output_manager.output_warning("Record may have foreign key dependencies")
+                    return 1
+
+            # Special handling for fields that map to properties
+            property_mappings = {
+                '_credentials': 'credentials'
+            }
+
+            # Separate property-mapped fields from direct fields
+            property_data = {}
+            direct_data = {}
+
+            for key, value in import_data.items():
+                if key in property_mappings:
+                    property_data[property_mappings[key]] = value
+                else:
+                    direct_data[key] = value
+
+            if existing_record and update_existing:
+                # Update existing record directly without merge
+                try:
+                    # Update fields directly on the existing record
+                    for key, value in direct_data.items():
+                        if key != 'id':  # Don't update UUID
+                            setattr(existing_record, key, value)
+                            self.output_manager.log_debug(f"Updated field {key} = {value}")
+
+                    # Set property-mapped fields
+                    for prop_name, value in property_data.items():
+                        setattr(existing_record, prop_name, value)
+                        self.output_manager.log_debug(f"Updated property {prop_name}")
+
+                    # Commit the changes
+                    self.db_session.commit()
+
+                    self.output_manager.output_success(f"Updated {model_class.__name__} record: {existing_record.id}")
+                    return 0
+
+                except Exception as e:
+                    self.db_session.rollback()
+                    self.output_manager.log_error(f"Failed to update record: {e}")
+                    self.output_manager.output_error(f"Update failed: {e}")
+                    return 1
+
+            else:
+                # Create new record
+                try:
+                    # For new records, generate new UUID if not provided
+                    if 'id' not in direct_data:
+                        direct_data['id'] = uuid.uuid4()
+                    elif isinstance(direct_data['id'], str):
+                        # Ensure UUID is properly formatted
+                        try:
+                            direct_data['id'] = uuid.UUID(direct_data['id'])
+                        except ValueError:
+                            self.output_manager.log_error(f"Invalid UUID format for new record: {direct_data['id']}")
+                            return 1
+
+                    new_record = model_class(**direct_data)
+
+                    # Set property-mapped fields after creation
+                    for prop_name, value in property_data.items():
+                        setattr(new_record, prop_name, value)
+
+                    self.db_session.add(new_record)
+                    self.db_session.commit()
+
+                    action = "Replaced" if replace_existing else "Created"
+                    self.output_manager.output_success(f"{action} {model_class.__name__} record: {new_record.id}")
+                    return 0
+
+                except Exception as e:
+                    self.db_session.rollback()
+                    self.output_manager.log_error(f"Failed to create record: {e}")
+                    self.output_manager.output_error(f"Failed to create record: {e}")
+                    return 1
+
+        except Exception as e:
+            self.db_session.rollback()
+            self.output_manager.log_error(f"Error importing record: {e}")
+            self.output_manager.output_error(f"Failed to import record: {e}")
+            return 1

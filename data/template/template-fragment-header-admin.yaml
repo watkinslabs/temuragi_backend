@@ -16,8 +16,8 @@ TemplateFragment:
       version_label: v1.0.0
       is_active: true
       template_source: |
-        <div class="topbar">
-            <span>Documentation Portal | Latest Updates | Support</span>
+        <div class="topbar htmx-indicator">
+            
         </div>
         <header class="header">
               <div class="header_brand">

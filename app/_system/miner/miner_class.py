@@ -1244,12 +1244,16 @@ class Miner:
     def _apply_sorting(self, query, model_class, sort_by, sort_order):
         """Apply sorting to query"""
         if not hasattr(model_class, sort_by):
-            # Fallback to created_at if sort field doesn't exist
-            if hasattr(model_class, 'created_at'):
-                sort_by = 'created_at'
+            pk_field = self._get_primary_key_field(model_class)
+            if pk_field and hasattr(model_class, pk_field):
+                sort_by = pk_field
             else:
-                # No sorting if no valid field
+                # If absolutely no sortable field found, log error
+                if self.logger:
+                    self.logger.error(f"No sortable field found for {model_class.__name__}")
+                # Still return query unchanged - let database error provide feedback
                 return query
+
 
         field = getattr(model_class, sort_by)
 

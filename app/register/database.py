@@ -6,7 +6,7 @@ from flask import Flask, g
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session, Session
 from sqlalchemy.orm.session import Session as SessionType
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.pool import NullPool
 
 from app.config import config
 
@@ -105,7 +105,8 @@ class DynamicDatabaseRegistry:
             connection_string = connection.get_connection_string()
             
             # Create the engine
-            engine = create_engine(connection_string, pool_size=5, max_overflow=10)
+            engine = create_engine(connection_string,    poolclass=NullPool,  pool_pre_ping=False)
+
             
             with engine.connect() as conn:
                 result = conn.execute(text("SELECT 1"))
