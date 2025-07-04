@@ -7,48 +7,54 @@ DSN='DSN=mssql-dev;UID=webuser;PWD=!w21eb1;'
 CONN='PR_MSSQL'
 OUTPUT='app/user/test/'
 
-#    "JADVDATA locations s l"
-#    "JADVDATA po_log s l"
-#    "JADVDATA po_lock s l"
-#    "GPACIFIC BKAPHPOL s l -S BKAPPOL"
-#    "GPACIFIC BKAPHPO s l -S BKAPPO"
-#    "GPACIFIC _po_details n l"
-#    "GPACIFIC BKAPPO s l"
-#    "GPACIFIC BKAPPOL s l"
-#    "GPACIFIC BKPOERD s l"
-#    "GPACIFIC BKGLCOA s l -S BKGL"
-#    "GPACIFIC BKICLOC s l"
-#    "GPACIFIC BKSYMSTR s l -S BKSY"
-#    "GPACIFIC BKGLCOA s l"    
-#    "GCANADA BKAPHPO s l -S BKAPPO"
-#    "GCANADA BKAPHPOL s l -S BKAPPOL"
-#    "GCANADA _po_details n l"
-#    "GCANADA BKAPPO s l"
-#    "GCANADA BKAPPOL s l"
-#    "GCANADA BKGLCOA s l -S BKGL"
-#    "GCANADA BKICLOC s l"
-#    "GCANADA BKPOERD s l"
-#    "GCANADA BKSYMSTR s l  -S BKSY"
-#    PartsTrader orders
-#    PartsTrader parked_orders
-#    PartsTrader parked_order_parts
-#    PartsTrader repairers
-#    PartsTrader requesters
-#   "GPACIFIC BKICVNXF s l"
+#  "JADVDATA locations s l"
+#  "JADVDATA po_log s l"
+#  "JADVDATA po_lock s l"
+#  "JADVDATA BKZIP s l"
+#  "JADVDATA _vinv_config n"
+#  "JADVDATA _vinv_locs n"
+#  "JADVDATA _vinv_oem_avail n"
+#  "JADVDATA _virtual_inventory n"
+#  "GPACIFIC BKAPHPOL s l -S BKAPPOL"
+#  "GPACIFIC BKAPHPO s l -S BKAPPO"
+#  "GPACIFIC _po_details n l"
+#  "GPACIFIC BKAPPO s l"
+#  "GPACIFIC BKAPPOL s l"
+#  "GPACIFIC BKPOERD s l"
+#  "GPACIFIC BKGLCOA s l -S BKGL"
+#  "GPACIFIC BKICLOC s l"
+#  "GPACIFIC BKSYMSTR s l -S BKSY"
+#  "GPACIFIC BKGLCOA s l"    
+#  "GPACIFIC BKICVNXF s l"
 #  "GPACIFIC BKAPVEND s l"
 #  "GPACIFIC BKARCUST s l"
 #  "GPACIFIC BKPHONE s l"
-#"JADVDATA BKZIP s l"
+#  "GPACIFIC BKSYTERM s l"
+#  "GPACIFIC BKICMSTR s l"
+#  "GCANADA BKAPHPO s l -S BKAPPO"
+#  "GCANADA BKAPHPOL s l -S BKAPPOL"
+#  "GCANADA _po_details n l"
+#  "GCANADA BKAPPO s l"
+#  "GCANADA BKAPPOL s l"
+#  "GCANADA BKGLCOA s l -S BKGL"
+#  "GCANADA BKICLOC s l"
+#  "GCANADA BKPOERD s l"
+#  "GCANADA BKSYMSTR s l  -S BKSY"
 #  "GCANADA BKICVNXF s l"
 #  "GCANADA BKAPVEND s l"
 #  "GCANADA BKARCUST s l"
 #  "GCANADA BKPHONE s l"
-#    "PartsTrader parked_orders_po"
-#   "PartsTrader parked_orders_so"
+#  "GCANADA BKSYTERM s l"
+#  "GCANADA BKICMSTR s l"
+#   PartsTrader orders
+#   PartsTrader parked_orders
+#   PartsTrader parked_order_parts
+#   PartsTrader repairers
+#   PartsTrader requesters
+#  "PartsTrader parked_orders_po"
+#  "PartsTrader parked_orders_so"
 #
 TABLES=(
-         "GPACIFIC BKSYTERM s l"
-         "GCANADA BKSYTERM s l"
  )
 
 # Process each entry

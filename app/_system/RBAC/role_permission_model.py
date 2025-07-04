@@ -6,8 +6,11 @@ from flask import g
 
 from app.base.model import BaseModel
 
-from app.classes import Permission
-from app.models import User
+try:
+    from app.classes import Permission
+    from app.models import User
+except:
+    pass
 
 from app.register.database import db_registry
 
@@ -15,7 +18,7 @@ class RolePermission(BaseModel):
     """
     Junction table linking roles to permissions
     """
-    __depends_on__ = ['Role', 'Permission']
+    __depends_on__ = ['Role', 'Permission','User']
     __tablename__ = 'role_permissions'
 
     role_id = Column(

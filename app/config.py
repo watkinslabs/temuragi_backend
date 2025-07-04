@@ -8,10 +8,10 @@ basedir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 config={
     'SYSTEM_SCAN_PATHS'    : ['_system','admin','user'],
     'BASE_DIR'             : os.path.dirname(__file__),
-    'DATABASE_URI'      :  ("postgresql+psycopg2://temuragi:"
+    'DATABASE_URI'      :  ("postgresql+psycopg2://vr_web_user:"
                             "stronk_password_%24314X"
-                            "@10.90.0.40:5432/temuragi"
-                            ),
+                            "@10.0.0.52:5432/virtual_reports"
+                            ),                            
     'DB_CONN_ENC_KEY'   : 'lejookie',
     'CIPHER_KEY'        :  b'u1tOOtBW2ECTWXSMS_pZ9wwdn4dEZzg_-ihYJfbYbd8=',
     'SECRET_KEY'        : 'your_secret_key_here',
@@ -22,9 +22,9 @@ config={
     'ADMIN_ROUTE_PREFIX': '/v2/admin',
     'APP_NAME'          : 'app1',
     'site_template' :{
-        'SITE_NAME'         : 'Temuragi',
+        'SITE_NAME'         : 'Ahoy!',
         'SITE_AUTHOR'       : "Chris Watkins",
-        'SITE_DESCRIPTION'  : "Modular Templating System for OPS and Reporting",
+        'SITE_DESCRIPTION'  : "Performance Radiator Parts System",
     }
 }
 # dynamic

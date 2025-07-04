@@ -3,6 +3,7 @@ class PurchaseOrderBuilder {
         // Only need the data API URL now
         this.data_api_url = config.data_api;
         
+        
         // Configuration
         this.po_number = config.po_number || null;
         this.is_edit_mode = !!this.po_number && this.po_number !== 'NEW';
@@ -15,7 +16,9 @@ class PurchaseOrderBuilder {
             location: config.location,
             ship_via: config.ship_via,
             shipping_address: config.shipping_address,
-            initial_items: config.initial_items || []
+            initial_items: config.initial_items || [],
+            vendors:config.vendors || false,
+            parked_order_id : config.parked_order_id || 0
         };
         // Model names for API calls
         this.models = {
@@ -24,7 +27,8 @@ class PurchaseOrderBuilder {
             parts: 'JADVDATA_dbo_part_meta',
             ship_methods: 'BKSYSSHIP',
             locations: 'JADVDATA_dbo_locations',
-            terms: 'GPACIFIC_dbo_BKSYTERM'
+            terms: 'GPACIFIC_dbo_BKSYTERM',
+            icmstr: 'GPACIFIC_dbo_BKICMSTR'
         };
 
         // State
@@ -73,6 +77,17 @@ class PurchaseOrderBuilder {
         // Build the UI first
         this.build_ui();
         
+        // Set today's date for order date
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        $('#order_date').val(todayString);
+
+        // Set expected receipt date to +2 days
+        const expectedDate = new Date(today);
+        expectedDate.setDate(expectedDate.getDate() + 2);
+        const expectedDateString = expectedDate.toISOString().split('T')[0];
+        $('#expected_receipt_date').val(expectedDateString);
+
         // Setup event handlers
         this.setup_event_handlers();
         await this.load_terms_and_locations();
@@ -117,6 +132,13 @@ class PurchaseOrderBuilder {
     build_ui() {
         const container = $(`#${this.container_id}`);
         
+        // Check if we should use select or input for vendor
+        const vendor_field_html = this.pre_populate_data.vendors && this.pre_populate_data.vendors.length > 0
+            ? `<select class="form-select form-select-sm" id="vendor_code" required>
+                   <option value="">Select vendor...</option>
+               </select>`
+            : `<input type="text" class="form-control form-control-sm" id="vendor_code" placeholder="Search vendor..." required>`;
+        
         const html = `
             <!-- Loading overlay -->
             <div id="loadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -127,70 +149,89 @@ class PurchaseOrderBuilder {
             </div>
 
             <div class="container-fluid mt-3">
-                <h4 class="mb-3">Purchase Order <span id="po_number_display">${this.po_number ? '#' + this.po_number : ''}</span></h4>
+                <h4 class="mb-3">Purchase Order <span id="po_number_display">${this.po_number ? '#' + this.po_number : ''}</span></h4> 
                 
                 <!-- Header Section -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h6 class="mb-0">Order Information</h6>
+                <div class="row g-3">
+                    <!-- Order Details Card -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100 mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Order Details</h6>
+                                <span id="printed_badge" class="badge bg-success" style="display: none;">Printed</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label for="vendor_code" class="form-label">Vendor <span class="text-danger">*</span></label>
+                                        ${vendor_field_html}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="ordered_by" class="form-label">Ordered By</label>
+                                        <input type="text" class="form-control form-control-sm" id="ordered_by" placeholder="Name...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="order_date" class="form-label">Order Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control form-control-sm" id="order_date" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="expected_receipt_date" class="form-label">Expected Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control form-control-sm" id="expected_receipt_date" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-2">
-                            <div class="col-md-3">
-                                <label for="vendor_code" class="form-label">Vendor <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="vendor_code" placeholder="Search vendor..." required>
+                    
+                    <!-- Shipping Details Card -->
+                    <div class="col-lg-6 mb-3">
+                        <div class="card h-100 mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Shipping Details</h6>
                             </div>
-                            <div class="col-md-2">
-                                <label for="order_date" class="form-label">Order Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control form-control-sm" id="order_date" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label for="expected_receipt_date" class="form-label">Expected Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control form-control-sm" id="expected_receipt_date" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label for="terms" class="form-label">Terms</label>
-                                <select class="form-select form-select-sm" id="terms" >
-                                    <option value="">Select Terms...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-1">
-                                <label for="ship_via" class="form-label">Ship Via</label>
-                                <input type="text" class="form-control form-control-sm" id="ship_via" value="UPS" placeholder="Ship...">
-                            </div>
-                            <div class="col-md-1">
-                                <label for="freight" class="form-label">Freight</label>
-                                <input type="number" class="form-control form-control-sm" id="freight" value="0" min="0" step="0.01">
-                            </div>
-                            <div class="col-md-1">
-                                <label for="location" class="form-label">Loc</label>
-                                <select class="form-select form-select-sm" id="location">
-                                    <option value="">Select Location...</option>
-                                </select>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label for="terms" class="form-label">Terms</label>
+                                        <select class="form-select form-select-sm" id="terms">
+                                            <option value="">Select Terms...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="ship_via" class="form-label">Ship Via</label>
+                                        <input type="text" class="form-control form-control-sm" id="ship_via" value="UPS" placeholder="Ship...">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="freight" class="form-label">Freight</label>
+                                        <input type="number" class="form-control form-control-sm" id="freight" value="0" min="0" step="0.01">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="location" class="form-label">Location</label>
+                                        <select class="form-select form-select-sm" id="location">
+                                            <option value="">Select Location...</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Combined Addresses Section -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-6">
+                <!-- Vendor Comments Warning -->
+                <div id="vendor_comments_alert" class="alert alert-warning" style="display: none;">
+                    <h6 class="alert-heading">Vendor Notes:</h6>
+                    <div id="vendor_comments_content"></div>
+                </div>
+      
+                <!-- Split Addresses Section -->
+                <div class="row g-3 mb-3">
+                    <!-- Billing Address Card -->
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header">
                                 <h6 class="mb-0">Billing Address</h6>
                             </div>
-                            <div class="col-6 d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">Shipping Address</h6>
-                                <button type="button" class="btn btn-sm btn-secondary" id="copy_billing_btn">
-                                    Copy from Billing
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-2">
-                            <!-- Billing Column -->
-                            <div class="col-md-6">
+                            <div class="card-body">
                                 <div class="row g-2">
                                     <div class="col-12">
                                         <input type="text" class="form-control form-control-sm billing-field" id="billing_name" placeholder="Company Name">
@@ -215,9 +256,19 @@ class PurchaseOrderBuilder {
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Shipping Column -->
-                            <div class="col-md-6">
+                        </div>
+                    </div>
+                    
+                    <!-- Shipping Address Card -->
+                    <div class="col-lg-6">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Shipping Address</h6>
+                                <button type="button" class="btn btn-sm btn-secondary" id="copy_billing_btn">
+                                    Copy from Billing
+                                </button>
+                            </div>
+                            <div class="card-body">
                                 <div class="row g-2">
                                     <div class="col-12">
                                         <input type="text" class="form-control form-control-sm shipping-field" id="shipping_name" placeholder="Company Name">
@@ -249,11 +300,6 @@ class PurchaseOrderBuilder {
                     </div>
                 </div>
 
-                <!-- Vendor Comments Warning -->
-                <div id="vendor_comments_alert" class="alert alert-warning" style="display: none;">
-                    <h6 class="alert-heading">Vendor Notes:</h6>
-                    <div id="vendor_comments_content"></div>
-                </div>
                 <!-- Line Items Section -->
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -309,9 +355,18 @@ class PurchaseOrderBuilder {
                     <button type="button" class="btn btn-primary" id="receive_po_btn" style="display:none;">
                         <i class="fas fa-truck"></i> Receive
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/purchase_orders'">
+
+                    
+                    <a class="btn btn-secondary" 
+                                href="/v2/parked_orders/manage" 
+                                hx-indicator=".htmx-indicator"  
+                                hx-post="/v2/parked_orders/manage" 
+                                hx-ext="json-enc"
+                                hx-swap="innerHTML" 
+                                hx-target="#main-content"  
+                                hx-vals='{"id":${this.pre_populate_data.parked_order_id}}'>
                         <i class="fas fa-times"></i> Cancel
-                    </button>
+                    </a>
                 </div>
             </div>
         `;
@@ -356,39 +411,85 @@ class PurchaseOrderBuilder {
     }
 
     setup_event_handlers() {
-        // Vendor autocomplete with jQuery UI
-        $('#vendor_code').autocomplete({
-            source: async (request, response) => {
-                const result = await this.api_call('list', this.models.vendors, {
-                    "filters": {
-                    "name": {
-                    "operator": "ilike",
-                    "value": request.term
+        const self = this;
+
+        // Check if we have static vendors
+        if (this.pre_populate_data.vendors && this.pre_populate_data.vendors.length > 0) {
+            // Populate vendor select dropdown
+            const $vendor_select = $('#vendor_code');
+            this.pre_populate_data.vendors.forEach(vendor => {
+                $vendor_select.append(`<option value="${vendor.company}">${vendor.code} - ${vendor.company}</option>`);
+            });
+            
+            // Handle select change
+            $vendor_select.on('change', async function() {
+                const selected_code = $(this).val();
+                if (selected_code) {
+                    // Show loading
+                    self.show_loading(true);
+                    
+                    try {
+                        // Fetch full vendor details from API
+                        const result = await self.api_call('list', self.models.vendors, {
+                            filters: {
+                                code: {
+                                    operator: "eq",
+                                    value: selected_code
+                                }
+                            },
+                            start: 0,
+                            length: 1
+                        });
+                        
+                        if (result.success && result.data && result.data.length > 0) {
+                            const vendor = result.data[0];
+                            self.on_vendor_change(vendor);
+                        } else {
+                            self.show_error('Failed to load vendor details');
+                        }
+                    } catch (error) {
+                        console.error('Error fetching vendor details:', error);
+                        self.show_error('Error loading vendor details');
+                    } finally {
+                        self.show_loading(false);
                     }
-                    }
-                });
-                
-                if (result.success && result.data) {
-                    response(result.data.map(vendor => ({
-                        label: `${vendor.code} - ${vendor.name}`,
-                        value: vendor.code,
-                        vendor: vendor
-                    })));
-                } else {
-                    response([]);
                 }
-            },
-            minLength: 2,
-            select: (event, ui) => {
-                this.on_vendor_change(ui.item.vendor);
-                return true;
-            }
-        });
+            });
+        } else {
+            // Use autocomplete for dynamic vendor search
+            $('#vendor_code').autocomplete({
+                source: async (request, response) => {
+                    const result = await self.api_call('list', self.models.vendors, {
+                        "filters": {
+                            "name": {
+                                "operator": "ilike",
+                                "value": request.term
+                            }
+                        }
+                    });
+                    
+                    if (result.success && result.data) {
+                        response(result.data.map(vendor => ({
+                            label: `${vendor.code} - ${vendor.name}`,
+                            value: vendor.code,
+                            vendor: vendor
+                        })));
+                    } else {
+                        response([]);
+                    }
+                },
+                minLength: 2,
+                select: (event, ui) => {
+                    self.on_vendor_change(ui.item.vendor);
+                    return true;
+                }
+            });
+        }
 
         // Ship Via autocomplete
         $('#ship_via').autocomplete({
             source: async (request, response) => {
-                const result = await this.api_call('list', this.models.ship_methods, {
+                const result = await self.api_call('list', self.models.ship_methods, {
                     search: request.term
                 });
                 
@@ -407,31 +508,29 @@ class PurchaseOrderBuilder {
             }
         });
 
-      
-        
         // Header fields
-        $('#order_date, #expected_receipt_date').on('change', () => this.update_header_from_form());
-        $('#ship_via, #location, #terms').on('change', () => this.update_header_from_form());
+        $('#order_date, #expected_receipt_date').on('change', () => self.update_header_from_form());
+        $('#ship_via, #location, #terms').on('change', () => self.update_header_from_form());
         $('#freight').on('input', () => {
-            this.update_header_from_form();
-            this.calculate_totals();
+            self.update_header_from_form();
+            self.calculate_totals();
         });
 
         // Address fields
-        $('.billing-field, .shipping-field').on('input', () => this.update_header_from_form());
+        $('.billing-field, .shipping-field').on('input', () => self.update_header_from_form());
 
         // Buttons
-        $('#add_line_btn').on('click', () => this.add_line());
-        $('#add_note_btn').on('click', () => this.add_note_line());
-        $('#save_po_btn').on('click', () => this.save_po());
-        $('#receive_po_btn').on('click', () => this.show_receive_modal());
-        $('#copy_billing_btn').on('click', () => this.copy_billing_to_shipping());
+        $('#add_line_btn').on('click', () => self.add_line());
+        $('#add_note_btn').on('click', () => self.add_note_line());
+        $('#save_po_btn').on('click', () => self.save_po());
+        $('#receive_po_btn').on('click', () => self.show_receive_modal());
+        $('#copy_billing_btn').on('click', () => self.copy_billing_to_shipping());
     }
 
     async load_terms_and_locations() {
         // Load terms
         const terms_result = await this.api_call('list', 
-            this.models.terms,
+            window.purchaseOrderBuilder.models.terms,
             {start:0,
             length:0,
             return_columns: ["num", "desc"],
@@ -454,20 +553,34 @@ class PurchaseOrderBuilder {
         }
         
         // Load locations  
-        const locations_result = await this.api_call('list', this.models.locations,
+        const locations_result = await this.api_call('list', window.purchaseOrderBuilder.models.locations,
                 {
                     start:0,
                     length:0,
                     return_columns: ["location", "location_name"],
-                    order:[{'column':0,'dir':'asc'}],
-                    columns:[{'name':'location'},{'name':'location_name'}]
+                    order:[{'column':1,'dir':'asc'}],
+                    columns:[{'name':'location'},{'name':'location_name'}],
+                    "filters": {
+                        "company": {
+                            "operator": "eq",
+                            "value": "PACIFIC"
+                        },
+                        "warehouse": {
+                            "operator": "eq",
+                            "value": "1"
+                        },
+                        "active": {
+                            "operator": "eq",
+                            "value": "1"
+                        }                    
+                    }
                 }
             );
     
         if (locations_result.success && locations_result.data) {
             const $location = $('#location');
             locations_result.data.forEach(loc => {
-                $location.append(`<option value="${loc.location}">${loc.location_name}</option>`);
+                $location.append(`<option value="${loc.location}">${loc.location}  -  ${loc.location_name}</option>`);
             });
             $location.val(this.location); // Set default
             /*$location.selectpicker({
@@ -507,17 +620,18 @@ class PurchaseOrderBuilder {
         $('#billing_country').val(vendor.country || 'USA');
 
         // Update terms if vendor has specific terms
-        if (vendor.terms) {
-            $('#terms').val(vendor.terms);
-            this.po_data.header.terms = vendor.terms;
+        if (vendor.terms_num) {
+            $('#terms').val(vendor.terms_num);
+            this.po_data.header.terms = vendor.terms_num;
         }
+        this.po_data.vendor=vendor
         this.display_vendor_comments();
     }
 
 
     display_vendor_comments() {
-        const comments1 = this.po_data.header.vendor_comments1;
-        const comments2 = this.po_data.header.vendor_comments2;
+        const comments1 = this.po_data.vendor.comments1;
+        const comments2 = this.po_data.vendor.comments2;
         
         if (comments1 || comments2) {
             let content = '';
@@ -547,32 +661,61 @@ class PurchaseOrderBuilder {
             
             $input.autocomplete({
                 source: async (request, response) => {
-                    const result = await window.purchaseOrderBuilder.api_call('list', window.purchaseOrderBuilder.models.parts, {
-                        search: request.term
-                    });
+                    const result = await window.purchaseOrderBuilder.api_call('list', window.purchaseOrderBuilder.models.parts,
+                        {
+                            return_columns: ["part", "inventory_description"],
+                            order:[{'column':0,'dir':'asc'}],
+                            columns:[{'name':'part'},{'name':'inventory_description'}],
+                            "filters": {
+                                "part": {
+                                    "operator": "ilike",
+                                    "value": request.term
+                                }
+                            }
+                        }
+                    );
                     
                     if (result.success && result.data) {
                         response(result.data.slice(0, 20).map(part => ({
-                            label: `${part.code} - ${part.description}`,
-                            value: part.code,
+                            label: `${part.part} - ${part.inventory_description}`,
+                            value: part.part,
                             part: part
                         })));
                     } else {
                         response([]);
                     }
                 },
-                select: (event, ui) => {
+                select: async (event, ui) => {
                     const index = $(event.target).data('index');
                     const part = ui.item.part;
                     
                     // Update line with part info
-                    window.purchaseOrderBuilder.update_line(index, 'part', part.code);
-                    window.purchaseOrderBuilder.update_line(index, 'description', part.description);
-                    window.purchaseOrderBuilder.update_line(index, 'price', part.price || 0);
+                    window.purchaseOrderBuilder.update_line(index, 'part', part.part);
+                    window.purchaseOrderBuilder.update_line(index, 'description', part.inventory_description);
                     
                     // Update display
-                    $(`.po-line[data-index="${index}"] input[data-field="description"]`).val(part.description);
-                    $(`.po-line[data-index="${index}"] input[data-field="price"]`).val(part.price || 0);
+                    $(`.po-line[data-index="${index}"] input[data-field="description"]`).val(part.inventory_description);
+                    
+                    // Fetch the cost for this part
+                    const cost_result = await window.purchaseOrderBuilder.api_call('list', window.purchaseOrderBuilder.models.icmstr, {
+                        return_columns: ["code", "lstc"],
+                        order:[{'column':0,'dir':'asc'}],
+                        columns:[{'name':'code'},{'name':'lstc'}],
+                        start: 0,
+                        length:1,
+                        "filters": {
+                            "code": {
+                                "operator": "eq",
+                                "value": part.part
+                            }
+                        }
+                    });
+                    
+                    if (cost_result.success && cost_result.data && cost_result.data.length > 0) {
+                        const cost = cost_result.data[0].lstc || 0;
+                        window.purchaseOrderBuilder.update_line(index, 'price', cost);
+                        $(`.po-line[data-index="${index}"] input[data-field="price"]`).val(cost);
+                    }
                     
                     // Recalculate
                     window.purchaseOrderBuilder.calculate_totals();
@@ -585,7 +728,7 @@ class PurchaseOrderBuilder {
     }
 
     async load_existing_po() {
-        const result = await this.api_call('get', this.models.purchase_order, {
+        const result = await this.api_call('get', window.purchaseOrderBuilder.models.purchase_order, {
             po_number: this.po_number
         });
 
@@ -606,6 +749,15 @@ class PurchaseOrderBuilder {
         }
     }
 
+    update_printed_badge() {
+        const is_printed = this.po_data.header.printed === true || this.po_data.header.printed === 'Y';
+        if (is_printed) {
+            $('#printed_badge').show();
+        } else {
+            $('#printed_badge').hide();
+        }
+    }
+
     async save_po() {
         if (!this.validate_po()) return;
 
@@ -615,13 +767,20 @@ class PurchaseOrderBuilder {
         this.update_header_from_form();
 
         const save_data = {
-            po_number: this.po_number,
             header: this.po_data.header,
             lines: this.po_data.lines,
             deleted_line_ids: this.deleted_line_ids
         };
 
-        const result = await this.api_call('update', this.models.purchase_order, {
+        // Only add po_number if in edit mode
+        if (this.is_edit_mode) {
+            save_data.po_number = this.po_number;
+        }
+
+        // Determine operation based on mode
+        const operation = this.is_edit_mode ? 'update' : 'create';
+
+        const result = await this.api_call(operation, window.purchaseOrderBuilder.models.purchase_order, {
             data: save_data
         });
 
@@ -634,6 +793,9 @@ class PurchaseOrderBuilder {
                 this.is_edit_mode = true;
                 window.history.replaceState({}, '', `/purchase_orders/edit/${this.po_number}`);
                 $('#po_number_display').text('#' + this.po_number);
+                
+                // Show receive button immediately
+                $('#receive_po_btn').show();
             }
 
             // Clear deleted lines tracker
@@ -650,7 +812,6 @@ class PurchaseOrderBuilder {
         
         this.show_loading(false);
     }
-
     async process_receive() {
         const receive_lines = [];
 
@@ -667,7 +828,7 @@ class PurchaseOrderBuilder {
 
         this.show_loading(true);
 
-        const result = await this.api_call('update', this.models.purchase_order, {
+        const result = await this.api_call('update', window.purchaseOrderBuilder.models.purchase_order, {
             po_number: this.po_number,
             action: 'receive_lines',
             line_indices: receive_lines
@@ -699,6 +860,7 @@ class PurchaseOrderBuilder {
             expected_receipt_date: today,
             location: this.location,
             entered_by: '',
+            orderd_by_customer: '',
             terms: '',
             ship_via: 'UPS',
             freight: 0.0,
@@ -770,8 +932,7 @@ class PurchaseOrderBuilder {
             tax_amount: parseFloat(header.taxamt || header.tax_amount || 0),
             total: parseFloat(header.total || 0),
             printed: header.prtd === 'Y' || header.printed || false,
-            vendor_comments1: header.vendor_comments1 || header.comments1 || '',
-            vendor_comments2: header.vendor_comments2 || header.comments2 || '',            
+            orderd_by_customer: header.obycus || '',
             billing: {
                 name: header.vndnme || header.vendor_name || '',
                 address1: header.vnda1 || '',
@@ -840,9 +1001,10 @@ class PurchaseOrderBuilder {
         $('#shipping_zip').val(header.shipping.zip);
         $('#shipping_country').val(header.shipping.country);
         
-        // Update totals display
-        this.update_totals_display();
         this.display_vendor_comments();
+        this.update_printed_badge();
+        this.calculate_totals();
+        this.update_totals_display();
 
     }
 
@@ -876,7 +1038,6 @@ class PurchaseOrderBuilder {
         if (is_note_line) {
             // Simple note line - just type and message
             const message = line.msg || line.message || '';
-            const type_char = line.type || 'N';
             
             return `
                 <div class="po-line card mb-2 ${is_readonly ? 'readonly-line' : ''}" data-index="${index}">
@@ -887,13 +1048,7 @@ class PurchaseOrderBuilder {
                                 ${is_received ? '<span class="received-badge">RECEIVED</span>' : ''}
                             </div>
                             <div class="col-auto">
-                                <input type="text" class="form-control form-control-sm" 
-                                       data-field="type" data-index="${index}"
-                                       value="${type_char}"
-                                       maxlength="1"
-                                       style="width: 50px;"
-                                       placeholder="Type"
-                                       ${is_readonly ? 'readonly' : ''}>
+                                <span class="badge bg-info">NOTE</span>
                             </div>
                             <div class="col">
                                 <input type="text" class="form-control form-control-sm" 
@@ -941,47 +1096,50 @@ class PurchaseOrderBuilder {
                         
                         <div class="row g-2">
                             <div class="col-md-2">
+                                <label class="form-label small mb-1">Part #</label>
                                 <input type="text" class="form-control form-control-sm part-search" 
                                        data-field="part" data-index="${index}"
                                        value="${part_code}" 
-                                       placeholder="Part #"
+                                       placeholder="Search..."
                                        ${is_readonly ? 'readonly' : ''}>
                             </div>
                             <div class="col-md-4">
+                                <label class="form-label small mb-1">Description</label>
                                 <input type="text" class="form-control form-control-sm" 
                                        data-field="description" data-index="${index}"
                                        value="${description}"
-                                       placeholder="Description"
+                                       placeholder="Part description"
                                        ${is_readonly ? 'readonly' : ''}>
                             </div>
                             <div class="col-md-1">
+                                <label class="form-label small mb-1">Qty</label>
                                 <input type="number" class="form-control form-control-sm" 
                                        data-field="quantity" data-index="${index}"
                                        value="${quantity}" min="0" step="1"
-                                       placeholder="Qty"
                                        ${is_readonly ? 'readonly' : ''}>
                             </div>
                             <div class="col-md-1">
+                                <label class="form-label small mb-1">Price</label>
                                 <input type="number" class="form-control form-control-sm" 
                                        data-field="price" data-index="${index}"
                                        value="${price}" min="0" step="0.01"
-                                       placeholder="Price"
                                        ${is_readonly ? 'readonly' : ''}>
                             </div>
                             <div class="col-md-1">
+                                <label class="form-label small mb-1">Disc</label>
                                 <input type="number" class="form-control form-control-sm" 
                                        data-field="discount" data-index="${index}"
-                                       value="${discount}" min="0" max="100" step="0.01"
-                                       placeholder="Disc%"
+                                       value="${discount}" min="0"
                                        ${is_readonly ? 'readonly' : ''}>
                             </div>
                             <div class="col-md-1">
+                                <label class="form-label small mb-1">Extended</label>
                                 <input type="text" class="form-control form-control-sm" 
                                        value="$${extended.toFixed(2)}" 
-                                       placeholder="Extended"
                                        readonly>
                             </div>
                             <div class="col-md-2">
+                                <label class="form-label small mb-1">Expected Date</label>
                                 <input type="date" class="form-control form-control-sm" 
                                        data-field="erd" data-index="${index}"
                                        value="${erd}"
@@ -993,7 +1151,6 @@ class PurchaseOrderBuilder {
             `;
         }
     }
-
     add_line() {
         const new_line = {
             _source: 'active',
@@ -1112,7 +1269,7 @@ class PurchaseOrderBuilder {
                 const price = parseFloat(line.price || line.pprce || 0);
                 const discount = parseFloat(line.discount || line.pdisc || 0);
                 
-                const extended = qty * price * (1 - discount / 100);
+                const extended = qty * (price - discount);
                 line.extended = extended;
                 line.pext = extended;
                 
@@ -1482,16 +1639,15 @@ apply_pre_population() {
                     _source: 'active',
                     part: item.part,
                     pcode: item.part,
-                    description: '',
-                    pdesc: '',
+                    description: item.description,
+                    pdesc: item.description,
                     quantity: item.qty || 1,
                     pqty: item.qty || 1,
-                    price: 0,
-                    pprce: 0,
+                    pprce: item.price,
                     discount: 0,
                     pdisc: 0,
-                    extended: 0,
-                    pext: 0,
+                    extended: item.price*item.qty,
+                    pext: item.price*item.qty,
                     received_qty: 0,
                     rqty: 0,
                     erd: this.po_data.header.expected_receipt_date || new Date().toISOString().split('T')[0],

@@ -10,7 +10,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 # Add app path
-sys.path.append('/web/temuragi')
+sys.path.append('/web/ahoy2.radiatorusa.com')
 from app.base.cli_v1 import BaseCLI
 
 try:

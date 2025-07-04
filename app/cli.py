@@ -420,7 +420,7 @@ class TMasterCLI(BaseCLI):
                 pass
         
         # Get current URL from config
-        current_url = current_config.get('base_url', 'https://temuragi.watkinslabs.com')
+        current_url = current_config.get('base_url', 'https://ahoy2.perfrad.com')
         
         # Prompt for new URL
         url = input(f"API Base URL [{current_url}]: ").strip() or current_url

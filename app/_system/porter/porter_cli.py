@@ -8,7 +8,7 @@ import argparse
 import sys
 from pathlib import Path
 
-sys.path.append('/web/temuragi')
+sys.path.append('/web/ahoy2.radiatorusa.com')
 
 from app.base.cli_v1 import BaseCLI
 from .exporter import ComponentExporter

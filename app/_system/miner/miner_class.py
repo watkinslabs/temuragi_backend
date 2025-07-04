@@ -103,20 +103,6 @@ class Miner:
             method_name = method_map.get(operation)
             if None == method_name :
                 self.logger.error(f"{operation}: not supported")
-            # Direct debugging
-            self.logger.debug(f"Testing method access for '{method_name}':")
-            self.logger.debug(f"  method_name type: {type(method_name)}")
-            self.logger.debug(f"  method_name repr: {repr(method_name)}")
-
-            # Test different ways of checking
-            try:
-                # Direct getattr
-                method = getattr(handler, method_name, None)
-                self.logger.debug(f"  getattr returned: {method}")
-                self.logger.debug(f"  method is None: {method is None}")
-                self.logger.debug(f"  method is callable: {callable(method) if method else False}")
-            except Exception as e:
-                self.logger.debug(f"  getattr raised: {type(e).__name__}: {e}")
 
             # Check hasattr explicitly
             has_attr_result = hasattr(handler, method_name)
@@ -130,6 +116,7 @@ class Miner:
                     handler_class=handler_class.__name__,
                     operation=operation
                 )
+
             # Call the handler method
             method = getattr(handler, method_name)
             result = method(data)
@@ -304,9 +291,6 @@ class Miner:
 
             # Calculate response time
             response_time_ms = int((time.time() - start_time) * 1000)
-
-            # Log successful operation
-            self.logger.info(f"API {operation} {model_name} - User: {audit_data.get('user_id')} - Time: {response_time_ms}ms")
 
             return result
 

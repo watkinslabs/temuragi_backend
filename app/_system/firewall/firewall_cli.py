@@ -8,7 +8,8 @@ import argparse
 import sys
 
 # Add your app path to import the model and config
-sys.path.append('/web/temuragi')
+sys.path.append('/web/ahoy2.radiatorusa.com')
+
 from app.base.cli_v1 import  BaseCLI
 
 CLI_DESCRIPTION = "Manages firewall rules and policies"

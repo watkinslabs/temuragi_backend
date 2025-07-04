@@ -11,8 +11,8 @@ import getpass
 from datetime import datetime, timedelta
 from tabulate import tabulate
 
-# Add your app path to import the model and config
-sys.path.append('/web/temuragi')
+## Add your app path to import the model and config
+sys.path.append('/web/ahoy2.radiatorusa.com')
 from app.base.cli_v1 import BaseCLI
 
 CLI_DESCRIPTION = "Manages user accounts and authentication"

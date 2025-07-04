@@ -396,9 +396,7 @@ class Template(BaseModel):
         
         template = query.first()
         
-        if template:
-            logger.debug(f"Found template: '{name}' ({template.id})")
-        else:
+        if not template:
             logger.warning(f"Template not found: '{name}' in module {module_id}")
         
         return template
@@ -408,7 +406,6 @@ class Template(BaseModel):
         """Get the default template for a module or system"""
         db_session=db_registry._routing_session()
         logger = cls._get_logger()
-        logger.debug(f"Getting default template: module={module_id}, admin_only={admin_only}")
         
         query = db_session.query(cls).filter_by(
             module_id=module_id,
@@ -420,9 +417,7 @@ class Template(BaseModel):
         
         template = query.first()
         
-        if template:
-            logger.debug(f"Found default template: '{template.name}'")
-        else:
+        if not template:
             scope = "admin " if admin_only else ""
             context = f"module {module_id}" if module_id else "system"
             logger.warning(f"No default {scope}template found for {context}")
@@ -433,9 +428,7 @@ class Template(BaseModel):
     def get_templates_by_type(cls,  layout_type=None, is_admin=None, module_id=None):
         """Get templates filtered by type and other criteria"""
         db_session=db_registry._routing_session()
-        logger = cls._get_logger()
-        logger.debug(f"Getting templates: layout={layout_type}, admin={is_admin}, module={module_id}")
-        
+
         query = db_session.query(cls)
         
         if layout_type:
@@ -448,15 +441,11 @@ class Template(BaseModel):
             query = query.filter_by(module_id=module_id)
         
         templates = query.order_by(cls.name).all()
-        
-        logger.info(f"Found {len(templates)} templates matching criteria")
         return templates
 
     def get_render_context(self):
         """Get template context for rendering"""
         db_session=db_registry._routing_session()
-        logger = self._get_logger()
-        logger.debug(f"Getting render context for template '{self.name}'")
         
         context = {
             'template_name': self.name,
@@ -470,7 +459,6 @@ class Template(BaseModel):
             'is_admin_template': self.is_admin_template
         }
         
-        logger.debug(f"Template '{self.name}' render context prepared")
         return context
 
     def __repr__(self):

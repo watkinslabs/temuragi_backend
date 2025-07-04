@@ -6,7 +6,8 @@ Class CLI - Manage and inspect class dependencies
 import sys
 import argparse
 from collections import defaultdict, deque
-sys.path.append('/web/temuragi')
+
+sys.path.append('/web/ahoy2.radiatorusa.com')
 from app.base.cli_v1 import BaseCLI
 
 

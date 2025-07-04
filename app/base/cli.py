@@ -90,7 +90,7 @@ class RemoteBackend(Backend):
     
     def __init__(self, config: Dict[str, Any], logger=None):
         super().__init__(config, logger)
-        self.base_url = config.get('base_url', 'https://temuragi.watkinslabs.com').rstrip('/')
+        self.base_url = config.get('base_url', 'https://ahoy2.perfrad.com').rstrip('/')
         self.api_token = None
         self.refresh_token = None
         self.user_id = None
@@ -122,7 +122,7 @@ class RemoteBackend(Backend):
         """Initialize remote backend"""
         try:
             # Check if we have a base URL
-            if not self.base_url or self.base_url == 'https://temuragi.watkinslabs.com':
+            if not self.base_url or self.base_url == 'https://ahoy2.perfrad.com':
                 # Default URL is fine, just check if it's accessible
                 pass
             

@@ -8,7 +8,8 @@ import argparse
 import json
 import uuid
 from jinja2 import Environment
-sys.path.append('/web/temuragi')
+
+sys.path.append('/web/ahoy2.radiatorusa.com')
 from app.base.cli_v1 import BaseCLI
 
 
