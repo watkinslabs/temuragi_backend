@@ -28,7 +28,8 @@ class PurchaseOrderBuilder {
             ship_methods: 'BKSYSSHIP',
             locations: 'JADVDATA_dbo_locations',
             terms: 'GPACIFIC_dbo_BKSYTERM',
-            icmstr: 'GPACIFIC_dbo_BKICMSTR'
+            icmstr: 'GPACIFIC_dbo_BKICMSTR',
+            virtual_inventory: 'JADVDATA_dbo_virtual_inventory'
         };
 
         // State
@@ -717,6 +718,9 @@ class PurchaseOrderBuilder {
                         $(`.po-line[data-index="${index}"] input[data-field="price"]`).val(cost);
                     }
                     
+                    // Fetch virtual inventory for this part
+                    window.purchaseOrderBuilder.fetch_virtual_inventory(part.part, index);
+                    
                     // Recalculate
                     window.purchaseOrderBuilder.calculate_totals();
                     
@@ -1045,7 +1049,7 @@ class PurchaseOrderBuilder {
                         <div class="row align-items-center">
                             <div class="col-auto">
                                 <span class="line-number">Line ${line_number}</span>
-                                ${is_received ? '<span class="received-badge">RECEIVED</span>' : ''}
+                                ${is_received ? '<span class="badge bg-success ms-2">RECEIVED</span>' : ''}
                             </div>
                             <div class="col-auto">
                                 <span class="badge bg-info">NOTE</span>
@@ -1060,7 +1064,7 @@ class PurchaseOrderBuilder {
                             </div>
                             ${!is_readonly ? `
                                 <div class="col-auto">
-                                    <button class="btn btn-sm btn-outline-danger remove-line-btn" data-index="${index}">
+                                    <button class="btn btn-sm btn-danger remove-line-btn" data-index="${index}">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -1085,10 +1089,10 @@ class PurchaseOrderBuilder {
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <div>
                                 <span class="line-number">Line ${line_number}</span>
-                                ${is_received ? '<span class="received-badge">RECEIVED</span>' : ''}
+                                ${is_received ? '<span class="badge bg-success ms-2">RECEIVED</span>' : ''}
                             </div>
                             ${!is_readonly ? `
-                                <button class="btn btn-sm btn-outline-danger remove-line-btn" data-index="${index}">
+                                <button class="btn btn-sm btn-danger remove-line-btn" data-index="${index}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             ` : ''}
@@ -1146,11 +1150,32 @@ class PurchaseOrderBuilder {
                                        ${is_readonly ? 'readonly' : ''}>
                             </div>
                         </div>
+                        
+                        <!-- Virtual Inventory Section -->
+                        <div class="virtual-inventory-section mt-3" id="virtual_inventory_${index}" style="display: none;">
+                            <div class="card border-secondary">
+                                <div class="card-header py-2">
+                                    <h6 class="mb-0 small">Integrated vendor inventory avability</h6>
+                                </div>
+                                <div class="card-body p-2">
+                                    <div class="virtual-inventory-loading text-center py-2" style="display: none;">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <span class="ms-2 small text-muted">Loading inventory...</span>
+                                    </div>
+                                    <div class="virtual-inventory-content">
+                                        <!-- Inventory items will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
         }
     }
+
     add_line() {
         const new_line = {
             _source: 'active',
@@ -1591,105 +1616,318 @@ class PurchaseOrderBuilder {
 
     // Add after show_info() method:
 
-apply_pre_population() {
-    const data = this.pre_populate_data;
-    
-    // Apply location if provided
-    if (data.location) {
-        $('#location').val(data.location);
-        this.po_data.header.location = data.location;
-    }
-    
-    // Apply ship_via if provided
-    if (data.ship_via) {
-        $('#ship_via').val(data.ship_via);
-        this.po_data.header.ship_via = data.ship_via;
-    }
-    
-    // Apply shipping address if provided
-    if (data.shipping_address) {
-        const addr = data.shipping_address;
-        $('#shipping_name').val(addr.name || '');
-        $('#shipping_attention').val(addr.attention || '');
-        $('#shipping_address1').val(addr.address1 || '');
-        $('#shipping_address2').val(addr.address2 || '');
-        $('#shipping_city').val(addr.city || '');
-        $('#shipping_state').val(addr.state || '');
-        $('#shipping_zip').val(addr.zip || '');
-        $('#shipping_country').val(addr.country || 'USA');
+   async  apply_pre_population() {
+        const data = this.pre_populate_data;
         
-        // Update header
-        this.po_data.header.shipping = {
-            name: addr.name || '',
-            attention: addr.attention || '',
-            address1: addr.address1 || '',
-            address2: addr.address2 || '',
-            city: addr.city || '',
-            state: addr.state || '',
-            zip: addr.zip || '',
-            country: addr.country || 'USA'
-        };
-    }
-    
-    // Add initial items if provided
-    if (data.initial_items && data.initial_items.length > 0) {
-        data.initial_items.forEach(item => {
-            if (item.type === 'part' && item.part) {
-                const new_line = {
-                    _source: 'active',
-                    part: item.part,
-                    pcode: item.part,
-                    description: item.description,
-                    pdesc: item.description,
-                    quantity: item.qty || 1,
-                    pqty: item.qty || 1,
-                    pprce: item.price,
-                    discount: 0,
-                    pdisc: 0,
-                    extended: item.price*item.qty,
-                    pext: item.price*item.qty,
-                    received_qty: 0,
-                    rqty: 0,
-                    erd: this.po_data.header.expected_receipt_date || new Date().toISOString().split('T')[0],
-                    type: 'R',
-                    taxable: false,
-                    message: '',
-                    msg: ''
-                };
-                this.po_data.lines.push(new_line);
-                
-            } else if (item.type === 'note' && item.message) {
-                const new_note = {
-                    _source: 'active',
-                    type: 'N',
-                    part: '',
-                    pcode: '',
-                    description: '',
-                    pdesc: '',
-                    quantity: 0,
-                    pqty: 0,
-                    price: 0,
-                    pprce: 0,
-                    discount: 0,
-                    pdisc: 0,
-                    extended: 0,
-                    pext: 0,
-                    received_qty: 0,
-                    rqty: 0,
-                    erd: this.po_data.header.expected_receipt_date || new Date().toISOString().split('T')[0],
-                    taxable: false,
-                    message: item.message,
-                    msg: item.message
-                };
-                this.po_data.lines.push(new_note);
+        // Apply location if provided
+        if (data.location) {
+            $('#location').val(data.location);
+            this.po_data.header.location = data.location;
+        }
+        
+        // Apply ship_via if provided
+        if (data.ship_via) {
+            $('#ship_via').val(data.ship_via);
+            this.po_data.header.ship_via = data.ship_via;
+        }
+        
+        // Apply shipping address if provided
+        if (data.shipping_address) {
+            const addr = data.shipping_address;
+            $('#shipping_name').val(addr.name || '');
+            $('#shipping_attention').val(addr.attention || '');
+            $('#shipping_address1').val(addr.address1 || '');
+            $('#shipping_address2').val(addr.address2 || '');
+            $('#shipping_city').val(addr.city || '');
+            $('#shipping_state').val(addr.state || '');
+            $('#shipping_zip').val(addr.zip || '');
+            $('#shipping_country').val(addr.country || 'USA');
+            
+            // Update header
+            this.po_data.header.shipping = {
+                name: addr.name || '',
+                attention: addr.attention || '',
+                address1: addr.address1 || '',
+                address2: addr.address2 || '',
+                city: addr.city || '',
+                state: addr.state || '',
+                zip: addr.zip || '',
+                country: addr.country || 'USA'
+            };
+        }
+        
+        // Add initial items if provided
+        if (data.initial_items && data.initial_items.length > 0) {
+            const parts_to_fetch_inventory = [];
+
+            data.initial_items.forEach(item => {
+                if (item.type === 'part' && item.part) {
+                    const new_line = {
+                        _source: 'active',
+                        part: item.part,
+                        pcode: item.part,
+                        description: item.description,
+                        pdesc: item.description,
+                        quantity: item.qty || 1,
+                        pqty: item.qty || 1,
+                        pprce: item.price,
+                        discount: 0,
+                        pdisc: 0,
+                        extended: item.price*item.qty,
+                        pext: item.price*item.qty,
+                        received_qty: 0,
+                        rqty: 0,
+                        erd: this.po_data.header.expected_receipt_date || new Date().toISOString().split('T')[0],
+                        type: 'R',
+                        taxable: false,
+                        message: '',
+                        msg: ''
+                    };
+                    this.po_data.lines.push(new_line);
+
+                    parts_to_fetch_inventory.push({
+                        part: item.part,
+                        index: this.po_data.lines.length - 1
+                    });
+                    
+                } else if (item.type === 'note' && item.message) {
+                    const new_note = {
+                        _source: 'active',
+                        type: 'N',
+                        part: '',
+                        pcode: '',
+                        description: '',
+                        pdesc: '',
+                        quantity: 0,
+                        pqty: 0,
+                        price: 0,
+                        pprce: 0,
+                        discount: 0,
+                        pdisc: 0,
+                        extended: 0,
+                        pext: 0,
+                        received_qty: 0,
+                        rqty: 0,
+                        erd: this.po_data.header.expected_receipt_date || new Date().toISOString().split('T')[0],
+                        taxable: false,
+                        message: item.message,
+                        msg: item.message
+                    };
+                    this.po_data.lines.push(new_note);
+                }
+            });
+            
+            // Render the pre-populated lines
+            this.render_lines();
+            this.update_line_counts();
+
+            for (const item of parts_to_fetch_inventory) {
+                await this.fetch_virtual_inventory(item.part, item.index);
             }
-        });
         
-        // Render the pre-populated lines
-        this.render_lines();
-        this.update_line_counts();
+        }
     }
-}
+
+    async fetch_virtual_inventory(part, index) {
+        if (!part) return;
+        
+        const inventory_section = $(`#virtual_inventory_${index}`);
+        const loading_div = inventory_section.find('.virtual-inventory-loading');
+        const content_div = inventory_section.find('.virtual-inventory-content');
+        
+        // Show section and loading
+        inventory_section.show();
+        loading_div.show();
+        content_div.empty();
+        
+        try {
+            const result = await this.api_call('list', this.models.virtual_inventory, {
+                filters: {
+                    part: {
+                        operator: "eq",
+                        value: part
+                    }
+                },
+                start: 0,
+                length: 50
+            });
+            
+            if (result.success && result.data && result.data.length > 0) {
+                let inventory_html = `
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Company</th>
+                                    <th scope="col">Location</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col" style="width: 80px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                result.data.forEach((item, idx) => {
+                    const company_upper = (item.company || '').toUpperCase();
+                    inventory_html += `
+                        <tr>
+                            <td class="fw-bold">${company_upper}</td>
+                            <td>${item.loc || ''}</td>
+                            <td>${item.qty || 0}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary use-vendor-btn" 
+                                        data-vendor="${company_upper}" 
+                                        data-line-index="${index}">
+                                    Use
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                inventory_html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                content_div.html(inventory_html);
+            } else {
+                content_div.html('<div class="text-muted text-center py-2 small">No inventory found for this part</div>');
+            }
+        } catch (error) {
+            console.error('Error fetching virtual inventory:', error);
+            content_div.html('<div class="text-danger text-center py-2 small">Error loading inventory</div>');
+        } finally {
+            loading_div.hide();
+        }
+    }
+
+    async fetch_virtual_inventory(part, index) {
+        if (!part) return;
+        
+        const inventory_section = $(`#virtual_inventory_${index}`);
+        const loading_div = inventory_section.find('.virtual-inventory-loading');
+        const content_div = inventory_section.find('.virtual-inventory-content');
+        
+        // Show section and loading
+        inventory_section.show();
+        loading_div.show();
+        content_div.empty();
+        
+        try {
+            const result = await this.api_call('list', this.models.virtual_inventory, {
+                filters: {
+                    part: {
+                        operator: "eq",
+                        value: part
+                    }
+                },
+                start: 0,
+                length: 50
+            });
+            
+            if (result.success && result.data && result.data.length > 0) {
+                let inventory_html = `
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover table-striped mb-0">
+                            <thead >
+                                <tr>
+                                    <th scope="col">Company</th>
+                                    <th scope="col">Location</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col" style="width: 80px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                result.data.forEach((item, idx) => {
+                    const company_upper = (item.company || '').toUpperCase();
+                    inventory_html += `
+                        <tr>
+                            <td class="fw-bold">${company_upper}</td>
+                            <td>${item.loc || ''}</td>
+                            <td>${item.qty || 0}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary use-vendor-btn" 
+                                        data-vendor="${company_upper}" 
+                                        data-line-index="${index}">
+                                    Use
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                inventory_html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                content_div.html(inventory_html);
+                loading_div.hide();
+                // Keep section visible since we have data
+            } else {
+                // No inventory found - hide the entire section
+                inventory_section.hide();
+            }
+        } catch (error) {
+            console.error('Error fetching virtual inventory:', error);
+            // On error, also hide the section
+            inventory_section.hide();
+        }
+    }
+
+    async select_vendor_from_inventory(vendor_code, line_index) {
+        // First check if we have this vendor in our select dropdown (for static vendors)
+        const $vendor_select = $('#vendor_code');
+        if ($vendor_select.is('select')) {
+            const option_exists = $vendor_select.find(`option[value="${vendor_code}"]`).length > 0;
+            if (option_exists) {
+                $vendor_select.val(vendor_code).trigger('change');
+                return;
+            }
+        }
+        
+        // Otherwise, fetch the vendor details
+        this.show_loading(true);
+        
+        try {
+            const result = await this.api_call('list', this.models.vendors, {
+                filters: {
+                    code: {
+                        operator: "eq", 
+                        value: vendor_code
+                    }
+                },
+                start: 0,
+                length: 1
+            });
+            
+            if (result.success && result.data && result.data.length > 0) {
+                const vendor = result.data[0];
+                
+                // Update vendor field
+                if ($vendor_select.is('input')) {
+                    $vendor_select.val(`${vendor.code} - ${vendor.name}`);
+                }
+                
+                // Update vendor data
+                this.on_vendor_change(vendor);
+                
+                this.show_success(`Vendor changed to ${vendor_code}`);
+            } else {
+                this.show_error(`Vendor ${vendor_code} not found`);
+            }
+        } catch (error) {
+            console.error('Error fetching vendor:', error);
+            this.show_error('Error loading vendor details');
+        } finally {
+            this.show_loading(false);
+        }
+    }
 }
 
 // Event delegation for dynamic elements
@@ -1707,5 +1945,15 @@ $(document).on('click', '.remove-line-btn', function() {
     const index = $(this).data('index');
     if (window.purchaseOrderBuilder) {
         window.purchaseOrderBuilder.remove_line(index);
+    }
+});
+
+// Add this to the document ready event handlers at the bottom:
+$(document).on('click', '.use-vendor-btn', function() {
+    const vendor_code = $(this).data('vendor');
+    const line_index = $(this).data('line-index');
+    
+    if (window.purchaseOrderBuilder) {
+        window.purchaseOrderBuilder.select_vendor_from_inventory(vendor_code, line_index);
     }
 });

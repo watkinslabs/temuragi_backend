@@ -12,3 +12,4 @@ def data():
     miner=  current_app.extensions['Miner']
     
     return miner.data_endpoint()
+

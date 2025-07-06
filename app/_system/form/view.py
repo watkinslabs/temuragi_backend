@@ -28,16 +28,10 @@ def render_dynamic_list(slug):
     """
     try:
         slug="f/"+slug.lower()+"/list"
-        logger.info(f"Rendering page with slug: {slug}")
-        
-        print(f"Successfully rendered page: {slug}")
-        
         # Create template renderer
         renderer = TemplateRenderer()
         rendered_content = renderer.render_page(slug)
 
-        
-        logger.info(f"Successfully rendered page: {slug}")
         return rendered_content
         
     except Exception as e:
@@ -116,7 +110,7 @@ def render_dynamic_manage(slug):
     """
     try:
         slug="f/"+slug.lower()+"/manage"
-        logger.info(f"Rendering page with slug: {slug}")
+
         try:
             data = request.get_json()
         except:
@@ -132,8 +126,6 @@ def render_dynamic_manage(slug):
 
             rendered_content = renderer.render_page(slug)
 
-        
-        logger.info(f"Successfully rendered page: {slug}")
         return rendered_content
         
     except Exception as e:

@@ -210,19 +210,11 @@ class TemplateFragment(BaseModel):
     def get_active_version(cls, template_id, template_file_path):
         """Get the currently active version for a specific template and template_file_path"""
         db_session=db_registry._routing_session()
-        logger = cls._get_logger()
-        #logger.debug(f"Getting active version for template {template_id}, file {template_file_path}")
-        
         fragment = db_session.query(cls)\
                          .filter_by(template_id=template_id,
                                    template_file_path=template_file_path,
                                    is_active=True)\
                          .first()
-        
-        #if fragment:
-        #    logger.debug(f"Found active version {fragment.version_number} for {template_file_path}")
-        #else:
-        #    logger.warning(f"No active version found for template {template_id}, file {template_file_path}")
         
         return fragment
 
@@ -230,8 +222,6 @@ class TemplateFragment(BaseModel):
     def get_active_by_key(cls, template_id, fragment_key):
         """Get active fragment by template and fragment_key"""
         db_session=db_registry._routing_session()
-        logger = cls._get_logger()
-        #logger.debug(f"Getting active fragment by key: template {template_id}, fragment {fragment_key}")
         
         fragment = db_session.query(cls)\
                          .filter_by(template_id=template_id,
@@ -239,10 +229,6 @@ class TemplateFragment(BaseModel):
                                    is_active=True)\
                          .first()
         
-        #if fragment:
-        #    logger.debug(f"Found active fragment '{fragment_key}' version {fragment.version_number}")
-        #else:
-        #    logger.warning(f"No active fragment found for template {template_id}, key {fragment_key}")
         
         return fragment
 

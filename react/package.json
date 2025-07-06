@@ -1,0 +1,33 @@
+{
+  "name": "react-app",
+  "version": "1.0.0",
+  "description": "React SPA with dynamic components",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "build:components": "node scripts/build-components.js",
+    "upload:components": "node scripts/upload-components.js",
+    "build:upload": "npm run build:components && npm run upload:components",
+    "dev": "webpack --mode development --watch",
+    "clean": "rm -rf ../app/static/js/*"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/preset-react": "^7.18.0",
+    "babel-loader": "^9.1.0",
+    "css-loader": "^6.7.0",
+    "dotenv": "^16.0.0",
+    "glob": "^8.0.0",
+    "style-loader": "^3.3.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0",
+    "webpack-dev-server": "^4.11.0"
+  }
+}

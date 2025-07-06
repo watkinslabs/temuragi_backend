@@ -17,6 +17,7 @@ class User(BaseModel):
     __depends_on__ = ['Role'] 
     __tablename__ = 'users'
 
+
     landing_page = Column(String( 200), unique=False, nullable=False)
     username = Column(String(100), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)

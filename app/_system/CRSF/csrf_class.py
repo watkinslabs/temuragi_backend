@@ -32,6 +32,20 @@ class CSRFProtection:
         if request.method not in ['POST', 'PUT', 'PATCH', 'DELETE']:
             return
         
+        # Exempt localhost requests
+        if request.remote_addr in ['127.0.0.1', 'localhost', '::1']:
+            current_app.logger.debug(f"CSRF check skipped for localhost request from {request.remote_addr}")
+            return
+        
+        # Also check for forwarded IPs if behind a proxy
+        forwarded_for = request.headers.get('X-Forwarded-For')
+        if forwarded_for:
+            # Get the first IP in the chain (original client)
+            client_ip = forwarded_for.split(',')[0].strip()
+            if client_ip in ['127.0.0.1', 'localhost', '::1']:
+                current_app.logger.debug(f"CSRF check skipped for localhost request from {client_ip} (via X-Forwarded-For)")
+                return
+        
         # Check if endpoint is exempt
         if request.endpoint in self.exempt_endpoints:
             return

@@ -129,7 +129,6 @@ class Page(BaseModel):
             logger.debug(f"Page '{self.slug}' expired (expire date: {self.expire_date})")
             return False
         
-        logger.debug(f"Page '{self.slug}' is visible")
         return True
 
     def increment_view_count(self):
@@ -142,7 +141,6 @@ class Page(BaseModel):
             db_session=db_registry._routing_session()
 
             db_session.commit()
-            logger.debug(f"Page '{self.slug}' view count incremented: {old_count} -> {self.view_count}")
         except Exception as e:
             logger.error(f"Failed to increment view count for page '{self.slug}': {e}")
             db_session.rollback()
@@ -223,8 +221,6 @@ class Page(BaseModel):
         old_expire = self.expire_date
         self.expire_date = expire_date
         
-        logger.info(f"Page '{self.slug}' expiration updated: {old_expire} -> {expire_date}")
-
         db_session=db_registry._routing_session()
         
         try:

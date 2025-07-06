@@ -201,9 +201,7 @@ class PageFragment(BaseModel):
     @classmethod
     def get_fragments_by_type(cls, page_id, fragment_type, include_hidden=False):
         """Get all active fragments of a specific type, ordered by sort_order"""
-        logger = cls._get_logger()
-        logger.debug(f"Getting fragments by type '{fragment_type}' for page {page_id}, include_hidden={include_hidden}")
-        
+
         db_session=db_registry._routing_session()
         fragments = db_session.query(cls)\
                           .filter_by(page_id=page_id,
@@ -214,18 +212,13 @@ class PageFragment(BaseModel):
         
         if not include_hidden:
             visible_fragments = [f for f in fragments if f.is_visible()]
-            logger.debug(f"Found {len(visible_fragments)} visible fragments of type '{fragment_type}' (total: {len(fragments)})")
             return visible_fragments
         
-        logger.debug(f"Found {len(fragments)} fragments of type '{fragment_type}'")
         return fragments
 
     @classmethod
     def get_all_active_for_page(cls, page_id, include_hidden=False):
         """Get all active content pieces for a page (all active fragment_keys)"""
-        logger = cls._get_logger()
-        logger.debug(f"Getting all active fragments for page {page_id}, include_hidden={include_hidden}")
-
         db_session=db_registry._routing_session()
         
         fragments = db_session.query(cls)\
@@ -235,10 +228,8 @@ class PageFragment(BaseModel):
         
         if not include_hidden:
             visible_fragments = [f for f in fragments if f.is_visible()]
-            logger.info(f"Retrieved {len(visible_fragments)} visible fragments for page {page_id} (total: {len(fragments)})")
             return visible_fragments
-        
-        logger.info(f"Retrieved {len(fragments)} fragments for page {page_id}")
+
         return fragments
 
     @classmethod
@@ -260,13 +251,11 @@ class PageFragment(BaseModel):
                                         fragment_key=fragment.fragment_key)\
                               .update({'is_active': False})
         
-        logger.debug(f"Deactivated {updated_count} versions of fragment {fragment.fragment_key}")
 
         # Activate this version
         fragment.is_active = True
         db_session.commit()
         
-        logger.info(f"Activated version {fragment.version_number} of fragment {fragment.fragment_key}")
         return fragment
 
     @classmethod
@@ -274,7 +263,6 @@ class PageFragment(BaseModel):
                                                   fragment_key, version_number):
         """Set active version by page, fragment_key, and version number"""
         logger = cls._get_logger()
-        logger.info(f"Setting active version: page {page_id}, fragment {fragment_key}, version {version_number}")
 
         db_session=db_registry._routing_session()
 

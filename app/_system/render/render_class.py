@@ -856,10 +856,10 @@ class TemplateRenderer:
                 ).first()
             
             if not theme:
-                theme =self.db_session.query(Theme).filter_by(is_default=True).first()
+                theme = self.db_session.query(Theme).filter_by(is_default=True).first()
                 
             if not theme:
-                theme =self.db_session.query(Theme).first()
+                theme = self.db_session.query(Theme).first()
                 
             if not theme:
                 return "/* No theme found */"
@@ -883,6 +883,25 @@ class TemplateRenderer:
                 f"--theme-content-area: {theme.content_area_color};",
                 f"--theme-sidebar: {theme.sidebar_color};",
                 f"--theme-component: {theme.component_color};"
+            ])
+            
+            # Bootstrap variable mappings
+            css_vars.extend([
+                "/* Bootstrap Integration */",
+                "--bs-primary: var(--theme-primary);",
+                "--bs-secondary: var(--theme-secondary);",
+                "--bs-success: var(--theme-success);",
+                "--bs-warning: var(--theme-warning);",
+                "--bs-danger: var(--theme-danger);",
+                "--bs-info: var(--theme-info);",
+                "--bs-body-bg: var(--theme-content-area);",
+                "--bs-body-color: var(--theme-text);",
+                "--bs-border-color: var(--theme-border-color);",
+                "--bs-card-bg: var(--theme-component);",
+                "--bs-card-border-color: var(--theme-border-color);",
+                "--bs-secondary-bg: var(--theme-surface);",
+                "--bs-tertiary-bg: var(--theme-surface);",
+                "--bs-emphasis-color: var(--theme-text);"
             ])
             
             # Dark mode color variables
@@ -1013,6 +1032,68 @@ class TemplateRenderer:
                 "}"
             ])
             
+            # Bootstrap component overrides
+            css_output.extend([
+                "",
+                "/* Bootstrap Component Integration */",
+                ".form-control, .form-select {",
+                "  background-color: var(--theme-surface);",
+                "  border-color: var(--theme-border-color);",
+                "  color: var(--theme-text);",
+                "}",
+                "",
+                ".form-control:focus, .form-select:focus {",
+                "  background-color: var(--theme-surface);",
+                "  border-color: var(--theme-primary);",
+                "  color: var(--theme-text);",
+                "}",
+                "",
+                ".card {",
+                "  background-color: var(--theme-component);",
+                "  border-color: var(--theme-border-color);",
+                "  color: var(--theme-text);",
+                "}",
+                "",
+                ".card-header {",
+                "  background-color: rgba(0, 0, 0, 0.05);",
+                "  border-bottom-color: var(--theme-border-color);",
+                "}",
+                "",
+                ".table {",
+                "  --bs-table-bg: transparent;",
+                "  color: var(--theme-text);",
+                "}",
+                "",
+                ".table > :not(caption) > * > * {",
+                "  background-color: var(--bs-table-bg);",
+                "  border-bottom-color: var(--theme-border-color);",
+                "}",
+                "",
+                ".modal-content {",
+                "  background-color: var(--theme-component);",
+                "  border-color: var(--theme-border-color);",
+                "  color: var(--theme-text);",
+                "}",
+                "",
+                ".modal-header, .modal-footer {",
+                "  border-color: var(--theme-border-color);",
+                "}",
+                "",
+                ".dropdown-menu {",
+                "  background-color: var(--theme-surface);",
+                "  border-color: var(--theme-border-color);",
+                "}",
+                "",
+                ".dropdown-item {",
+                "  color: var(--theme-text);",
+                "}",
+                "",
+                ".dropdown-item:hover, .dropdown-item:focus {",
+                "  background-color: rgba(0, 0, 0, 0.05);",
+                "  color: var(--theme-text);",
+                "}"
+            ])
+            
             # Logo handling for dark/light themes
             css_output.extend([
                 "",
@@ -1037,15 +1118,6 @@ class TemplateRenderer:
                 "}",
                 "",
                 "[data-bs-theme='dark'] .logo_dark {",
-                "  display: block;",
-                "}",
-                "",
-                "/* Legacy data-theme attribute support */",
-                "[data-theme='dark'] .logo_light {",
-                "  display: none;",
-                "}",
-                "",
-                "[data-theme='dark'] .logo_dark {",
                 "  display: block;",
                 "}"
             ])
@@ -1086,6 +1158,81 @@ class TemplateRenderer:
             
             # Dark mode support
             if theme.supports_dark_mode:
+                # Dark mode Bootstrap integration
+                dark_mode_css = [
+                    "",
+                    "/* Dark mode Bootstrap variable mappings */",
+                    "[data-theme='dark'], [data-bs-theme='dark'] {",
+                    "  --bs-primary: var(--theme-primary-dark);",
+                    "  --bs-secondary: var(--theme-secondary-dark);",
+                    "  --bs-success: var(--theme-success-dark);",
+                    "  --bs-warning: var(--theme-warning-dark);",
+                    "  --bs-danger: var(--theme-danger-dark);",
+                    "  --bs-info: var(--theme-info-dark);",
+                    "  --bs-body-bg: var(--theme-content-area-dark);",
+                    "  --bs-body-color: var(--theme-text-dark);",
+                    "  --bs-border-color: var(--theme-border-color-dark);",
+                    "  --bs-card-bg: var(--theme-component-dark);",
+                    "  --bs-card-border-color: var(--theme-border-color-dark);",
+                    "  --bs-secondary-bg: var(--theme-surface-dark);",
+                    "  --bs-tertiary-bg: var(--theme-surface-dark);",
+                    "  --bs-emphasis-color: var(--theme-text-dark);",
+                    "}",
+                    "",
+                    "/* Dark mode component overrides */",
+                    "[data-theme='dark'] .form-control,",
+                    "[data-theme='dark'] .form-select,",
+                    "[data-bs-theme='dark'] .form-control,",
+                    "[data-bs-theme='dark'] .form-select {",
+                    "  background-color: var(--theme-surface-dark);",
+                    "  border-color: var(--theme-border-color-dark);",
+                    "  color: var(--theme-text-dark);",
+                    "}",
+                    "",
+                    "[data-theme='dark'] .form-control:focus,",
+                    "[data-theme='dark'] .form-select:focus,",
+                    "[data-bs-theme='dark'] .form-control:focus,",
+                    "[data-bs-theme='dark'] .form-select:focus {",
+                    "  background-color: var(--theme-surface-dark);",
+                    "  border-color: var(--theme-primary-dark);",
+                    "  color: var(--theme-text-dark);",
+                    "}",
+                    "",
+                    "[data-theme='dark'] .card,",
+                    "[data-bs-theme='dark'] .card {",
+                    "  background-color: var(--theme-component-dark);",
+                    "  border-color: var(--theme-border-color-dark);",
+                    "  color: var(--theme-text-dark);",
+                    "}",
+                    "",
+                    "[data-theme='dark'] .card-header,",
+                    "[data-bs-theme='dark'] .card-header {",
+                    "  background-color: rgba(255, 255, 255, 0.05);",
+                    "  border-bottom-color: var(--theme-border-color-dark);",
+                    "}",
+                    "",
+                    "[data-theme='dark'] .dropdown-menu,",
+                    "[data-bs-theme='dark'] .dropdown-menu {",
+                    "  background-color: var(--theme-surface-dark);",
+                    "  border-color: var(--theme-border-color-dark);",
+                    "}",
+                    "",
+                    "[data-theme='dark'] .dropdown-item,",
+                    "[data-bs-theme='dark'] .dropdown-item {",
+                    "  color: var(--theme-text-dark);",
+                    "}",
+                    "",
+                    "[data-theme='dark'] .dropdown-item:hover,",
+                    "[data-theme='dark'] .dropdown-item:focus,",
+                    "[data-bs-theme='dark'] .dropdown-item:hover,",
+                    "[data-bs-theme='dark'] .dropdown-item:focus {",
+                    "  background-color: rgba(255, 255, 255, 0.05);",
+                    "  color: var(--theme-text-dark);",
+                    "}"
+                ]
+                
+                css_output.extend(dark_mode_css)
+                
                 if theme.mode == 'dark':
                     # Force dark mode - override root variables
                     css_output.extend([
@@ -1129,15 +1276,6 @@ class TemplateRenderer:
                         f"    --theme-content-area: {theme.content_area_color_dark or theme.content_area_color};",
                         f"    --theme-sidebar: {theme.sidebar_color_dark or theme.sidebar_color};",
                         f"    --theme-component: {theme.component_color_dark or theme.component_color};",
-                        "  }",
-                        "  ",
-                        "  /* Auto dark mode logo switching */",
-                        "  :root:not([data-theme]) .logo_light {",
-                        "    display: none;",
-                        "  }",
-                        "  ",
-                        "  :root:not([data-theme]) .logo_dark {",
-                        "    display: block;",
                         "  }",
                         "}",
                         "",
@@ -1211,7 +1349,7 @@ class TemplateRenderer:
             
         except Exception as e:
             return f"/* Error generating theme CSS: {e} */"
-    
+
     def _render_menu(self, menu_name=None, user_id=None, **kwargs):
         """
         Render menu directly in templates using {{ render_menu('ADMIN') }}

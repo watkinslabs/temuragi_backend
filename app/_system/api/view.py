@@ -7,9 +7,7 @@ from app.classes import AuthService
 # Create auth blueprint
 bp = Blueprint('api_auth', __name__, url_prefix='/api/auth')
 
-
-
-@bp.route('/', methods=['POST'])
+@bp.route('/login', methods=['POST'])
 def login():
   if request.is_json:
             data = request.get_json()
@@ -20,14 +18,14 @@ def login():
             # Get auth service and perform API login
             auth = AuthService()
             result = auth.login_api(identity, password, remember, application='web')
-            
+            result['default_context']='default'
             if result['success']:
                 return jsonify(result), 200
             else:
                 return jsonify(result), 401
 
 
-@bp.route('/validate', methods=['GET'])
+@bp.route('/validate', methods=['GET','POST'])
 def validate():
     """Validate current access token"""
     auth_header = request.headers.get('Authorization')

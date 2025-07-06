@@ -26,6 +26,8 @@ dotenv = "*"
 pyodbc = "*"
 anthropic = "*"
 keyring = "*"
+flort = "*"
+babel = "*"
 
 [dev-packages]
 

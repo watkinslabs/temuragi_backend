@@ -66,7 +66,6 @@ class Miner:
             Result from the handler
         """
         start_time = time.time()
-        self.logger.info(f"In Miner Data API Service processor {model_name}")
 
         
         # Get the handler for this model
@@ -106,7 +105,6 @@ class Miner:
 
             # Check hasattr explicitly
             has_attr_result = hasattr(handler, method_name)
-            self.logger.debug(f"  hasattr result: {has_attr_result}")
 
             # The original check that's failing
             if not method_name or not hasattr(handler, method_name):
@@ -120,12 +118,6 @@ class Miner:
             # Call the handler method
             method = getattr(handler, method_name)
             result = method(data)
-            
-            # Log successful operation
-            response_time_ms = int((time.time() - start_time) * 1000)
-            self.logger.info(
-                f"Data broker: {handler_class.__name__}.{method_name} completed in {response_time_ms}ms"
-            )
             
             return result
             

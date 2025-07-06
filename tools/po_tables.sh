@@ -55,6 +55,9 @@ OUTPUT='app/user/test/'
 #  "PartsTrader parked_orders_so"
 #
 TABLES=(
+  "JADVDATA _vinv_locs n"
+  "JADVDATA _vinv_oem_avail n"
+  "JADVDATA _virtual_inventory n"
  )
 
 # Process each entry

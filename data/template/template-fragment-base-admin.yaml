@@ -17,45 +17,12 @@ TemplateFragment:
         <!DOCTYPE html>
         <html lang="en">
         <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>...</title>
-            <meta name="csrf-token" content="{{ csrf_token() }}">
-
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/blitzer/jquery-ui.css">
-            <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css">
-            <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-            <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js" integrity="sha256-AlTido85uXPlSyyaZNsjJXeCs07eSv3r43kyCVc8ChI=" crossorigin="anonymous"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-            <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
-
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js" integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/sql/sql.min.js" integrity="sha512-JOURLWZEM9blfKvYn1pKWvUZJeFwrkn77cQLJOS6M/7MVIRdPacZGNm2ij5xtDV/fpuhorOswIiJF3x/woe5fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            
-            <!-- Bootstrap-select for Bootstrap 5 -->
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
-            
-            <script src="/static/v2/app_core.js"></script>
-            <script src="/static/v2/token_manager.js"></script>
-            <script src="/static/v2/api_manager.js"></script>
-            <script src="/static/v2/auth_manager.js"></script>
-            <script src="/static/v2/connection_manager.js"></script>
-            <script src="/static/v2/template_manager.js"></script>
-            <script src="/static/v2/datatable.js"></script>
-            <script src="/static/v2/header.js"></script>
-            <script src="/static/v2/data_form.js"></script>
-            <script src="/static/v2/sidebar.js"></script>
-            <script src="/static/v2/report.js"></script>
-            <script src="/static/v2/app.js"></script>
-            
-            <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-            <script src="https://unpkg.com/htmx.org/dist/ext/head-support.js"></script>
-            <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <title>{{ site.name }}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
             <style>
                 {{ theme_css()|safe }}
@@ -330,61 +297,14 @@ TemplateFragment:
                 position: relative;
             }
             </style>
+
+
+
         </head>
         <body>
-            <div class="auth-loading" id="auth-loading">
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Checking authentication...</span>
-                    </div>
-                    <p class="mt-2">Checking authentication...</p>
-                </div>
-            </div>
-
-            <div id="app-content" style="display: none;">
-                {% include "header" %}
-
-                <div class="breadcrumbs">
-                    {% include "breadcrumb" %}
-                </div>
-
-                <div class="content_area">
-                    <div class="sidebar_container">
-                        {% include "sidebar" %}
-                    </div>
-                    
-                    <div class="main_content" id="main-content">
-                        {% block content %}
-                            No Content Yet
-                        {% endblock %}
-                    </div>
-                </div>
-                
-                <footer class="footer">
-                    {% include "footer" %}
-                </footer>
-            </div>
-
-            <script>
-                const csrf_token = document.querySelector('meta[name="csrf-token"]').content;
-
-                const app_urls = {
-                    login_url: '{{ url_for("auth.login") }}',
-                    validate_url: '{{ url_for("api_auth.validate") }}',
-                    refresh_url: '{{ url_for("api_auth.refresh") }}',
-                    logout_url: '{{ url_for("api_auth.logout") }}',
-                    status_url: '{{ url_for("api_auth.status") }}',
-                    health_endpoint: '{{ url_for("api_auth.health") }}',
-                    login_page_path: '{{ url_for("auth.login") }}',
-                    api_url: '{{ url_for("miner.data") }}'
-                    
-                };
-
-                document.addEventListener('DOMContentLoaded', async () => {
-                    const app = new AppInitializer(app_urls);
-                    await app.init();
-                });
-                </script>
+        <div id="root"></div>
+            <script src="/static/js/components/vendor.bundle.js"></script>
+            <script src="/static/js/main.bundle.js"></script>
         </body>
         </html>
       template_hash: null

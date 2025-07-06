@@ -1,4 +1,4 @@
-log
+logs
 *.log
 *.tar
 *.zip
@@ -21,3 +21,4 @@ db
 .env
 data/pr
 app/user
+node_modules
