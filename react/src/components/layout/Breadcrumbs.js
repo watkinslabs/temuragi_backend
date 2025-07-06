@@ -1,8 +1,10 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useNavigation } from '../../App';
+import { useSite } from '../../contexts/SiteContext';
 
-const Breadcrumbs = ({ site_config, current_context, available_contexts }) => {
-    const location = useLocation();
+const Breadcrumbs = () => {
+    const { current_view, navigate_to } = useNavigation();
+    const { site_info, current_context, available_contexts } = useSite();
 
     // Get current context display name
     const get_context_display_name = () => {
@@ -14,38 +16,29 @@ const Breadcrumbs = ({ site_config, current_context, available_contexts }) => {
         return context ? context.display : current_context;
     };
 
-    // Parse the current path into breadcrumb items
+    // Parse the current view into breadcrumb items
     const get_breadcrumb_items = () => {
-        const path = location.pathname;
         const items = [];
 
         // Always start with the context name
         items.push({
             label: get_context_display_name(),
-            path: '/',
-            is_last: path === '/'
+            view: 'home',
+            is_last: current_view === 'home'
         });
 
-        // Add path segments if not on home
-        if (path !== '/') {
-            const segments = path.split('/').filter(Boolean);
-            let accumulated_path = '';
+        // Add view segments if not on home
+        if (current_view !== 'home') {
+            // Convert view name to readable format (snake_case to Title Case)
+            const label = current_view
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
 
-            segments.forEach((segment, index) => {
-                accumulated_path += `/${segment}`;
-                const is_last = index === segments.length - 1;
-
-                // Convert segment to readable format (snake_case to Title Case)
-                const label = segment
-                    .split('_')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ');
-
-                items.push({
-                    label: label,
-                    path: accumulated_path,
-                    is_last: is_last
-                });
+            items.push({
+                label: label,
+                view: current_view,
+                is_last: true
             });
         }
 
@@ -67,7 +60,19 @@ const Breadcrumbs = ({ site_config, current_context, available_contexts }) => {
                             {item.is_last ? (
                                 item.label
                             ) : (
-                                <Link to={item.path}>{item.label}</Link>
+                                <button
+                                    onClick={() => navigate_to(item.view)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        color: 'var(--bs-link-color)',
+                                        cursor: 'pointer',
+                                        padding: 0,
+                                        textDecoration: 'underline'
+                                    }}
+                                >
+                                    {item.label}
+                                </button>
                             )}
                         </li>
                     ))}

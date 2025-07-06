@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useNavigation } from '../../App';
+import { useSite } from '../../contexts/SiteContext';
 
-const SidebarMenu = ({ menu_items = [], collapsed, onToggleCollapse }) => {
-    const location = useLocation();
+const SidebarMenu = ({ collapsed, onToggleCollapse }) => {
+    const { current_view, navigate_to } = useNavigation();
+    const { menu_items = [], current_context } = useSite();
     
+    // Debug logging
+    useEffect(() => {
+        console.log('SidebarMenu: Current context:', current_context);
+        console.log('SidebarMenu: Menu items:', menu_items);
+    }, [current_context, menu_items]);
+
     // Initialize expanded menus from localStorage
     const [expanded_menus, setExpandedMenus] = useState(() => {
         const saved = localStorage.getItem('expanded_menus');
@@ -15,18 +23,30 @@ const SidebarMenu = ({ menu_items = [], collapsed, onToggleCollapse }) => {
         localStorage.setItem('expanded_menus', JSON.stringify(expanded_menus));
     }, [expanded_menus]);
 
-    // Auto-expand active menu sections when location changes
+    // Auto-expand active menu sections when view changes
     useEffect(() => {
         if (menu_items.length > 0) {
             auto_expand_active_menus(menu_items);
         }
-    }, [location.pathname, menu_items]);
+    }, [current_view, menu_items]);
 
-    // Auto-expand menu sections that contain the current active route
+    // Convert URL to view name (remove leading slash and handle nested paths)
+    const url_to_view = (url) => {
+        if (!url) return 'home';
+        return url.replace(/^\//, '') || 'home';
+    };
+
+    // Check if a menu item is active
+    const is_item_active = (item) => {
+        const item_view = url_to_view(item.url);
+        return current_view === item_view;
+    };
+
+    // Auto-expand menu sections that contain the current active view
     const auto_expand_active_menus = (items) => {
         const find_and_expand_active = (items, parent_id = null) => {
             for (const item of items) {
-                if (item.url === location.pathname) {
+                if (is_item_active(item)) {
                     // Found active item, expand its parent
                     if (parent_id && !expanded_menus[parent_id]) {
                         setExpandedMenus(prev => ({
@@ -60,21 +80,25 @@ const SidebarMenu = ({ menu_items = [], collapsed, onToggleCollapse }) => {
         }));
     };
 
+    const handle_navigation = (url) => {
+        const view = url_to_view(url);
+        navigate_to(view);
+    };
+
     const render_menu_item = (item, depth = 0) => {
         const has_children = item.items && item.items.length > 0;
         const is_expanded = expanded_menus[item.id];
-        const is_active = location.pathname === item.url;
+        const is_active = is_item_active(item);
 
         // Check if any child is active
         const has_active_child = (items) => {
             return items?.some(child =>
-                child.url === location.pathname ||
+                is_item_active(child) ||
                 (child.items && has_active_child(child.items))
             );
         };
 
         const is_parent_of_active = has_children && has_active_child(item.items);
-
         // Handle tier type items (parent categories)
         if (item.type === 'tier') {
             return (
@@ -82,13 +106,18 @@ const SidebarMenu = ({ menu_items = [], collapsed, onToggleCollapse }) => {
                     <div
                         className={`sidebar_section_header ${is_parent_of_active ? 'has-active-child' : ''}`}
                         onClick={() => toggle_menu_expansion(item.id)}
-                        style={{ cursor: 'pointer' }}
+                        style={{ 
+                            cursor: 'pointer',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}
                     >
-                        <h5>
+                        <h5 style={{ margin: 0, display: 'flex', alignItems: 'center' }}>
                             {item.icon && <i className={`fas ${item.icon} me-2`}></i>}
                             {item.display}
-                            <i className={`fas fa-chevron-${is_expanded ? 'down' : 'right'} float-end`}></i>
                         </h5>
+                        <i className={`fas fa-chevron-${is_expanded ? 'down' : 'right'}`}></i>
                     </div>
                     {is_expanded && (
                         <ul className="nav flex-column">
@@ -146,13 +175,21 @@ const SidebarMenu = ({ menu_items = [], collapsed, onToggleCollapse }) => {
                                 {item.display}
                             </a>
                         ) : (
-                            <Link
-                                to={item.url}
+                            <button
+                                type="button"
                                 className={`nav-link ${is_active ? 'active' : ''}`}
+                                onClick={() => handle_navigation(item.url)}
+                                style={{
+                                    width: '100%',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    textAlign: 'left',
+                                    cursor: 'pointer'
+                                }}
                             >
                                 {item.icon && <i className={`fas ${item.icon} me-2`}></i>}
                                 {item.display}
-                            </Link>
+                            </button>
                         )
                     )}
                 </li>
@@ -176,9 +213,20 @@ const SidebarMenu = ({ menu_items = [], collapsed, onToggleCollapse }) => {
                             <h5>Navigation</h5>
                             <ul className="nav flex-column">
                                 <li className="nav-item">
-                                    <Link to="/" className="nav-link">
+                                    <button
+                                        type="button"
+                                        className="nav-link"
+                                        onClick={() => navigate_to('home')}
+                                        style={{
+                                            width: '100%',
+                                            border: 'none',
+                                            background: 'transparent',
+                                            textAlign: 'left',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
                                         <i className="fas fa-home me-2"></i>Dashboard
-                                    </Link>
+                                    </button>
                                 </li>
                             </ul>
                         </div>
@@ -189,4 +237,8 @@ const SidebarMenu = ({ menu_items = [], collapsed, onToggleCollapse }) => {
     );
 };
 
-export default SidebarMenu;
+// Memoize but include menu_items in dependency check
+export default React.memo(SidebarMenu, (prevProps, nextProps) => {
+    // Re-render if collapsed state changes
+    return prevProps.collapsed === nextProps.collapsed;
+});

@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
-    
+
     // We'll need to access SiteContext's clear_section
     const [clear_site_callback, setClearSiteCallback] = useState(null);
 
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
         try {
             // First try to validate the current token
-            const response = await fetch(config.getUrl(config.api.endpoints.auth.validate), {
+            const response = await config.apiCall(config.getUrl(config.api.endpoints.auth.validate), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${api_token}`,
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password, remember) => {
         try {
-            const response = await fetch(config.getUrl(config.api.endpoints.auth.login), {
+            const response = await config.apiCall(config.getUrl(config.api.endpoints.auth.login), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,40 +87,40 @@ export const AuthProvider = ({ children }) => {
                 },
                 body: JSON.stringify({ username, password, remember })
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
-    
+
                 // Store tokens
                 localStorage.setItem('api_token', data.api_token);
                 localStorage.setItem('refresh_token', data.refresh_token);
                 localStorage.setItem('user_id', data.user_id);
                 localStorage.setItem('user_info', JSON.stringify(data.user_info));
-                
+
                 // Store the ACTUAL default context from login
                 if (data.default_context) {
                     localStorage.setItem('default_context', data.default_context);
                     sessionStorage.setItem('current_context', data.default_context);
                     sessionStorage.setItem('current_section', data.default_context); // Also store as section for compatibility
                 }
-                
+
                 // Handle remember me
                 if (remember) {
                     localStorage.setItem('remembered_username', username);
                 } else {
                     localStorage.removeItem('remembered_username');
                 }
-    
+
                 setIsAuthenticated(true);
                 setUser(data.user_info);
-    
+
                 // Start token check interval after successful login
                 start_token_check_interval();
-    
+
                 return {
                     success: true,
                     landing_page: data.landing_page || '/',
-                    default_context: data.default_context  
+                    default_context: data.default_context
                 };
             } else {
                 const error_data = await response.json();
@@ -143,7 +143,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch(config.getUrl(config.api.endpoints.auth.refresh), {
+            const response = await config.apiCall(config.getUrl(config.api.endpoints.auth.refresh), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -192,11 +192,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user_id');
         localStorage.removeItem('user_info');
         localStorage.removeItem('default_context');  // Changed from default_section
-    
+
         // Clear state
         setIsAuthenticated(false);
         setUser(null);
-    
+
         // Stop token check interval
         stop_token_check_interval();
     };
@@ -217,7 +217,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const response = await fetch(config.getUrl(config.api.endpoints.auth.validate), {
+                const response = await config.apiCall(config.getUrl(config.api.endpoints.auth.validate), {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${api_token}`,

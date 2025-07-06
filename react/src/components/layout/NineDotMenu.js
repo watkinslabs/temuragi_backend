@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSite } from '../../contexts/SiteContext';
 
 const NineDotMenu = ({
     theme,
     user,
-    available_contexts,
-    current_context,
-    onSwitchContext,
     onToggleTheme,
     onLogout
 }) => {
     const [is_open, setIsOpen] = useState(false);
     const menu_ref = useRef(null);
+    
+    // Get context data directly
+    const { current_context, available_contexts, switch_context } = useSite();
 
     // Handle outside clicks
     useEffect(() => {
@@ -34,7 +35,7 @@ const NineDotMenu = ({
     }, [is_open]);
 
     const handle_context_switch = (context_name) => {
-        onSwitchContext(context_name);
+        switch_context(context_name);
         setIsOpen(false);
     };
 
@@ -152,20 +153,12 @@ const NineDotMenu = ({
                                     })}
                                 </div>
                             </div>
-                            <hr className="my-2" style={{
-                                borderColor: theme === 'dark' ? 'var(--theme-border-color-dark)' : 'var(--theme-border-color)',
-                                opacity: 0.5
-                            }} />
+
                         </>
                     )}
 
                     {/* Theme Toggle */}
                     <div className="dropdown_section mb-3">
-                        <h6 className="mb-2" style={{
-                            color: theme === 'dark' ? 'var(--theme-text-muted-dark)' : 'var(--theme-text-muted)'
-                        }}>
-                            Appearance
-                        </h6>
                         <div className="theme_toggle d-flex align-items-center">
                             <div className="form-check form-switch">
                                 <input
@@ -182,18 +175,9 @@ const NineDotMenu = ({
                         </div>
                     </div>
 
-                    <hr className="my-2" style={{
-                        borderColor: theme === 'dark' ? 'var(--theme-border-color-dark)' : 'var(--theme-border-color)',
-                        opacity: 0.5
-                    }} />
 
                     {/* Account Section */}
                     <div className="dropdown_section">
-                        <h6 className="mb-2" style={{
-                            color: theme === 'dark' ? 'var(--theme-text-muted-dark)' : 'var(--theme-text-muted)'
-                        }}>
-                            Account
-                        </h6>
                         {user && (
                             <div className="user_info mb-3 p-2 rounded" style={{
                                 backgroundColor: theme === 'dark' ? 'var(--theme-background-dark)' : 'var(--theme-component)',

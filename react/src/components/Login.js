@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import config from '../config';
 
@@ -13,8 +12,6 @@ const Login = () => {
     const [site_config, setSiteConfig] = useState(null);
     const [config_loading, setConfigLoading] = useState(true);
 
-    const navigate = useNavigate();
-    const location = useLocation();
     const { login } = useAuth();
 
     useEffect(() => {
@@ -24,12 +21,12 @@ const Login = () => {
         localStorage.removeItem('user_id');
         localStorage.removeItem('user_info');
         sessionStorage.clear();
-        
+
         // Clear cookies by making a logout request to the server
         // This ensures server-side session is destroyed
         const clearServerSession = async () => {
             try {
-                await fetch(config.getUrl(config.api.endpoints.auth.logout), {
+                await config.apiCall(config.getUrl(config.api.endpoints.auth.logout), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -41,7 +38,7 @@ const Login = () => {
                 // Ignore errors - we're logging out anyway
             }
         };
-        
+
         clearServerSession().then(() => {
             // Fetch site config for branding AFTER clearing session
             fetch_site_config();
@@ -60,7 +57,7 @@ const Login = () => {
         }
 
         // Check login reason
-        const params = new URLSearchParams(location.search);
+        const params = new URLSearchParams(window.location.search);
         const reason = params.get('reason');
 
         if (reason) {
@@ -73,7 +70,7 @@ const Login = () => {
         try {
             console.log('Login page fetching site config from:', config.getUrl('/site/config'));
 
-            const response = await fetch(config.getUrl('/site/config'), {
+            const response = await config.apiCall(config.getUrl('/site/config'), {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -85,7 +82,7 @@ const Login = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log('Site config response:', data);
-                
+
                 // The site config is nested in data.site
                 setSiteConfig(data.site);
             }
@@ -100,7 +97,8 @@ const Login = () => {
         const messages = {
             'token_expired': 'Your session has expired. Please log in again.',
             'logout': 'You have been logged out successfully.',
-            'unauthorized': 'Please log in to access that page.'
+            'unauthorized': 'Please log in to access that page.',
+            'csrf_invalid': 'Security token expired. Please log in again.'
         };
         return messages[reason] || 'Please log in to continue.';
     };
@@ -122,13 +120,10 @@ const Login = () => {
             // Only use the default_context from login response
             if (result.default_context) {
                 sessionStorage.setItem('current_context', result.default_context);
-                // Remove the line that stores as current_section
             }
 
-            // Redirect to landing page or original destination
-            const params = new URLSearchParams(location.search);
-            const from = params.get('from');
-            navigate(from || result.landing_page || '/');
+            // Since we're not using React Router, just reload the page
+            window.location.href = result.landing_page || '/';
         } else {
             setError(result.message || 'Invalid username or password.');
             setLoading(false);

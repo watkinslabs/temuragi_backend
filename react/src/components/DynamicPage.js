@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useSite } from '../contexts/SiteContext';
+import { useNavigation } from '../App';
 import config from '../config';
 import LoadingScreen from './LoadingScreen';
 import HtmlRenderer from './HtmlRenderer';
@@ -9,10 +9,8 @@ import HtmlRenderer from './HtmlRenderer';
 const component_cache = {};
 
 const DynamicPage = () => {
-    const location = useLocation();
-    const params = useParams();
-    const navigate = useNavigate();
-    const { get_current_section, current_section } = useSite();
+    const { current_view, view_params } = useNavigation();
+    const { get_current_context, current_context } = useSite();
     const [page_data, setPageData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -20,39 +18,32 @@ const DynamicPage = () => {
 
     useEffect(() => {
         loadPage();
-    }, [location.pathname, current_section]);
+    }, [current_view, current_context]);
 
     const loadPage = async () => {
         setLoading(true);
         setError(null);
         setDynamicComponent(null);
 
-        try {1
-            // Ask backend what component/template to load for this route
-            const response = await fetch(config.getUrl(config.api.endpoints.routes.resolve), {
+        try {
+            // Ask backend what component/template to load for this view
+            const response = await config.apiCall(config.getUrl(config.api.endpoints.routes.resolve), {
                 method: 'POST',
                 headers: config.getAuthHeaders(),
                 body: JSON.stringify({
-                    path: location.pathname,
-                    params: Object.fromEntries(new URLSearchParams(location.search)),
-                    section: get_current_section()
+                    path: `/${current_view}`, // Convert view to path format
+                    params: view_params,
+                    context: get_current_context()
                 })
             });
 
             if (!response.ok) {
-                // If 404 or route cannot be resolved, redirect to /home
+                // If 404 or route cannot be resolved
                 if (response.status === 404) {
-                    console.log('Route not found, redirecting to /home');
-                    // Only redirect if we're not already on /home (to avoid infinite loop)
-                    if (location.pathname !== '/home') {
-                        navigate('/home');
-                        return;
-                    } else {
-                        // If even /home fails, show error
-                        setError('Page not found');
-                        setLoading(false);
-                        return;
-                    }
+                    console.log('View not found:', current_view);
+                    setError('Page not found');
+                    setLoading(false);
+                    return;
                 }
                 throw new Error('Failed to load page');
             }
@@ -132,15 +123,6 @@ const DynamicPage = () => {
                 <div className="alert alert-danger">
                     <h4 className="alert-heading">Error</h4>
                     <p>{error}</p>
-                    <hr />
-                    <p className="mb-0">
-                        <button 
-                            className="btn btn-outline-danger btn-sm" 
-                            onClick={() => navigate('/')}
-                        >
-                            Go to Dashboard
-                        </button>
-                    </p>
                 </div>
             </div>
         );
@@ -151,7 +133,7 @@ const DynamicPage = () => {
         // Merge route params with configured props
         const component_props = {
             ...page_data.props,
-            route_params: params,
+            route_params: view_params,
             route_config: page_data.config || {},
             meta: {
                 title: page_data.title,

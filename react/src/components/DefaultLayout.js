@@ -1,43 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useSite } from '../contexts/SiteContext';
+import { useNavigation } from '../App';
 import NineDotMenu from './layout/NineDotMenu';
 import Breadcrumbs from './layout/Breadcrumbs';
 import SidebarMenu from './layout/SidebarMenu';
+import config from '../config';
 
 const DefaultLayout = ({ children }) => {
-    const location = useLocation();
     const { user, logout } = useAuth();
-    const {
-        current_context,
-        available_contexts,
-        context_loading,
-        site_config,
-        initialize_context,
-        switch_context,
-        fetch_site_config
-    } = useSite();
-
+    
     const [theme, setTheme] = useState(() => {
         return localStorage.getItem('theme_preference') || 'light';
     });
     const [sidebar_collapsed, setSidebarCollapsed] = useState(false);
-
-    // Initialize context from stored default if needed
-    useEffect(() => {
-        const stored_context = sessionStorage.getItem('current_context');
-        if (stored_context && !current_context) {
-            initialize_context(stored_context);
-        }
-    }, []);
-
-    // Fetch site config when location changes AND we have a context
-    useEffect(() => {
-        if (current_context) {
-            fetch_site_config(location.pathname);
-        }
-    }, [location.pathname, current_context]);
 
     // Apply theme
     useEffect(() => {
@@ -54,11 +29,40 @@ const DefaultLayout = ({ children }) => {
         setSidebarCollapsed(!sidebar_collapsed);
     };
 
-    const handle_logout = () => {
-        logout();
-    };
+    // Static site info - load once and cache
+    const [static_site_info, setStaticSiteInfo] = useState(() => {
+        const cached = sessionStorage.getItem('static_site_info');
+        return cached ? JSON.parse(cached) : null;
+    });
 
-    if (context_loading || !site_config) {
+    // Load site info ONCE on mount
+    useEffect(() => {
+        if (!static_site_info) {
+            config.apiCall(config.getUrl('/site/config'), {
+                method: 'POST',
+                headers: config.getAuthHeaders(),
+                body: JSON.stringify({ path: '/', include_contexts: false })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const info = {
+                    name: data.site.name,
+                    logo_desktop: data.site.logo_desktop,
+                    logo_desktop_dark: data.site.logo_desktop_dark,
+                    footer_text: data.site.footer_text,
+                    tagline: data.site.tagline,
+                    maintenance_mode: data.site.maintenance_mode
+                };
+                setStaticSiteInfo(info);
+                sessionStorage.setItem('static_site_info', JSON.stringify(info));
+            })
+            .catch(error => {
+                console.error('Failed to load site config:', error);
+            });
+        }
+    }, []);
+
+    if (!static_site_info) {
         return (
             <div className="d-flex justify-content-center align-items-center min-vh-100">
                 <div className="spinner-border" role="status">
@@ -68,9 +72,6 @@ const DefaultLayout = ({ children }) => {
         );
     }
 
-    const site_data = site_config;
-    const menu_data = { items: site_config?.menu_items || [] };
-
     return (
         <div id="app-content">
             <div className="topbar htmx-indicator"></div>
@@ -79,28 +80,28 @@ const DefaultLayout = ({ children }) => {
                 <div className="header_brand">
                     <div className="logo_wrapper">
                         {theme === 'light' ? (
-                            site_data.logo_desktop && (
+                            static_site_info.logo_desktop && (
                                 <img
-                                    src={site_data.logo_desktop}
-                                    alt={`${site_data.name || 'Site'} logo`}
+                                    src={static_site_info.logo_desktop}
+                                    alt={`${static_site_info.name || 'Site'} logo`}
                                     className="header_logo"
                                 />
                             )
                         ) : (
-                            site_data.logo_desktop_dark && (
+                            static_site_info.logo_desktop_dark && (
                                 <img
-                                    src={site_data.logo_desktop_dark}
-                                    alt={`${site_data.name || 'Site'} logo`}
+                                    src={static_site_info.logo_desktop_dark}
+                                    alt={`${static_site_info.name || 'Site'} logo`}
                                     className="header_logo"
                                 />
                             )
                         )}
                     </div>
-                    <h1>{site_data.name || 'Dashboard'}</h1>
+                    <h1>{static_site_info.name || 'Dashboard'}</h1>
                 </div>
 
                 <div className="header_actions">
-                    {site_data.maintenance_mode && (
+                    {static_site_info.maintenance_mode && (
                         <div className="maintenance_indicator me-3">
                             <span className="badge bg-warning text-dark">
                                 <i className="fas fa-tools me-1"></i>
@@ -112,24 +113,16 @@ const DefaultLayout = ({ children }) => {
                     <NineDotMenu
                         theme={theme}
                         user={user}
-                        available_contexts={available_contexts || []}
-                        current_context={current_context}
-                        onSwitchContext={switch_context}
                         onToggleTheme={handle_theme_toggle}
                         onLogout={logout}
                     />
                 </div>
             </header>
 
-            <Breadcrumbs 
-                site_config={site_config}
-                current_section={current_context}
-                available_sections={available_contexts}
-            />
+            <Breadcrumbs />
 
             <div className={`content_area ${sidebar_collapsed ? 'collapsed' : ''}`}>
-                <SidebarMenu 
-                    menu_items={menu_data.items}
+                <SidebarMenu
                     collapsed={sidebar_collapsed}
                     onToggleCollapse={toggle_sidebar}
                 />
@@ -141,9 +134,9 @@ const DefaultLayout = ({ children }) => {
 
             <footer className="footer">
                 <div className="footer_content">
-                    <p>{site_data.footer_text || `© ${new Date().getFullYear()} ${site_data.name || 'Your Company'}. All rights reserved.`}</p>
-                    {site_data.tagline && (
-                        <p className="tagline">{site_data.tagline}</p>
+                    <p>{static_site_info.footer_text || `© ${new Date().getFullYear()} ${static_site_info.name || 'Your Company'}. All rights reserved.`}</p>
+                    {static_site_info.tagline && (
+                        <p className="tagline">{static_site_info.tagline}</p>
                     )}
                 </div>
             </footer>
@@ -151,4 +144,4 @@ const DefaultLayout = ({ children }) => {
     );
 };
 
-export default DefaultLayout;
+export default React.memo(DefaultLayout);

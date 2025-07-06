@@ -3,7 +3,7 @@ import hmac
 import hashlib
 import time
 from datetime import datetime, date
-from flask import current_app, abort, request
+from flask import current_app, abort, request,jsonify
 
 class CSRFProtection:
     """Simple CSRF protection with daily token validation"""
@@ -120,8 +120,8 @@ class CSRFProtection:
     def protect(self, request):
         """Validate CSRF token from request"""
         token = self.get_token_from_request(request)
-        
+        results=jsonify({'success':False,'csrf_invalid':True})
         if not self.validate_token(token):
-            abort(403, 'Invalid CSRF token')
+            abort(403, results)
         
         return True

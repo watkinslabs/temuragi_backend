@@ -14,12 +14,12 @@ const ComponentBuilder = () => {
     const default_template = `// Define your component
 const Component = () => {
     const [count, setCount] = useState(0);
-    
+
     return (
         <div className="custom-component">
             <h2>My Custom Component</h2>
             <p>Count: {count}</p>
-            <button 
+            <button
                 onClick={() => setCount(count + 1)}
                 className="btn btn-primary"
             >
@@ -54,10 +54,10 @@ const Component = () => {
             );
 
             const TestComponent = component_function(...Object.values(sandbox_globals));
-            
+
             // Render preview
             setPreviewMode(true);
-            
+
             // Clear previous preview
             if (preview_ref.current) {
                 const root = ReactDOM.createRoot(preview_ref.current);
@@ -79,7 +79,7 @@ const Component = () => {
         }
 
         try {
-            const response = await fetch(config.getUrl('/components'), {
+            const response = await config.apiCall(config.getUrl('/components'), {
                 method: 'POST',
                 headers: config.getAuthHeaders(),
                 body: JSON.stringify({
@@ -98,7 +98,7 @@ const Component = () => {
             }
 
             setSuccess(`Component "${data.name}" created successfully!`);
-            
+
             // Reset form
             setComponentName('');
             setComponentCode('');
@@ -171,13 +171,13 @@ const Component = () => {
                             </div>
 
                             <div className="d-flex gap-2">
-                                <button 
+                                <button
                                     className="btn btn-secondary"
                                     onClick={handlePreview}
                                 >
                                     Preview
                                 </button>
-                                <button 
+                                <button
                                     className="btn btn-primary"
                                     onClick={handleSave}
                                     disabled={!component_name || !component_code}

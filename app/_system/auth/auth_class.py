@@ -200,10 +200,11 @@ class AuthService:
         token_obj = self.UserToken.validate_access_token( token)
         
         if not token_obj:
-            return {
-                'success': False,
-                'message': 'Invalid or expired token'
-            }
+            return {'success':False,
+                    'csrf_invalid':True,
+                    'message': 'Invalid or expired token' 
+                    }
+            
         
         user = token_obj.user
         
