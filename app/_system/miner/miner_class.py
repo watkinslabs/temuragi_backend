@@ -29,7 +29,7 @@ class Miner:
         self.app = app
         self.logger = None
         self.data_handlers = {}  # Registry for specialized data handlers
-        self.db_session=db_registry._routing_session()
+        #db_session=db_registry._routing_session()
 
         if app:
             self.init_app(app)
@@ -96,7 +96,9 @@ class Miner:
                 'export': 'handle_export',
                 'list': 'handle_list',
                 'get': 'handle_get',
-                'read': 'handle_read'
+                'read': 'handle_read',
+                'prefill': 'handle_prefill',
+                'rni_inv': 'handle_rni_inv'
             }
             
             method_name = method_map.get(operation)
@@ -604,6 +606,8 @@ class Miner:
     
     def handle_read(self, model_class, data, audit_data):
         """Handle read operations - single record by any column"""
+        db_session = db_registry._routing_session()
+
         # Support both old 'id' field and new flexible approach
         if 'id' in data:
             # Backward compatibility
@@ -623,7 +627,7 @@ class Miner:
         
         # Build query
         column = getattr(model_class, filter_column)
-        instance = self.db_session.query(model_class).filter(column == filter_value).first()
+        instance = db_session.query(model_class).filter(column == filter_value).first()
         
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
@@ -645,6 +649,7 @@ class Miner:
 
     def handle_create(self, model_class, data, audit_data):
         """Handle create operations"""
+        db_session = db_registry._routing_session()
         create_data = data.get('data', {})
         
         if not create_data:
@@ -655,8 +660,8 @@ class Miner:
 
         # Create new instance
         instance = model_class(**filtered_data)
-        self.db_session.add(instance)
-        self.db_session.commit()
+        db_session.add(instance)
+        db_session.commit()
 
 
         pk_value = self._get_instance_pk_value(instance)
@@ -684,6 +689,7 @@ class Miner:
 
     def handle_update(self, model_class, data, audit_data):
         """Handle update operations - find by any column"""
+        db_session = db_registry._routing_session()
         update_data = data.get('data', {})
         
         # Support both old 'id' field and new flexible approach
@@ -710,7 +716,7 @@ class Miner:
         
         # Find record
         column = getattr(model_class, filter_column)
-        instance = self.db_session.query(model_class).filter(column == filter_value).first()
+        instance = db_session.query(model_class).filter(column == filter_value).first()
         
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
@@ -731,7 +737,7 @@ class Miner:
                     setattr(instance, field, value)
                     fields_updated.append(field)
         
-        self.db_session.commit()
+        db_session.commit()
         
         # Update audit data
         audit_data['records_returned'] = 1
@@ -762,6 +768,8 @@ class Miner:
     
     def handle_delete(self, model_class, data, audit_data):
         """Handle delete operations - find by any column"""
+        db_session = db_registry._routing_session()
+
         hard_delete = data.get('hard_delete', False)
         
         # Support both old 'id' field and new flexible approach
@@ -783,7 +791,7 @@ class Miner:
         
         # Find record
         column = getattr(model_class, filter_column)
-        instance = self.db_session.query(model_class).filter(column == filter_value).first()
+        instance = db_session.query(model_class).filter(column == filter_value).first()
         
         if not instance:
             raise MinerError('Record not found', 'NotFoundError', 404)
@@ -792,15 +800,15 @@ class Miner:
         audit_data['filter_used'] = {filter_column: filter_value}
         
         if hard_delete:
-            self.db_session.delete(instance)
+            db_session.delete(instance)
         else:
             # Soft delete if model supports it
             if hasattr(instance, 'soft_delete'):
                 instance.soft_delete()
             else:
-                self.db_session.delete(instance)
+                db_session.delete(instance)
         
-        self.db_session.commit()
+        db_session.commit()
         
         delete_type = 'permanently deleted' if hard_delete else 'deactivated'
         
@@ -811,6 +819,7 @@ class Miner:
     
     def handle_list(self, model_class, data, audit_data):
         """Handle list operations with pagination, filtering, sorting, and search"""
+        db_session = db_registry._routing_session()
         
         # DataTables sends these parameters
         draw = data.get('draw', 1)
@@ -848,7 +857,7 @@ class Miner:
         slim = data.get('slim', False)
         
         # Start building query
-        query = self.db_session.query(model_class)
+        query = db_session.query(model_class)
         
         # Apply active filter unless explicitly including inactive
         if hasattr(model_class, 'is_active') and not include_inactive:
@@ -865,7 +874,7 @@ class Miner:
         # Get total count before filtering (for DataTables recordsTotal)
         pk_field = self._get_primary_key_field(model_class)
         pk_column = getattr(model_class, pk_field)
-        total_query = self.db_session.query(func.count(pk_column))
+        total_query = db_session.query(func.count(pk_column))
         if hasattr(model_class, 'is_active') and not include_inactive:
             total_query = total_query.filter(model_class.is_active == True)
         records_total = total_query.scalar() or 0
@@ -873,7 +882,7 @@ class Miner:
         # Get filtered count (for DataTables recordsFiltered) - using subquery approach
         # Create a subquery from the current query without ordering
         subquery = query.order_by(None).subquery()
-        records_filtered = self.db_session.query(func.count()).select_from(subquery).scalar() or 0
+        records_filtered = db_session.query(func.count()).select_from(subquery).scalar() or 0
         
         # Apply sorting
         query = self._apply_sorting(query, model_class, sort_by, sort_order)
@@ -913,6 +922,8 @@ class Miner:
     
     def handle_count(self, model_class, data, audit_data):
         """Handle count operations with optional filtering"""
+        db_session = db_registry._routing_session()
+
         filters = data.get('filters', {})
         include_inactive = data.get('include_inactive', False)
 
@@ -921,7 +932,7 @@ class Miner:
         pk_attr = getattr(model_class, pk_field)
 
         # Start building query
-        query = self.db_session.query(func.count(pk_attr))
+        query = db_session.query(func.count(pk_attr))
 
         # Apply active filter unless explicitly including inactive
         if hasattr(model_class, 'is_active') and not include_inactive:

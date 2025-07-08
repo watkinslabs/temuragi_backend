@@ -17,6 +17,18 @@ from .register.template_hooks import register_hooks
 from .register.database import register_db
 from .register.classes import register_classes
 
+from flask import Blueprint, redirect, request
+
+bp = Blueprint('V1', __name__,)
+
+@bp.route('/<path:path>')
+def catch_all(path):
+    return redirect(f'/v2/')
+
+@bp.route('/')
+def catch_all2():
+    return redirect(f'/v2/')
+
 app=None
 
 def set_app(instance):
@@ -44,6 +56,8 @@ def create_app():
     register_db(app)
     
         
+    app.register_blueprint(bp)
+
 
     # Register hooks for all scan paths
     for path in config['SYSTEM_SCAN_PATHS']:
@@ -52,6 +66,8 @@ def create_app():
     for path in config['SYSTEM_SCAN_PATHS']:
         register_blueprints(config['ROUTE_PREFIX'],path, app)
     
+  
+
 
     return app
 

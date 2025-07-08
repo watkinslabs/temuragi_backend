@@ -40,7 +40,7 @@ var __webpack_exports__ = {};
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "default": () => (/* binding */ PurchaseOrderBuilder)
+  "default": () => (/* binding */ user_components_PurchaseOrder)
 });
 
 ;// external "React"
@@ -328,7 +328,7 @@ const Trash2 = createLucideIcon("trash-2", trash_2_iconNode);
 
 //# sourceMappingURL=trash-2.js.map
 
-;// ./src/user_components/PurchaseOrderBuilder.js
+;// ./src/user_components/PurchaseOrder.js
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -336,11 +336,6 @@ function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Sym
 function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i["return"]) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { if (r) i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n;else { var o = function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); }; o("next", 0), o("throw", 1), o("return", 2); } }, _regeneratorDefine2(e, r, n, t); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
@@ -349,6 +344,11 @@ function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) 
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 /**
  * @routes ["PurchaseOrder"]
 */
@@ -357,8 +357,21 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 
 
 // Main Purchase Order Builder Component
-var PurchaseOrder = function PurchaseOrder(_ref) {
-  var config = _ref.config;
+var PurchaseOrder = function PurchaseOrder() {
+  // Get config from props or window
+  var config = window.config || {};
+
+  // Get navigation hook at the top level
+  var navigation = window.useNavigation ? window.useNavigation() : null;
+  var view_params = (navigation === null || navigation === void 0 ? void 0 : navigation.view_params) || {};
+
+  // Merge config with view_params for flexibility
+  var merged_config = _objectSpread(_objectSpread(_objectSpread({}, config), view_params), {}, {
+    company: config.company || 'PACIFIC',
+    data_api: config.data_api || '/v2/api/data'
+  });
+  var is_view_mode = merged_config.mode === 'view';
+
   // Core state
   var _useState = (0,external_React_namespaceObject.useState)(false),
     _useState2 = _slicedToArray(_useState, 2),
@@ -368,48 +381,57 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
     _useState4 = _slicedToArray(_useState3, 2),
     loadingMessage = _useState4[0],
     setLoadingMessage = _useState4[1];
+  var _useState5 = (0,external_React_namespaceObject.useState)(null),
+    _useState6 = _slicedToArray(_useState5, 2),
+    availableVendors = _useState6[0],
+    setAvailableVendors = _useState6[1];
+
+  // Determine if we're in edit mode based on po_number
+  var po_number_param = merged_config.po_number || null;
+  var is_new_po = !po_number_param || po_number_param === 'NEW';
+  var _useState7 = (0,external_React_namespaceObject.useState)(is_new_po ? null : po_number_param),
+    _useState8 = _slicedToArray(_useState7, 2),
+    poNumber = _useState8[0],
+    setPoNumber = _useState8[1];
+  var _useState9 = (0,external_React_namespaceObject.useState)(!is_new_po || is_view_mode),
+    _useState0 = _slicedToArray(_useState9, 2),
+    isSaved = _useState0[0],
+    setIsSaved = _useState0[1];
+
+  // Compute isEditMode based on current state
+  var isEditMode = (!is_new_po || poNumber && isSaved) && !is_view_mode;
+  var _useState1 = (0,external_React_namespaceObject.useState)(null),
+    _useState10 = _slicedToArray(_useState1, 2),
+    toast = _useState10[0],
+    setToast = _useState10[1];
 
   // PO Data state
-  var _useState5 = (0,external_React_namespaceObject.useState)(config.po_number || null),
-    _useState6 = _slicedToArray(_useState5, 1),
-    poNumber = _useState6[0];
-  var _useState7 = (0,external_React_namespaceObject.useState)(!!config.po_number && config.po_number !== 'NEW'),
-    _useState8 = _slicedToArray(_useState7, 1),
-    isEditMode = _useState8[0];
-  var _useState9 = (0,external_React_namespaceObject.useState)(null),
-    _useState0 = _slicedToArray(_useState9, 2),
-    vendor = _useState0[0],
-    setVendor = _useState0[1];
-  var _useState1 = (0,external_React_namespaceObject.useState)(get_default_header(config)),
-    _useState10 = _slicedToArray(_useState1, 2),
-    header = _useState10[0],
-    setHeader = _useState10[1];
-  var _useState11 = (0,external_React_namespaceObject.useState)([]),
+  var _useState11 = (0,external_React_namespaceObject.useState)(null),
     _useState12 = _slicedToArray(_useState11, 2),
-    lines = _useState12[0],
-    setLines = _useState12[1];
-  var _useState13 = (0,external_React_namespaceObject.useState)([]),
+    vendor = _useState12[0],
+    setVendor = _useState12[1];
+  var _useState13 = (0,external_React_namespaceObject.useState)(get_default_header(merged_config)),
     _useState14 = _slicedToArray(_useState13, 2),
-    deletedLineIds = _useState14[0],
-    setDeletedLineIds = _useState14[1];
+    header = _useState14[0],
+    setHeader = _useState14[1];
+  var _useState15 = (0,external_React_namespaceObject.useState)([]),
+    _useState16 = _slicedToArray(_useState15, 2),
+    lines = _useState16[0],
+    setLines = _useState16[1];
+  var _useState17 = (0,external_React_namespaceObject.useState)([]),
+    _useState18 = _slicedToArray(_useState17, 2),
+    deletedLineIds = _useState18[0],
+    setDeletedLineIds = _useState18[1];
 
   // UI State
-  var _useState15 = (0,external_React_namespaceObject.useState)({
+  var _useState19 = (0,external_React_namespaceObject.useState)({
       show: false,
       comments1: '',
       comments2: ''
     }),
-    _useState16 = _slicedToArray(_useState15, 2),
-    vendorComments = _useState16[0],
-    setVendorComments = _useState16[1];
-  var _useState17 = (0,external_React_namespaceObject.useState)(false),
-    _useState18 = _slicedToArray(_useState17, 2),
-    showReceiveModal = _useState18[0],
-    setShowReceiveModal = _useState18[1];
-  var _useState19 = (0,external_React_namespaceObject.useState)(new Set()),
     _useState20 = _slicedToArray(_useState19, 2),
-    selectedReceiveLines = _useState20[0],
-    setSelectedReceiveLines = _useState20[1];
+    vendorComments = _useState20[0],
+    setVendorComments = _useState20[1];
 
   // Virtual inventory state (part -> inventory data)
   var _useState21 = (0,external_React_namespaceObject.useState)({}),
@@ -420,23 +442,33 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
     _useState24 = _slicedToArray(_useState23, 2),
     inventoryLoading = _useState24[0],
     setInventoryLoading = _useState24[1];
-
-  // Pre-population data
-  var prePopulateData = config.pre_populate_data || {
-    location: config.location,
-    ship_via: config.ship_via,
-    shipping_address: config.shipping_address,
-    initial_items: config.initial_items || [],
-    vendors: config.vendors || false,
-    parked_order_id: config.parked_order_id || 0
-  };
+  (0,external_React_namespaceObject.useEffect)(function () {
+    console.log('=== PO STATE DEBUG ===', {
+      po_number_param: po_number_param,
+      is_new_po: is_new_po,
+      poNumber: poNumber,
+      isSaved: isSaved,
+      isEditMode: isEditMode,
+      loading: loading,
+      has_po_number: !!poNumber,
+      button_conditions: {
+        show_save: !isSaved,
+        show_receive_invoice: isSaved && poNumber,
+        actual_condition: !!poNumber
+      }
+    });
+  }, [po_number_param, is_new_po, poNumber, isSaved, isEditMode, loading]);
 
   // API configuration
   var api_call = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(operation, model) {
+    var _ref = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee(operation, model) {
+      var _window$app;
       var params,
         request_data,
-        _args = arguments;
+        _config$getAuthHeader,
+        response,
+        _args = arguments,
+        _t;
       return _regenerator().w(function (_context) {
         while (1) switch (_context.n) {
           case 0:
@@ -444,58 +476,200 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
             request_data = _objectSpread({
               operation: operation,
               model: model,
-              company: config.company || 'PACIFIC'
-            }, params); // Use your existing API manager
+              company: merged_config.company
+            }, params); // Use existing API manager if available, otherwise use fetch
+            if (!((_window$app = window.app) !== null && _window$app !== void 0 && (_window$app = _window$app.api) !== null && _window$app !== void 0 && _window$app.post)) {
+              _context.n = 2;
+              break;
+            }
             _context.n = 1;
-            return window.app.api.post(config.data_api, request_data);
+            return window.app.api.post(merged_config.data_api, request_data);
           case 1:
             return _context.a(2, _context.v);
+          case 2:
+            _context.p = 2;
+            _context.n = 3;
+            return fetch(merged_config.data_api, {
+              method: 'POST',
+              headers: _objectSpread({
+                'Content-Type': 'application/json'
+              }, (_config$getAuthHeader = config.getAuthHeaders) === null || _config$getAuthHeader === void 0 ? void 0 : _config$getAuthHeader.call(config)),
+              body: JSON.stringify(request_data)
+            });
+          case 3:
+            response = _context.v;
+            if (response.ok) {
+              _context.n = 4;
+              break;
+            }
+            throw new Error("HTTP error! status: ".concat(response.status));
+          case 4:
+            _context.n = 5;
+            return response.json();
+          case 5:
+            return _context.a(2, _context.v);
+          case 6:
+            _context.p = 6;
+            _t = _context.v;
+            console.error('API call failed:', _t);
+            return _context.a(2, {
+              success: false,
+              error: _t.message
+            });
+          case 7:
+            return _context.a(2);
         }
-      }, _callee);
+      }, _callee, null, [[2, 6]]);
     }));
     return function api_call(_x, _x2) {
-      return _ref2.apply(this, arguments);
+      return _ref.apply(this, arguments);
     };
   }();
 
   // Initialize component
   (0,external_React_namespaceObject.useEffect)(function () {
     var init = /*#__PURE__*/function () {
-      var _ref3 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+      var _ref2 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+        var prefill_result, prefill_data, pre_pop, new_lines, _t2;
         return _regenerator().w(function (_context2) {
           while (1) switch (_context2.n) {
             case 0:
-              if (!(config.po_number === 'NEW')) {
-                _context2.n = 1;
+              if (!is_new_po) {
+                _context2.n = 5;
                 break;
               }
-              // Apply pre-population for new POs
-              apply_pre_population();
-              if (prePopulateData.initial_items.length === 0) {
-                add_line();
-              }
-              _context2.n = 4;
-              break;
-            case 1:
-              if (!isEditMode) {
-                _context2.n = 3;
+              if (!(merged_config.mode === 'parked_order_populate' && merged_config.order && merged_config.line)) {
+                _context2.n = 4;
                 break;
               }
+              console.log('Detected parked order populate mode', {
+                order: merged_config.order,
+                line: merged_config.line
+              });
+              _context2.p = 1;
               _context2.n = 2;
-              return load_existing_po();
+              return api_call('prefill', 'PurchaseOrder', {
+                order_id: merged_config.order,
+                line: merged_config.line
+              });
             case 2:
+              prefill_result = _context2.v;
+              console.log('Prefill API response:', prefill_result);
+              if (prefill_result.success && prefill_result.data) {
+                prefill_data = prefill_result.data;
+                console.log('Prefill data received:', prefill_data);
+
+                // Apply pre-populate data to header
+                if (prefill_data.pre_populate_data) {
+                  pre_pop = prefill_data.pre_populate_data; // Set available vendors if provided
+                  if (prefill_data.vendors && prefill_data.vendors.length > 0) {
+                    console.log('Setting available vendors:', prefill_data.vendors);
+                    setAvailableVendors(prefill_data.vendors);
+                  }
+
+                  // Update header with location and ship_via
+                  setHeader(function (prev) {
+                    return _objectSpread(_objectSpread({}, prev), {}, {
+                      location: pre_pop.location || prev.location,
+                      ship_via: pre_pop.ship_via || prev.ship_via,
+                      ordered_by_customer: pre_pop.customer_code || prev.ordered_by_customer,
+                      shipping: pre_pop.shipping_address ? {
+                        name: pre_pop.shipping_address.name || '',
+                        attention: pre_pop.shipping_address.attention || '',
+                        address1: pre_pop.shipping_address.address1 || '',
+                        address2: pre_pop.shipping_address.address2 || '',
+                        city: pre_pop.shipping_address.city || '',
+                        state: pre_pop.shipping_address.state || '',
+                        zip: pre_pop.shipping_address.zip || '',
+                        country: 'USA'
+                      } : prev.shipping
+                    });
+                  });
+
+                  // Add initial items as lines
+                  if (pre_pop.initial_items && pre_pop.initial_items.length > 0) {
+                    new_lines = pre_pop.initial_items.map(function (item) {
+                      if (item.type === 'note') {
+                        return {
+                          _source: 'active',
+                          type: 'X',
+                          message: item.message || '',
+                          msg: item.message || '',
+                          part: '',
+                          pcode: '',
+                          description: '',
+                          pdesc: '',
+                          quantity: 0,
+                          pqty: 0,
+                          price: 0,
+                          pprce: 0,
+                          discount: 0,
+                          pdisc: 0,
+                          extended: 0,
+                          pext: 0,
+                          received_qty: 0,
+                          rqty: 0,
+                          erd: header.expected_receipt_date,
+                          taxable: false
+                        };
+                      } else {
+                        // Part line
+                        var qty = item.qty || 1;
+                        var price = item.price || 0;
+                        var extended = qty * price;
+                        return {
+                          _source: 'active',
+                          part: item.part || '',
+                          pcode: item.part || '',
+                          description: item.description || '',
+                          pdesc: item.description || '',
+                          quantity: qty,
+                          pqty: qty,
+                          price: price,
+                          pprce: price,
+                          discount: 0,
+                          pdisc: 0,
+                          extended: extended,
+                          pext: extended,
+                          received_qty: 0,
+                          rqty: 0,
+                          erd: header.expected_receipt_date,
+                          type: 'R',
+                          taxable: false,
+                          message: '',
+                          msg: ''
+                        };
+                      }
+                    });
+                    setLines(new_lines);
+                  }
+                }
+              } else {
+                console.error('Prefill failed:', prefill_result.error || 'Unknown error');
+              }
               _context2.n = 4;
               break;
             case 3:
-              // New PO without pre-population
-              add_line();
+              _context2.p = 3;
+              _t2 = _context2.v;
+              console.error('Error calling prefill:', _t2);
             case 4:
+              // Only add empty line if we didn't prepopulate
+              if (!merged_config.mode || merged_config.mode !== 'parked_order_populate') {
+                add_line();
+              }
+              _context2.n = 6;
+              break;
+            case 5:
+              _context2.n = 6;
+              return load_existing_po();
+            case 6:
               return _context2.a(2);
           }
-        }, _callee2);
+        }, _callee2, null, [[1, 3]]);
       }));
       return function init() {
-        return _ref3.apply(this, arguments);
+        return _ref2.apply(this, arguments);
       };
     }();
     init();
@@ -503,21 +677,28 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
 
   // Load existing PO
   var load_existing_po = /*#__PURE__*/function () {
-    var _ref4 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-      var result, cleaned_data;
+    var _ref3 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+      var result, _cleaned_data$header, cleaned_data, _t3;
       return _regenerator().w(function (_context3) {
         while (1) switch (_context3.n) {
           case 0:
+            if (poNumber) {
+              _context3.n = 1;
+              break;
+            }
+            return _context3.a(2);
+          case 1:
             setLoading(true);
             setLoadingMessage('Loading purchase order...');
-            _context3.n = 1;
+            _context3.p = 2;
+            _context3.n = 3;
             return api_call('get', 'PurchaseOrder', {
               po_number: poNumber
             });
-          case 1:
+          case 3:
             result = _context3.v;
             if (!result.success) {
-              _context3.n = 3;
+              _context3.n = 5;
               break;
             }
             cleaned_data = clean_po_data(result);
@@ -525,143 +706,81 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
             setLines(cleaned_data.lines || []);
 
             // Load vendor info if we have vendor code
-            if (!cleaned_data.header.vendor_code) {
-              _context3.n = 2;
+            if (!((_cleaned_data$header = cleaned_data.header) !== null && _cleaned_data$header !== void 0 && _cleaned_data$header.vendor_code)) {
+              _context3.n = 4;
               break;
             }
-            _context3.n = 2;
-            return load_vendor_details(cleaned_data.header.vendor_code);
-          case 2:
             _context3.n = 4;
-            break;
-          case 3:
-            show_error('Failed to load purchase order');
+            return load_vendor_details(cleaned_data.header.vendor_code);
           case 4:
-            setLoading(false);
+            _context3.n = 6;
+            break;
           case 5:
+            show_error('Failed to load purchase order: ' + (result.error || 'Unknown error'));
+          case 6:
+            _context3.n = 8;
+            break;
+          case 7:
+            _context3.p = 7;
+            _t3 = _context3.v;
+            console.error('Error loading PO:', _t3);
+            show_error('Failed to load purchase order');
+          case 8:
+            _context3.p = 8;
+            setLoading(false);
+            return _context3.f(8);
+          case 9:
             return _context3.a(2);
         }
-      }, _callee3);
+      }, _callee3, null, [[2, 7, 8, 9]]);
     }));
     return function load_existing_po() {
-      return _ref4.apply(this, arguments);
+      return _ref3.apply(this, arguments);
     };
   }();
 
-  // Apply pre-population data
-  var apply_pre_population = function apply_pre_population() {
-    var data = prePopulateData;
-
-    // Apply location
-    if (data.location) {
-      setHeader(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          location: data.location
-        });
-      });
-    }
-
-    // Apply ship_via
-    if (data.ship_via) {
-      setHeader(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          ship_via: data.ship_via
-        });
-      });
-    }
-
-    // Apply shipping address
-    if (data.shipping_address) {
-      setHeader(function (prev) {
-        return _objectSpread(_objectSpread({}, prev), {}, {
-          shipping: _objectSpread(_objectSpread({}, prev.shipping), data.shipping_address)
-        });
-      });
-    }
-
-    // Add initial items
-    if (data.initial_items && data.initial_items.length > 0) {
-      var new_lines = data.initial_items.map(function (item) {
-        if (item.type === 'part' && item.part) {
-          return {
-            _source: 'active',
-            part: item.part,
-            pcode: item.part,
-            description: item.description || '',
-            pdesc: item.description || '',
-            quantity: item.qty || 1,
-            pqty: item.qty || 1,
-            price: item.price || 0,
-            pprce: item.price || 0,
-            discount: 0,
-            pdisc: 0,
-            extended: (item.price || 0) * (item.qty || 1),
-            pext: (item.price || 0) * (item.qty || 1),
-            received_qty: 0,
-            rqty: 0,
-            erd: header.expected_receipt_date,
-            type: 'R',
-            taxable: false,
-            message: '',
-            msg: ''
-          };
-        } else if (item.type === 'note' && item.message) {
-          return {
-            _source: 'active',
-            type: 'N',
-            message: item.message,
-            msg: item.message,
-            part: '',
-            pcode: '',
-            description: '',
-            pdesc: '',
-            quantity: 0,
-            pqty: 0,
-            price: 0,
-            pprce: 0,
-            discount: 0,
-            pdisc: 0,
-            extended: 0,
-            pext: 0,
-            received_qty: 0,
-            rqty: 0,
-            erd: header.expected_receipt_date,
-            taxable: false
-          };
-        }
-        return null;
-      }).filter(Boolean);
-      setLines(new_lines);
-
-      // Fetch virtual inventory for parts
-      new_lines.forEach(function (line, index) {
-        if (line.part) {
-          fetch_virtual_inventory(line.part, index);
-        }
-      });
-    }
-  };
-
   // Vendor handling
   var handle_vendor_change = /*#__PURE__*/function () {
-    var _ref5 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(vendor_data) {
+    var _ref4 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4(vendor_data) {
       return _regenerator().w(function (_context4) {
         while (1) switch (_context4.n) {
           case 0:
+            if (vendor_data) {
+              _context4.n = 1;
+              break;
+            }
+            setVendor(null);
+            setHeader(function (prev) {
+              return _objectSpread(_objectSpread({}, prev), {}, {
+                vendor_code: '',
+                vendor_name: '',
+                billing: {
+                  name: '',
+                  address1: '',
+                  address2: '',
+                  city: '',
+                  state: '',
+                  zip: '',
+                  country: 'USA'
+                }
+              });
+            });
+            return _context4.a(2);
+          case 1:
             setVendor(vendor_data);
 
             // Update header
             setHeader(function (prev) {
               return _objectSpread(_objectSpread({}, prev), {}, {
-                vendor_code: vendor_data.code,
-                vendor_name: vendor_data.name,
+                vendor_code: vendor_data.code || '',
+                vendor_name: vendor_data.name || '',
                 billing: {
-                  name: vendor_data.name,
+                  name: vendor_data.name || '',
                   address1: vendor_data.add1 || '',
                   address2: vendor_data.add2 || '',
                   city: vendor_data.city || '',
                   state: vendor_data.state || '',
-                  zip: vendor_data.zip_ || '',
+                  zip: vendor_data.zip_ || vendor_data.zip || '',
                   country: vendor_data.country || 'USA'
                 },
                 terms: vendor_data.terms_num || prev.terms
@@ -682,22 +801,30 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
                 comments2: ''
               });
             }
-          case 1:
+          case 2:
             return _context4.a(2);
         }
       }, _callee4);
     }));
     return function handle_vendor_change(_x3) {
-      return _ref5.apply(this, arguments);
+      return _ref4.apply(this, arguments);
     };
   }();
   var load_vendor_details = /*#__PURE__*/function () {
-    var _ref6 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(vendor_code) {
-      var result;
+    var _ref5 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5(vendor_code) {
+      var result, _t4;
       return _regenerator().w(function (_context5) {
         while (1) switch (_context5.n) {
           case 0:
-            _context5.n = 1;
+            if (vendor_code) {
+              _context5.n = 1;
+              break;
+            }
+            return _context5.a(2);
+          case 1:
+            console.log('Loading vendor details for:', vendor_code);
+            _context5.p = 2;
+            _context5.n = 3;
             return api_call('list', 'GPACIFIC_dbo_BKAPVEND', {
               filters: {
                 code: {
@@ -708,21 +835,51 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
               start: 0,
               length: 1
             });
-          case 1:
+          case 3:
             result = _context5.v;
-            if (!(result.success && result.data && result.data.length > 0)) {
-              _context5.n = 2;
+            if (!(!result.success || !result.data || result.data.length === 0)) {
+              _context5.n = 5;
               break;
             }
-            _context5.n = 2;
+            _context5.n = 4;
+            return api_call('list', 'GPACIFIC_dbo_BKAPVEND', {
+              filters: {
+                code: {
+                  operator: "ilike",
+                  value: vendor_code
+                }
+              },
+              start: 0,
+              length: 1
+            });
+          case 4:
+            result = _context5.v;
+          case 5:
+            if (!(result.success && result.data && result.data.length > 0)) {
+              _context5.n = 7;
+              break;
+            }
+            console.log('Found vendor:', result.data[0]);
+            _context5.n = 6;
             return handle_vendor_change(result.data[0]);
-          case 2:
-            return _context5.a(2);
+          case 6:
+            return _context5.a(2, result.data[0]);
+          case 7:
+            console.log('No vendor found for code:', vendor_code);
+          case 8:
+            _context5.n = 10;
+            break;
+          case 9:
+            _context5.p = 9;
+            _t4 = _context5.v;
+            console.error('Error loading vendor details:', _t4);
+          case 10:
+            return _context5.a(2, null);
         }
-      }, _callee5);
+      }, _callee5, null, [[2, 9]]);
     }));
     return function load_vendor_details(_x4) {
-      return _ref6.apply(this, arguments);
+      return _ref5.apply(this, arguments);
     };
   }();
 
@@ -757,7 +914,7 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
   var add_note_line = function add_note_line() {
     var new_note = {
       _source: 'active',
-      type: 'N',
+      type: 'X',
       message: '',
       msg: '',
       part: '',
@@ -822,7 +979,7 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
       }
 
       // Recalculate extended if needed
-      if (line.type !== 'N' && ['quantity', 'price', 'discount'].includes(field)) {
+      if (line.type !== 'X' && ['quantity', 'price', 'discount'].includes(field)) {
         var qty = parseFloat(line.quantity || line.pqty || 0);
         var price = parseFloat(line.price || line.pprce || 0);
         var discount = parseFloat(line.discount || line.pdisc || 0);
@@ -837,8 +994,8 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
 
   // Virtual inventory
   var fetch_virtual_inventory = /*#__PURE__*/function () {
-    var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(part, index) {
-      var result;
+    var _ref6 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6(part, index) {
+      var result, _t5;
       return _regenerator().w(function (_context6) {
         while (1) switch (_context6.n) {
           case 0:
@@ -851,7 +1008,8 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
             setInventoryLoading(function (prev) {
               return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, index, true));
             });
-            _context6.n = 2;
+            _context6.p = 2;
+            _context6.n = 3;
             return api_call('list', 'JADVDATA_dbo_virtual_inventory', {
               filters: {
                 part: {
@@ -862,7 +1020,7 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
               start: 0,
               length: 50
             });
-          case 2:
+          case 3:
             result = _context6.v;
             if (result.success && result.data && result.data.length > 0) {
               setVirtualInventory(function (prev) {
@@ -873,56 +1031,53 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
                 return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, index, []));
               });
             }
+            _context6.n = 5;
+            break;
+          case 4:
+            _context6.p = 4;
+            _t5 = _context6.v;
+            console.error('Error fetching virtual inventory:', _t5);
+            setVirtualInventory(function (prev) {
+              return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, index, []));
+            });
+          case 5:
+            _context6.p = 5;
             setInventoryLoading(function (prev) {
               return _objectSpread(_objectSpread({}, prev), {}, _defineProperty({}, index, false));
             });
-          case 3:
+            return _context6.f(5);
+          case 6:
             return _context6.a(2);
         }
-      }, _callee6);
+      }, _callee6, null, [[2, 4, 5, 6]]);
     }));
     return function fetch_virtual_inventory(_x5, _x6) {
-      return _ref7.apply(this, arguments);
+      return _ref6.apply(this, arguments);
     };
   }();
   var select_vendor_from_inventory = /*#__PURE__*/function () {
-    var _ref8 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(vendor_code, line_index) {
-      var static_vendor;
+    var _ref7 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7(vendor_code, line_index) {
+      var vendor_data;
       return _regenerator().w(function (_context7) {
         while (1) switch (_context7.n) {
           case 0:
-            if (!(prePopulateData.vendors && prePopulateData.vendors.length > 0)) {
-              _context7.n = 2;
-              break;
-            }
-            static_vendor = prePopulateData.vendors.find(function (v) {
-              return v.code === vendor_code;
-            });
-            if (!static_vendor) {
-              _context7.n = 2;
-              break;
-            }
             _context7.n = 1;
-            return handle_vendor_change(static_vendor);
-          case 1:
-            return _context7.a(2);
-          case 2:
-            _context7.n = 3;
             return load_vendor_details(vendor_code);
-          case 3:
-            return _context7.a(2);
+          case 1:
+            vendor_data = _context7.v;
+            return _context7.a(2, vendor_data);
         }
       }, _callee7);
     }));
     return function select_vendor_from_inventory(_x7, _x8) {
-      return _ref8.apply(this, arguments);
+      return _ref7.apply(this, arguments);
     };
   }();
 
   // Save PO
   var save_po = /*#__PURE__*/function () {
-    var _ref9 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
-      var save_data, operation, result;
+    var _ref8 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
+      var lines_with_numbers, save_data, operation, result, _result$data, _result$data2, _t6;
       return _regenerator().w(function (_context8) {
         while (1) switch (_context8.n) {
           case 0:
@@ -934,52 +1089,71 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
           case 1:
             setLoading(true);
             setLoadingMessage('Saving purchase order...');
+            _context8.p = 2;
+            // Add line numbers to each line
+            lines_with_numbers = lines.map(function (line, index) {
+              return _objectSpread(_objectSpread({}, line), {}, {
+                line_number: index + 1
+              });
+            });
             save_data = {
               header: header,
-              lines: lines,
+              lines: lines_with_numbers,
               deleted_line_ids: deletedLineIds
             };
             if (isEditMode) {
               save_data.po_number = poNumber;
             }
             operation = isEditMode ? 'update' : 'create';
-            _context8.n = 2;
+            _context8.n = 3;
             return api_call(operation, 'PurchaseOrder', {
               data: save_data
             });
-          case 2:
-            result = _context8.v;
-            if (!result.success) {
-              _context8.n = 5;
-              break;
-            }
-            show_success('Purchase order saved successfully!');
-            if (!(!isEditMode && result.data.po_number)) {
-              _context8.n = 3;
-              break;
-            }
-            // Redirect to edit mode
-            window.location.href = "/purchase_orders/edit/".concat(result.data.po_number);
-            _context8.n = 4;
-            break;
           case 3:
-            _context8.n = 4;
-            return load_existing_po();
-          case 4:
-            setDeletedLineIds([]);
-            _context8.n = 6;
+            result = _context8.v;
+            if (result.success) {
+              console.log('SAVE SUCCESS - Before state updates:', {
+                current_poNumber: poNumber,
+                current_isSaved: isSaved,
+                new_po_number: (_result$data = result.data) === null || _result$data === void 0 ? void 0 : _result$data.po_number
+              });
+              show_toast('Purchase order saved successfully!', 'success');
+              setIsSaved(true);
+              if (!isEditMode && (_result$data2 = result.data) !== null && _result$data2 !== void 0 && _result$data2.po_number) {
+                // Set the PO number for the current session
+                setPoNumber(result.data.po_number);
+                console.log('SAVE SUCCESS - After setPoNumber:', {
+                  poNumber: result.data.po_number,
+                  isSaved: true
+                });
+              }
+              console.log('SAVE SUCCESS - Final state (may not be updated yet):', {
+                poNumber: poNumber,
+                isSaved: isSaved,
+                isEditMode: isEditMode
+              });
+              setDeletedLineIds([]);
+            } else {
+              show_toast(result.error || result.message || 'Failed to save purchase order', 'error');
+            }
+            _context8.n = 5;
             break;
+          case 4:
+            _context8.p = 4;
+            _t6 = _context8.v;
+            console.error('Error saving PO:', _t6);
+            show_toast('Failed to save purchase order', 'error');
           case 5:
-            show_error(result.message || 'Failed to save purchase order');
-          case 6:
+            _context8.p = 5;
             setLoading(false);
-          case 7:
+            return _context8.f(5);
+          case 6:
             return _context8.a(2);
         }
-      }, _callee8);
+      }, _callee8, null, [[2, 4, 5, 6]]);
     }));
     return function save_po() {
-      return _ref9.apply(this, arguments);
+      return _ref8.apply(this, arguments);
     };
   }();
 
@@ -1000,6 +1174,25 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
       total: total
     };
   }, [lines, header.freight, header.tax_amount]);
+
+  // Sync calculated totals back to header
+  (0,external_React_namespaceObject.useEffect)(function () {
+    setHeader(function (prev) {
+      return _objectSpread(_objectSpread({}, prev), {}, {
+        subtotal: totals.subtotal,
+        total: totals.total
+      });
+    });
+  }, [totals.subtotal, totals.total]);
+
+  // Sync line count to header
+  (0,external_React_namespaceObject.useEffect)(function () {
+    setHeader(function (prev) {
+      return _objectSpread(_objectSpread({}, prev), {}, {
+        line_count: lines.length
+      });
+    });
+  }, [lines.length]);
 
   // Validation
   var validate_po = function validate_po() {
@@ -1036,17 +1229,28 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
 
   // Utility functions
   var show_error = function show_error(message) {
-    alert('Error: ' + message);
+    show_toast(message, 'error');
   };
   var show_success = function show_success(message) {
-    alert('Success: ' + message);
+    show_toast(message, 'success');
+  };
+  var show_toast = function show_toast(message) {
+    var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'info';
+    setToast({
+      message: message,
+      type: type
+    });
+    setTimeout(function () {
+      return setToast(null);
+    }, 5000);
   };
 
   // Render helpers
   var is_partially_received = lines.some(function (line) {
     return line.rqty > 0;
   });
-  var can_edit_header = !is_partially_received;
+  var can_edit_header = !is_partially_received && !isSaved && !is_view_mode;
+  var can_edit_lines = !isSaved && !is_view_mode;
   return /*#__PURE__*/external_React_default().createElement("div", {
     className: "container-fluid mt-3"
   }, loading && /*#__PURE__*/external_React_default().createElement("div", {
@@ -1062,7 +1266,19 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
     role: "status"
   }, /*#__PURE__*/external_React_default().createElement("span", {
     className: "visually-hidden"
-  }, "Loading...")), /*#__PURE__*/external_React_default().createElement("div", null, loadingMessage || 'Loading...'))), /*#__PURE__*/external_React_default().createElement("h4", {
+  }, "Loading...")), /*#__PURE__*/external_React_default().createElement("div", null, loadingMessage || 'Loading...'))), toast && /*#__PURE__*/external_React_default().createElement("div", {
+    className: "position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-".concat(toast.type === 'error' ? 'danger' : toast.type, " alert-dismissible"),
+    style: {
+      zIndex: 10000,
+      minWidth: '300px'
+    }
+  }, toast.message, /*#__PURE__*/external_React_default().createElement("button", {
+    type: "button",
+    className: "btn-close",
+    onClick: function onClick() {
+      return setToast(null);
+    }
+  })), /*#__PURE__*/external_React_default().createElement("h4", {
     className: "mb-3"
   }, "Purchase Order", poNumber && /*#__PURE__*/external_React_default().createElement("span", {
     className: "ms-2"
@@ -1090,10 +1306,11 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
     className: "text-danger"
   }, "*")), /*#__PURE__*/external_React_default().createElement(VendorSelect, {
     value: header.vendor_code,
-    vendors: prePopulateData.vendors,
+    vendor_name: header.vendor_name,
+    vendors: availableVendors,
     onVendorChange: handle_vendor_change,
     api_call: api_call,
-    disabled: !can_edit_header
+    disabled: !can_edit_header || is_view_mode
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-md-6"
   }, /*#__PURE__*/external_React_default().createElement("label", {
@@ -1101,15 +1318,16 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
   }, "Ordered By"), /*#__PURE__*/external_React_default().createElement("input", {
     type: "text",
     className: "form-control form-control-sm",
-    value: header.orderd_by_customer || '',
+    value: header.ordered_by_customer || '',
     onChange: function onChange(e) {
       return setHeader(function (prev) {
         return _objectSpread(_objectSpread({}, prev), {}, {
-          orderd_by_customer: e.target.value
+          ordered_by_customer: e.target.value
         });
       });
     },
-    placeholder: "Name..."
+    placeholder: "Name...",
+    disabled: is_view_mode
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-md-6"
   }, /*#__PURE__*/external_React_default().createElement("label", {
@@ -1146,6 +1364,8 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
         });
       });
     },
+    disabled: !can_edit_header // Add disabled prop
+    ,
     required: true
   })))))), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-lg-6 mb-3"
@@ -1198,14 +1418,16 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
     className: "form-control form-control-sm",
     value: header.freight,
     onChange: function onChange(e) {
-      return setHeader(function (prev) {
+      var val = parseFloat(e.target.value) || 0;
+      setHeader(function (prev) {
         return _objectSpread(_objectSpread({}, prev), {}, {
-          freight: parseFloat(e.target.value) || 0
+          freight: Math.max(0, val)
         });
       });
     },
     min: "0",
-    step: "0.01"
+    step: "0.01",
+    disabled: is_view_mode
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-md-12"
   }, /*#__PURE__*/external_React_default().createElement("label", {
@@ -1220,7 +1442,8 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
       });
     },
     api_call: api_call,
-    company: config.company
+    company: merged_config.company,
+    disabled: !can_edit_header // Add disabled prop
   }))))))), vendorComments.show && /*#__PURE__*/external_React_default().createElement("div", {
     className: "alert alert-warning"
   }, /*#__PURE__*/external_React_default().createElement("h6", {
@@ -1243,7 +1466,7 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
         });
       });
     },
-    readonly: !can_edit_header
+    readonly: !can_edit_header || is_view_mode
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-lg-6"
   }, /*#__PURE__*/external_React_default().createElement(AddressCard, {
@@ -1265,22 +1488,23 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
           })
         });
       });
-    }
+    },
+    readonly: is_view_mode
   }))), /*#__PURE__*/external_React_default().createElement("div", {
     className: "card mb-3"
   }, /*#__PURE__*/external_React_default().createElement("div", {
     className: "card-header d-flex justify-content-between align-items-center"
   }, /*#__PURE__*/external_React_default().createElement("h6", {
     className: "mb-0"
-  }, "Line Items"), /*#__PURE__*/external_React_default().createElement("div", null, /*#__PURE__*/external_React_default().createElement("button", {
-    className: "btn btn-primary btn-sm me-2",
-    onClick: add_line
-  }, /*#__PURE__*/external_React_default().createElement(Plus, {
-    size: 16,
-    className: "me-1"
-  }), "Add Line"), /*#__PURE__*/external_React_default().createElement("button", {
-    className: "btn btn-secondary btn-sm",
-    onClick: add_note_line
+  }, "Line Items"), /*#__PURE__*/external_React_default().createElement("div", null, /*#__PURE__*/external_React_default().createElement(AddLineButton, {
+    onClick: add_line,
+    label: "Add Line",
+    icon: Plus,
+    disabled: isSaved || is_view_mode
+  }), /*#__PURE__*/external_React_default().createElement("button", {
+    className: "btn btn-secondary btn-sm ms-2",
+    onClick: add_note_line,
+    disabled: isSaved || is_view_mode
   }, /*#__PURE__*/external_React_default().createElement(MessageSquare, {
     size: 16,
     className: "me-1"
@@ -1301,9 +1525,8 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
       onFetchInventory: function onFetchInventory(part) {
         return fetch_virtual_inventory(part, index);
       },
-      onSelectVendor: function onSelectVendor(vendor_code) {
-        return select_vendor_from_inventory(vendor_code, index);
-      }
+      onSelectVendor: select_vendor_from_inventory,
+      readonly: isSaved || is_view_mode
     });
   }))), /*#__PURE__*/external_React_default().createElement("div", {
     className: "row mb-3"
@@ -1327,81 +1550,131 @@ var PurchaseOrder = function PurchaseOrder(_ref) {
     className: "h5"
   }, "$", totals.total.toFixed(2))))))), /*#__PURE__*/external_React_default().createElement("div", {
     className: "mb-4"
-  }, /*#__PURE__*/external_React_default().createElement("button", {
+  }, !isSaved && !is_view_mode && /*#__PURE__*/external_React_default().createElement("button", {
     className: "btn btn-success me-2",
     onClick: save_po,
     disabled: loading
   }, /*#__PURE__*/external_React_default().createElement(Save, {
     size: 16,
     className: "me-1"
-  }), isEditMode ? 'Update PO' : 'Create PO'), isEditMode && /*#__PURE__*/external_React_default().createElement("button", {
+  }), isEditMode ? 'Update PO' : 'Create PO'), isSaved && poNumber && !is_view_mode && /*#__PURE__*/external_React_default().createElement("button", {
     className: "btn btn-primary me-2",
-    onClick: function onClick() {
-      return setShowReceiveModal(true);
-    }
+    onClick: /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+      var _window$app2, _window$app3, _window$app4, _window$app5, _window$app6, user, result, order_id, _t7;
+      return _regenerator().w(function (_context9) {
+        while (1) switch (_context9.n) {
+          case 0:
+            setLoading(true);
+            setLoadingMessage('Processing receive and invoice...');
+            _context9.p = 1;
+            // Debug: Check all possible user locations
+            console.log('=== USER DEBUG ===', {
+              config: config,
+              config_user: config.user,
+              window_user: window.user,
+              window_app: window.app,
+              window_app_user: (_window$app2 = window.app) === null || _window$app2 === void 0 ? void 0 : _window$app2.user,
+              window_app_state: (_window$app3 = window.app) === null || _window$app3 === void 0 ? void 0 : _window$app3.state,
+              window_app_state_user: (_window$app4 = window.app) === null || _window$app4 === void 0 || (_window$app4 = _window$app4.state) === null || _window$app4 === void 0 ? void 0 : _window$app4.user,
+              merged_config: merged_config,
+              merged_config_user: merged_config.user,
+              localStorage_user: localStorage.getItem('user'),
+              sessionStorage_user: sessionStorage.getItem('user')
+            });
+
+            // Try multiple sources for user
+            user = config.user || window.user || ((_window$app5 = window.app) === null || _window$app5 === void 0 ? void 0 : _window$app5.user) || ((_window$app6 = window.app) === null || _window$app6 === void 0 || (_window$app6 = _window$app6.state) === null || _window$app6 === void 0 ? void 0 : _window$app6.user) || merged_config.user || (localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null) || null;
+            console.log('Final user found:', user);
+            _context9.n = 2;
+            return api_call('rni_inv', 'PurchaseOrder', {
+              po_number: poNumber,
+              parked_order_id: merged_config.order || merged_config.parked_order_id || null,
+              parked_order_line: merged_config.line || null,
+              user: user,
+              user_id: (user === null || user === void 0 ? void 0 : user.id) || (user === null || user === void 0 ? void 0 : user.user_id) || null,
+              user_name: (user === null || user === void 0 ? void 0 : user.name) || (user === null || user === void 0 ? void 0 : user.username) || null
+            });
+          case 2:
+            result = _context9.v;
+            if (result.success) {
+              show_toast('Successfully received and invoiced PO', 'success');
+              // Navigate back to parked order or PO list
+              if (merged_config.order || merged_config.parked_order_id) {
+                order_id = merged_config.order || merged_config.parked_order_id;
+                if (navigation) {
+                  navigation.navigate_to('ParkedOrderDetail', {
+                    id: order_id
+                  });
+                }
+              } else {
+                if (navigation) {
+                  navigation.navigate_to('PurchaseOrders');
+                }
+              }
+            } else {
+              show_error(result.message || 'Failed to receive and invoice PO');
+            }
+            _context9.n = 4;
+            break;
+          case 3:
+            _context9.p = 3;
+            _t7 = _context9.v;
+            console.error('Error processing receive and invoice:', _t7);
+            show_error('Failed to receive and invoice PO');
+          case 4:
+            _context9.p = 4;
+            setLoading(false);
+            return _context9.f(4);
+          case 5:
+            return _context9.a(2);
+        }
+      }, _callee9, null, [[1, 3, 4, 5]]);
+    })),
+    disabled: loading
   }, /*#__PURE__*/external_React_default().createElement(Truck, {
     size: 16,
     className: "me-1"
-  }), "Receive"), /*#__PURE__*/external_React_default().createElement("button", {
-    className: "btn btn-secondary",
-    onClick: function onClick() {
-      return window.location.href = '/purchase_orders';
-    }
-  }, /*#__PURE__*/external_React_default().createElement(X, {
-    size: 16,
-    className: "me-1"
-  }), "Cancel")), showReceiveModal && /*#__PURE__*/external_React_default().createElement(ReceiveModal, {
-    lines: lines,
-    onClose: function onClose() {
-      return setShowReceiveModal(false);
-    },
-    onReceive: (/*#__PURE__*/function () {
-      var _ref0 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9(selected_indices) {
-        var result;
-        return _regenerator().w(function (_context9) {
-          while (1) switch (_context9.n) {
-            case 0:
-              setLoading(true);
-              setLoadingMessage('Processing receipt...');
-              _context9.n = 1;
-              return api_call('update', 'PurchaseOrder', {
-                po_number: poNumber,
-                action: 'receive_lines',
-                line_indices: selected_indices
-              });
-            case 1:
-              result = _context9.v;
-              if (!result.success) {
-                _context9.n = 3;
-                break;
-              }
-              show_success("Successfully received ".concat(selected_indices.length, " line(s)"));
-              _context9.n = 2;
-              return load_existing_po();
-            case 2:
-              _context9.n = 4;
-              break;
-            case 3:
-              show_error(result.message || 'Failed to process receipt');
-            case 4:
-              setLoading(false);
-              setShowReceiveModal(false);
-            case 5:
-              return _context9.a(2);
-          }
-        }, _callee9);
-      }));
-      return function (_x9) {
-        return _ref0.apply(this, arguments);
-      };
-    }())
-  }));
+  }), "Receive & Invoice"), /*#__PURE__*/external_React_default().createElement(CancelButton, {
+    navigation: navigation,
+    merged_config: merged_config
+  })));
 };
 
 // Sub-components
 
+var CancelButton = function CancelButton(_ref0) {
+  var navigation = _ref0.navigation,
+    merged_config = _ref0.merged_config;
+  var handle_cancel = function handle_cancel() {
+    // If we came from a parked order, go back to it
+    if (merged_config.order || merged_config.parked_order_id) {
+      var order_id = merged_config.order || merged_config.parked_order_id;
+      if (navigation) {
+        navigation.navigate_to('ParkedOrderDetail', {
+          id: order_id
+        });
+      }
+    } else {
+      // Otherwise go to purchase orders list
+      if (navigation) {
+        navigation.navigate_to('PurchaseOrders');
+      }
+    }
+  };
+
+  // In view mode, you might want to show "Back" instead of "Cancel"
+  var button_label = merged_config.mode === 'view' ? 'Back' : 'Cancel';
+  return /*#__PURE__*/external_React_default().createElement("button", {
+    className: "btn btn-secondary",
+    onClick: handle_cancel
+  }, /*#__PURE__*/external_React_default().createElement(X, {
+    size: 16,
+    className: "me-1"
+  }), button_label);
+};
 var VendorSelect = function VendorSelect(_ref1) {
   var value = _ref1.value,
+    vendor_name = _ref1.vendor_name,
     vendors = _ref1.vendors,
     onVendorChange = _ref1.onVendorChange,
     api_call = _ref1.api_call,
@@ -1423,26 +1696,97 @@ var VendorSelect = function VendorSelect(_ref1) {
     showDropdown = _useState32[0],
     setShowDropdown = _useState32[1];
 
+  // Update search term when value changes (e.g., when selected from virtual inventory)
+  (0,external_React_namespaceObject.useEffect)(function () {
+    if (value && vendor_name) {
+      setSearchTerm("".concat(value, " - ").concat(vendor_name));
+    } else if (value) {
+      setSearchTerm(value);
+    }
+  }, [value, vendor_name]);
+
+  // Search vendors function
+  var search_vendors = /*#__PURE__*/function () {
+    var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(term) {
+      var result, _t8;
+      return _regenerator().w(function (_context0) {
+        while (1) switch (_context0.n) {
+          case 0:
+            if (!(term.length < 2)) {
+              _context0.n = 1;
+              break;
+            }
+            setSuggestions([]);
+            return _context0.a(2);
+          case 1:
+            setLoading(true);
+            _context0.p = 2;
+            _context0.n = 3;
+            return api_call('list', 'GPACIFIC_dbo_BKAPVEND', {
+              filters: {
+                name: {
+                  operator: "ilike",
+                  value: "%".concat(term, "%")
+                }
+              },
+              start: 0,
+              length: 10
+            });
+          case 3:
+            result = _context0.v;
+            if (result.success && result.data) {
+              setSuggestions(result.data);
+            }
+            _context0.n = 5;
+            break;
+          case 4:
+            _context0.p = 4;
+            _t8 = _context0.v;
+            console.error('Error searching vendors:', _t8);
+            setSuggestions([]);
+          case 5:
+            setLoading(false);
+          case 6:
+            return _context0.a(2);
+        }
+      }, _callee0, null, [[2, 4]]);
+    }));
+    return function search_vendors(_x9) {
+      return _ref10.apply(this, arguments);
+    };
+  }();
+  (0,external_React_namespaceObject.useEffect)(function () {
+    var timer = setTimeout(function () {
+      if (searchTerm && !value) {
+        search_vendors(searchTerm);
+      }
+    }, 300);
+    return function () {
+      return clearTimeout(timer);
+    };
+  }, [searchTerm, value]);
+
   // Static vendors mode
   if (vendors && vendors.length > 0) {
     return /*#__PURE__*/external_React_default().createElement("select", {
       className: "form-select form-select-sm",
-      value: value,
+      value: value || '',
       onChange: (/*#__PURE__*/function () {
-        var _ref10 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0(e) {
-          var _result$data;
+        var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(e) {
+          var _result$data3;
           var vendor_code, result;
-          return _regenerator().w(function (_context0) {
-            while (1) switch (_context0.n) {
+          return _regenerator().w(function (_context1) {
+            while (1) switch (_context1.n) {
               case 0:
                 vendor_code = e.target.value;
                 if (vendor_code) {
-                  _context0.n = 1;
+                  _context1.n = 1;
                   break;
                 }
-                return _context0.a(2);
+                onVendorChange(null);
+                return _context1.a(2);
               case 1:
-                _context0.n = 2;
+                _context1.n = 2;
                 return api_call('list', 'GPACIFIC_dbo_BKAPVEND', {
                   filters: {
                     code: {
@@ -1454,17 +1798,17 @@ var VendorSelect = function VendorSelect(_ref1) {
                   length: 1
                 });
               case 2:
-                result = _context0.v;
-                if (result.success && (_result$data = result.data) !== null && _result$data !== void 0 && _result$data[0]) {
+                result = _context1.v;
+                if (result.success && (_result$data3 = result.data) !== null && _result$data3 !== void 0 && _result$data3[0]) {
                   onVendorChange(result.data[0]);
                 }
               case 3:
-                return _context0.a(2);
+                return _context1.a(2);
             }
-          }, _callee0);
+          }, _callee1);
         }));
         return function (_x0) {
-          return _ref10.apply(this, arguments);
+          return _ref11.apply(this, arguments);
         };
       }()),
       disabled: disabled,
@@ -1480,63 +1824,18 @@ var VendorSelect = function VendorSelect(_ref1) {
   }
 
   // Autocomplete mode
-  var search_vendors = /*#__PURE__*/function () {
-    var _ref11 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee1(term) {
-      var result;
-      return _regenerator().w(function (_context1) {
-        while (1) switch (_context1.n) {
-          case 0:
-            if (!(term.length < 2)) {
-              _context1.n = 1;
-              break;
-            }
-            setSuggestions([]);
-            return _context1.a(2);
-          case 1:
-            setLoading(true);
-            _context1.n = 2;
-            return api_call('list', 'GPACIFIC_dbo_BKAPVEND', {
-              filters: {
-                name: {
-                  operator: "ilike",
-                  value: term
-                }
-              }
-            });
-          case 2:
-            result = _context1.v;
-            if (result.success && result.data) {
-              setSuggestions(result.data.slice(0, 10));
-            }
-            setLoading(false);
-          case 3:
-            return _context1.a(2);
-        }
-      }, _callee1);
-    }));
-    return function search_vendors(_x1) {
-      return _ref11.apply(this, arguments);
-    };
-  }();
-  (0,external_React_namespaceObject.useEffect)(function () {
-    var timer = setTimeout(function () {
-      if (searchTerm && !value) {
-        search_vendors(searchTerm);
-      }
-    }, 300);
-    return function () {
-      return clearTimeout(timer);
-    };
-  }, [searchTerm]);
   return /*#__PURE__*/external_React_default().createElement("div", {
     className: "position-relative"
   }, /*#__PURE__*/external_React_default().createElement("input", {
     type: "text",
     className: "form-control form-control-sm",
-    value: value ? "".concat(value, " - ").concat(searchTerm) : searchTerm,
+    value: searchTerm,
     onChange: function onChange(e) {
       setSearchTerm(e.target.value);
       setShowDropdown(true);
+      if (!e.target.value) {
+        onVendorChange(null);
+      }
     },
     onFocus: function onFocus() {
       return setShowDropdown(true);
@@ -1546,26 +1845,32 @@ var VendorSelect = function VendorSelect(_ref1) {
         return setShowDropdown(false);
       }, 200);
     },
-    placeholder: "Search vendor...",
+    placeholder: "Search vendor by code or name...",
     disabled: disabled,
     required: true
-  }), showDropdown && suggestions.length > 0 && /*#__PURE__*/external_React_default().createElement("div", {
-    className: "position-absolute top-100 start-0 w-100 bg-white border rounded shadow-sm mt-1",
+  }), showDropdown && (suggestions.length > 0 || loading) && /*#__PURE__*/external_React_default().createElement("div", {
+    className: "dropdown-menu d-block position-absolute mt-1",
     style: {
-      maxHeight: '200px',
-      overflowY: 'auto',
-      zIndex: 1050
+      minWidth: '400px',
+      maxHeight: '300px',
+      overflowY: 'auto'
     }
-  }, suggestions.map(function (vendor) {
-    return /*#__PURE__*/external_React_default().createElement("div", {
+  }, loading && /*#__PURE__*/external_React_default().createElement("div", {
+    className: "dropdown-item-text text-center"
+  }, /*#__PURE__*/external_React_default().createElement("small", {
+    className: "text-muted"
+  }, "Loading...")), !loading && suggestions.map(function (vendor) {
+    return /*#__PURE__*/external_React_default().createElement("button", {
       key: vendor.code,
-      className: "p-2 hover-bg-light cursor-pointer",
+      className: "dropdown-item text-truncate",
+      type: "button",
       onClick: function onClick() {
         onVendorChange(vendor);
-        setSearchTerm(vendor.name);
+        setSearchTerm("".concat(vendor.code, " - ").concat(vendor.name));
         setShowDropdown(false);
-      }
-    }, vendor.code, " - ", vendor.name);
+      },
+      title: "".concat(vendor.code, " - ").concat(vendor.name)
+    }, /*#__PURE__*/external_React_default().createElement("strong", null, vendor.code), " - ", vendor.name);
   })));
 };
 var TermsSelect = function TermsSelect(_ref12) {
@@ -1585,7 +1890,7 @@ var TermsSelect = function TermsSelect(_ref12) {
           while (1) switch (_context10.n) {
             case 0:
               _context10.n = 1;
-              return api_call('list', 'BKSYSTERM', {
+              return api_call('list', 'GPACIFIC_dbo_BKSYTERM', {
                 start: 0,
                 length: 0,
                 return_columns: ["num", "desc"],
@@ -1635,7 +1940,8 @@ var LocationSelect = function LocationSelect(_ref14) {
   var value = _ref14.value,
     _onChange2 = _ref14.onChange,
     api_call = _ref14.api_call,
-    company = _ref14.company;
+    company = _ref14.company,
+    disabled = _ref14.disabled;
   var _useState35 = (0,external_React_namespaceObject.useState)([]),
     _useState36 = _slicedToArray(_useState35, 2),
     locations = _useState36[0],
@@ -1697,7 +2003,8 @@ var LocationSelect = function LocationSelect(_ref14) {
     value: value,
     onChange: function onChange(e) {
       return _onChange2(e.target.value);
-    }
+    },
+    disabled: disabled // Add disabled prop
   }, /*#__PURE__*/external_React_default().createElement("option", {
     value: ""
   }, "Select Location..."), locations.map(function (loc) {
@@ -1712,51 +2019,22 @@ var ShipViaInput = function ShipViaInput(_ref16) {
     _onChange3 = _ref16.onChange,
     api_call = _ref16.api_call,
     disabled = _ref16.disabled;
-  var _useState37 = (0,external_React_namespaceObject.useState)([]),
-    _useState38 = _slicedToArray(_useState37, 2),
-    suggestions = _useState38[0],
-    setSuggestions = _useState38[1];
-  var _useState39 = (0,external_React_namespaceObject.useState)(false),
-    _useState40 = _slicedToArray(_useState39, 2),
-    showDropdown = _useState40[0],
-    setShowDropdown = _useState40[1];
-  var common_options = ['UPS', 'FEDEX', 'USPS', 'DHL', 'FREIGHT', 'PICKUP'];
-  return /*#__PURE__*/external_React_default().createElement("div", {
-    className: "position-relative"
-  }, /*#__PURE__*/external_React_default().createElement("input", {
-    type: "text",
-    className: "form-control form-control-sm",
+  var ship_options = ['UPS', 'FEDEX', 'WILL CALL', 'LOCAL', 'FREIGHT', 'USPS', 'DHL'];
+  return /*#__PURE__*/external_React_default().createElement("select", {
+    className: "form-select form-select-sm",
     value: value,
     onChange: function onChange(e) {
       return _onChange3(e.target.value);
     },
-    onFocus: function onFocus() {
-      return setShowDropdown(true);
-    },
-    onBlur: function onBlur() {
-      return setTimeout(function () {
-        return setShowDropdown(false);
-      }, 200);
-    },
-    placeholder: "Ship via...",
     disabled: disabled
-  }), showDropdown && /*#__PURE__*/external_React_default().createElement("div", {
-    className: "position-absolute top-100 start-0 w-100 bg-white border rounded shadow-sm mt-1",
-    style: {
-      zIndex: 1050
-    }
-  }, common_options.filter(function (opt) {
-    return opt.toLowerCase().includes(value.toLowerCase());
-  }).map(function (opt) {
-    return /*#__PURE__*/external_React_default().createElement("div", {
+  }, /*#__PURE__*/external_React_default().createElement("option", {
+    value: ""
+  }, "Select ship via..."), ship_options.map(function (opt) {
+    return /*#__PURE__*/external_React_default().createElement("option", {
       key: opt,
-      className: "p-2 hover-bg-light cursor-pointer",
-      onClick: function onClick() {
-        _onChange3(opt);
-        setShowDropdown(false);
-      }
+      value: opt
     }, opt);
-  })));
+  }));
 };
 var AddressCard = function AddressCard(_ref17) {
   var title = _ref17.title,
@@ -1771,7 +2049,7 @@ var AddressCard = function AddressCard(_ref17) {
     className: "card-header d-flex justify-content-between align-items-center"
   }, /*#__PURE__*/external_React_default().createElement("h6", {
     className: "mb-0"
-  }, title), showCopyButton && /*#__PURE__*/external_React_default().createElement("button", {
+  }, title), showCopyButton && !readonly && /*#__PURE__*/external_React_default().createElement("button", {
     type: "button",
     className: "btn btn-sm btn-secondary",
     onClick: onCopy
@@ -1806,7 +2084,8 @@ var AddressCard = function AddressCard(_ref17) {
         attention: e.target.value
       }));
     },
-    placeholder: "Attention"
+    placeholder: "Attention",
+    readOnly: readonly
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-12"
   }, /*#__PURE__*/external_React_default().createElement("input", {
@@ -1879,17 +2158,18 @@ var LineItem = function LineItem(_ref18) {
   var line = _ref18.line,
     index = _ref18.index,
     onUpdate = _ref18.onUpdate,
-    onRemove = _ref18.onRemove,
+    _onRemove = _ref18.onRemove,
     api_call = _ref18.api_call,
     virtualInventory = _ref18.virtualInventory,
     inventoryLoading = _ref18.inventoryLoading,
     onFetchInventory = _ref18.onFetchInventory,
-    onSelectVendor = _ref18.onSelectVendor;
+    onSelectVendor = _ref18.onSelectVendor,
+    readonly = _ref18.readonly;
   var is_received = parseFloat(line.rqty || 0) > 0;
   var is_historical = line._source === 'historical';
-  var is_readonly = is_received || is_historical;
+  var is_readonly = is_received || is_historical || readonly;
   var line_number = index + 1;
-  var is_note_line = line.type === 'N' || !line.pcode && !line.part && line.msg;
+  var is_note_line = line.type === 'X' || !line.pcode && !line.part && line.msg;
   if (is_note_line) {
     return /*#__PURE__*/external_React_default().createElement("div", {
       className: "card mb-2 ".concat(is_readonly ? 'bg-light' : '')
@@ -1924,7 +2204,7 @@ var LineItem = function LineItem(_ref18) {
     }, /*#__PURE__*/external_React_default().createElement("button", {
       className: "btn btn-sm btn-danger",
       onClick: function onClick() {
-        return onRemove(index);
+        return _onRemove(index);
       }
     }, /*#__PURE__*/external_React_default().createElement(Trash2, {
       size: 16
@@ -1940,14 +2220,11 @@ var LineItem = function LineItem(_ref18) {
     className: "fw-bold text-muted"
   }, "Line ", line_number), is_received && /*#__PURE__*/external_React_default().createElement("span", {
     className: "badge bg-success ms-2"
-  }, "RECEIVED")), !is_readonly && /*#__PURE__*/external_React_default().createElement("button", {
-    className: "btn btn-sm btn-danger",
-    onClick: function onClick() {
-      return onRemove(index);
+  }, "RECEIVED")), !is_readonly && /*#__PURE__*/external_React_default().createElement(RemoveLineButton, {
+    onRemove: function onRemove() {
+      return _onRemove(index);
     }
-  }, /*#__PURE__*/external_React_default().createElement(Trash2, {
-    size: 16
-  }))), /*#__PURE__*/external_React_default().createElement("div", {
+  })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "row g-2"
   }, /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-md-2"
@@ -2003,12 +2280,12 @@ var LineItem = function LineItem(_ref18) {
           }
         }, _callee12);
       }));
-      return function (_x10) {
+      return function (_x1) {
         return _ref19.apply(this, arguments);
       };
     }()),
     api_call: api_call,
-    readonly: is_readonly
+    readonly: is_readonly || readonly // Add the parent readonly prop
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-md-4"
   }, /*#__PURE__*/external_React_default().createElement("label", {
@@ -2031,7 +2308,8 @@ var LineItem = function LineItem(_ref18) {
     className: "form-control form-control-sm",
     value: line.quantity || line.pqty || 0,
     onChange: function onChange(e) {
-      return onUpdate(index, 'quantity', parseFloat(e.target.value) || 0);
+      var val = parseFloat(e.target.value) || 0;
+      onUpdate(index, 'quantity', Math.max(0, val));
     },
     min: "0",
     step: "1",
@@ -2045,7 +2323,8 @@ var LineItem = function LineItem(_ref18) {
     className: "form-control form-control-sm",
     value: line.price || line.pprce || 0,
     onChange: function onChange(e) {
-      return onUpdate(index, 'price', parseFloat(e.target.value) || 0);
+      var val = parseFloat(e.target.value) || 0;
+      onUpdate(index, 'price', Math.max(0, val));
     },
     min: "0",
     step: "0.01",
@@ -2059,7 +2338,8 @@ var LineItem = function LineItem(_ref18) {
     className: "form-control form-control-sm",
     value: line.discount || line.pdisc || 0,
     onChange: function onChange(e) {
-      return onUpdate(index, 'discount', parseFloat(e.target.value) || 0);
+      var val = parseFloat(e.target.value) || 0;
+      onUpdate(index, 'discount', Math.max(0, val));
     },
     min: "0",
     readOnly: is_readonly
@@ -2083,7 +2363,7 @@ var LineItem = function LineItem(_ref18) {
     onChange: function onChange(e) {
       return onUpdate(index, 'erd', e.target.value);
     },
-    readOnly: is_readonly
+    readOnly: is_readonly || readonly // Add parent readonly prop
   }))), virtualInventory && virtualInventory.length > 0 && /*#__PURE__*/external_React_default().createElement("div", {
     className: "mt-3"
   }, /*#__PURE__*/external_React_default().createElement("div", {
@@ -2116,12 +2396,10 @@ var LineItem = function LineItem(_ref18) {
       key: idx
     }, /*#__PURE__*/external_React_default().createElement("td", {
       className: "fw-bold"
-    }, (item.company || '').toUpperCase()), /*#__PURE__*/external_React_default().createElement("td", null, item.loc || ''), /*#__PURE__*/external_React_default().createElement("td", null, item.qty || 0), /*#__PURE__*/external_React_default().createElement("td", null, /*#__PURE__*/external_React_default().createElement("button", {
-      className: "btn btn-sm btn-primary",
-      onClick: function onClick() {
-        return onSelectVendor((item.company || '').toUpperCase());
-      }
-    }, "Use")));
+    }, (item.company || '').toUpperCase()), /*#__PURE__*/external_React_default().createElement("td", null, item.loc || ''), /*#__PURE__*/external_React_default().createElement("td", null, item.qty || 0), /*#__PURE__*/external_React_default().createElement("td", null, /*#__PURE__*/external_React_default().createElement(UseVendorButton, {
+      vendor_code: (item.company || '').toUpperCase(),
+      onSelectVendor: onSelectVendor
+    })));
   })))))))));
 };
 var PartSearch = function PartSearch(_ref20) {
@@ -2130,28 +2408,28 @@ var PartSearch = function PartSearch(_ref20) {
     onPartSelect = _ref20.onPartSelect,
     api_call = _ref20.api_call,
     readonly = _ref20.readonly;
-  var _useState41 = (0,external_React_namespaceObject.useState)(value),
+  var _useState37 = (0,external_React_namespaceObject.useState)(value || ''),
+    _useState38 = _slicedToArray(_useState37, 2),
+    searchTerm = _useState38[0],
+    setSearchTerm = _useState38[1];
+  var _useState39 = (0,external_React_namespaceObject.useState)([]),
+    _useState40 = _slicedToArray(_useState39, 2),
+    suggestions = _useState40[0],
+    setSuggestions = _useState40[1];
+  var _useState41 = (0,external_React_namespaceObject.useState)(false),
     _useState42 = _slicedToArray(_useState41, 2),
-    searchTerm = _useState42[0],
-    setSearchTerm = _useState42[1];
-  var _useState43 = (0,external_React_namespaceObject.useState)([]),
+    showDropdown = _useState42[0],
+    setShowDropdown = _useState42[1];
+  var _useState43 = (0,external_React_namespaceObject.useState)(false),
     _useState44 = _slicedToArray(_useState43, 2),
-    suggestions = _useState44[0],
-    setSuggestions = _useState44[1];
-  var _useState45 = (0,external_React_namespaceObject.useState)(false),
-    _useState46 = _slicedToArray(_useState45, 2),
-    showDropdown = _useState46[0],
-    setShowDropdown = _useState46[1];
-  var _useState47 = (0,external_React_namespaceObject.useState)(false),
-    _useState48 = _slicedToArray(_useState47, 2),
-    loading = _useState48[0],
-    setLoading = _useState48[1];
+    loading = _useState44[0],
+    setLoading = _useState44[1];
   (0,external_React_namespaceObject.useEffect)(function () {
-    setSearchTerm(value);
+    setSearchTerm(value || '');
   }, [value]);
   var search_parts = /*#__PURE__*/function () {
     var _ref21 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee13(term) {
-      var result;
+      var result, _t9;
       return _regenerator().w(function (_context13) {
         while (1) switch (_context13.n) {
           case 0:
@@ -2163,7 +2441,8 @@ var PartSearch = function PartSearch(_ref20) {
             return _context13.a(2);
           case 1:
             setLoading(true);
-            _context13.n = 2;
+            _context13.p = 2;
+            _context13.n = 3;
             return api_call('list', 'JADVDATA_dbo_part_meta', {
               return_columns: ["part", "inventory_description"],
               order: [{
@@ -2178,29 +2457,43 @@ var PartSearch = function PartSearch(_ref20) {
               filters: {
                 part: {
                   operator: "ilike",
-                  value: term
+                  value: "".concat(term, "%")
                 }
-              }
+              },
+              start: 0,
+              length: 20
             });
-          case 2:
+          case 3:
             result = _context13.v;
             if (result.success && result.data) {
-              setSuggestions(result.data.slice(0, 20));
+              setSuggestions(result.data);
+            } else {
+              setSuggestions([]);
             }
+            _context13.n = 5;
+            break;
+          case 4:
+            _context13.p = 4;
+            _t9 = _context13.v;
+            console.error('Error searching parts:', _t9);
+            setSuggestions([]);
+          case 5:
             setLoading(false);
-          case 3:
+          case 6:
             return _context13.a(2);
         }
-      }, _callee13);
+      }, _callee13, null, [[2, 4]]);
     }));
-    return function search_parts(_x11) {
+    return function search_parts(_x10) {
       return _ref21.apply(this, arguments);
     };
   }();
   (0,external_React_namespaceObject.useEffect)(function () {
     var timer = setTimeout(function () {
-      if (searchTerm && searchTerm !== value) {
+      if (searchTerm) {
         search_parts(searchTerm);
+      } else {
+        setSuggestions([]);
       }
     }, 300);
     return function () {
@@ -2214,47 +2507,62 @@ var PartSearch = function PartSearch(_ref20) {
     className: "form-control form-control-sm",
     value: searchTerm,
     onChange: function onChange(e) {
-      setSearchTerm(e.target.value);
-      _onChange5(e.target.value);
+      var new_value = e.target.value;
+      setSearchTerm(new_value);
+      _onChange5(new_value);
       setShowDropdown(true);
     },
     onFocus: function onFocus() {
-      return setShowDropdown(true);
+      setShowDropdown(true);
+      if (searchTerm && suggestions.length === 0) {
+        search_parts(searchTerm);
+      }
     },
     onBlur: function onBlur() {
       return setTimeout(function () {
         return setShowDropdown(false);
       }, 200);
     },
-    placeholder: "Search...",
+    placeholder: "Search part...",
     readOnly: readonly
-  }), showDropdown && suggestions.length > 0 && /*#__PURE__*/external_React_default().createElement("div", {
-    className: "position-absolute top-100 start-0 w-100 bg-white border rounded shadow-sm mt-1",
+  }), showDropdown && (searchTerm.length >= 2 || suggestions.length > 0) && /*#__PURE__*/external_React_default().createElement("div", {
+    className: "dropdown-menu d-block position-absolute w-100 mt-1",
     style: {
       maxHeight: '200px',
-      overflowY: 'auto',
-      zIndex: 1050
+      overflowY: 'auto'
     }
-  }, suggestions.map(function (part) {
-    return /*#__PURE__*/external_React_default().createElement("div", {
+  }, loading && /*#__PURE__*/external_React_default().createElement("div", {
+    className: "dropdown-item-text text-center"
+  }, /*#__PURE__*/external_React_default().createElement("small", {
+    className: "text-muted"
+  }, "Searching parts...")), !loading && suggestions.length === 0 && searchTerm.length >= 2 && /*#__PURE__*/external_React_default().createElement("div", {
+    className: "dropdown-item-text text-center"
+  }, /*#__PURE__*/external_React_default().createElement("small", {
+    className: "text-muted"
+  }, "No parts found")), !loading && suggestions.map(function (part) {
+    return /*#__PURE__*/external_React_default().createElement("button", {
       key: part.part,
-      className: "p-2 hover-bg-light cursor-pointer",
+      className: "dropdown-item",
+      type: "button",
       onClick: function onClick() {
         onPartSelect(part);
         setSearchTerm(part.part);
         setShowDropdown(false);
+        setSuggestions([]);
       }
-    }, part.part, " - ", part.inventory_description);
+    }, /*#__PURE__*/external_React_default().createElement("strong", null, part.part), part.inventory_description && /*#__PURE__*/external_React_default().createElement("div", {
+      className: "small text-muted"
+    }, part.inventory_description));
   })));
 };
 var ReceiveModal = function ReceiveModal(_ref22) {
   var lines = _ref22.lines,
     onClose = _ref22.onClose,
     onReceive = _ref22.onReceive;
-  var _useState49 = (0,external_React_namespaceObject.useState)(new Set()),
-    _useState50 = _slicedToArray(_useState49, 2),
-    selected = _useState50[0],
-    setSelected = _useState50[1];
+  var _useState45 = useState(new Set()),
+    _useState46 = _slicedToArray(_useState45, 2),
+    selected = _useState46[0],
+    setSelected = _useState46[1];
   var receivable_lines = lines.map(function (line, index) {
     return {
       line: line,
@@ -2265,30 +2573,30 @@ var ReceiveModal = function ReceiveModal(_ref22) {
     return parseFloat(line.rqty || line.received_qty || 0) === 0;
   });
   if (receivable_lines.length === 0) {
-    return /*#__PURE__*/external_React_default().createElement("div", {
+    return /*#__PURE__*/React.createElement("div", {
       className: "modal d-block",
       style: {
         backgroundColor: 'rgba(0,0,0,0.5)'
       }
-    }, /*#__PURE__*/external_React_default().createElement("div", {
+    }, /*#__PURE__*/React.createElement("div", {
       className: "modal-dialog"
-    }, /*#__PURE__*/external_React_default().createElement("div", {
+    }, /*#__PURE__*/React.createElement("div", {
       className: "modal-content"
-    }, /*#__PURE__*/external_React_default().createElement("div", {
+    }, /*#__PURE__*/React.createElement("div", {
       className: "modal-header"
-    }, /*#__PURE__*/external_React_default().createElement("h5", {
+    }, /*#__PURE__*/React.createElement("h5", {
       className: "modal-title"
-    }, "Receive Purchase Order Lines"), /*#__PURE__*/external_React_default().createElement("button", {
+    }, "Receive Purchase Order Lines"), /*#__PURE__*/React.createElement("button", {
       type: "button",
       className: "btn-close",
       onClick: onClose
-    })), /*#__PURE__*/external_React_default().createElement("div", {
+    })), /*#__PURE__*/React.createElement("div", {
       className: "modal-body"
-    }, /*#__PURE__*/external_React_default().createElement("p", {
+    }, /*#__PURE__*/React.createElement("p", {
       className: "text-muted"
-    }, "All lines have been received.")), /*#__PURE__*/external_React_default().createElement("div", {
+    }, "All lines have been received.")), /*#__PURE__*/React.createElement("div", {
       className: "modal-footer"
-    }, /*#__PURE__*/external_React_default().createElement("button", {
+    }, /*#__PURE__*/React.createElement("button", {
       type: "button",
       className: "btn btn-secondary",
       onClick: onClose
@@ -2313,58 +2621,58 @@ var ReceiveModal = function ReceiveModal(_ref22) {
     }
     setSelected(new_selected);
   };
-  return /*#__PURE__*/external_React_default().createElement("div", {
+  return /*#__PURE__*/React.createElement("div", {
     className: "modal d-block",
     style: {
       backgroundColor: 'rgba(0,0,0,0.5)'
     }
-  }, /*#__PURE__*/external_React_default().createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     className: "modal-dialog modal-lg"
-  }, /*#__PURE__*/external_React_default().createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     className: "modal-content"
-  }, /*#__PURE__*/external_React_default().createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     className: "modal-header"
-  }, /*#__PURE__*/external_React_default().createElement("h5", {
+  }, /*#__PURE__*/React.createElement("h5", {
     className: "modal-title"
-  }, "Receive Purchase Order Lines"), /*#__PURE__*/external_React_default().createElement("button", {
+  }, "Receive Purchase Order Lines"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "btn-close",
     onClick: onClose
-  })), /*#__PURE__*/external_React_default().createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {
     className: "modal-body"
-  }, /*#__PURE__*/external_React_default().createElement("p", {
+  }, /*#__PURE__*/React.createElement("p", {
     className: "text-muted"
-  }, "Select which lines to receive. Each selected line will be fully received."), /*#__PURE__*/external_React_default().createElement("div", {
+  }, "Select which lines to receive. Each selected line will be fully received."), /*#__PURE__*/React.createElement("div", {
     className: "table-responsive"
-  }, /*#__PURE__*/external_React_default().createElement("table", {
+  }, /*#__PURE__*/React.createElement("table", {
     className: "table"
-  }, /*#__PURE__*/external_React_default().createElement("thead", null, /*#__PURE__*/external_React_default().createElement("tr", null, /*#__PURE__*/external_React_default().createElement("th", {
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
     width: "50"
-  }, /*#__PURE__*/external_React_default().createElement("input", {
+  }, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
     className: "form-check-input",
     checked: selected.size === receivable_lines.length,
     onChange: toggle_all
-  })), /*#__PURE__*/external_React_default().createElement("th", null, "Line"), /*#__PURE__*/external_React_default().createElement("th", null, "Part"), /*#__PURE__*/external_React_default().createElement("th", null, "Description"), /*#__PURE__*/external_React_default().createElement("th", null, "Quantity"))), /*#__PURE__*/external_React_default().createElement("tbody", null, receivable_lines.map(function (_ref25) {
+  })), /*#__PURE__*/React.createElement("th", null, "Line"), /*#__PURE__*/React.createElement("th", null, "Part"), /*#__PURE__*/React.createElement("th", null, "Description"), /*#__PURE__*/React.createElement("th", null, "Quantity"))), /*#__PURE__*/React.createElement("tbody", null, receivable_lines.map(function (_ref25) {
     var line = _ref25.line,
       index = _ref25.index;
-    return /*#__PURE__*/external_React_default().createElement("tr", {
+    return /*#__PURE__*/React.createElement("tr", {
       key: index
-    }, /*#__PURE__*/external_React_default().createElement("td", null, /*#__PURE__*/external_React_default().createElement("input", {
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("input", {
       type: "checkbox",
       className: "form-check-input",
       checked: selected.has(index),
       onChange: function onChange() {
         return toggle_line(index);
       }
-    })), /*#__PURE__*/external_React_default().createElement("td", null, index + 1), /*#__PURE__*/external_React_default().createElement("td", null, line.pcode || line.part || ''), /*#__PURE__*/external_React_default().createElement("td", null, line.pdesc || line.description || ''), /*#__PURE__*/external_React_default().createElement("td", null, line.pqty || line.quantity || 0));
-  }))))), /*#__PURE__*/external_React_default().createElement("div", {
+    })), /*#__PURE__*/React.createElement("td", null, index + 1), /*#__PURE__*/React.createElement("td", null, line.pcode || line.part || ''), /*#__PURE__*/React.createElement("td", null, line.pdesc || line.description || ''), /*#__PURE__*/React.createElement("td", null, line.pqty || line.quantity || 0));
+  }))))), /*#__PURE__*/React.createElement("div", {
     className: "modal-footer"
-  }, /*#__PURE__*/external_React_default().createElement("button", {
+  }, /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "btn btn-secondary",
     onClick: onClose
-  }, "Cancel"), /*#__PURE__*/external_React_default().createElement("button", {
+  }, "Cancel"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "btn btn-primary",
     onClick: function onClick() {
@@ -2372,6 +2680,53 @@ var ReceiveModal = function ReceiveModal(_ref22) {
     },
     disabled: selected.size === 0
   }, "Receive Selected Lines (", selected.size, ")")))));
+};
+var RemoveLineButton = function RemoveLineButton(_ref26) {
+  var onRemove = _ref26.onRemove;
+  return /*#__PURE__*/external_React_default().createElement("button", {
+    className: "btn btn-sm btn-danger",
+    onClick: onRemove
+  }, /*#__PURE__*/external_React_default().createElement(Trash2, {
+    size: 16
+  }));
+};
+var UseVendorButton = function UseVendorButton(_ref27) {
+  var vendor_code = _ref27.vendor_code,
+    onSelectVendor = _ref27.onSelectVendor;
+  var handle_click = /*#__PURE__*/function () {
+    var _ref28 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee14() {
+      return _regenerator().w(function (_context14) {
+        while (1) switch (_context14.n) {
+          case 0:
+            _context14.n = 1;
+            return onSelectVendor(vendor_code);
+          case 1:
+            return _context14.a(2);
+        }
+      }, _callee14);
+    }));
+    return function handle_click() {
+      return _ref28.apply(this, arguments);
+    };
+  }();
+  return /*#__PURE__*/external_React_default().createElement("button", {
+    className: "btn btn-sm btn-primary",
+    onClick: handle_click
+  }, "Use");
+};
+var AddLineButton = function AddLineButton(_ref29) {
+  var onClick = _ref29.onClick,
+    label = _ref29.label,
+    Icon = _ref29.icon,
+    disabled = _ref29.disabled;
+  return /*#__PURE__*/external_React_default().createElement("button", {
+    className: "btn btn-sm btn-primary",
+    onClick: onClick,
+    disabled: disabled
+  }, /*#__PURE__*/external_React_default().createElement(Icon, {
+    size: 16,
+    className: "me-1"
+  }), label);
 };
 
 // Helper functions
@@ -2386,7 +2741,7 @@ function get_default_header(config) {
     expected_receipt_date: expected_date.toISOString().split('T')[0],
     location: config.location || 'TAC',
     entered_by: '',
-    orderd_by_customer: '',
+    ordered_by_customer: '',
     terms: '',
     ship_via: 'UPS',
     freight: 0.0,
@@ -2418,42 +2773,60 @@ function get_default_header(config) {
 function clean_po_data(data) {
   if (data.lines) {
     data.lines = data.lines.map(function (line) {
+      // Clean null characters from messages
       if (line.msg) {
         var clean_msg = line.msg.split('\x00')[0].trim();
         line.msg = clean_msg;
       }
+      if (line.message) {
+        var clean_message = line.message.split('\x00')[0].trim();
+        line.message = clean_message;
+      }
+
+      // Clean null characters from other fields
       ['gla', 'gldpta', 'tskcod', 'cat'].forEach(function (field) {
         if (line[field] && typeof line[field] === 'string') {
           line[field] = line[field].replace(/\x00/g, '').trim();
         }
       });
+
+      // Ensure both message formats are populated
+      if (line.message && !line.msg) {
+        line.msg = line.message;
+      } else if (line.msg && !line.message) {
+        line.message = line.msg;
+      }
       return line;
     });
   }
   return {
     header: data.header || {},
     lines: data.lines || [],
-    source_info: data.source_info || {}
+    source_info: data.source_info || {},
+    expected_receipt_date: data.expected_receipt_date || ''
   };
 }
 function map_header_data(header) {
+  // For existing POs, check if we already have the modern structure
+  var has_modern_structure = header.billing && _typeof(header.billing) === 'object';
   return {
-    vendor_code: header.vndcod || header.vendor_code || '',
-    vendor_name: header.vndnme || header.vendor_name || '',
-    order_date: format_date(header.orddte || header.order_date),
-    expected_receipt_date: format_date(header.erd || header.expected_receipt_date),
-    location: header.loc || header.location || 'TAC',
-    entered_by: header.entby || header.entered_by || '',
-    terms: header.termd || header.terms || '',
-    ship_via: header.shpvia || header.ship_via || 'UPS',
-    freight: parseFloat(header.frght || header.freight || 0),
-    subtotal: parseFloat(header.subtot || header.subtotal || 0),
-    tax_amount: parseFloat(header.taxamt || header.tax_amount || 0),
+    vendor_code: header.vendor_code || header.vndcod || '',
+    vendor_name: header.vendor_name || header.vndnme || '',
+    order_date: format_date(header.order_date || header.orddte),
+    expected_receipt_date: format_date(header.expected_receipt_date || header.erd),
+    location: header.location || header.loc || 'TAC',
+    entered_by: header.entered_by || header.entby || '',
+    terms: header.terms || header.termd || '',
+    ship_via: header.ship_via || header.shpvia || 'UPS',
+    freight: parseFloat(header.freight || header.frght || 0),
+    subtotal: parseFloat(header.subtotal || header.subtot || 0),
+    tax_amount: parseFloat(header.tax_amount || header.taxamt || 0),
     total: parseFloat(header.total || 0),
-    printed: header.prtd === 'Y' || header.printed || false,
-    orderd_by_customer: header.obycus || '',
-    billing: {
-      name: header.vndnme || header.vendor_name || '',
+    printed: header.printed || header.prtd === 'Y' || false,
+    ordered_by_customer: header.ordered_by_customer || header.obycus || '',
+    // Handle billing - use modern structure if available, otherwise map old fields
+    billing: has_modern_structure && header.billing ? header.billing : {
+      name: header.vendor_name || header.vndnme || '',
       address1: header.vnda1 || '',
       address2: header.vnda2 || '',
       city: header.vndcty || '',
@@ -2461,7 +2834,8 @@ function map_header_data(header) {
       zip: header.vndzip || '',
       country: header.vndctry || 'USA'
     },
-    shipping: {
+    // Handle shipping - use modern structure if available, otherwise map old fields
+    shipping: has_modern_structure && header.shipping ? header.shipping : {
       name: header.shpnme || '',
       attention: header.shpatn || '',
       address1: header.shpa1 || '',
@@ -2494,8 +2868,8 @@ if (typeof document !== 'undefined') {
   style_element.textContent = styles;
   document.head.appendChild(style_element);
 }
-/* harmony default export */ const PurchaseOrderBuilder = (PurchaseOrder);
-window["components/PurchaseOrderBuilder"] = __webpack_exports__["default"];
+/* harmony default export */ const user_components_PurchaseOrder = (PurchaseOrder);
+window["components/PurchaseOrder"] = __webpack_exports__["default"];
 /******/ })()
 ;
-//# sourceMappingURL=PurchaseOrderBuilder.bundle.js.map
+//# sourceMappingURL=PurchaseOrder.bundle.js.map

@@ -60,53 +60,30 @@ async function uploadComponents() {
 
     console.log(`Using API base: ${API_BASE}`);
 
-    // Find built component files in both components and user_components directories
-    const component_search_path = path.join(__dirname, '../../app/static/js/components/*.bundle.js');
+    // Find built component files in user_components directory only
     const user_component_search_path = path.join(__dirname, '../../app/static/js/user_components/*.bundle.js');
     
-    console.log(`Searching for bundles in:`);
-    console.log(`  - ${component_search_path}`);
-    console.log(`  - ${user_component_search_path}`);
+    console.log(`Searching for bundles in: ${user_component_search_path}`);
     
-    // Get files from both directories
-    const component_files = glob.sync(component_search_path).filter(file => !file.includes('vendor.bundle.js'));
+    // Get files from user_components directory
     const user_component_files = glob.sync(user_component_search_path);
     
-    // Combine all files with their source directory info
-    const all_component_files = [
-        ...component_files.map(file => ({ file, source_dir: 'components' })),
-        ...user_component_files.map(file => ({ file, source_dir: 'user_components' }))
-    ];
+    console.log(`Found ${user_component_files.length} user component bundles to upload`);
 
-    console.log(`Found ${component_files.length} component bundles`);
-    console.log(`Found ${user_component_files.length} user component bundles`);
-    console.log(`Total: ${all_component_files.length} bundles to upload`);
-
-    for (const { file, source_dir } of all_component_files) {
+    for (const file of user_component_files) {
         const component_name = path.basename(file, '.bundle.js');
         const compiled_code = fs.readFileSync(file, 'utf8');
 
-        // Look for source file in the appropriate directory
+        // Look for source file in user_components directory
         let source_code = '';
         let source_found = false;
 
-        // Try to find source file in the corresponding source directory
-        const source_path = path.join(__dirname, `../src/${source_dir}/${component_name}.js`);
+        const source_path = path.join(__dirname, `../src/user_components/${component_name}.js`);
         
         if (fs.existsSync(source_path)) {
             source_code = fs.readFileSync(source_path, 'utf8');
             source_found = true;
             console.log(`Found source for ${component_name} at ${source_path}`);
-        } else {
-            // If not found in expected location, try the other directory
-            const alt_source_dir = source_dir === 'components' ? 'user_components' : 'components';
-            const alt_source_path = path.join(__dirname, `../src/${alt_source_dir}/${component_name}.js`);
-            
-            if (fs.existsSync(alt_source_path)) {
-                source_code = fs.readFileSync(alt_source_path, 'utf8');
-                source_found = true;
-                console.log(`Found source for ${component_name} at ${alt_source_path} (alternate location)`);
-            }
         }
 
         if (!source_found) {
@@ -114,7 +91,7 @@ async function uploadComponents() {
             continue;
         }
 
-        console.log(`Uploading ${component_name} (from ${source_dir})...`);
+        console.log(`Uploading ${component_name}...`);
 
         // Parse routes from source code
         const routes = parse_routes_from_source(source_code, component_name);

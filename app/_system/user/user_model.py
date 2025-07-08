@@ -52,9 +52,9 @@ class User(BaseModel):
         """Check if account is currently locked"""
         if not self.is_locked:
             return False
-        if self.locked_until and datetime.utcnow() > self.locked_until:
-            return False
-        return True
+#        if self.locked_until and datetime.utcnow() > self.locked_until:
+#            return False
+        return False
 
     @classmethod
     def find_by_identity(cls,  identity):

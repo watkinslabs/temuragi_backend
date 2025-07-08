@@ -38,8 +38,9 @@ def execute_report():
         menu_structure={}
         menus=[]
         menu_name='default'
-
+        print("GETTING USER STUFF")
         if user_id:
+
 
             user_id=uuid.UUID(user_id)
        
@@ -48,7 +49,7 @@ def execute_report():
             
             menu_builder = MenuBuilder()
             menus=menu_builder.get_available_menus(user_id)
-
+            
             menu_name=data.get('context') or 'default'
             
             if menus:

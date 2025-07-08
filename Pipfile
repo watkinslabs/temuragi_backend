@@ -28,6 +28,7 @@ anthropic = "*"
 keyring = "*"
 flort = "*"
 babel = "*"
+pandas = "*"
 
 [dev-packages]
 

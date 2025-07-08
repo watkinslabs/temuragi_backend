@@ -57,7 +57,7 @@ class PageAction(BaseModel):
     @validates('action_type')
     def validate_action_type(self, key, value):
         if value:
-            allowed_types = ['htmx', 'api', 'javascript']
+            allowed_types = ['htmx', 'api', 'javascript','navigate']
             if value not in allowed_types:
                 raise ValueError(f"Invalid action type: {value}. Must be one of {allowed_types}")
         return value

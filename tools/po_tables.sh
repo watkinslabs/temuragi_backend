@@ -53,12 +53,55 @@ OUTPUT='app/user/test/'
 #   PartsTrader requesters
 #  "PartsTrader parked_orders_po"
 #  "PartsTrader parked_orders_so"
+#  "JADVDATA _vinv_locs n"
+#  "JADVDATA _vinv_oem_avail n"
+#  "JADVDATA _virtual_inventory n"
+#  "PartsTrader parked_orders_po"
+#  "PartsTrader parked_orders_so"
+#    "JADVDATA BKMPFRGT s l"
+#    "GPACIFIC BKARINV s l"
+#    "GPACIFIC BKARINVL s l"
+#    "GPACIFIC BKSONOTE s l"
+#    "GPACIFIC BKARPR s l"
+#    "GPACIFIC BKSHPVIA s l"
+#    "JADVDATA BKMPFRGT s l"
+#    "GCANADA BKARINV s l"
+#    "GCANADA BKARINVL s l"
+#    "GCANADA BKSONOTE s l"
+#    "GCANADA BKARPR s l"
+#    "GCANADA BKSHPVIA s l"
+#    "GCANADA USER s l"
+#    "GPACIFIC USER s l"
+#    "GPACIFIC NEXTSO s l"
+#    "GCANADA  NEXTSO s l"
+#    "JADVDATA _freightExempt n"
+#    "JADVDATA _pricing_blanket_stock s n"
+#    "JADVDATA _pricing_parents s n"
+#    "JADVDATA _oe_list_map s n"
+#    "JADVDATA _cost_basis s n"
+#    "JADVDATA BKPRULES s l"
+#    "JADVDATA BKMPHEAD s l"
+#    "JADVDATA BKMPCONT s l"#
+#    "JADVDATA BKARPR s l"
+#    "JADVDATA BKEXCHNG s l"
+#    "JADVDATA BKARLOCP s l"
+#    "JADVDATA BKARSPPC s l"
+#    "JADVDATA BKICCAT s l"
+#    "GPACIFIC BKARCPRC s l"
+#    "GPACIFIC BKARLSTF s l"
+# "GCANADA BKARPR s l"
+             
 #
 TABLES=(
-  "JADVDATA _vinv_locs n"
-  "JADVDATA _vinv_oem_avail n"
-  "JADVDATA _virtual_inventory n"
+         "GCANADA BKARCPRC s l"
+
  )
+
+
+
+
+
+
 
 # Process each entry
 for entry in "${TABLES[@]}"; do

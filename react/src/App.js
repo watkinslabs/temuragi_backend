@@ -49,9 +49,14 @@ const AppContent = () => {
     const [current_view, setCurrentView] = useState('home');
     const [view_params, setViewParams] = useState({});
     const { initialize_context, fetch_site_config, current_context } = useSite();
+    const { isAuthenticated } = useAuth();
 
-    // Initialize context and fetch site config on mount
+    // Initialize context and fetch site config when authenticated
     useEffect(() => {
+        if (!isAuthenticated) {
+            return; // Don't fetch if not authenticated
+        }
+
         const init_app = async () => {
             // First check for stored context
             const stored_context = sessionStorage.getItem('current_context') || localStorage.getItem('default_context');
@@ -64,30 +69,17 @@ const AppContent = () => {
             // Always fetch site config to get menu items and available contexts
             console.log('Fetching initial site config...');
             await fetch_site_config('/');
+            
+            // Check if we have an initial view from login
+            const initial_view = sessionStorage.getItem('initial_view');
+            if (initial_view) {
+                navigate_to(initial_view);
+                sessionStorage.removeItem('initial_view');
+            }
         };
         
         init_app();
-    }, []); // Run only on mount
-
-    // Prevent browser back button from actually navigating
-    useEffect(() => {
-        // Push initial state at current URL
-        window.history.pushState(null, '', window.location.href);
-
-        // Handle browser back button
-        const handle_pop_state = (e) => {
-            // Push state again to prevent actual navigation but keep current URL
-            window.history.pushState(null, '', window.location.href);
-        };
-
-        // Prevent navigation
-        window.addEventListener('popstate', handle_pop_state);
-
-        // Cleanup
-        return () => {
-            window.removeEventListener('popstate', handle_pop_state);
-        };
-    }, []);
+    }, [isAuthenticated]); // Re-run when authentication status changes
 
     // Navigation function
     const navigate_to = (view, params = {}) => {

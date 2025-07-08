@@ -32,6 +32,148 @@ def json_response(data=None, error=None, status=200):
     }), status
 
 
+
+
+
+
+
+
+@bp.route('/config', methods=['POST'])
+def get_report_config():
+    """
+    Get report configuration for ServerDataTable component.
+    Returns the config in the format ServerDataTable expects.
+    """
+    try:
+        service = get_service()
+        data = request.get_json() or {}
+        
+        report_id = data.get('report_id')
+        context = data.get('context')
+        
+        if not report_id:
+            return json_response(error="report_id is required", status=400)
+        
+        # Get the report with all relationships
+        db_session = db_registry._routing_session()
+
+        from app.models import Report
+        report = db_session.query(Report).filter_by(id=report_id).first()
+        
+        if not report:
+            return json_response(error="Report not found", status=404)
+        
+        # Check permissions (optional, uncomment if needed)
+        # user_id = g.get('user_id')  # Get from auth
+        # if not Report.check_permission(user_id, report.slug, 'view'):
+        #     return json_response(error="Permission denied", status=403)
+        
+        # Build the columns configuration
+        columns_config = {}
+        
+        for col in report.columns:
+            if col.is_visible:
+                columns_config[col.name] = {
+                    'label': col.display_name or col.name,
+                    'searchable': col.is_searchable,
+                    'orderable': col.is_sortable,
+                    'order_index': col.order_index,
+                    'type': col.data_type.name if col.data_type else 'string',
+                    'format': col.format_string,
+                    'width': col.width,
+                    'alignment': col.alignment,
+                    'search_type': col.search_type,
+                    'render': None  # You can add custom render functions here
+                }
+                
+                # Add format-specific rendering hints
+                if col.data_type:
+                    if col.data_type.name in ['date', 'datetime']:
+                        columns_config[col.name]['format'] = 'date'
+                    elif col.data_type.name == 'boolean':
+                        columns_config[col.name]['format'] = 'boolean'
+                    elif col.data_type.name in ['decimal', 'float'] and col.format_string:
+                        if '$' in col.format_string:
+                            columns_config[col.name]['format'] = 'currency'
+                        elif '%' in col.format_string:
+                            columns_config[col.name]['format'] = 'percent'
+                        else:
+                            columns_config[col.name]['format'] = 'number'
+        
+        # Build actions array
+        actions = []
+        
+        # Add page actions from the report
+        for action in report.page_actions:
+            action_config = {
+                'name': action.name,
+                'title': action.display or action.name,
+                'icon': action.icon or 'fas fa-cog',
+                'color': action.color or 'primary',
+                'mode': action.mode or 'row',  # 'page' or 'row'
+                'action_type': action.action_type,  # 'htmx', 'api', 'javascript'
+                'url': action.url,
+                'url_for': action.url_for,  # Template URL with {{variables}}
+                'method': action.method or 'GET',
+                'target': action.target or '_self',
+                'headers': action.headers or {},
+                'payload': action.payload or {},
+                'confirm': action.confirm,
+                'confirm_message': action.confirm_message,
+                'data_index': action.data_index,
+                'order_index': action.order_index
+            }
+            
+            # Add javascript code if it's a javascript action
+            if action.action_type == 'javascript' and action.javascript_code:
+                action_config['javascript'] = action.javascript_code
+            
+            actions.append(action_config)
+        
+        # Get datatable options from report options
+        datatable_options = report.options.get('datatable', {}) if report.options else {}
+        
+        # Build the complete configuration
+        config = {
+            'model_name': report.name,
+            'report_name': report.slug,
+            'api_url': '/v2/api/data',  # Your data endpoint
+            'page_length': datatable_options.get('page_length', 25),
+            'show_search': datatable_options.get('is_searchable', True),
+            'show_column_search': datatable_options.get('show_column_search', False),
+            'show_pagination': True,
+            'table_title': report.display or report.name,
+            'table_description': report.description,
+            'report_id': str(report.id),
+            'is_model': report.is_model,
+            'columns': columns_config,
+            'excluded_columns': [],
+            'actions': actions,
+            'is_wide': report.is_wide,
+            'is_ajax': report.is_ajax,
+            'is_auto_run': report.is_auto_run,
+            'export_formats': {
+                'csv': report.is_download_csv,
+                'xlsx': report.is_download_xlsx
+            }
+        }
+        
+        # Add any custom options from the report
+        if report.options:
+            config['custom_options'] = {
+                'cache_enabled': report.options.get('cache_enabled', False),
+                'refresh_interval': report.options.get('refresh_interval', 0),
+                'row_limit': report.options.get('row_limit', 10000)
+            }
+        
+        return json_response(data={
+            'success': True,
+            'config': config
+        })
+        
+    except Exception as e:
+        return json_response(error=str(e), status=500)
+
 # =====================================================================
 # REPORT EXECUTION ROUTES
 # =====================================================================

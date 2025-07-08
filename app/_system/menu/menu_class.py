@@ -44,7 +44,8 @@ class MenuBuilder:
         all_menus = self.db_session.query(Menu).filter(
             Menu.is_active == True
         ).all()
-        
+        print(f"user->{user_id}")
+
         if not user_id:
             # No user specified, return all active menus
             return [menu.name for menu in all_menus]
@@ -53,6 +54,7 @@ class MenuBuilder:
         available_menus = []
         for menu in all_menus:
             permission_name = f"menu:{menu.name.lower()}:view"
+            print(f"permname:{permission_name}")
             
             # Check if user has permission
             if self._user_has_menu_permission(user_id, menu.name):
@@ -70,6 +72,12 @@ class MenuBuilder:
         Returns:
             List of menu dictionaries with details
         """
+        print(f"GETTING MENUS: {user_id}")
+        is_admin=None
+        if "11111111-1111-1111-1111-111111111111"==str(user_id):
+            is_admin=True
+
+
         # Convert string UUID to UUID object if needed
         if user_id and isinstance(user_id, str):
             user_id = uuid.UUID(user_id)
@@ -81,7 +89,11 @@ class MenuBuilder:
         available_menus = []
         if user_id:
             for menu in all_menus:
+                print(f"Checking for permission {user_id} {menu.name}")
                 if self._user_has_menu_permission(user_id, menu.name):
+                    print(f"ADDING {menu.name}")
+                    if menu.name.lower()=='admin' and not is_admin:
+                        continue
                     available_menus.append({
                         'id': str(menu.id),
                         'name': menu.name,

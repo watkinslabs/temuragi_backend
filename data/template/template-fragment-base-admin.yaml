@@ -303,7 +303,7 @@ TemplateFragment:
         </head>
         <body>
         <div id="root"></div>
-            <script src="/static/js/components/vendor.bundle.js"></script>
+            <script src="/static/js/vendor.bundle.js"></script>
             <script src="/static/js/main.bundle.js"></script>
         </body>
         </html>

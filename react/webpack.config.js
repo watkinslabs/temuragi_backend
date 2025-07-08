@@ -1,72 +1,13 @@
+// react/webpack.config.js
 const path = require('path');
 const fs = require('fs');
 const glob = require('glob');
+const webpack = require('webpack');
 
-// Function to get all component entries
-function getComponentEntries() {
-    const entries = {
-        // Main app bundle
-        main: './src/index.js'
-    };
-
-    // Find all components in the components directory (excluding standard ones)
-    const component_files = glob.sync('./src/components/*.js', {
-        ignore: [
-            './src/components/DynamicPage.js',
-            './src/components/LoadingScreen.js',
-            './src/components/Login.js',
-            './src/components/HtmlRenderer.js',
-            './src/components/ComponentBuilder.js'
-        ]
-    });
-
-    component_files.forEach(file => {
-        const name = path.basename(file, '.js');
-        // Ensure the path starts with ./
-        const entry_path = file.startsWith('./') ? file : `./${file}`;
-        entries[`components/${name}`] = entry_path;
-    });
-
-    // Find all components in the user_components directory
-    const user_component_files = glob.sync('./src/user_components/*.js');
-    
-    user_component_files.forEach(file => {
-        const name = path.basename(file, '.js');
-        // Ensure the path starts with ./
-        const entry_path = file.startsWith('./') ? file : `./${file}`;
-        // You can choose to prefix these differently if you want
-        entries[`user_components/${name}`] = entry_path;
-    });
-
-    console.log('Webpack entries:', entries);
-    return entries;
-}
-
-module.exports = {
-    mode: 'development', // Instead of 'production'
-    
-    optimization: {
-        minimize: false,  // Disable minification
-        usedExports: false,  // Keep all exports
-        concatenateModules: false,  // Don't concatenate modules
-        sideEffects: false  // Don't remove "unused" code
-    },
-    
-    devtool: 'source-map', // Or 'inline-source-map' for inline maps
-    
-    entry: getComponentEntries(),
-    output: {
-        path: path.resolve(__dirname, '../app/static/js'),
-        filename: '[name].bundle.js',
-        chunkFilename: '[name].chunk.js',
-        publicPath: '/static/js/',
-        // For components, export them in a way we can access
-        library: {
-            name: '[name]',
-            type: 'umd',
-            export: 'default'
-        }
-    },
+// Base configuration
+const baseConfig = {
+    mode: 'development',
+    devtool: 'source-map',
     module: {
         rules: [
             {
@@ -90,20 +31,93 @@ module.exports = {
         alias: {
             '@': path.resolve(__dirname, 'src')
         }
+    }
+};
+
+// Main app configuration
+const mainConfig = {
+    ...baseConfig,
+    name: 'main',
+    entry: {
+        main: './src/index.js'
+    },
+    output: {
+        path: path.resolve(__dirname, '../app/static/js'),
+        filename: '[name].bundle.js',
+        chunkFilename: '[name].chunk.js',
+        publicPath: '/static/js/'
     },
     optimization: {
+        minimize: false,
+        usedExports: false,
+        concatenateModules: false,
+        sideEffects: false,
         splitChunks: {
-            chunks: (chunk) => {
-                // Don't split component chunks
-                return chunk.name === 'main';
-            },
+            chunks: 'initial',
             cacheGroups: {
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
-                    name: 'components/vendor',
+                    name: 'vendor',
                     chunks: 'initial'
                 }
             }
         }
     }
 };
+
+// User components configuration
+const userComponentConfigs = [];
+
+// Find all user components
+const user_component_files = glob.sync('./src/user_components/*.js');
+
+user_component_files.forEach(file => {
+    const component_name = path.basename(file, '.js');
+    const entry_path = file.startsWith('./') ? file : `./${file}`;
+    
+    userComponentConfigs.push({
+        ...baseConfig,
+        name: `user_component_${component_name}`,
+        entry: entry_path,
+        output: {
+            path: path.resolve(__dirname, '../app/static/js/user_components'),
+            filename: `${component_name}.bundle.js`,
+            publicPath: '/static/js/',
+            library: `components/${component_name}`,
+            libraryTarget: 'window',
+            libraryExport: 'default'
+        },
+        externals: {
+            'react': 'React',
+            'react-dom': 'ReactDOM',
+            // Add pattern matching for components
+            ...Object.fromEntries(
+                glob.sync('./src/components/*.js').map(compFile => {
+                    const compName = path.basename(compFile, '.js');
+                    return [
+                        `../components/${compName}`,
+                        `window.Components.${compName}`
+                    ];
+                })
+            )
+        },
+        optimization: {
+            minimize: false,
+            // Disable all splitting for user components
+            splitChunks: false,
+            runtimeChunk: false
+        },
+        plugins: [
+            new webpack.BannerPlugin({
+                banner: `// Ensure window.Components exists
+window.Components = window.Components || {};`,
+                raw: true
+            })
+        ]
+    });
+});
+
+// Export array of configurations
+module.exports = [mainConfig, ...userComponentConfigs];
+
+console.log(`Building main app and ${userComponentConfigs.length} user components`);

@@ -122,13 +122,21 @@ const Login = () => {
                 sessionStorage.setItem('current_context', result.default_context);
             }
 
-            // Since we're not using React Router, just reload the page
-            window.location.href = result.landing_page || '/';
+            // If you need to navigate to a specific view based on landing_page:
+            // Parse the landing_page URL to extract the view
+            if (result.landing_page && result.landing_page !== '/') {
+                const view = result.landing_page.replace(/^\//, '') || 'home';
+                // Store it for the app to use after mounting
+                sessionStorage.setItem('initial_view', view);
+            }
+            
+            // Don't set loading to false - let the component unmount naturally
         } else {
             setError(result.message || 'Invalid username or password.');
             setLoading(false);
         }
     };
+
 
     const toggle_password = () => {
         setShowPassword(!show_password);
@@ -155,7 +163,7 @@ const Login = () => {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    background: var(--bs-gray-100);
+                    background: var(--theme-background);
                     padding: 20px;
                 }
                 .login-wrapper {
