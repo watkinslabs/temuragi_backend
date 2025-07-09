@@ -89,12 +89,14 @@ OUTPUT='app/user/test/'
 #    "JADVDATA BKICCAT s l"
 #    "GPACIFIC BKARCPRC s l"
 #    "GPACIFIC BKARLSTF s l"
-# "GCANADA BKARPR s l"
+#    "GCANADA BKARPR s l"
+#    "GCANADA BKARCPRC s l"
+#    "JADVDATA users_sales_reps_meta"
+#    "GCANADA BKARLSTF s l"
              
 #
 TABLES=(
-         "GCANADA BKARCPRC s l"
-
+         
  )
 
 

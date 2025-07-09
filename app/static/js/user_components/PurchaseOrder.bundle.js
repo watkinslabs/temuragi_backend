@@ -2172,7 +2172,7 @@ var LineItem = function LineItem(_ref18) {
   var is_note_line = line.type === 'X' || !line.pcode && !line.part && line.msg;
   if (is_note_line) {
     return /*#__PURE__*/external_React_default().createElement("div", {
-      className: "card mb-2 ".concat(is_readonly ? 'bg-light' : '')
+      className: "card mb-2"
     }, /*#__PURE__*/external_React_default().createElement("div", {
       className: "card-body"
     }, /*#__PURE__*/external_React_default().createElement("div", {
@@ -2211,7 +2211,7 @@ var LineItem = function LineItem(_ref18) {
     }))))));
   }
   return /*#__PURE__*/external_React_default().createElement("div", {
-    className: "card mb-2 ".concat(is_readonly ? 'bg-light' : '')
+    className: "card mb-2 "
   }, /*#__PURE__*/external_React_default().createElement("div", {
     className: "card-body"
   }, /*#__PURE__*/external_React_default().createElement("div", {
@@ -2285,7 +2285,8 @@ var LineItem = function LineItem(_ref18) {
       };
     }()),
     api_call: api_call,
-    readonly: is_readonly || readonly // Add the parent readonly prop
+    readonly: is_readonly || readonly,
+    disabled: is_readonly || readonly
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-md-4"
   }, /*#__PURE__*/external_React_default().createElement("label", {
@@ -2407,7 +2408,8 @@ var PartSearch = function PartSearch(_ref20) {
     _onChange5 = _ref20.onChange,
     onPartSelect = _ref20.onPartSelect,
     api_call = _ref20.api_call,
-    readonly = _ref20.readonly;
+    readonly = _ref20.readonly,
+    disabled = _ref20.disabled;
   var _useState37 = (0,external_React_namespaceObject.useState)(value || ''),
     _useState38 = _slicedToArray(_useState37, 2),
     searchTerm = _useState38[0],
@@ -2524,8 +2526,9 @@ var PartSearch = function PartSearch(_ref20) {
       }, 200);
     },
     placeholder: "Search part...",
-    readOnly: readonly
-  }), showDropdown && (searchTerm.length >= 2 || suggestions.length > 0) && /*#__PURE__*/external_React_default().createElement("div", {
+    readOnly: readonly,
+    disabled: disabled
+  }), showDropdown && !disabled && (searchTerm.length >= 2 || suggestions.length > 0) && /*#__PURE__*/external_React_default().createElement("div", {
     className: "dropdown-menu d-block position-absolute w-100 mt-1",
     style: {
       maxHeight: '200px',

@@ -1384,7 +1384,7 @@ const LineItem = ({ line, index, onUpdate, onRemove, api_call, virtualInventory,
 
     if (is_note_line) {
         return (
-            <div className={`card mb-2 ${is_readonly ? 'bg-light' : ''}`}>
+            <div className={`card mb-2`}>
                 <div className="card-body">
                     <div className="row align-items-center">
                         <div className="col-auto">
@@ -1422,7 +1422,7 @@ const LineItem = ({ line, index, onUpdate, onRemove, api_call, virtualInventory,
     }
 
     return (
-        <div className={`card mb-2 ${is_readonly ? 'bg-light' : ''}`}>
+        <div className={`card mb-2 `}>
             <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-2">
                     <div>
@@ -1466,7 +1466,8 @@ const LineItem = ({ line, index, onUpdate, onRemove, api_call, virtualInventory,
                                 onFetchInventory(part.part);
                             }}
                             api_call={api_call}
-                            readonly={is_readonly || readonly}  // Add the parent readonly prop
+                            readonly={is_readonly || readonly}
+                            disabled={is_readonly || readonly}
                             />
                     </div>
                     <div className="col-md-4">
@@ -1598,7 +1599,7 @@ const LineItem = ({ line, index, onUpdate, onRemove, api_call, virtualInventory,
     );
 };
 
-const PartSearch = ({ value, onChange, onPartSelect, api_call, readonly }) => {
+const PartSearch = ({ value, onChange, onPartSelect, api_call, readonly,disabled }) => {
     const [searchTerm, setSearchTerm] = useState(value || '');
     const [suggestions, setSuggestions] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -1672,9 +1673,10 @@ const PartSearch = ({ value, onChange, onPartSelect, api_call, readonly }) => {
                 onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                 placeholder="Search part..."
                 readOnly={readonly}
+                disabled={disabled}
             />
 
-            {showDropdown && (searchTerm.length >= 2 || suggestions.length > 0) && (
+           {showDropdown && !disabled && (searchTerm.length >= 2 || suggestions.length > 0) && (
                 <div className="dropdown-menu d-block position-absolute w-100 mt-1" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                     {loading && (
                         <div className="dropdown-item-text text-center">

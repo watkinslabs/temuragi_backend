@@ -92,7 +92,7 @@ var ParkedOrderDetail = function ParkedOrderDetail() {
                 method: 'POST',
                 headers: config.getAuthHeaders(),
                 body: JSON.stringify({
-                  model: 'ParkedOrderDetails',
+                  model: 'ParkedOrder',
                   operation: 'get',
                   company: 'PACIFIC',
                   pr_repair_order_id: order_id
@@ -159,7 +159,13 @@ var ParkedOrderDetail = function ParkedOrderDetail() {
     navigate_to('PurchaseOrder', {
       po_number: po_number,
       mode: 'view',
-      order: order.order_info.pr_repair_order_id
+      order: order.order_info.pr_repair_order_id,
+      from: {
+        view: "ParkedOrderDetail",
+        parameters: {
+          order: order.order_info.pr_repair_order_id
+        }
+      }
     });
   };
   var handle_view_so = function handle_view_so(so_number) {
@@ -167,8 +173,10 @@ var ParkedOrderDetail = function ParkedOrderDetail() {
       so_number: so_number,
       mode: 'view',
       from: {
-        view: "ParkedOrderDetails",
-        order_id: order.order_info.pr_repair_order_id
+        view: "ParkedOrderDetail",
+        parameters: {
+          id: order.order_info.pr_repair_order_id
+        }
       }
     });
   };

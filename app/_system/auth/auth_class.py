@@ -125,8 +125,9 @@ class AuthService:
         
         user = login_result['user']
         
-        # Clean up expired tokens for this user before creating new ones
-        self._cleanup_user_tokens(user['id'])
+        if user:
+            # Clean up expired tokens for this user before creating new ones
+            self._cleanup_user_tokens(user['id'])
         
         # Check for existing valid refresh token for this application
         existing_refresh = self._get_valid_refresh_token(user['id'], application)

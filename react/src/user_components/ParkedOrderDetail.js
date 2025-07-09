@@ -33,7 +33,7 @@ const ParkedOrderDetail = () => {
                     method: 'POST',
                     headers: config.getAuthHeaders(),
                     body: JSON.stringify({
-                        model: 'ParkedOrderDetails',
+                        model: 'ParkedOrder',
                         operation:'get',
                         company: 'PACIFIC',
                         pr_repair_order_id: order_id,  
@@ -79,6 +79,12 @@ const ParkedOrderDetail = () => {
             po_number: po_number,
             mode:'view',
             order: order.order_info.pr_repair_order_id,
+            from: {
+                view: "ParkedOrderDetail",
+                parameters: {
+                    order: order.order_info.pr_repair_order_id
+                }
+            }
         });
     };
 
@@ -87,8 +93,10 @@ const ParkedOrderDetail = () => {
             so_number: so_number,
             mode: 'view',
             from: {
-                view: "ParkedOrderDetails",
-                order_id: order.order_info.pr_repair_order_id,
+                view: "ParkedOrderDetail",
+                parameters: {
+                    id: order.order_info.pr_repair_order_id
+                }
             }
         });
     };

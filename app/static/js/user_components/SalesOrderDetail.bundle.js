@@ -242,80 +242,6 @@ const Plus = createLucideIcon("plus", plus_iconNode);
 
 //# sourceMappingURL=plus.js.map
 
-;// ./node_modules/lucide-react/dist/esm/icons/circle-alert.js
-/**
- * @license lucide-react v0.525.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-
-
-
-const circle_alert_iconNode = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["line", { x1: "12", x2: "12", y1: "8", y2: "12", key: "1pkeuh" }],
-  ["line", { x1: "12", x2: "12.01", y1: "16", y2: "16", key: "4dfq90" }]
-];
-const CircleAlert = createLucideIcon("circle-alert", circle_alert_iconNode);
-
-
-//# sourceMappingURL=circle-alert.js.map
-
-;// ./node_modules/lucide-react/dist/esm/icons/check.js
-/**
- * @license lucide-react v0.525.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-
-
-
-const check_iconNode = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
-const Check = createLucideIcon("check", check_iconNode);
-
-
-//# sourceMappingURL=check.js.map
-
-;// ./node_modules/lucide-react/dist/esm/icons/credit-card.js
-/**
- * @license lucide-react v0.525.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-
-
-
-const credit_card_iconNode = [
-  ["rect", { width: "20", height: "14", x: "2", y: "5", rx: "2", key: "ynyp8z" }],
-  ["line", { x1: "2", x2: "22", y1: "10", y2: "10", key: "1b3vmo" }]
-];
-const CreditCard = createLucideIcon("credit-card", credit_card_iconNode);
-
-
-//# sourceMappingURL=credit-card.js.map
-
-;// ./node_modules/lucide-react/dist/esm/icons/user.js
-/**
- * @license lucide-react v0.525.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-
-
-
-const user_iconNode = [
-  ["path", { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", key: "975kel" }],
-  ["circle", { cx: "12", cy: "7", r: "4", key: "17ys0d" }]
-];
-const User = createLucideIcon("user", user_iconNode);
-
-
-//# sourceMappingURL=user.js.map
-
 ;// ./node_modules/lucide-react/dist/esm/icons/package.js
 /**
  * @license lucide-react v0.525.0 - ISC
@@ -342,6 +268,67 @@ const Package = createLucideIcon("package", package_iconNode);
 
 
 //# sourceMappingURL=package.js.map
+
+;// ./node_modules/lucide-react/dist/esm/icons/printer.js
+/**
+ * @license lucide-react v0.525.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+
+
+
+const printer_iconNode = [
+  [
+    "path",
+    {
+      d: "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2",
+      key: "143wyd"
+    }
+  ],
+  ["path", { d: "M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6", key: "1itne7" }],
+  ["rect", { x: "6", y: "14", width: "12", height: "8", rx: "1", key: "1ue0tg" }]
+];
+const Printer = createLucideIcon("printer", printer_iconNode);
+
+
+//# sourceMappingURL=printer.js.map
+
+;// ./node_modules/lucide-react/dist/esm/icons/check.js
+/**
+ * @license lucide-react v0.525.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+
+
+
+const check_iconNode = [["path", { d: "M20 6 9 17l-5-5", key: "1gmf2c" }]];
+const Check = createLucideIcon("check", check_iconNode);
+
+
+//# sourceMappingURL=check.js.map
+
+;// ./node_modules/lucide-react/dist/esm/icons/user.js
+/**
+ * @license lucide-react v0.525.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+
+
+
+const user_iconNode = [
+  ["path", { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2", key: "975kel" }],
+  ["circle", { cx: "12", cy: "7", r: "4", key: "17ys0d" }]
+];
+const User = createLucideIcon("user", user_iconNode);
+
+
+//# sourceMappingURL=user.js.map
 
 ;// ./node_modules/lucide-react/dist/esm/icons/truck.js
 /**
@@ -550,7 +537,7 @@ var SalesOrderDetail = function SalesOrderDetail() {
     setLoading = _useState2[1];
   var _useState3 = (0,external_React_namespaceObject.useState)(''),
     _useState4 = _slicedToArray(_useState3, 2),
-    loadingMessage = _useState4[0],
+    loading_message = _useState4[0],
     setLoadingMessage = _useState4[1];
   var _useState5 = (0,external_React_namespaceObject.useState)(is_view_mode ? 'view' : is_edit_mode ? 'edit' : 'create'),
     _useState6 = _slicedToArray(_useState5, 2),
@@ -564,7 +551,7 @@ var SalesOrderDetail = function SalesOrderDetail() {
   // SO Data state
   var _useState9 = (0,external_React_namespaceObject.useState)(is_new_so ? null : so_number_param),
     _useState0 = _slicedToArray(_useState9, 2),
-    soNumber = _useState0[0],
+    so_number = _useState0[0],
     setSoNumber = _useState0[1];
   var _useState1 = (0,external_React_namespaceObject.useState)(null),
     _useState10 = _slicedToArray(_useState1, 2),
@@ -578,10 +565,10 @@ var SalesOrderDetail = function SalesOrderDetail() {
     _useState14 = _slicedToArray(_useState13, 2),
     lines = _useState14[0],
     setLines = _useState14[1];
-  var _useState15 = (0,external_React_namespaceObject.useState)('PENDING'),
+  var _useState15 = (0,external_React_namespaceObject.useState)('OPEN'),
     _useState16 = _slicedToArray(_useState15, 2),
-    status = _useState16[0],
-    setStatus = _useState16[1];
+    order_status = _useState16[0],
+    setOrderStatus = _useState16[1];
 
   // API configuration
   var api_call = /*#__PURE__*/function () {
@@ -678,11 +665,11 @@ var SalesOrderDetail = function SalesOrderDetail() {
   // Load existing SO
   var load_existing_so = /*#__PURE__*/function () {
     var _ref3 = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-      var result, _result$header, _result$header2, _t2;
+      var result, _result$header, _result$header2, _result$header3, mapped_header, _t2;
       return _regenerator().w(function (_context3) {
         while (1) switch (_context3.n) {
           case 0:
-            if (soNumber) {
+            if (so_number) {
               _context3.n = 1;
               break;
             }
@@ -693,48 +680,59 @@ var SalesOrderDetail = function SalesOrderDetail() {
             _context3.p = 2;
             _context3.n = 3;
             return api_call('get', 'SalesOrder', {
-              so_number: soNumber,
+              so_number: so_number,
               company: merged_config.company
             });
           case 3:
             result = _context3.v;
             if (!result.success) {
-              _context3.n = 5;
+              _context3.n = 6;
               break;
             }
-            // Map the data
-            setHeader(map_header_data(result.header || {}));
+            // Map the data with human-readable values
+            mapped_header = map_header_data(result.header || {});
+            setHeader(mapped_header);
             setLines(result.lines || []);
-            setStatus(((_result$header = result.header) === null || _result$header === void 0 ? void 0 : _result$header.status) || 'PENDING');
 
-            // Load customer info if we have customer code
-            if (!((_result$header2 = result.header) !== null && _result$header2 !== void 0 && _result$header2.customer_code)) {
+            // Set order status
+            setOrderStatus(((_result$header = result.header) === null || _result$header === void 0 ? void 0 : _result$header.order_status) || 'OPEN');
+
+            // Load customer info - prioritize customer_info in header
+            if (!((_result$header2 = result.header) !== null && _result$header2 !== void 0 && _result$header2.customer_info)) {
               _context3.n = 4;
               break;
             }
-            _context3.n = 4;
-            return load_customer_details(result.header.customer_code);
+            setCustomer(result.header.customer_info);
+            _context3.n = 5;
+            break;
           case 4:
-            _context3.n = 6;
-            break;
+            if (!((_result$header3 = result.header) !== null && _result$header3 !== void 0 && _result$header3.customer_code)) {
+              _context3.n = 5;
+              break;
+            }
+            _context3.n = 5;
+            return load_customer_details(result.header.customer_code);
           case 5:
-            show_error('Failed to load sales order: ' + (result.error || 'Unknown error'));
-          case 6:
-            _context3.n = 8;
+            _context3.n = 7;
             break;
+          case 6:
+            show_error('Failed to load sales order: ' + (result.error || 'Unknown error'));
           case 7:
-            _context3.p = 7;
+            _context3.n = 9;
+            break;
+          case 8:
+            _context3.p = 8;
             _t2 = _context3.v;
             console.error('Error loading SO:', _t2);
             show_error('Failed to load sales order');
-          case 8:
-            _context3.p = 8;
-            setLoading(false);
-            return _context3.f(8);
           case 9:
+            _context3.p = 9;
+            setLoading(false);
+            return _context3.f(9);
+          case 10:
             return _context3.a(2);
         }
-      }, _callee3, null, [[2, 7, 8, 9]]);
+      }, _callee3, null, [[2, 8, 9, 10]]);
     }));
     return function load_existing_so() {
       return _ref3.apply(this, arguments);
@@ -974,21 +972,21 @@ var SalesOrderDetail = function SalesOrderDetail() {
     }), config.text);
   };
 
-  // Status badge component
-  var StatusBadge = function StatusBadge(_ref6) {
+  // Order Status badge component
+  var OrderStatusBadge = function OrderStatusBadge(_ref6) {
     var status = _ref6.status;
     var status_config = {
-      PENDING: {
-        color: 'warning',
-        icon: CircleAlert
+      OPEN: {
+        color: 'primary',
+        icon: Package
       },
-      INVOICED: {
+      PRINTED: {
+        color: 'warning',
+        icon: Printer
+      },
+      POSTED: {
         color: 'success',
         icon: Check
-      },
-      CREDIT: {
-        color: 'danger',
-        icon: CreditCard
       }
     };
     var config = status_config[status] || {
@@ -1003,6 +1001,66 @@ var SalesOrderDetail = function SalesOrderDetail() {
       className: "me-1"
     }), status);
   };
+
+  // Component methods
+  function add_line() {
+    var new_line = {
+      type: 'R',
+      part: '',
+      description: '',
+      quantity: 1,
+      price: 0,
+      list_price: 0,
+      discount: 0,
+      extended: 0,
+      freight: 0,
+      taxable: false,
+      message: ''
+    };
+    setLines(function (prev) {
+      return [].concat(_toConsumableArray(prev), [new_line]);
+    });
+  }
+  function add_note_line() {
+    var new_note = {
+      type: 'X',
+      message: '',
+      part: '',
+      description: '',
+      quantity: 0,
+      price: 0,
+      extended: 0
+    };
+    setLines(function (prev) {
+      return [].concat(_toConsumableArray(prev), [new_note]);
+    });
+  }
+  function remove_line(index) {
+    if (confirm('Remove this line?')) {
+      setLines(function (prev) {
+        return prev.filter(function (_, i) {
+          return i !== index;
+        });
+      });
+    }
+  }
+  function update_line(index, field, value) {
+    setLines(function (prev) {
+      var updated = _toConsumableArray(prev);
+      var line = _objectSpread({}, updated[index]);
+      line[field] = value;
+
+      // Recalculate extended if needed
+      if (line.type !== 'X' && ['quantity', 'price', 'discount'].includes(field)) {
+        var qty = parseFloat(line.quantity || 0);
+        var price = parseFloat(line.price || 0);
+        var discount = parseFloat(line.discount || 0);
+        line.extended = qty * (price - discount);
+      }
+      updated[index] = line;
+      return updated;
+    });
+  }
   return /*#__PURE__*/external_React_default().createElement("div", {
     className: "container-fluid mt-2"
   }, loading && /*#__PURE__*/external_React_default().createElement("div", {
@@ -1018,7 +1076,7 @@ var SalesOrderDetail = function SalesOrderDetail() {
     role: "status"
   }, /*#__PURE__*/external_React_default().createElement("span", {
     className: "visually-hidden"
-  }, "Loading...")), /*#__PURE__*/external_React_default().createElement("div", null, loadingMessage || 'Loading...'))), toast && /*#__PURE__*/external_React_default().createElement("div", {
+  }, "Loading...")), /*#__PURE__*/external_React_default().createElement("div", null, loading_message || 'Loading...'))), toast && /*#__PURE__*/external_React_default().createElement("div", {
     className: "position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-".concat(toast.type === 'error' ? 'danger' : toast.type, " alert-dismissible"),
     style: {
       zIndex: 10000,
@@ -1033,13 +1091,13 @@ var SalesOrderDetail = function SalesOrderDetail() {
   })), /*#__PURE__*/external_React_default().createElement("div", {
     className: "d-flex justify-content-between align-items-center mb-3"
   }, /*#__PURE__*/external_React_default().createElement("div", {
-    className: "d-flex align-items-center"
+    className: "d-flex align-items-center flex-wrap"
   }, /*#__PURE__*/external_React_default().createElement("h4", {
     className: "mb-0 me-3"
-  }, "Sales Order", soNumber && /*#__PURE__*/external_React_default().createElement("span", {
+  }, "Sales Order", so_number && /*#__PURE__*/external_React_default().createElement("span", {
     className: "ms-2"
-  }, "#", soNumber)), /*#__PURE__*/external_React_default().createElement(ModeBadge, null), soNumber && /*#__PURE__*/external_React_default().createElement(StatusBadge, {
-    status: status
+  }, "#", so_number)), /*#__PURE__*/external_React_default().createElement(ModeBadge, null), so_number && /*#__PURE__*/external_React_default().createElement(OrderStatusBadge, {
+    status: order_status
   })), mode === 'view' && !is_view_mode && /*#__PURE__*/external_React_default().createElement("div", null, /*#__PURE__*/external_React_default().createElement("button", {
     className: "btn btn-primary btn-sm",
     onClick: function onClick() {
@@ -1088,32 +1146,24 @@ var SalesOrderDetail = function SalesOrderDetail() {
   }), customer && /*#__PURE__*/external_React_default().createElement("div", {
     className: "mt-2 pt-2 border-top"
   }, /*#__PURE__*/external_React_default().createElement("div", {
-    className: "row g-2 small"
+    className: "small"
   }, /*#__PURE__*/external_React_default().createElement("div", {
-    className: "col-6"
+    className: "mb-1"
   }, /*#__PURE__*/external_React_default().createElement("span", {
     className: "text-muted"
   }, "Terms:"), /*#__PURE__*/external_React_default().createElement("strong", {
     className: "ms-1"
-  }, customer.terms_num || 'N/A')), /*#__PURE__*/external_React_default().createElement("div", {
-    className: "col-6"
+  }, header.terms_desc || 'N/A')), /*#__PURE__*/external_React_default().createElement("div", {
+    className: "mb-1"
   }, /*#__PURE__*/external_React_default().createElement("span", {
+    className: "text-muted"
+  }, "Phone:"), /*#__PURE__*/external_React_default().createElement("strong", {
+    className: "ms-1"
+  }, format_phone(customer.phone || customer.telephone))), /*#__PURE__*/external_React_default().createElement("div", null, /*#__PURE__*/external_React_default().createElement("span", {
     className: "text-muted"
   }, "Sales Person:"), /*#__PURE__*/external_React_default().createElement("strong", {
     className: "ms-1"
-  }, customer.slsp_num || 'N/A')), /*#__PURE__*/external_React_default().createElement("div", {
-    className: "col-6"
-  }, /*#__PURE__*/external_React_default().createElement("span", {
-    className: "text-muted"
-  }, "Credit Limit:"), /*#__PURE__*/external_React_default().createElement("strong", {
-    className: "ms-1"
-  }, "$", customer.creditlmt || 0)), /*#__PURE__*/external_React_default().createElement("div", {
-    className: "col-6"
-  }, /*#__PURE__*/external_React_default().createElement("span", {
-    className: "text-muted"
-  }, "Available:"), /*#__PURE__*/external_React_default().createElement("strong", {
-    className: "ms-1"
-  }, "$", customer.remaincrd || 0))))))), /*#__PURE__*/external_React_default().createElement("div", {
+  }, header.sales_person_name || 'N/A'))))))), /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-lg-4"
   }, /*#__PURE__*/external_React_default().createElement("div", {
     className: "card h-100"
@@ -1202,7 +1252,16 @@ var SalesOrderDetail = function SalesOrderDetail() {
     className: "card-body p-2"
   }, /*#__PURE__*/external_React_default().createElement("div", {
     className: "row g-2"
-  }, /*#__PURE__*/external_React_default().createElement("div", {
+  }, mode === 'view' && header.ship_via ? /*#__PURE__*/external_React_default().createElement("div", {
+    className: "col-6"
+  }, /*#__PURE__*/external_React_default().createElement("label", {
+    className: "form-label small mb-1"
+  }, "Ship Via"), /*#__PURE__*/external_React_default().createElement("input", {
+    type: "text",
+    className: "form-control form-control-sm",
+    value: header.ship_via,
+    readOnly: true
+  })) : /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-6"
   }, /*#__PURE__*/external_React_default().createElement("label", {
     className: "form-label small mb-1"
@@ -1219,7 +1278,16 @@ var SalesOrderDetail = function SalesOrderDetail() {
     api_call: api_call,
     disabled: mode === 'view',
     size: "sm"
-  })), /*#__PURE__*/external_React_default().createElement("div", {
+  })), mode === 'view' && header.terms_desc ? /*#__PURE__*/external_React_default().createElement("div", {
+    className: "col-6"
+  }, /*#__PURE__*/external_React_default().createElement("label", {
+    className: "form-label small mb-1"
+  }, "Terms"), /*#__PURE__*/external_React_default().createElement("input", {
+    type: "text",
+    className: "form-control form-control-sm",
+    value: header.terms_desc,
+    readOnly: true
+  })) : /*#__PURE__*/external_React_default().createElement("div", {
     className: "col-6"
   }, /*#__PURE__*/external_React_default().createElement("label", {
     className: "form-label small mb-1"
@@ -1358,74 +1426,28 @@ var SalesOrderDetail = function SalesOrderDetail() {
   }), "Cancel")), mode === 'view' && /*#__PURE__*/external_React_default().createElement("button", {
     className: "btn btn-secondary",
     onClick: function onClick() {
-      if (navigation) {
-        navigation.navigate_to('SalesOrders');
+      console.log('Back button clicked');
+      console.log('merged_config:', merged_config);
+      console.log('from info:', merged_config.from);
+      if (navigation && navigation.navigate_to) {
+        // Check if we have 'from' information in the merged_config
+        if (merged_config.from && merged_config.from.view) {
+          console.log('Navigating to:', merged_config.from.view, 'with params:', merged_config.from.parameters);
+          // Navigate back to the view that sent us here
+          navigation.navigate_to(merged_config.from.view, merged_config.from.parameters || {});
+        } else {
+          console.log('No from info, defaulting to SalesOrders');
+          // Default fallback to SalesOrders list
+          navigation.navigate_to('SalesOrders', {});
+        }
+      } else {
+        console.log('No navigation available');
       }
     }
   }, /*#__PURE__*/external_React_default().createElement(ArrowLeft, {
     size: 16,
     className: "me-1"
-  }), "Back to Orders")));
-
-  // Component methods
-  function add_line() {
-    var new_line = {
-      type: 'R',
-      part: '',
-      description: '',
-      quantity: 1,
-      price: 0,
-      list_price: 0,
-      discount: 0,
-      extended: 0,
-      freight: 0,
-      taxable: false,
-      message: ''
-    };
-    setLines(function (prev) {
-      return [].concat(_toConsumableArray(prev), [new_line]);
-    });
-  }
-  function add_note_line() {
-    var new_note = {
-      type: 'X',
-      message: '',
-      part: '',
-      description: '',
-      quantity: 0,
-      price: 0,
-      extended: 0
-    };
-    setLines(function (prev) {
-      return [].concat(_toConsumableArray(prev), [new_note]);
-    });
-  }
-  function remove_line(index) {
-    if (confirm('Remove this line?')) {
-      setLines(function (prev) {
-        return prev.filter(function (_, i) {
-          return i !== index;
-        });
-      });
-    }
-  }
-  function update_line(index, field, value) {
-    setLines(function (prev) {
-      var updated = _toConsumableArray(prev);
-      var line = _objectSpread({}, updated[index]);
-      line[field] = value;
-
-      // Recalculate extended if needed
-      if (line.type !== 'X' && ['quantity', 'price', 'discount'].includes(field)) {
-        var qty = parseFloat(line.quantity || 0);
-        var price = parseFloat(line.price || 0);
-        var discount = parseFloat(line.discount || 0);
-        line.extended = qty * (price - discount);
-      }
-      updated[index] = line;
-      return updated;
-    });
-  }
+  }), "Back")));
 };
 
 // Sub-components
@@ -1438,7 +1460,7 @@ var CustomerSection = function CustomerSection(_ref7) {
     readonly = _ref7.readonly;
   var _useState17 = (0,external_React_namespaceObject.useState)(''),
     _useState18 = _slicedToArray(_useState17, 2),
-    searchTerm = _useState18[0],
+    search_term = _useState18[0],
     setSearchTerm = _useState18[1];
   var _useState19 = (0,external_React_namespaceObject.useState)([]),
     _useState20 = _slicedToArray(_useState19, 2),
@@ -1450,7 +1472,7 @@ var CustomerSection = function CustomerSection(_ref7) {
     setLoading = _useState22[1];
   var _useState23 = (0,external_React_namespaceObject.useState)(false),
     _useState24 = _slicedToArray(_useState23, 2),
-    showDropdown = _useState24[0],
+    show_dropdown = _useState24[0],
     setShowDropdown = _useState24[1];
   (0,external_React_namespaceObject.useEffect)(function () {
     if (customer) {
@@ -1514,14 +1536,14 @@ var CustomerSection = function CustomerSection(_ref7) {
   }();
   (0,external_React_namespaceObject.useEffect)(function () {
     var timer = setTimeout(function () {
-      if (searchTerm && !customer) {
-        search_customers(searchTerm);
+      if (search_term && !customer) {
+        search_customers(search_term);
       }
     }, 300);
     return function () {
       return clearTimeout(timer);
     };
-  }, [searchTerm, customer]);
+  }, [search_term, customer]);
   if (readonly && customer) {
     return /*#__PURE__*/external_React_default().createElement("div", null, /*#__PURE__*/external_React_default().createElement("div", {
       className: "fw-bold"
@@ -1529,16 +1551,14 @@ var CustomerSection = function CustomerSection(_ref7) {
       className: "text-muted small"
     }, "Customer #", customer.code), customer.contact && /*#__PURE__*/external_React_default().createElement("div", {
       className: "text-muted small"
-    }, "Contact: ", customer.contact), customer.telephone && /*#__PURE__*/external_React_default().createElement("div", {
-      className: "text-muted small"
-    }, "Phone: ", customer.telephone));
+    }, "Contact: ", customer.contact));
   }
   return /*#__PURE__*/external_React_default().createElement("div", {
     className: "position-relative"
   }, /*#__PURE__*/external_React_default().createElement("input", {
     type: "text",
     className: "form-control form-control-sm",
-    value: searchTerm,
+    value: search_term,
     onChange: function onChange(e) {
       setSearchTerm(e.target.value);
       setShowDropdown(true);
@@ -1556,7 +1576,7 @@ var CustomerSection = function CustomerSection(_ref7) {
     },
     placeholder: "Search customer by code or name...",
     disabled: readonly
-  }), showDropdown && (suggestions.length > 0 || loading) && /*#__PURE__*/external_React_default().createElement("div", {
+  }), show_dropdown && (suggestions.length > 0 || loading) && /*#__PURE__*/external_React_default().createElement("div", {
     className: "dropdown-menu d-block position-absolute mt-1 w-100",
     style: {
       maxHeight: '200px',
@@ -1591,7 +1611,7 @@ var AddressSection = function AddressSection(_ref9) {
     collapsed = _ref9.collapsed;
   var _useState25 = (0,external_React_namespaceObject.useState)(collapsed),
     _useState26 = _slicedToArray(_useState25, 2),
-    isCollapsed = _useState26[0],
+    is_collapsed = _useState26[0],
     setIsCollapsed = _useState26[1];
   return /*#__PURE__*/external_React_default().createElement("div", {
     className: "card mb-3"
@@ -1600,12 +1620,12 @@ var AddressSection = function AddressSection(_ref9) {
   }, /*#__PURE__*/external_React_default().createElement("button", {
     className: "btn btn-link btn-sm text-decoration-none w-100 text-start p-0",
     onClick: function onClick() {
-      return setIsCollapsed(!isCollapsed);
+      return setIsCollapsed(!is_collapsed);
     },
     type: "button"
   }, /*#__PURE__*/external_React_default().createElement("h6", {
     className: "mb-0"
-  }, isCollapsed ? '▶' : '▼', " Billing & Shipping Addresses"))), !isCollapsed && /*#__PURE__*/external_React_default().createElement("div", {
+  }, is_collapsed ? '▶' : '▼', " Billing & Shipping Addresses"))), !is_collapsed && /*#__PURE__*/external_React_default().createElement("div", {
     className: "card-body"
   }, /*#__PURE__*/external_React_default().createElement("div", {
     className: "row g-2"
@@ -1766,9 +1786,7 @@ var LineItemsTable = function LineItemsTable(_ref1) {
     className: "table-responsive"
   }, /*#__PURE__*/external_React_default().createElement("table", {
     className: "table table-sm table-hover mb-0"
-  }, /*#__PURE__*/external_React_default().createElement("thead", {
-    className: "table-light"
-  }, /*#__PURE__*/external_React_default().createElement("tr", null, /*#__PURE__*/external_React_default().createElement("th", {
+  }, /*#__PURE__*/external_React_default().createElement("thead", null, /*#__PURE__*/external_React_default().createElement("tr", null, /*#__PURE__*/external_React_default().createElement("th", {
     width: "40"
   }, "#"), /*#__PURE__*/external_React_default().createElement("th", {
     width: "120"
@@ -1908,7 +1926,7 @@ var PartInput = function PartInput(_ref12) {
     api_call = _ref12.api_call;
   var _useState27 = (0,external_React_namespaceObject.useState)(value || ''),
     _useState28 = _slicedToArray(_useState27, 2),
-    searchTerm = _useState28[0],
+    search_term = _useState28[0],
     setSearchTerm = _useState28[1];
   var _useState29 = (0,external_React_namespaceObject.useState)([]),
     _useState30 = _slicedToArray(_useState29, 2),
@@ -1916,7 +1934,7 @@ var PartInput = function PartInput(_ref12) {
     setSuggestions = _useState30[1];
   var _useState31 = (0,external_React_namespaceObject.useState)(false),
     _useState32 = _slicedToArray(_useState31, 2),
-    showDropdown = _useState32[0],
+    show_dropdown = _useState32[0],
     setShowDropdown = _useState32[1];
   var _useState33 = (0,external_React_namespaceObject.useState)(false),
     _useState34 = _slicedToArray(_useState33, 2),
@@ -1977,20 +1995,20 @@ var PartInput = function PartInput(_ref12) {
   }();
   (0,external_React_namespaceObject.useEffect)(function () {
     var timer = setTimeout(function () {
-      if (searchTerm && searchTerm !== value) {
-        search_parts(searchTerm);
+      if (search_term && search_term !== value) {
+        search_parts(search_term);
       }
     }, 300);
     return function () {
       return clearTimeout(timer);
     };
-  }, [searchTerm]);
+  }, [search_term]);
   return /*#__PURE__*/external_React_default().createElement("div", {
     className: "position-relative"
   }, /*#__PURE__*/external_React_default().createElement("input", {
     type: "text",
     className: "form-control form-control-sm",
-    value: searchTerm,
+    value: search_term,
     onChange: function onChange(e) {
       setSearchTerm(e.target.value);
       _onChange2(e.target.value);
@@ -2005,7 +2023,7 @@ var PartInput = function PartInput(_ref12) {
       }, 200);
     },
     placeholder: "Part #"
-  }), showDropdown && (suggestions.length > 0 || loading) && /*#__PURE__*/external_React_default().createElement("div", {
+  }), show_dropdown && (suggestions.length > 0 || loading) && /*#__PURE__*/external_React_default().createElement("div", {
     className: "dropdown-menu d-block position-absolute mt-1",
     style: {
       maxHeight: '200px',
@@ -2265,6 +2283,17 @@ var CancelButton = function CancelButton(_ref21) {
 };
 
 // Helper functions
+function format_phone(phone) {
+  if (!phone) return 'N/A';
+  // Remove all non-numeric characters
+  var cleaned = phone.toString().replace(/\D/g, '');
+  // Format as (XXX) XXX-XXXX if 10 digits
+  if (cleaned.length === 10) {
+    return "(".concat(cleaned.slice(0, 3), ") ").concat(cleaned.slice(3, 6), "-").concat(cleaned.slice(6));
+  }
+  // Return as-is if not 10 digits
+  return phone;
+}
 function get_default_header(config) {
   var today = new Date().toISOString().split('T')[0];
   return {
@@ -2275,8 +2304,10 @@ function get_default_header(config) {
     location: config.location || 'TAC',
     entered_by: '',
     sales_person: '',
+    sales_person_name: '',
     custom_po: '',
     terms: '',
+    terms_desc: '',
     ship_via: '',
     ship_via_id: 0,
     freight: 0,
@@ -2308,7 +2339,7 @@ function get_default_header(config) {
   };
 }
 function map_header_data(header) {
-  var _header$shipping, _header$shipping2, _header$payment;
+  var _header$sales_person_, _header$payment, _header$shipping, _header$shipping2, _header$payment2;
   return {
     customer_code: header.customer_code || '',
     order_date: format_date(header.order_date),
@@ -2317,8 +2348,10 @@ function map_header_data(header) {
     location: header.location || 'TAC',
     entered_by: header.entered_by || '',
     sales_person: header.sales_person || '',
+    sales_person_name: ((_header$sales_person_ = header.sales_person_info) === null || _header$sales_person_ === void 0 ? void 0 : _header$sales_person_.full_name) || '',
     custom_po: header.custom_po || '',
     terms: header.terms || '',
+    terms_desc: ((_header$payment = header.payment) === null || _header$payment === void 0 ? void 0 : _header$payment.terms_desc) || '',
     ship_via: ((_header$shipping = header.shipping) === null || _header$shipping === void 0 ? void 0 : _header$shipping.via) || '',
     ship_via_id: ((_header$shipping2 = header.shipping) === null || _header$shipping2 === void 0 ? void 0 : _header$shipping2.via_id) || 0,
     freight: parseFloat(header.freight || 0),
@@ -2326,7 +2359,7 @@ function map_header_data(header) {
     taxable: header.taxable === 'Y',
     tax_rate: parseFloat(header.tax_rate || 0),
     tax_key: header.tax_key || '',
-    cod: ((_header$payment = header.payment) === null || _header$payment === void 0 ? void 0 : _header$payment.cod) || 'N',
+    cod: ((_header$payment2 = header.payment) === null || _header$payment2 === void 0 ? void 0 : _header$payment2.cod) || 'N',
     billing: header.billing || get_default_header().billing,
     shipping: header.shipping || get_default_header().shipping
   };

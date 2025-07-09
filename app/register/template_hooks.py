@@ -36,7 +36,7 @@ def register_hooks(path, app):
                 hook_module_name = hook_file[:-3]
                 import_path = '.'.join([base_pkg] + module_parts + [hook_module_name])
                 hook_modules.append(import_path)
-                app.logger.info(f"Found hook module: {import_path}")
+                app.logger.info(f"----------Found hook module: {import_path}")
 
             # Stop recursion into dirs with files
             dirnames[:] = []

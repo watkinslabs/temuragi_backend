@@ -6,7 +6,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
     Search, Plus, MessageSquare, Trash2, Save, X, Copy, 
     Package, User, Truck, CreditCard, FileText, AlertCircle,
-    Check, Edit2, ArrowLeft
+    Check, Edit2, ArrowLeft, Printer
 } from 'lucide-react';
 
 // Main Sales Order Component
@@ -34,16 +34,16 @@ const SalesOrderDetail = () => {
 
     // Core state
     const [loading, setLoading] = useState(false);
-    const [loadingMessage, setLoadingMessage] = useState('');
+    const [loading_message, setLoadingMessage] = useState('');
     const [mode, setMode] = useState(is_view_mode ? 'view' : (is_edit_mode ? 'edit' : 'create'));
     const [toast, setToast] = useState(null);
 
     // SO Data state
-    const [soNumber, setSoNumber] = useState(is_new_so ? null : so_number_param);
+    const [so_number, setSoNumber] = useState(is_new_so ? null : so_number_param);
     const [customer, setCustomer] = useState(null);
     const [header, setHeader] = useState(get_default_header(merged_config));
     const [lines, setLines] = useState([]);
-    const [status, setStatus] = useState('PENDING');
+    const [order_status, setOrderStatus] = useState('OPEN');
 
     // API configuration
     const api_call = async (operation, model, params = {}) => {
@@ -91,25 +91,30 @@ const SalesOrderDetail = () => {
 
     // Load existing SO
     const load_existing_so = async () => {
-        if (!soNumber) return;
+        if (!so_number) return;
         
         setLoading(true);
         setLoadingMessage('Loading sales order...');
 
         try {
             const result = await api_call('get', 'SalesOrder', {
-                so_number: soNumber,
+                so_number: so_number,
                 company: merged_config.company
             });
 
             if (result.success) {
-                // Map the data
-                setHeader(map_header_data(result.header || {}));
+                // Map the data with human-readable values
+                const mapped_header = map_header_data(result.header || {});
+                setHeader(mapped_header);
                 setLines(result.lines || []);
-                setStatus(result.header?.status || 'PENDING');
                 
-                // Load customer info if we have customer code
-                if (result.header?.customer_code) {
+                // Set order status
+                setOrderStatus(result.header?.order_status || 'OPEN');
+                
+                // Load customer info - prioritize customer_info in header
+                if (result.header?.customer_info) {
+                    setCustomer(result.header.customer_info);
+                } else if (result.header?.customer_code) {
                     await load_customer_details(result.header.customer_code);
                 }
             } else {
@@ -278,12 +283,12 @@ const SalesOrderDetail = () => {
         );
     };
 
-    // Status badge component
-    const StatusBadge = ({ status }) => {
+    // Order Status badge component
+    const OrderStatusBadge = ({ status }) => {
         const status_config = {
-            PENDING: { color: 'warning', icon: AlertCircle },
-            INVOICED: { color: 'success', icon: Check },
-            CREDIT: { color: 'danger', icon: CreditCard }
+            OPEN: { color: 'primary', icon: Package },
+            PRINTED: { color: 'warning', icon: Printer },
+            POSTED: { color: 'success', icon: Check }
         };
 
         const config = status_config[status] || { color: 'secondary', icon: FileText };
@@ -297,6 +302,64 @@ const SalesOrderDetail = () => {
         );
     };
 
+    // Component methods
+    function add_line() {
+        const new_line = {
+            type: 'R',
+            part: '',
+            description: '',
+            quantity: 1,
+            price: 0,
+            list_price: 0,
+            discount: 0,
+            extended: 0,
+            freight: 0,
+            taxable: false,
+            message: ''
+        };
+        setLines(prev => [...prev, new_line]);
+    }
+
+    function add_note_line() {
+        const new_note = {
+            type: 'X',
+            message: '',
+            part: '',
+            description: '',
+            quantity: 0,
+            price: 0,
+            extended: 0
+        };
+        setLines(prev => [...prev, new_note]);
+    }
+
+    function remove_line(index) {
+        if (confirm('Remove this line?')) {
+            setLines(prev => prev.filter((_, i) => i !== index));
+        }
+    }
+
+    function update_line(index, field, value) {
+        setLines(prev => {
+            const updated = [...prev];
+            const line = { ...updated[index] };
+            
+            line[field] = value;
+            
+            // Recalculate extended if needed
+            if (line.type !== 'X' && ['quantity', 'price', 'discount'].includes(field)) {
+                const qty = parseFloat(line.quantity || 0);
+                const price = parseFloat(line.price || 0);
+                const discount = parseFloat(line.discount || 0);
+                
+                line.extended = qty * (price - discount);
+            }
+            
+            updated[index] = line;
+            return updated;
+        });
+    }
+
     return (
         <div className="container-fluid mt-2">
             {loading && (
@@ -306,7 +369,7 @@ const SalesOrderDetail = () => {
                         <div className="spinner-border text-light mb-2" role="status">
                             <span className="visually-hidden">Loading...</span>
                         </div>
-                        <div>{loadingMessage || 'Loading...'}</div>
+                        <div>{loading_message || 'Loading...'}</div>
                     </div>
                 </div>
             )}
@@ -328,13 +391,13 @@ const SalesOrderDetail = () => {
 
             {/* Header with badges */}
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <div className="d-flex align-items-center">
+                <div className="d-flex align-items-center flex-wrap">
                     <h4 className="mb-0 me-3">
                         Sales Order
-                        {soNumber && <span className="ms-2">#{soNumber}</span>}
+                        {so_number && <span className="ms-2">#{so_number}</span>}
                     </h4>
                     <ModeBadge />
-                    {soNumber && <StatusBadge status={status} />}
+                    {so_number && <OrderStatusBadge status={order_status} />}
                 </div>
                 
                 {/* Action buttons for view mode */}
@@ -388,22 +451,18 @@ const SalesOrderDetail = () => {
                             
                             {customer && (
                                 <div className="mt-2 pt-2 border-top">
-                                    <div className="row g-2 small">
-                                        <div className="col-6">
+                                    <div className="small">
+                                        <div className="mb-1">
                                             <span className="text-muted">Terms:</span>
-                                            <strong className="ms-1">{customer.terms_num || 'N/A'}</strong>
+                                            <strong className="ms-1">{header.terms_desc || 'N/A'}</strong>
                                         </div>
-                                        <div className="col-6">
+                                        <div className="mb-1">
+                                            <span className="text-muted">Phone:</span>
+                                            <strong className="ms-1">{format_phone(customer.phone || customer.telephone)}</strong>
+                                        </div>
+                                        <div>
                                             <span className="text-muted">Sales Person:</span>
-                                            <strong className="ms-1">{customer.slsp_num || 'N/A'}</strong>
-                                        </div>
-                                        <div className="col-6">
-                                            <span className="text-muted">Credit Limit:</span>
-                                            <strong className="ms-1">${customer.creditlmt || 0}</strong>
-                                        </div>
-                                        <div className="col-6">
-                                            <span className="text-muted">Available:</span>
-                                            <strong className="ms-1">${customer.remaincrd || 0}</strong>
+                                            <strong className="ms-1">{header.sales_person_name || 'N/A'}</strong>
                                         </div>
                                     </div>
                                 </div>
@@ -480,30 +539,56 @@ const SalesOrderDetail = () => {
                         </div>
                         <div className="card-body p-2">
                             <div className="row g-2">
-                                <div className="col-6">
-                                    <label className="form-label small mb-1">Ship Via</label>
-                                    <ShipViaSelect
-                                        value={header.ship_via}
-                                        onChange={(value, id) => setHeader(prev => ({ 
-                                            ...prev, 
-                                            ship_via: value,
-                                            ship_via_id: id 
-                                        }))}
-                                        api_call={api_call}
-                                        disabled={mode === 'view'}
-                                        size="sm"
-                                    />
-                                </div>
-                                <div className="col-6">
-                                    <label className="form-label small mb-1">Terms</label>
-                                    <TermsSelect
-                                        value={header.terms}
-                                        onChange={(value) => setHeader(prev => ({ ...prev, terms: value }))}
-                                        api_call={api_call}
-                                        disabled={mode === 'view'}
-                                        size="sm"
-                                    />
-                                </div>
+                                {mode === 'view' && header.ship_via ? (
+                                    <div className="col-6">
+                                        <label className="form-label small mb-1">Ship Via</label>
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm"
+                                            value={header.ship_via}
+                                            readOnly
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="col-6">
+                                        <label className="form-label small mb-1">Ship Via</label>
+                                        <ShipViaSelect
+                                            value={header.ship_via}
+                                            onChange={(value, id) => setHeader(prev => ({ 
+                                                ...prev, 
+                                                ship_via: value,
+                                                ship_via_id: id 
+                                            }))}
+                                            api_call={api_call}
+                                            disabled={mode === 'view'}
+                                            size="sm"
+                                        />
+                                    </div>
+                                )}
+                                
+                                {mode === 'view' && header.terms_desc ? (
+                                    <div className="col-6">
+                                        <label className="form-label small mb-1">Terms</label>
+                                        <input
+                                            type="text"
+                                            className="form-control form-control-sm"
+                                            value={header.terms_desc}
+                                            readOnly
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="col-6">
+                                        <label className="form-label small mb-1">Terms</label>
+                                        <TermsSelect
+                                            value={header.terms}
+                                            onChange={(value) => setHeader(prev => ({ ...prev, terms: value }))}
+                                            api_call={api_call}
+                                            disabled={mode === 'view'}
+                                            size="sm"
+                                        />
+                                    </div>
+                                )}
+                                
                                 <div className="col-6">
                                     <label className="form-label small mb-1">Freight</label>
                                     <input
@@ -631,85 +716,42 @@ const SalesOrderDetail = () => {
                     <button
                         className="btn btn-secondary"
                         onClick={() => {
-                            if (navigation) {
-                                navigation.navigate_to('SalesOrders');
+                            console.log('Back button clicked');
+                            console.log('merged_config:', merged_config);
+                            console.log('from info:', merged_config.from);
+                            
+                            if (navigation && navigation.navigate_to) {
+                                // Check if we have 'from' information in the merged_config
+                                if (merged_config.from && merged_config.from.view) {
+                                    console.log('Navigating to:', merged_config.from.view, 'with params:', merged_config.from.parameters);
+                                    // Navigate back to the view that sent us here
+                                    navigation.navigate_to(merged_config.from.view, merged_config.from.parameters || {});
+                                } else {
+                                    console.log('No from info, defaulting to SalesOrders');
+                                    // Default fallback to SalesOrders list
+                                    navigation.navigate_to('SalesOrders', {});
+                                }
+                            } else {
+                                console.log('No navigation available');
                             }
                         }}
                     >
                         <ArrowLeft size={16} className="me-1" />
-                        Back to Orders
+                        Back
                     </button>
                 )}
             </div>
         </div>
     );
-
-    // Component methods
-    function add_line() {
-        const new_line = {
-            type: 'R',
-            part: '',
-            description: '',
-            quantity: 1,
-            price: 0,
-            list_price: 0,
-            discount: 0,
-            extended: 0,
-            freight: 0,
-            taxable: false,
-            message: ''
-        };
-        setLines(prev => [...prev, new_line]);
-    }
-
-    function add_note_line() {
-        const new_note = {
-            type: 'X',
-            message: '',
-            part: '',
-            description: '',
-            quantity: 0,
-            price: 0,
-            extended: 0
-        };
-        setLines(prev => [...prev, new_note]);
-    }
-
-    function remove_line(index) {
-        if (confirm('Remove this line?')) {
-            setLines(prev => prev.filter((_, i) => i !== index));
-        }
-    }
-
-    function update_line(index, field, value) {
-        setLines(prev => {
-            const updated = [...prev];
-            const line = { ...updated[index] };
-            
-            line[field] = value;
-            
-            // Recalculate extended if needed
-            if (line.type !== 'X' && ['quantity', 'price', 'discount'].includes(field)) {
-                const qty = parseFloat(line.quantity || 0);
-                const price = parseFloat(line.price || 0);
-                const discount = parseFloat(line.discount || 0);
-                
-                line.extended = qty * (price - discount);
-            }
-            
-            updated[index] = line;
-            return updated;
-        });
-    }
 };
 
 // Sub-components
 
 const CustomerSection = ({ customer, customer_code, onCustomerChange, api_call, readonly }) => {
-    const [searchTerm, setSearchTerm] = useState('');
+    const [search_term, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [showDropdown, setShowDropdown] = useState(false);
+    const [show_dropdown, setShowDropdown] = useState(false);
 
     useEffect(() => {
         if (customer) {
@@ -749,13 +791,13 @@ const CustomerSection = ({ customer, customer_code, onCustomerChange, api_call, 
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchTerm && !customer) {
-                search_customers(searchTerm);
+            if (search_term && !customer) {
+                search_customers(search_term);
             }
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchTerm, customer]);
+    }, [search_term, customer]);
 
     if (readonly && customer) {
         return (
@@ -764,9 +806,6 @@ const CustomerSection = ({ customer, customer_code, onCustomerChange, api_call, 
                 <div className="text-muted small">Customer #{customer.code}</div>
                 {customer.contact && (
                     <div className="text-muted small">Contact: {customer.contact}</div>
-                )}
-                {customer.telephone && (
-                    <div className="text-muted small">Phone: {customer.telephone}</div>
                 )}
             </div>
         );
@@ -777,7 +816,7 @@ const CustomerSection = ({ customer, customer_code, onCustomerChange, api_call, 
             <input
                 type="text"
                 className="form-control form-control-sm"
-                value={searchTerm}
+                value={search_term}
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
                     setShowDropdown(true);
@@ -791,7 +830,7 @@ const CustomerSection = ({ customer, customer_code, onCustomerChange, api_call, 
                 disabled={readonly}
             />
 
-            {showDropdown && (suggestions.length > 0 || loading) && (
+            {show_dropdown && (suggestions.length > 0 || loading) && (
                 <div className="dropdown-menu d-block position-absolute mt-1 w-100" 
                      style={{ maxHeight: '200px', overflowY: 'auto', zIndex: 1050 }}>
                     {loading && (
@@ -821,22 +860,22 @@ const CustomerSection = ({ customer, customer_code, onCustomerChange, api_call, 
 };
 
 const AddressSection = ({ billing, shipping, onBillingChange, onShippingChange, readonly, collapsed }) => {
-    const [isCollapsed, setIsCollapsed] = useState(collapsed);
+    const [is_collapsed, setIsCollapsed] = useState(collapsed);
 
     return (
         <div className="card mb-3">
             <div className="card-header py-2">
                 <button
                     className="btn btn-link btn-sm text-decoration-none w-100 text-start p-0"
-                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    onClick={() => setIsCollapsed(!is_collapsed)}
                     type="button"
                 >
                     <h6 className="mb-0">
-                        {isCollapsed ? '▶' : '▼'} Billing & Shipping Addresses
+                        {is_collapsed ? '▶' : '▼'} Billing & Shipping Addresses
                     </h6>
                 </button>
             </div>
-            {!isCollapsed && (
+            {!is_collapsed && (
                 <div className="card-body">
                     <div className="row g-2">
                         <div className="col-lg-6">
@@ -974,7 +1013,7 @@ const LineItemsTable = ({ lines, onUpdate, onRemove, api_call, readonly }) => {
     return (
         <div className="table-responsive">
             <table className="table table-sm table-hover mb-0">
-                <thead className="table-light">
+                <thead>
                     <tr>
                         <th width="40">#</th>
                         <th width="120">Part</th>
@@ -1135,9 +1174,9 @@ const LineItemRow = ({ line, index, onUpdate, onRemove, api_call, readonly }) =>
 };
 
 const PartInput = ({ value, onChange, onPartSelect, api_call }) => {
-    const [searchTerm, setSearchTerm] = useState(value || '');
+    const [search_term, setSearchTerm] = useState(value || '');
     const [suggestions, setSuggestions] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
+    const [show_dropdown, setShowDropdown] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -1173,20 +1212,20 @@ const PartInput = ({ value, onChange, onPartSelect, api_call }) => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchTerm && searchTerm !== value) {
-                search_parts(searchTerm);
+            if (search_term && search_term !== value) {
+                search_parts(search_term);
             }
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchTerm]);
+    }, [search_term]);
 
     return (
         <div className="position-relative">
             <input
                 type="text"
                 className="form-control form-control-sm"
-                value={searchTerm}
+                value={search_term}
                 onChange={(e) => {
                     setSearchTerm(e.target.value);
                     onChange(e.target.value);
@@ -1197,7 +1236,7 @@ const PartInput = ({ value, onChange, onPartSelect, api_call }) => {
                 placeholder="Part #"
             />
 
-            {showDropdown && (suggestions.length > 0 || loading) && (
+            {show_dropdown && (suggestions.length > 0 || loading) && (
                 <div className="dropdown-menu d-block position-absolute mt-1" 
                      style={{ maxHeight: '200px', overflowY: 'auto', minWidth: '300px', zIndex: 1050 }}>
                     {loading && (
@@ -1386,6 +1425,18 @@ const CancelButton = ({ navigation }) => {
 };
 
 // Helper functions
+function format_phone(phone) {
+    if (!phone) return 'N/A';
+    // Remove all non-numeric characters
+    const cleaned = phone.toString().replace(/\D/g, '');
+    // Format as (XXX) XXX-XXXX if 10 digits
+    if (cleaned.length === 10) {
+        return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    // Return as-is if not 10 digits
+    return phone;
+}
+
 function get_default_header(config) {
     const today = new Date().toISOString().split('T')[0];
     
@@ -1397,8 +1448,10 @@ function get_default_header(config) {
         location: config.location || 'TAC',
         entered_by: '',
         sales_person: '',
+        sales_person_name: '',
         custom_po: '',
         terms: '',
+        terms_desc: '',
         ship_via: '',
         ship_via_id: 0,
         freight: 0,
@@ -1439,8 +1492,10 @@ function map_header_data(header) {
         location: header.location || 'TAC',
         entered_by: header.entered_by || '',
         sales_person: header.sales_person || '',
+        sales_person_name: header.sales_person_info?.full_name || '',
         custom_po: header.custom_po || '',
         terms: header.terms || '',
+        terms_desc: header.payment?.terms_desc || '',
         ship_via: header.shipping?.via || '',
         ship_via_id: header.shipping?.via_id || 0,
         freight: parseFloat(header.freight || 0),

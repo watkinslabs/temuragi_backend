@@ -22,3 +22,5 @@ db
 data/pr
 app/user
 node_modules
+user_components
+app/static/js
