@@ -19,6 +19,8 @@ from .register.classes import register_classes
 
 from flask import Blueprint, redirect, request
 
+from .config import config
+
 bp = Blueprint('V1', __name__,)
 
 @bp.route('/<path:path>')
@@ -60,11 +62,11 @@ def create_app():
 
 
     # Register hooks for all scan paths
-    for path in config['SYSTEM_SCAN_PATHS']:
+    for path in config.scan_paths:
         register_hooks(path, app)
     
-    for path in config['SYSTEM_SCAN_PATHS']:
-        register_blueprints(config['ROUTE_PREFIX'],path, app)
+    for path in config.scan_paths:
+        register_blueprints(config.route_prefix,path, app)
     
   
 
@@ -74,4 +76,4 @@ def create_app():
     
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=config.port)

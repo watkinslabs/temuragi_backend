@@ -74,7 +74,7 @@ def get_report_config():
         for col in report.columns:
             if col.is_visible:
                 columns_config[col.name] = {
-                    'label': col.display_name or col.name,
+                    'label': col.label or col.name,
                     'searchable': col.is_searchable,
                     'orderable': col.is_sortable,
                     'order_index': col.order_index,
@@ -107,7 +107,7 @@ def get_report_config():
         for action in report.page_actions:
             action_config = {
                 'name': action.name,
-                'title': action.display or action.name,
+                'title': action.label or action.name,
                 'icon': action.icon or 'fas fa-cog',
                 'color': action.color or 'primary',
                 'mode': action.mode or 'row',  # 'page' or 'row'
@@ -142,7 +142,7 @@ def get_report_config():
             'show_search': datatable_options.get('is_searchable', True),
             'show_column_search': datatable_options.get('show_column_search', False),
             'show_pagination': True,
-            'table_title': report.display or report.name,
+            'table_title': report.label or report.name,
             'table_description': report.description,
             'report_id': str(report.id),
             'is_model': report.is_model,
@@ -466,7 +466,7 @@ def list_report_templates():
             {
                 'id': str(t.id),
                 'name': t.name,
-                'display_name': t.display_name,
+                'label': t.label,
                 'description': t.description,
                 'created_at': t.created_at.isoformat() if t.created_at else None
             }
@@ -488,18 +488,18 @@ def create_report_template():
         
         # Extract required fields
         name = data.get('name')
-        display_name = data.get('display_name')
+        label = data.get('label')
         template_id = data.get('template_id')
         
-        if not all([name, display_name, template_id]):
+        if not all([name, label, template_id]):
             return json_response(
-                error="name, display_name, and template_id are required",
+                error="name, label, and template_id are required",
                 status=400
             )
         
         template = service.create_report_template(
             name=name,
-            display_name=display_name,
+            label=label,
             template_id=template_id,
             description=data.get('description'),
             show_filters=data.get('show_filters', True),
@@ -515,7 +515,7 @@ def create_report_template():
         return json_response(data={
             'id': str(template.id),
             'name': template.name,
-            'display_name': template.display_name
+            'label': template.label
         })
         
     except ValueError as e:
@@ -546,7 +546,7 @@ def update_report_template():
         return json_response(data={
             'id': str(template.id),
             'name': template.name,
-            'display_name': template.display_name
+            'label': template.label
         })
         
     except ValueError as e:
@@ -761,7 +761,7 @@ def validate_variables():
 # QUERY METADATA ROUTES
 # =====================================================================
 
-@bp.route('/query/metadata', methods=['POST'])
+@bp.route('/query-metadata', methods=['POST'])
 def get_query_metadata():
     """
     Extract column metadata from a SQL query without fetching data.
@@ -810,7 +810,7 @@ def get_query_metadata():
         return json_response(error=str(e), status=500)
 
 
-@bp.route('/columns/analyze', methods=['POST'])
+@bp.route('/analyze-columns', methods=['POST'])
 def analyze_report_columns():
     """
     Analyze a report's query and compare with existing column definitions.
@@ -870,7 +870,7 @@ def analyze_report_columns():
         return json_response(error=str(e), status=500)
 
 
-@bp.route('/columns/sync', methods=['POST'])
+@bp.route('/sync-columns', methods=['POST'])
 def sync_report_columns():
     """
     Synchronize report columns with query metadata.
@@ -1036,12 +1036,12 @@ def suggest_column_settings():
         if not column_name:
             return json_response(error="column_name is required", status=400)
         
-        # Suggest display name
-        display_name = column_name.replace('_', ' ').title()
+        # Suggest label name
+        label = column_name.replace('_', ' ').title()
         
         # Common patterns for special handling
         suggestions = {
-            'display_name': display_name,
+            'label': label,
             'is_searchable': True,
             'is_sortable': True,
             'is_visible': True,

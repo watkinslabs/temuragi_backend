@@ -9,12 +9,12 @@ def register_hooks(path, app):
     """Recursively discover and register hooks from hook.py and *_hook.py files, skip 'templates' and 'static' dirs.
     Stop recursion once files are found in a directory."""
 
-    base_dir = os.path.join(config['BASE_DIR'], path)
+    base_dir = os.path.join(config.base_dir, path)
     base_pkg = 'app.' + path.replace(os.sep, '.').strip('.')
 
     # Add BASE_DIR to sys.path once, so imports work cleanly
-    if config['BASE_DIR'] not in sys.path:
-        sys.path.insert(0, config['BASE_DIR'])
+    if config.base_dir not in sys.path:
+        sys.path.insert(0, config.base_dir)
 
     # Collect all hook modules first
     hook_modules = []

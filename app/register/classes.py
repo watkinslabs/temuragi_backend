@@ -24,13 +24,13 @@ def register_classes():
             # Auto-load all classes from multiple directories
             auto_load_classes(
                 _class_registry,
-                base_directories=config['SYSTEM_SCAN_PATHS'],
+                base_directories=config.scan_paths,
                 patterns=[
                     "*_class.py",
                     "*_service.py",
                     "*_model.py",
                 ],
-                base_dir=config['BASE_DIR']
+                base_dir=config.base_dir
                 )
             #everything is in the class registy, now add the models to their own registry
             for name, class_obj in _class_registry.items():

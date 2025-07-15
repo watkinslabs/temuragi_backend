@@ -1,0 +1,40 @@
+PageFragment:
+  meta:
+    tablename: page_fragments
+    schema: public
+  data:
+    page_id: 00000000-0000-0000-0000-100000020000
+    # NOTE: page_id must reference existing record UUID
+    fragment_type: content
+    fragment_name: Purchase Orders Manage
+    fragment_key: base
+    content_type: text/html
+    version_number: 1
+    version_label: v1.0
+    is_active: true
+    content_source: |
+        <script>
+        // Initialize in your page
+        (function() {
+          const config = {
+              data_api: '/v2/api/data',
+              po_number: 'NEW',
+              company: 'PACIFIC',
+              location: 'TAC'
+          };
+
+        var po= new PurchaseOrderBuilder(config);
+        })();
+        </script>
+    content_hash: null
+    variables_data: null
+    template_fragment_key: null
+    description: Main content block for the page, contains title and body content
+    sort_order: 1
+    is_published: true
+    publish_date: null
+    expire_date: null
+    cache_duration: 3600
+    last_rendered: null
+    change_description: Initial content fragment for page
+    created_by_user_id: null

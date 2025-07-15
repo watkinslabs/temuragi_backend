@@ -9,12 +9,12 @@ Report:
   data:
   - slug: report2/list
     name: reports-list
-    display: Manage Report Definitions
+    label: Manage Report Definitions
     query: |-
       SELECT
           t.slug,
           t.name,
-          t.display,
+          t.label,
           t.query,
           t.description,
           t.model_id,
@@ -57,7 +57,7 @@ Report:
     is_download_csv: false
     is_download_xlsx: false
     is_system: true
-    is_model: true
+    is_model: false
     permissions_created: true
     options: 
     version: 1

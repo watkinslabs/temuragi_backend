@@ -1,0 +1,29 @@
+MenuLink:
+ meta:
+   tablename: menu_links
+   schema: public
+ data:
+   # Content & Pages
+   - id: 10000000-0000-0000-0000-000000000001
+     name: pages
+     display: Parked Orders
+     url: /v2/f/pac-pt-parked-orders/list
+     tier_id: 00000001-0000-0000-0000-000000001000
+     icon: fa-file
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+   
+   - id: 10000000-0000-0000-0000-100000000001
+     name: pages
+     display: Purchase Orders
+     url: /v2/f/pac_po/list
+     tier_id: 00000001-0000-0000-0000-000000002000
+     icon: fa-file
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+  
+ 

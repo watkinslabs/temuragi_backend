@@ -8,133 +8,133 @@ DataType:
     schema: public
   data:
   - name: percentage
-    display: Percentage
+    label: Percentage
     id: 370a0cd6-b52b-467d-afe1-0267a49608e5
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: url
-    display: URL
+    label: URL
     id: 37a8212f-a85a-4c6c-bd66-a1d2cd6d9a80
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: decimal
-    display: Decimal
+    label: Decimal
     id: 3b4c3cf1-eac5-4bb2-bcbb-4224cbe1c900
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: integer
-    display: Integer
+    label: Integer
     id: 44a52263-cec6-40fe-89e9-525bcd9ef955
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: html
-    display: HTML
+    label: HTML
     id: 46c324c1-9550-4401-bfdf-01d1530c7c9a
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: ip_address
-    display: IP Address
+    label: IP Address
     id: 49c98745-53fc-45c8-a64f-93d4adf5897e
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: email
-    display: Email
+    label: Email
     id: 509339c8-8665-40f4-8a4e-626a8131600f
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: money
-    display: Money
+    label: Money
     id: 513bda7e-a374-49ef-9b08-2fc6f511c79b
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: date
-    display: Date
+    label: Date
     id: 51ad509f-2fed-422f-ab8f-75a2158937d8
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: json
-    display: JSON
+    label: JSON
     id: 648430fe-c500-473b-89b8-fc90fd68e63f
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: number
-    display: Number
+    label: Number
     id: 7dc8a3b3-f8fc-4847-8730-276ba31a7b50
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: color
-    display: Color
+    label: Color
     id: 7e983426-cb89-4db5-a541-ef4edf603f51
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: boolean
-    display: Boolean
+    label: Boolean
     id: 81870d70-c6a1-4212-afe9-ad5459b661c8
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: file
-    display: File
+    label: File
     id: 8408390e-ec1d-44f0-862b-f4bbc3b059cd
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: time
-    display: Time
+    label: Time
     id: a0c5b0e6-fb5d-4008-be84-dc2148fff81e
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: image
-    display: Image
+    label: Image
     id: d9568059-4ad2-4d95-8275-c365fc1bdf9f
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: id
-    display: UUID
+    label: UUID
     id: e156d77c-4b73-4587-b6d3-8eaaf9191728
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: string
-    display: String
+    label: String
     id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: markdown
-    display: Markdown
+    label: Markdown
     id: ef0556a4-f4b0-4028-a74e-a331bc355d64
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: array
-    display: Array
+    label: Array
     id: f45942dd-86d9-4407-ab21-5d35fd9795a5
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: code
-    display: Code
+    label: Code
     id: f77723d1-b695-41f3-bd3c-92240c840103
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: datetime
-    display: DateTime
+    label: DateTime
     id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'

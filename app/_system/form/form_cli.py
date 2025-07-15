@@ -180,7 +180,7 @@ class FormsCLI(BaseCLI):
                 # Create new page
                 page = Page(
                     name=f"{report.name} Report",
-                    title=report.display or report.name,
+                    title=report.label or report.name,
                     slug=page_slug,
                     template_id=template.id,
                     meta_description=report.description or f"View {report.name} data",

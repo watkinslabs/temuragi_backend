@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Add app path
 sys.path.append('/web/ahoy2.radiatorusa.com')
-from app.base.cli_v1 import BaseCLI
+from app.base.cli import BaseCLI  # Changed from cli_v1
 
 try:
     from app.config import config
@@ -25,26 +25,39 @@ CLI_DESCRIPTION = "Database Init"
 class DatabaseCLI(BaseCLI):
     def __init__(self, verbose=False, show_icons=True, table_format=None):
         """Initialize CLI with database connection and logging"""
-        # Initialize parent with database connection enabled
+        # Initialize parent with local backend for database operations
         super().__init__(
             name="database",
+            backend_type="local",  # Use local backend for direct database access
             log_file="logs/database_cli.log",
-            connect_db=True,  # Let base class handle DB connection
             verbose=verbose,
             show_icons=show_icons,
             table_format=table_format
         )
 
         self.log_info("Starting database CLI initialization")
-        
+
+        # The new BaseCLI provides self.session through the local backend
         # Create engine from the session's bind for operations that need it
         if self.session and self.session.bind:
             self.engine = self.session.bind
             self.log_info("Engine reference created from session")
         else:
             # Create engine directly if session doesn't have one
-            self.engine = create_engine(config['DATABASE_URI'])
+            self.engine = create_engine(config.database.uri)
             self.log_info("Engine created directly from DATABASE_URI")
+
+        # Store app reference for compatibility
+        if hasattr(self.backend, 'app'):
+            self.app = self.backend.app
+        else:
+            # Create minimal app object for compatibility
+            class AppBase:
+                def __init__(self):
+                    self.logger = None
+            
+            self.app = AppBase()
+            self.app.logger = self.logger
 
     def discover_models_with_initial_data(self):
         """Discover all models that have create_initial_data method using base class methods"""
@@ -547,7 +560,7 @@ class DatabaseCLI(BaseCLI):
 
             # Create connection to postgres database for admin operations
             from urllib.parse import urlparse
-            db_url = config['DATABASE_URI']
+            db_url = config.database.uri
             parsed = urlparse(db_url)
 
             # Connect to postgres database instead of target database
@@ -585,7 +598,7 @@ class DatabaseCLI(BaseCLI):
 
             # Create connection to postgres database for admin operations
             from urllib.parse import urlparse
-            db_url = config['DATABASE_URI']
+            db_url = config.database.uri
             parsed = urlparse(db_url)
 
             # Connect to postgres database instead of target database
@@ -930,14 +943,14 @@ class DatabaseCLI(BaseCLI):
             all_models = get_all_models()
             self.output_info(f"\n--- Registry State ---")
             self.output_info(f"Total models in registry: {len(all_models)}")
-            
+
             if all_models:
                 self.output_info("Sample models in registry:")
                 for i, (name, cls) in enumerate(all_models.items()):
                     if i >= 5:  # Show first 5 only
                         break
                     self.output_info(f"  {name}: {cls} (from {cls.__module__})")
-            
+
             self.output_info("=== END DEBUG ===")
             return 0
 

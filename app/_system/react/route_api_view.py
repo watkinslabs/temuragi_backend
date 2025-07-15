@@ -24,145 +24,161 @@ def test_endpoint():
 
 @bp.route('/components/sync', methods=['POST'])
 def sync_component():
-    """Sync a component from build process"""
-    
-    # Try to get data from different sources
-    data = None
-    
-    # First try JSON
-    if request.is_json:
-        data = request.get_json()
-        current_app.logger.info("Data received as JSON")
-    # Try form data
-    elif request.form:
-        data = request.form.to_dict()
-        current_app.logger.info("Data received as form data")
-    # Try raw data
-    elif request.data:
-        try:
-            # Attempt to parse as JSON even without proper content-type
-            import json
-            data = json.loads(request.data)
-        except:
-            return jsonify({'error': 'Could not parse request data'}), 400
-    
-    if data is None:
-        return jsonify({'error': 'No data received'}), 400
-        
-    db_session = db_registry._routing_session()
+   """Sync a component from build process"""
+   
+   # Try to get data from different sources
+   data = None
+   
+   # First try JSON
+   if request.is_json:
+       data = request.get_json()
+       current_app.logger.info("Data received as JSON")
+   # Try form data
+   elif request.form:
+       data = request.form.to_dict()
+       current_app.logger.info("Data received as form data")
+   # Try raw data
+   elif request.data:
+       try:
+           # Attempt to parse as JSON even without proper content-type
+           import json
+           data = json.loads(request.data)
+       except:
+           return jsonify({'error': 'Could not parse request data'}), 400
+   
+   if data is None:
+       return jsonify({'error': 'No data received'}), 400
+       
+   db_session = db_registry._routing_session()
 
-    # Validate required fields
-    required = ['name', 'source_code', 'compiled_code']
-    for field in required:
-        if not data.get(field):
-            return jsonify({'error': f'{field} is required'}), 400
+   # Validate required fields
+   required = ['name', 'source_code', 'compiled_code']
+   for field in required:
+       if not data.get(field):
+           return jsonify({'error': f'{field} is required'}), 400
 
-    component_name = data['name']
+   component_name = data['name']
 
-    try:
-        # Find existing component
-        component = db_session.query(ComponentBundle).filter(
-            ComponentBundle.name == component_name
-        ).first()
+   try:
+       # Find existing component
+       component = db_session.query(ComponentBundle).filter(
+           ComponentBundle.name == component_name
+       ).first()
 
-        if component:
-            # Check if source changed
-            new_source_hash = hashlib.sha256(data['source_code'].encode()).hexdigest()
-            source_unchanged = component.source_hash == new_source_hash
-            
-            if source_unchanged:
-                # Source unchanged, but still update routes if they changed
-                
-                # Update routes even if source unchanged
-                if data.get('routes'):
-                    old_routes = component.routes or []
-                    new_routes = data.get('routes', [])
-                    if set(old_routes) != set(new_routes):
-                        component.routes = new_routes
-                        db_session.commit()
-                        update_route_mappings(component, new_routes)
-                        
-                        return jsonify({
-                            'id': str(component.id),
-                            'name': component.name,
-                            'version': component.version,
-                            'build_number': component.build_number,
-                            'status': 'routes_updated'
-                        })
-                
-                return jsonify({
-                    'id': str(component.id),
-                    'name': component.name,
-                    'version': component.version,
-                    'build_number': component.build_number,
-                    'status': 'unchanged'
-                })
+       if component:
+           # Check if source changed
+           new_source_hash = hashlib.sha256(data['source_code'].encode()).hexdigest()
+           source_unchanged = component.source_hash == new_source_hash
 
-            # Store old values before updating
-            old_version = component.version
-            old_build = component.build_number
+           source_unchanged=False
+           
+           if source_unchanged:
+               # Source unchanged, but still update routes if they changed
+               
+               # Update routes even if source unchanged
+               if data.get('routes'):
+                   old_routes = component.routes or []
+                   new_routes = data.get('routes', [])
+                   if set(old_routes) != set(new_routes):
+                       component.routes = new_routes
+                       db_session.commit()
+                       update_route_mappings(component, new_routes)
+                       
+                       return jsonify({
+                           'id': str(component.id),
+                           'name': component.name,
+                           'version': component.version,
+                           'build_number': component.build_number,
+                           'status': 'routes_updated'
+                       })
+               
+               return jsonify({
+                   'id': str(component.id),
+                   'name': component.name,
+                   'version': component.version,
+                   'build_number': component.build_number,
+                   'status': 'unchanged'
+               })
 
-            component.source_code = data['source_code']
-            component.compiled_code = data['compiled_code']
-            component.build_number += 1
-            component.build_timestamp = func.now()
+           # Store old values before updating
+           old_version = component.version
+           old_build = component.build_number
 
-            # Update version if provided
-            if data.get('version'):
-                component.version = data['version']
-                
-        else:
-            # Create new component
-            version = data.get('version', '1.0.0')
-            component = ComponentBundle(
-                name=component_name,
-                source_code=data['source_code'],
-                compiled_code=data['compiled_code'],
-                version=version
-            )
-            db_session.add(component)
+           component.source_code = data['source_code']
+           component.compiled_code = data['compiled_code']
+           component.source_hash = new_source_hash
+           component.build_number += 1
+           component.build_timestamp = func.now()
 
-        # Update metadata
-        metadata_updated = []
-        if data.get('description'):
-            component.description = data['description']
-            metadata_updated.append('description')
-        if data.get('props_schema'):
-            component.props_schema = data['props_schema']
-            metadata_updated.append('props_schema')
-        if data.get('default_props'):
-            component.default_props = data['default_props']
-            metadata_updated.append('default_props')
-        if data.get('dependencies'):
-            component.dependencies = data['dependencies']
-            metadata_updated.append('dependencies')
-        if 'routes' in data:  # Check if routes key exists, even if empty
-            component.routes = data['routes']
-            metadata_updated.append('routes')
-            
+           # Update version - increment patch unless explicitly provided
+           if data.get('version'):
+               component.version = data['version']
+           else:
+               # Parse and increment patch version
+               version_parts = component.version.split('.')
+               if len(version_parts) == 3:
+                   try:
+                       major = int(version_parts[0])
+                       minor = int(version_parts[1])
+                       patch = int(version_parts[2])
+                       component.version = f"{major}.{minor}.{patch + 1}"
+                   except ValueError:
+                       # If parsing fails, keep existing version
+                       pass
+               
+       else:
+           # Create new component
+           version = data.get('version', '1.0.0')
+           new_source_hash = hashlib.sha256(data['source_code'].encode()).hexdigest()
+           component = ComponentBundle(
+               name=component_name,
+               source_code=data['source_code'],
+               compiled_code=data['compiled_code'],
+               source_hash=new_source_hash,
+               version=version
+           )
+           db_session.add(component)
 
-        db_session.commit()
+       # Update metadata
+       metadata_updated = []
+       if data.get('description'):
+           component.description = data['description']
+           metadata_updated.append('description')
+       if data.get('props_schema'):
+           component.props_schema = data['props_schema']
+           metadata_updated.append('props_schema')
+       if data.get('default_props'):
+           component.default_props = data['default_props']
+           metadata_updated.append('default_props')
+       if data.get('dependencies'):
+           component.dependencies = data['dependencies']
+           metadata_updated.append('dependencies')
+       if 'routes' in data:  # Check if routes key exists, even if empty
+           component.routes = data['routes']
+           metadata_updated.append('routes')
+           
 
-        # Update route mappings if provided
-        if 'routes' in data:  # Always update route mappings if routes are provided
-            update_route_mappings(component, data['routes'])
+       db_session.commit()
 
-        status = 'updated' if component else 'created'
-        
-        return jsonify({
-            'id': str(component.id),
-            'name': component.name,
-            'version': component.version,
-            'build_number': component.build_number,
-            'status': status
-        })
-        
-    except Exception as e:
-        db_session.rollback()
-        return jsonify({'error': 'Internal server error'}), 500
-    finally:
-        db_session.close()
+       # Update route mappings if provided
+       if 'routes' in data:  # Always update route mappings if routes are provided
+           update_route_mappings(component, data['routes'])
 
+       status = 'updated' if component else 'created'
+       
+       return jsonify({
+           'id': str(component.id),
+           'name': component.name,
+           'version': component.version,
+           'build_number': component.build_number,
+           'status': status
+       })
+       
+   except Exception as e:
+       db_session.rollback()
+       return jsonify({'error': 'Internal server error'}), 500
+   finally:
+       db_session.close()
 
 def update_route_mappings(component, routes):
     """Update route mappings for a component"""
@@ -214,6 +230,8 @@ def update_route_mappings(component, routes):
 def get_component_bundle(component_name):
     """Serve component bundle"""
     version = request.args.get('v', 'latest')
+
+    print(f"GOT:{component_name}")
     
     db_session = db_registry._routing_session()
 
@@ -234,26 +252,8 @@ def get_component_bundle(component_name):
             return jsonify({'error': 'Component not found'}), 404
 
 
-        # Wrap the component to register it properly
-        wrapped_code = f"""
-(function() {{
-    // Ensure window.Components exists
-    window.Components = window.Components || {{}};
-
-    // Component code - webpack UMD format will create window['components/{component.name}']
-    {component.compiled_code}
-
-    // Register the component from the UMD global
-    if (window['components/{component.name}']) {{
-        window.Components['{component.name}'] = window['components/{component.name}'];
-    }} else {{
-        console.error('Component {component.name} not found after loading bundle');
-    }}
-}})();
-"""
-
         # Return JavaScript bundle with proper headers
-        response = Response(wrapped_code, mimetype='application/javascript')
+        response = Response(component.compiled_code, mimetype='application/javascript')
         response.headers['Cache-Control'] = 'public, max-age=31536000'  # 1 year
         response.headers['ETag'] = f'"{component.source_hash}"'
 

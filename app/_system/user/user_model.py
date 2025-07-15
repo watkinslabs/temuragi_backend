@@ -40,6 +40,11 @@ class User(BaseModel):
     quick_links = relationship("UserQuickLink", back_populates="user", cascade="all, delete-orphan")
     tokens = relationship("UserToken", back_populates="user", cascade="all, delete-orphan")
     rbac_audit_logs = relationship("RbacAuditLog", back_populates="user", cascade="all, delete-orphan")
+    names = relationship("Name", back_populates="user", cascade="all, delete-orphan")
+    addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
+    phone_numbers = relationship("PhoneNumber", back_populates="user", cascade="all, delete-orphan")
+    emails = relationship("Email", back_populates="user", cascade="all, delete-orphan")
+    social_contacts = relationship("SocialContact", back_populates="user", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_users_email', 'email'),

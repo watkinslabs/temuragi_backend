@@ -1,0 +1,18 @@
+# Connection - All Records
+# Total records: 2
+# Exported from template CLI
+
+Connection:
+  meta:
+    tablename: connections
+    schema: public
+  data:
+  - name: PR_MSSQL
+    database_type_id: 50c384dd-3b8e-4466-a485-815fa3cc9e3f
+    connection_string: DSN=mssql-dev
+    username: webuser
+    password: '!w21eb1;'
+    id: c8d31251-fa7f-4e90-8320-e843499bdd3e
+    is_active: true
+    created_at: '2025-06-27T11:53:49.085967-04:00'
+    updated_at: '2025-06-27T11:53:49.086008-04:00'

@@ -51,12 +51,12 @@ class ReportCLI(BaseCLI):
 
         try:
             templates = self.service.list_report_templates()
-
+ 
             if not templates:
                 self.output_warning("No report templates found")
                 return 0
 
-            headers = ['Name', 'Display Name', 'Base Template', 'Filters', 'Export', 'Reports']
+            headers = ['Name', 'label Name', 'Base Template', 'Filters', 'Export', 'Reports']
             rows = []
 
             for template in templates:
@@ -67,7 +67,7 @@ class ReportCLI(BaseCLI):
 
                 rows.append([
                     template.name,
-                    template.display_name,
+                    template.label,
                     template.template.name if template.template else 'N/A',
                     f"{self.icon('check') if template.show_filters else self.icon('cross')} {template.filter_position}",
                     self.icon('check') if template.show_export_buttons else self.icon('cross'),
@@ -84,14 +84,14 @@ class ReportCLI(BaseCLI):
             self.output_error(f"Error listing templates: {e}")
             return 1
 
-    def create_template(self, name, display_name, template_id, **kwargs):
+    def create_template(self, name, label, template_id, **kwargs):
         """Create a new report template"""
         self.log_info(f"Creating report template: {name}")
 
         try:
             template = self.service.create_report_template(
                 name=name,
-                display_name=display_name,
+                label=label,
                 template_id=template_id,
                 **kwargs
             )
@@ -236,13 +236,13 @@ class ReportCLI(BaseCLI):
 
             basic_info = [
                 ['Slug', report.slug],
-                ['Display Name', report.display or 'N/A'],
+                ['label Name', report.label or 'N/A'],
                 ['Description', (report.description[:50] + '...') if report.description and len(report.description) > 50 else (report.description or 'N/A')],
                 ['Category', report.category or 'None'],
                 ['Connection', report.connection.name],
                 ['Database Type', report.connection.db_type],
                 ['Model', model_info],  # Add this
-                ['Template', report.report_template.display_name if report.report_template else 'None'],
+                ['Template', report.report_template.label if report.report_template else 'None'],
                 ['Created', report.created_at.strftime('%Y-%m-%d %H:%M')],
                 ['Last Run', report.last_run.strftime('%Y-%m-%d %H:%M') if report.last_run else 'Never']
             ]
@@ -267,14 +267,14 @@ class ReportCLI(BaseCLI):
             # Columns
             if structure['columns']:
                 self.output_info(f"\nColumns ({structure['column_count']}):")
-                col_headers = ['Name', 'Display', 'Type', 'Searchable', 'Sortable', 'Format']
+                col_headers = ['Name', 'label', 'Type', 'Searchable', 'Sortable', 'Format']
                 col_rows = []
 
                 for col in structure['columns']:
                     col_rows.append([
                         col.name,
-                        col.display_name,
-                        col.data_type.display,
+                        col.label,
+                        col.data_type.label,
                         self.icon('check') if col.is_searchable else self.icon('cross'),
                         self.icon('check') if col.is_sortable else self.icon('cross'),
                         col.format_string or 'None'
@@ -285,15 +285,15 @@ class ReportCLI(BaseCLI):
             # Variables
             if structure['variables']:
                 self.output_info(f"\nVariables ({structure['variable_count']}):")
-                var_headers = ['Name', 'Display', 'Type', 'Input', 'Required', 'Default']
+                var_headers = ['Name', 'label', 'Type', 'Input', 'Required', 'Default']
                 var_rows = []
 
                 for var in structure['variables']:
                     var_rows.append([
                         var.name,
-                        var.display_name,
-                        var.data_type.display,
-                        var.variable_type.display,
+                        var.label,
+                        var.data_type.label,
+                        var.variable_type.label,
                         self.icon('check') if var.is_required else self.icon('cross'),
                         var.default_value or 'None'
                     ])
@@ -458,13 +458,13 @@ class ReportCLI(BaseCLI):
             self.output_success("Query executed successfully!")
             self.output_info(f"Detected {len(columns)} columns:")
 
-            headers = ['Column Name', 'Display Name', 'Type']
+            headers = ['Column Name', 'label Name', 'Type']
             rows = []
 
             for col in columns:
                 rows.append([
                     col['name'],
-                    col['display'],
+                    col['label'],
                     col['type']
                 ])
 
@@ -512,7 +512,7 @@ class ReportCLI(BaseCLI):
                 self.output_error(f"Execution failed: {result['error']}")
                 return 1
 
-            # Display results
+            # label results
             self.output_success(f"Report executed successfully!")
             self.output_info(f"Total records: {result['recordsTotal']}")
             self.output_info(f"Filtered records: {result['recordsFiltered']}")

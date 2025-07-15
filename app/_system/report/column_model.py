@@ -19,7 +19,7 @@ class ReportColumn(BaseModel):
         nullable=False
     )
     name = Column(String(255), nullable=False)
-    display_name = Column(String(255))
+    label = Column(String(255))
     
     # Link to data type
     data_type_id = Column(
@@ -32,7 +32,9 @@ class ReportColumn(BaseModel):
     is_searchable = Column(Boolean, default=True)
     search_type = Column(String(50), default='contains')  # exact, contains, starts, ends, range, list
     
-    # Display configuration
+    is_pk = Column(Boolean, default=False)
+    is_identity = Column(Boolean, default=False)
+
     is_default_sort = Column(Boolean, default=False)
     is_visible = Column(Boolean, default=True)
     is_sortable = Column(Boolean, default=True)

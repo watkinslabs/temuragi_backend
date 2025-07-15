@@ -1,0 +1,30 @@
+MenuTier:
+ meta:
+   tablename: menu_tiers
+   schema: public
+ data:
+   # Main tiers
+   - id: 00000001-0000-0000-0000-000000001000
+     name: customer
+     display: Customer
+     slug: salse
+     menu_id: 00000001-0000-0000-0000-000000001000
+     icon: fa-file-text
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+
+   # Main tiers
+   - id: 00000001-0000-0000-0000-000000002000
+     name: sales
+     display: Sales
+     slug: sales
+     menu_id: 00000001-0000-0000-0000-000000001000
+     icon: fa-file-text
+     position: 1
+     visible: true
+     development: false
+     is_active: true
+
+  

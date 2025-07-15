@@ -43,7 +43,7 @@ class DynamicDatabaseRegistry:
         """Initialize the main database connection"""
         self._app = app
 
-        main_uri = config.get('DATABASE_URI')
+        main_uri = config.database.uri
         if not main_uri:
             raise ValueError("DATABASE_URI not configured")
 

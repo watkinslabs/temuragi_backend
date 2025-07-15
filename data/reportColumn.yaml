@@ -9,7 +9,7 @@ ReportColumn:
   data:
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_auto_run
-    display_name: Is Auto Run
+    label: Is Auto Run
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -24,7 +24,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.063379-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: query
-    display_name: Query
+    label: Query
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -39,7 +39,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.230374-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: connection_id
-    display_name: Connection Id
+    label: Connection Id
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -54,7 +54,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.190944-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: permissions_created
-    display_name: Permissions Created
+    label: Permissions Created
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -69,7 +69,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.923663-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: description
-    display_name: Description
+    label: Description
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: true
     search_type: contains
@@ -84,7 +84,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.285969-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_published
-    display_name: Is Published
+    label: Is Published
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -99,7 +99,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.011235-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_active
-    display_name: Is Active
+    label: Is Active
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -114,7 +114,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.809854-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: category
-    display_name: Category
+    label: Category
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -129,7 +129,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.171533-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_system
-    display_name: Is System
+    label: Is System
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -144,7 +144,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.958481-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_model
-    display_name: Is Model
+    label: Is Model
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -159,7 +159,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.941039-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: slug
-    display_name: Slug
+    label: Slug
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: true
     search_type: contains
@@ -174,7 +174,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.304389-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_ajax
-    display_name: Is Ajax
+    label: Is Ajax
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -189,7 +189,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.081082-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: id
-    display_name: Id
+    label: Id
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -198,13 +198,15 @@ ReportColumn:
     alignment: left
     options: '{}'
     order_index: 3
+    is_pk: true
+    is_identity: false
     id: 78eb2e23-34c4-454a-bccb-d3925d722c2e
     is_active: true
     created_at: '2025-06-28T19:12:13.715633-04:00'
     updated_at: '2025-06-28T19:20:34.828701-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: model_id
-    display_name: Model Id
+    label: Model Id
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -219,7 +221,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.209334-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: report_template_id
-    display_name: Report Template Id
+    label: Report Template Id
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -234,7 +236,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.848291-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: version
-    display_name: Version
+    label: Version
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -249,7 +251,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.867519-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: created_at
-    display_name: Created At
+    label: Created At
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -264,7 +266,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.791152-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_wide
-    display_name: Is Wide
+    label: Is Wide
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -279,7 +281,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.098177-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: last_run
-    display_name: Last Run
+    label: Last Run
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -294,7 +296,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.886157-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_download_xlsx
-    display_name: Is Download Xlsx
+    label: Is Download Xlsx
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -309,7 +311,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.975853-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_download_csv
-    display_name: Is Download Csv
+    label: Is Download Csv
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -324,7 +326,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.994053-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: icon
-    display_name: Icon
+    label: Icon
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -339,7 +341,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.134419-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: color
-    display_name: Color
+    label: Color
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -353,8 +355,8 @@ ReportColumn:
     created_at: '2025-06-28T19:12:13.646518-04:00'
     updated_at: '2025-06-28T19:20:35.115854-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
-    name: display
-    display_name: Display
+    name: label
+    label: Label
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: true
     search_type: contains
@@ -369,7 +371,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.249384-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: updated_at
-    display_name: Updated At
+    label: Updated At
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -384,7 +386,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:34.772587-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_searchable
-    display_name: Is Searchable
+    label: Is Searchable
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -399,7 +401,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.045923-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: tags
-    display_name: Tags
+    label: Tags
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -414,7 +416,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.152703-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: is_public
-    display_name: Is Public
+    label: Is Public
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains
@@ -429,7 +431,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.028932-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: name
-    display_name: Name
+    label: Name
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: true
     search_type: contains
@@ -444,7 +446,7 @@ ReportColumn:
     updated_at: '2025-06-28T19:20:35.268022-04:00'
   - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
     name: options
-    display_name: Options
+    label: Options
     data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
     is_searchable: false
     search_type: contains

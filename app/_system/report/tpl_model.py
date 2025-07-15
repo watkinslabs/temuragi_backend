@@ -21,7 +21,7 @@ class ReportTemplate(BaseModel):
     
     # Report template metadata
     name = Column(String(255), nullable=False, unique=True)
-    display_name = Column(String(255), nullable=False)
+    label = Column(String(255), nullable=False)
     description = Column(Text)
     
     # Report-specific layout options

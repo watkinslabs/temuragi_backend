@@ -184,39 +184,3 @@ pr:
 pri:
 	@python -m app.cli porter import-dir ./data/pr
 
-
-
-
-# React build commands
-react-install:
-	cd react && npm install
-
-react-build:
-	cd react && npm run build
-
-react-upload:
-	cd react && API_TOKEN="$(API_TOKEN)" npm run build:components
-
-react-clean:
-	cd react && npm run clean
-
-# Full component build and deploy
-components: react-build react-upload
-	@echo "Components built and uploaded successfully"
-
-# Development mode
-react-watch:
-	cd react && npm run watch
-
-# Complete setup
-setup-react: react-install
-	@echo "React dependencies installed"
-
-# Build everything
-build-all: react-build react-upload
-	@echo "All components built and synced to database"
-
-
-
-build:
-	@cd react && npm run build && npm run upload:components

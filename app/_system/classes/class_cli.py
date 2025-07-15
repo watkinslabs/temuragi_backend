@@ -558,7 +558,7 @@ class ClassCLI(BaseCLI):
             found_files = []
             pattern = re.compile(rf'class\s+{class_name}\s*[:\(]', re.MULTILINE)
             
-            for scan_path in config['SYSTEM_SCAN_PATHS']:
+            for scan_path in config.scan_paths:
                 base_dir = os.path.join(app_root, scan_path)
                 if not os.path.exists(base_dir):
                     continue

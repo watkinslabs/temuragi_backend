@@ -43,7 +43,8 @@ class RouteMapping(BaseModel):
     
     # Relationships
     component = relationship("ComponentBundle", back_populates="route_mappings")
-    
+    page_actions = relationship("PageAction", back_populates="route")
+
     # Indexes
     __table_args__ = (
         Index('idx_route_path', 'path'),

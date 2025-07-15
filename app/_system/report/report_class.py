@@ -44,7 +44,7 @@ class ReportService:
     # REPORT TEMPLATE OPERATIONS
     # =====================================================================
 
-    def create_report_template(self, name: str, display_name: str,
+    def create_report_template(self, name: str, label: str,
                              template_id: UUID, description: Optional[str] = None,
                              show_filters: bool = True, filter_position: str = 'top',
                              show_export_buttons: bool = True, show_pagination: bool = True,
@@ -60,7 +60,7 @@ class ReportService:
 
         report_template = ReportTemplate(
             name=name,
-            display_name=display_name,
+            label=label,
             template_id=template_id,
             description=description,
             show_filters=show_filters,
@@ -139,7 +139,7 @@ class ReportService:
     # =====================================================================
 
     def create_report(self, slug: str, name: str, query: str, connection_id: UUID,
-                     display: Optional[str] = None, description: Optional[str] = None,
+                     label: Optional[str] = None, description: Optional[str] = None,
                      category: Optional[str] = None, tags: Optional[List[str]] = None,
                      report_template_id: Optional[UUID] = None, is_model: bool = False, 
                      model_id: Optional[UUID] = None, **kwargs) -> Report:  # Add model_id parameter
@@ -170,7 +170,7 @@ class ReportService:
         report = Report(
             slug=slug,
             name=name,
-            display=display,
+            label=label,
             query=query,
             description=description,
             connection_id=connection_id,
@@ -240,7 +240,7 @@ class ReportService:
                 setattr(report, key, value)
 
         # Update permissions if name changed
-        if 'name' in kwargs or 'display' in kwargs:
+        if 'name' in kwargs or 'label' in kwargs:
             report.update_permission_descriptions()
 
         self.db_session.commit()
@@ -307,7 +307,7 @@ class ReportService:
     # =====================================================================
 
     def add_report_column(self, report_id: UUID, name: str, data_type_id: UUID,
-                         display_name: Optional[str] = None, **kwargs) -> ReportColumn:
+                         label: Optional[str] = None, **kwargs) -> ReportColumn:
         """Add a column to a report"""
         report = self.get_report(report_id)
         if not report:
@@ -321,7 +321,7 @@ class ReportService:
         column = ReportColumn(
             report_id=report_id,
             name=name,
-            display_name=display_name or name,
+            label=label or name,
             data_type_id=data_type_id,
             order_index=order_index,
             **kwargs
@@ -372,7 +372,7 @@ class ReportService:
 
     def add_report_variable(self, report_id: UUID, name: str,
                            variable_type_id: UUID, 
-                           display_name: Optional[str] = None, **kwargs) -> ReportVariable:
+                           label: Optional[str] = None, **kwargs) -> ReportVariable:
         """Add a variable to a report"""
         report = self.get_report(report_id)
         if not report:
@@ -386,7 +386,7 @@ class ReportService:
         variable = ReportVariable(
             report_id=report_id,
             name=name,
-            display_name=display_name or name,
+            label=label or name,
             variable_type_id=variable_type_id,
             order_index=order_index,
             **kwargs
@@ -571,21 +571,21 @@ class ReportService:
         """List all available data types"""
         return self.db_session.query(DataType)\
                           .filter_by(is_active=True)\
-                          .order_by(DataType.display)\
+                          .order_by(DataType.label)\
                           .all()
 
     def list_variable_types(self) -> List[VariableType]:
         """List all available variable types"""
         return self.db_session.query(VariableType)\
                           .filter_by(is_active=True)\
-                          .order_by(VariableType.display)\
+                          .order_by(VariableType.label)\
                           .all()
 
     def list_database_types(self) -> List[DatabaseType]:
         """List all available database types"""
         return self.db_session.query(DatabaseType)\
                           .filter_by(is_active=True)\
-                          .order_by(DatabaseType.display)\
+                          .order_by(DatabaseType.label)\
                           .all()
 
     # =====================================================================
@@ -716,7 +716,7 @@ class ReportService:
                 'model_id': report.model_id,  # Add this
                 'slug': report.slug,
                 'name': report.name,
-                'display': report.display,
+                'label': report.label,
                 'query': report.query,
                 'description': report.description,
                 'category': report.category,
@@ -737,7 +737,7 @@ class ReportService:
             'columns': [
                 {
                     'name': col.name,
-                    'display_name': col.display_name,
+                    'label': col.label,
                     'data_type': col.data_type.name,
                     'is_searchable': col.is_searchable,
                     'search_type': col.search_type,
@@ -753,7 +753,7 @@ class ReportService:
             'variables': [
                 {
                     'name': var.name,
-                    'display_name': var.display_name,
+                    'label': var.label,
                     'variable_type': var.variable_type.name,
                     'default_value': var.default_value,
                     'placeholder': var.placeholder,
@@ -775,7 +775,7 @@ class ReportService:
         report = self.create_report(
             slug=report_data['slug'],
             name=report_data['name'],
-            display=report_data.get('display'),
+            label=report_data.get('label'),
             query=report_data['query'],
             description=report_data.get('description'),
             connection_id=connection_id,
@@ -793,7 +793,7 @@ class ReportService:
             self.add_report_column(
                 report_id=report.id,
                 name=col_data['name'],
-                display_name=col_data.get('display_name'),
+                label=col_data.get('label'),
                 data_type_id=data_types[col_data['data_type']],
                 is_searchable=col_data.get('is_searchable', True),
                 search_type=col_data.get('search_type', 'contains'),
@@ -811,7 +811,7 @@ class ReportService:
             self.add_report_variable(
                 report_id=report.id,
                 name=var_data['name'],
-                display_name=var_data.get('display_name'),
+                label=var_data.get('label'),
                 variable_type_id=variable_types[var_data['variable_type']],
                 default_value=var_data.get('default_value'),
                 placeholder=var_data.get('placeholder'),
@@ -962,7 +962,7 @@ class ReportService:
                             report_id=report.id,
                             name=new_col['name'],
                             data_type_id=data_type.id,
-                            display_name=new_col['name'].replace('_', ' ').title()
+                            label=new_col['name'].replace('_', ' ').title()
                         )
                         analysis['changes_made'].append(f"Added column: {new_col['name']}")
                     except Exception as e:
@@ -1066,7 +1066,7 @@ class ReportService:
                     report_id=report.id,
                     name=col_name,
                     data_type_id=data_type.id,
-                    display_name=col_name.replace('_', ' ').title(),
+                    label=col_name.replace('_', ' ').title(),
                     order_index=index
                 )
                 results['added'].append(col_name)

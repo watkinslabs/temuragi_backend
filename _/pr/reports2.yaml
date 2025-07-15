@@ -1,0 +1,34 @@
+# Report - All Records
+# Total records: 18
+# Exported from template CLI
+
+Report:
+  meta:
+    tablename: reports
+    schema: public
+  data:
+  - slug: pac-pt-parked-orders/list
+    name: pac-pt-parked-orders
+    display: PartsTrader  Parked Orders
+    query: "SELECT r.name,pr_repair_order_id as id,o.customer_code,part_count as parts,o.created_at,o.status FROM PartsTrader.dbo.Parked_Orders as o LEFT JOIN  partstrader.dbo.repairers r on r.repairer_id=o.repairer_id"
+    description: The list of third party orders for PartsTrader
+    connection_id: c8d31251-fa7f-4e90-8320-e843499bdd3e
+    category: Sales
+    tags: '[''orders'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: true
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: false
+    is_model: false
+    permissions_created: false
+    options: {results_limit: 0, cache_duration_minutes: 60}
+    version: 1
+    id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+    is_active: true
+    created_at: '2025-06-29T19:21:45.971706-04:00'
+    updated_at: '2025-06-29T19:22:55.549944-04:00'

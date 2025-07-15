@@ -22,6 +22,10 @@ class AppBase:
     def __init__(self):
         pass
 
+ 
+    def teardown_appcontext(self, f):
+        """Register a function to be called at the end of each request context."""
+        pass
 
 class BaseCLI:
     """
@@ -60,9 +64,12 @@ class BaseCLI:
 
         self._setup_logger(log_level, log_file)
         register_db(self.app)
+                # Initialize the registry
+        db_registry.init_app(self.app)
+
         if db_registry==None:
             print ("FDSFSD")
-        # Configure table format from config or parameter
+        
         self.table_format = table_format or config.get('CLI_TABLE_FORMAT', 'simple')
 
 
@@ -179,7 +186,7 @@ class BaseCLI:
             from sqlalchemy.orm import sessionmaker
             
             # Create engine and session
-            engine = create_engine(config['DATABASE_URI'])
+            engine = create_engine(config.database.uri)
             session_factory = sessionmaker(bind=engine)
             self.session = session_factory()
             self.log_info("Database session created successfully")

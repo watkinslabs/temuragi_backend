@@ -79,7 +79,7 @@ class ModelReportCLI(BaseCLI):
                 model_record = Model(
                     name=model_name,
                     table_name=table_name,
-                    display_name=model_name.replace('_', ' ').title(),
+                    label=model_name.replace('_', ' ').title(),
                     description=f"Auto-generated model for {table_name} table",
                     is_active=True
                 )
@@ -218,7 +218,7 @@ class ModelReportCLI(BaseCLI):
             # Create column metadata with attribute name
             col_meta = {
                 'name': attr_name,  # Use attribute name here
-                'display_name': attr_name.replace('_', ' ').title(),
+                'label': attr_name.replace('_', ' ').title(),
                 'data_type': data_type,
                 'is_primary_key': bool(column.primary_key),
                 'is_foreign_key': bool(column.foreign_keys),
@@ -259,24 +259,24 @@ class ModelReportCLI(BaseCLI):
                                 # Add join
                                 joins.append(f"LEFT JOIN {rel_table} {rel_alias} ON t.{fk_col.name} = {rel_alias}.id")
                                 
-                                # Add display column from related table (usually 'name' or 'display')
-                                display_cols = ['name', 'display', 'title', 'display_name']
+                                # Add label column from related table (usually 'name' or 'label')
+                                label_cols = ['name', 'label', 'title', 'label']
                                 rel_columns = [c.name for c in rel_mapper.mapped_table.columns]
                                 
-                                for display_col in display_cols:
-                                    if display_col in rel_columns:
+                                for label_col in label_cols:
+                                    if label_col in rel_columns:
                                         relationship_columns.append({
-                                            'name': f"{rel.key}_{display_col}",
-                                            'display_name': f"{rel.key.replace('_', ' ').title()} {display_col.title()}",
+                                            'name': f"{rel.key}_{label_col}",
+                                            'label': f"{rel.key.replace('_', ' ').title()} {label_col.title()}",
                                             'data_type': 'string',
                                             'is_relationship': True,
                                             'relationship_name': rel.key,
-                                            'query_expression': f"{rel_alias}.{display_col}",
+                                            'query_expression': f"{rel_alias}.{label_col}",
                                             'is_searchable': True,
                                             'is_sortable': True,
                                             'is_visible': True
                                         })
-                                        columns.append(f"{rel_alias}.{display_col} as {rel.key}_{display_col}")
+                                        columns.append(f"{rel_alias}.{label_col} as {rel.key}_{label_col}")
                                         break
                         except Exception as e:
                             self.log_warning(f"Skipping relationship {rel.key}: {e}")
@@ -375,7 +375,7 @@ class ModelReportCLI(BaseCLI):
             report = self.service.create_report(
                 slug=report_slug,
                 name=report_name,
-                display=report_name,  # Use same as name
+                label=report_name,  # Use same as name
                 query=query_data['query'],
                 connection_id=connection.id,
                 model_id=model_id,  # Associate with Model record
@@ -424,7 +424,7 @@ class ModelReportCLI(BaseCLI):
                 self.service.add_report_column(
                     report_id=report.id,
                     name=col_data['name'],
-                    display_name=col_data['display_name'],
+                    label=col_data['label'],
                     data_type_id=data_type.id,
                     **column_config
                 )
@@ -433,14 +433,14 @@ class ModelReportCLI(BaseCLI):
             standard_variables = [
                 {
                     'name': 'search_term',
-                    'display_name': 'Search',
+                    'label': 'Search',
                     'type': 'text',
                     'placeholder': 'Search all columns...',
                     'required': False
                 },
                 {
                     'name': 'limit',
-                    'display_name': 'Results Limit',
+                    'label': 'Results Limit',
                     'type': 'number',
                     'default': '1000',
                     'required': False
@@ -453,13 +453,13 @@ class ModelReportCLI(BaseCLI):
                 standard_variables.extend([
                     {
                         'name': 'date_from',
-                        'display_name': 'Date From',
+                        'label': 'Date From',
                         'type': 'date',
                         'required': False
                     },
                     {
                         'name': 'date_to',
-                        'display_name': 'Date To',
+                        'label': 'Date To',
                         'type': 'date',
                         'required': False
                     }
@@ -472,7 +472,7 @@ class ModelReportCLI(BaseCLI):
                     self.service.add_report_variable(
                         report_id=report.id,
                         name=var_data['name'],
-                        display_name=var_data['display_name'],
+                        label=var_data['label'],
                         variable_type_id=var_type.id,
                         default_value=var_data.get('default'),
                         placeholder=var_data.get('placeholder'),
@@ -548,7 +548,7 @@ class ModelReportCLI(BaseCLI):
             # Sort by name
             models.sort(key=lambda x: x['name'])
             
-            # Display table
+            # label table
             if show_existing_reports:
                 headers = ['Model Name', 'Table Name', 'Columns', 'Relationships', 'Report Slug']
             else:
@@ -622,7 +622,7 @@ class ModelReportCLI(BaseCLI):
             
             # Show columns
             self.output_info("\nColumns that would be created:")
-            headers = ['Column Name', 'Display Name', 'Data Type', 'Special']
+            headers = ['Column Name', 'label Name', 'Data Type', 'Special']
             rows = []
             
             for col in query_data['columns']:
@@ -638,7 +638,7 @@ class ModelReportCLI(BaseCLI):
                 
                 rows.append([
                     col['name'],
-                    col['display_name'],
+                    col['label'],
                     col['data_type'],
                     ', '.join(special) if special else ''
                 ])

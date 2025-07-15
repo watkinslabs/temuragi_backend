@@ -8,37 +8,37 @@ DatabaseType:
     schema: public
   data:
   - name: mongodb
-    display: mongodb
+    label: mongodb
     id: 4a3ffb19-1dc2-4182-b1c7-be9848996915
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: mssql
-    display: MSSQL
+    label: MSSQL
     id: 50c384dd-3b8e-4466-a485-815fa3cc9e3f
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: oracle
-    display: Oracle
+    label: Oracle
     id: 6d78c18e-faa2-4748-be95-6315d8372868
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: mysql
-    display: MySQL
+    label: MySQL
     id: 97fd1bac-7c22-41fb-b822-5e94697f5f8a
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: postgres
-    display: PostgreSQL
+    label: PostgreSQL
     id: 988dd788-979a-445e-b4b6-f40b87bc4ef8
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'
     updated_at: '2025-06-16T10:13:45.883374-04:00'
   - name: sqlite
-    display: SQLite
+    label: SQLite
     id: c7420df8-6591-4cd0-9d37-70969298886d
     is_active: true
     created_at: '2025-06-16T10:13:45.883307-04:00'

@@ -1,0 +1,103 @@
+ReportColumn:
+  meta:
+    tablename: report_columns
+    schema: public
+  data:
+  - report_id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+    name: status
+    display_name: Status
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 4
+    id: 2a34cf2e-806d-4838-bd08-46fa9e3de9db
+    is_active: true
+    created_at: '2025-07-02T15:51:40.193496-04:00'
+    updated_at: '2025-07-02T15:53:15.243865-04:00'
+  - report_id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+    name: created_at
+    display_name: Created At
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: date_range
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    format_string: '%Y-%m-%d %H:%M'
+    alignment: center
+    options: '{}'
+    order_index: 5
+    id: 34737c7d-5db7-4375-b214-25cefc41a261
+    is_active: true
+    created_at: '2025-07-02T15:51:40.198769-04:00'
+    updated_at: '2025-07-02T15:53:15.262061-04:00'
+  - report_id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+    name: name
+    display_name: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 1
+    id: 4022031d-545c-4af9-b898-a396e4b3e140
+    is_active: true
+    created_at: '2025-07-02T15:51:40.201755-04:00'
+    updated_at: '2025-07-02T15:53:15.190651-04:00'
+  - report_id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+    name: id
+    display_name: Id
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: b606d308-5196-4118-8c04-fb20a3eed0fd
+    is_active: true
+    created_at: '2025-07-02T15:52:56.128936-04:00'
+    updated_at: '2025-07-02T15:53:15.173295-04:00'
+  - report_id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+    name: parts
+    display_name: Parts
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 3
+    id: b8c3bba0-ef8e-40a8-b300-366bf6c699a4
+    is_active: true
+    created_at: '2025-07-02T15:52:56.164909-04:00'
+    updated_at: '2025-07-02T15:53:15.225431-04:00'
+  - report_id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+    name: customer_code
+    display_name: Customer Code
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 2
+    id: e592a2e5-dc5b-45a3-a592-2f6d02df5f08
+    is_active: true
+    created_at: '2025-07-02T15:51:40.219185-04:00'
+    updated_at: '2025-07-02T15:53:15.207934-04:00'
+ 

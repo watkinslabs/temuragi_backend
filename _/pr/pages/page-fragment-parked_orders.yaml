@@ -1,0 +1,356 @@
+PageFragment:
+  meta:
+    tablename: page_fragments
+    schema: public
+  data:
+    page_id: 00000000-0000-0000-0000-100000010000
+    # NOTE: page_id must reference existing record UUID
+    fragment_type: content
+    fragment_name: Parked Orders Manage
+    fragment_key: base
+    content_type: text/html
+    version_number: 1
+    version_label: v1.0
+    is_active: true
+    content_source: |
+        {% block title %}Parked Order #{{ order.order_info.pt_order_id }}{% endblock %}
+
+        {% block content %}
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="h2"><i class="fas fa-clipboard-list me-3"></i>Parked Order #{{ order.order_info.pt_order_id }}</h1>
+                </div>
+            </div>
+
+            <!-- Order Info Cards -->
+            <div class="row mb-4">
+           <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Order Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted small">Parts Trader Order</td>
+                                        <td class="fw-bold text-end">{{ order.order_info.pt_order_id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted small">Performance Radiator RO</td>
+                                        <td class="fw-bold text-end">#{{ order.order_info.pr_repair_order_id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted small">Status</td>
+                                        <td class="fw-bold text-end">{{ order.order_info.status }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted small">Created Date</td>
+                                        <td class="fw-bold text-end">{{ order.order_info.created_at }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-building me-2"></i>Performance Radiator Customer</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if order.customer %}
+                                <!-- Customer Section -->
+                                <div class="customer-section mb-3">
+                                    <div class="customer-details">
+                                        <p class="mb-1">
+                                            <strong>{{ order.customer.name }}</strong>
+                                        </p>
+                                        <p class="mb-1">{{ order.customer.address_1 }}</p>
+                                        {% if order.customer.address_2 %}
+                                            <p class="mb-1">{{ order.customer.address_2 }}</p>
+                                        {% endif %}
+                                        <p class="mb-1">
+                                            {{ order.customer.city }}, {{ order.customer.state }} {{ order.customer.zip }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <span class="text-muted">Customer Code:</span> 
+                                            <strong>{{ order.customer.customer_code }}</strong>
+                                        </p>
+                                        {% if order.customer.phone %}
+                                            <p class="mb-0">
+                                                <i class="fas fa-phone me-2 text-muted"></i>
+                                                <a href="tel:{{ order.customer.phone }}">{{ order.customer.phone }}</a>
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <hr class="my-3">
+                                
+                                <!-- Warehouse Section -->
+                                {% if order.closest_warehouse %}
+                                    <div class="warehouse-section">
+                                        <h6 class="text-muted small mb-2">Customer Assigned Location</h6>
+                                        <div class="warehouse-details">
+                                            <p class="mb-1">
+                                                <strong>{{ order.closest_warehouse.name }} ({{ order.closest_warehouse.code }})</strong>
+                                            </p>
+                                            <p class="mb-1">{{ order.closest_warehouse.address }}</p>
+                                            <p class="mb-1">
+                                                {{ order.closest_warehouse.city }}, {{ order.closest_warehouse.state }} {{ order.closest_warehouse.zip }}
+                                            </p>
+                                            {% if order.closest_warehouse.distance_miles %}
+                                                <p class="mb-0">
+                                                    <span class="text-muted">Distance:</span> 
+                                                    <strong>{{ order.closest_warehouse.distance_miles }} miles</strong>
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning mb-0">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>No warehouse assigned</strong>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                    <strong>NEEDS CUSTOMER MAPPING</strong>
+                                    <p class="mb-0 mt-2 small">Customer information is missing. PO creation is disabled until customer is mapped.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-user me-2"></i>PartsTrader Customer</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- Repairer Section -->
+                                    <div class="repairer-section mb-4">
+                                        <div class="repairer-details">
+                                            <p class="mb-1">
+                                                <strong>{{ order.repairer.name }}</strong>
+                                            </p>
+                                            <p class="mb-1">{{ order.repairer.address }}</p>
+                                            {% if order.repairer.address2 %}
+                                                <p class="mb-1">{{ order.repairer.address2 }}</p>
+                                            {% endif %}
+                                            <p class="mb-2">
+                                                {{ order.repairer.city }}, {{ order.repairer.state_province }}, {{ order.repairer.postal_code }}
+                                            </p>
+                                            <p class="mb-0">
+                                                <span class="text-muted">Customer Code:</span> 
+                                                <strong>{{ order.repairer.customer_code }}</strong>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Requester Section -->
+                                    <div class="requester-section">
+                                        <div class="requester-details">
+                                            <p class="mb-2">
+                                                <strong>{{ order.requester.name }}</strong>
+                                            </p>
+                                            <p class="mb-1">
+                                                <i class="fas fa-envelope me-2 text-muted"></i>
+                                                <a href="mailto:{{ order.requester.email }}">{{ order.requester.email }}</a>
+                                            </p>
+                                            <p class="mb-0">
+                                                <i class="fas fa-phone me-2 text-muted"></i>
+                                                <a href="tel:{{ order.requester.phone }}">{{ order.requester.phone }}</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                    
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Stats -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Order Summary:</strong>
+                        Total Parts: {{ order.order_summary.total_parts }} |
+                        POs Created: {{ order.order_summary.total_pos_created }} |
+                        {% if order.order_summary.parts_fully_ordered > 0 %}
+                            Fully Ordered: {{ order.order_summary.parts_fully_ordered }} |
+                        {% endif %}
+                        {% if order.order_summary.parts_partially_ordered > 0 %}
+                            Partially Ordered: {{ order.order_summary.parts_partially_ordered }} |
+                        {% endif %}
+                        {% if order.order_summary.parts_not_ordered > 0 %}
+                            Not Ordered: {{ order.order_summary.parts_not_ordered }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parts Table -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Parts Details</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Line</th>
+                                            <th>Part Number</th>
+                                            <th>Description</th>
+                                            <th class="text-center">Qty</th>
+
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for part in order.parts %}
+                                        <tr>
+                                            <td>{{ part.line }}</td>
+                                            <td><strong>{{ part.part_number }}</strong></td>
+                                            <td>{{ part.description or 'N/A' }}</td>
+                                            <td class="text-center">{{ part.quantity_needed }}</td>
+
+                                            <td>
+                                                {% if part.status == 'FULLY_INVOICED' %}
+                                                    <span class="badge bg-success">FULLY INVOICED</span>
+                                                {% elif part.quantity_ordered > 0 and part.quantity_ordered < part.quantity_needed %}
+                                                    <span class="badge bg-warning">PARTIAL</span>
+                                                {% elif part.quantity_ordered == 0 %}
+                                                    <span class="badge bg-danger">NOT ORDERED</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ part.status }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if part.quantity_ordered < part.quantity_needed %}
+                                                    {% set remaining_qty = part.quantity_needed - part.quantity_ordered %}
+                                
+                                                    {% if order.customer and order.closest_warehouse %}
+                                                        <a href="/v2/purchase-orders/manage" 
+                                                        hx-extension="js-enc"
+                                                        hx-indicator=".htmx-indicator" 
+                                                        hx-post="/v2/purchase-orders/manage" 
+                                                        hx-swap="innerHTML" 
+                                                        hx-target="#main-content" 
+                                                        hx-vals='{"part": "{{ part.part_number }}", "line": "{{ part.line }}", "order": "{{ order.order_info.pr_repair_order_id }}", "qty": "{{ remaining_qty }}", "warehouse": "{{ order.closest_warehouse.code }}", "id": 0}'
+                                                        class="btn btn-sm btn-success">
+                                                            <i class="fas fa-plus me-1"></i>Create PO
+                                                        </a>
+                                                    {% else %}
+                                                        <button class="btn btn-sm btn-danger" disabled title="Customer mapping required">
+                                                            <i class="fas fa-exclamation-circle me-1"></i>No Customer
+                                                        </button>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Purchase Orders for this part -->
+                                        {% if part.purchase_orders %}
+                                            {% for po in part.purchase_orders %}
+                                            <tr class="table-secondary">
+                                                <td></td>
+                                                <td colspan="8">
+                                                    <i class="fas fa-level-up-alt me-2"></i>
+                                                    <strong>PO #{{ po.po_number }}</strong> - 
+                                                    Quantity: {{ po.quantity }}
+                                                    <a href="/v2/f/pac-pt-purchase-orders/view" 
+                                                       hx-ext="json-enc"
+                                                       hx-indicator=".htmx-indicator"
+                                                       hx-post="/v2/f/pac-pt-purchase-orders/view"
+                                                       hx-swap="innerHTML"
+                                                       hx-target="#main-content"
+                                                       hx-vals='{"po_number": "{{ po.po_number }}"}'
+                                                       class="btn btn-sm btn-outline-primary ms-3">
+                                                        <i class="fas fa-eye me-1"></i>View PO
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                        
+                                        <!-- Sales Orders for this part -->
+                                        {% if part.sales_orders %}
+                                            {% for so in part.sales_orders %}
+                                            <tr class="table-info">
+                                                <td></td>
+                                                <td colspan="8">
+                                                    <i class="fas fa-level-up-alt me-2"></i>
+                                                    <strong>SO #{{ so.so_number }}</strong> - 
+                                                    Quantity: {{ so.quantity }} | 
+                                                    Status: {{ so.status }}
+                                                    {% if so.inv_number and so.inv_number != 999999 %}
+                                                        | Invoice #{{ so.inv_number }}
+                                                    {% endif %}
+                                                    <a href="/v2/order/view/view" 
+                                                       hx-ext="json-enc"
+                                                       hx-indicator=".htmx-indicator"
+                                                       hx-post="/v2/order/view/view"
+                                                       hx-swap="innerHTML"
+                                                       hx-target="#main-content"
+                                                       hx-vals='{"so_number": "{{ so.so_number }}"}'
+                                                       class="btn btn-sm btn-outline-info ms-3">
+                                                        <i class="fas fa-eye me-1"></i>View SO
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Action Bar -->
+            <div class="row">
+                <div class="col-12">
+                    <a href="/v2/f/pac-pt-parked-orders/list" 
+                       hx-indicator=".htmx-indicator" 
+                       hx-post="/v2/f/pac-pt-parked-orders/list" 
+                       hx-swap="innerHTML" 
+                       hx-target="#main-content" 
+                       hx-vals='{"order_id": "{{ order.order_info.pr_repair_order_id }}"}'
+                       class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+    content_hash: null
+    variables_data: null
+    template_fragment_key: null
+    description: Main content block for the page, contains title and body content
+    sort_order: 1
+    is_published: true
+    publish_date: null
+    expire_date: null
+    cache_duration: 3600
+    last_rendered: null
+    change_description: Initial content fragment for page
+    created_by_user_id: null

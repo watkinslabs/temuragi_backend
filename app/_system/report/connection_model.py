@@ -10,7 +10,7 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 from app.base.model import BaseModel
 from app.config import config
 
-encryption_key = config["DB_CONN_ENC_KEY"]
+encryption_key = config.db_conn_enc_key
 
 class Connection(BaseModel):
     __depends_on__ = ['DatabaseType']
@@ -51,7 +51,7 @@ class Connection(BaseModel):
 
         if not username or not password:
             raise ValueError(
-                f"Username and password required for {self.database_type.display} connections"
+                f"Username and password required for {self.database_type.label} connections"
             )
 
         if '://' in conn_str:
@@ -115,4 +115,4 @@ class Connection(BaseModel):
         if db_type_name == 'mongodb':
             return json.dumps(params)
 
-        raise ValueError(f"Unsupported database type: {self.database_type.display}")
+        raise ValueError(f"Unsupported database type: {self.database_type.label}")

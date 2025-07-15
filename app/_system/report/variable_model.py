@@ -18,7 +18,7 @@ class ReportVariable(BaseModel):
         nullable=False
     )
     name = Column(String(255), nullable=False)  # Variable name in query {var_name}
-    display_name = Column(String(255))
+    label = Column(String(255))
     
     # Link to data type
     variable_type_id = Column(

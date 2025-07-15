@@ -357,6 +357,7 @@ class Miner:
             'list': 'read', 
             'count': 'read',
             'create': 'create',
+            'write': 'write',
             'update': 'update', 
             'delete': 'delete'
         }
@@ -474,7 +475,19 @@ class Miner:
                 'default': str(column.default) if column.default else None,
                 'unique': column.unique or False,
                 'index': column.index or False,
+                'is_pk': column.primary_key,  # Add this
+                'is_identity': False,  # Default to False, will be set below
             }
+            
+            # Check if column is an identity/autoincrement column
+            if hasattr(column, 'autoincrement') and column.autoincrement:
+                column_info['is_identity'] = True
+            elif column.primary_key and str(column.type).upper() in ['INTEGER', 'BIGINT', 'SERIAL', 'BIGSERIAL']:
+                # Common identity column patterns
+                column_info['is_identity'] = True
+            elif column.name.lower() == 'id' and column.primary_key:
+                # Common convention
+                column_info['is_identity'] = True
             
             # Add human-readable label (convert snake_case to Title Case)
             label = column.name.replace('_', ' ').title()
@@ -582,6 +595,7 @@ class Miner:
             'columns': columns,
             'relationships': relationships,
             'primary_keys': [col.name for col in model_class.__table__.primary_key],
+            'identity_columns': [col['name'] for col in columns if col.get('is_identity')],  # Add this
             'indexes': [
                 {
                     'name': idx.name,
@@ -603,7 +617,6 @@ class Miner:
             'success': True,
             'metadata': metadata
         })
-    
     def handle_read(self, model_class, data, audit_data):
         """Handle read operations - single record by any column"""
         db_session = db_registry._routing_session()
@@ -820,57 +833,57 @@ class Miner:
     def handle_list(self, model_class, data, audit_data):
         """Handle list operations with pagination, filtering, sorting, and search"""
         db_session = db_registry._routing_session()
-        
+
         # DataTables sends these parameters
         draw = data.get('draw', 1)
         start = data.get('start', 0)
         length = data.get('length', 10)
-        
+
         # Search parameters - DataTables sends as 'search' (string) not in a dict
         search_value = data.get('search', '')
-        
+
         # Get searchable columns from the request
         searchable_columns = data.get('searchable_columns', [])
-        
+
         # Get columns to return
         return_columns = data.get('return_columns', [])
-        
+
         # Extract DataTables order information
         order_data = data.get('order', [])
-        columns_data = data.get('columns', [])
         
         # Determine sort column and direction
         sort_by = 'created_at'
         sort_order = 'desc'
-        
-        if order_data and len(order_data) > 0 and columns_data:
+
+        # Fix: Use return_columns to map column index to column name
+        if order_data and len(order_data) > 0 and return_columns:
             order_col_index = order_data[0].get('column', 0)
-            if 0 <= order_col_index < len(columns_data):
-                col_name = columns_data[order_col_index].get('name')
+            if 0 <= order_col_index < len(return_columns):
+                col_name = return_columns[order_col_index]
                 if col_name and hasattr(model_class, col_name):
                     sort_by = col_name
-                    sort_order = 'desc' if order_data[0].get('dir') == 'desc' else 'asc'
-        
+                    sort_order = order_data[0].get('dir', 'asc')
+
         # Other parameters from your existing implementation
         filters = data.get('filters', {})
         include_inactive = data.get('include_inactive', False)
         slim = data.get('slim', False)
-        
+
         # Start building query
         query = db_session.query(model_class)
-        
+
         # Apply active filter unless explicitly including inactive
         if hasattr(model_class, 'is_active') and not include_inactive:
             query = query.filter(model_class.is_active == True)
-        
+
         # Apply filters
         query = self._apply_filters(query, model_class, filters)
-        
+
         # Apply search using searchable columns
         if search_value and searchable_columns:
             query = self._apply_search(query, model_class, search_value, searchable_columns)
             audit_data['search_terms'] = search_value
-        
+
         # Get total count before filtering (for DataTables recordsTotal)
         pk_field = self._get_primary_key_field(model_class)
         pk_column = getattr(model_class, pk_field)
@@ -878,34 +891,34 @@ class Miner:
         if hasattr(model_class, 'is_active') and not include_inactive:
             total_query = total_query.filter(model_class.is_active == True)
         records_total = total_query.scalar() or 0
-        
+
         # Get filtered count (for DataTables recordsFiltered) - using subquery approach
         # Create a subquery from the current query without ordering
         subquery = query.order_by(None).subquery()
         records_filtered = db_session.query(func.count()).select_from(subquery).scalar() or 0
-        
+
         # Apply sorting
         query = self._apply_sorting(query, model_class, sort_by, sort_order)
-        
+
         # Apply pagination using DataTables parameters
         if length==0:
             query = query.offset(start)
         else:
             query = query.offset(start).limit(length)
-        
+
         # Execute query
         instances = query.all()
-        
+
         # Update audit data
         audit_data.update({
             'records_returned': len(instances),
             'total_records': records_filtered,
             'filters_applied': filters
         })
-        
+
         # Serialize results with only requested columns
         data_list = [self._serialize_instance(instance, slim, return_columns) for instance in instances]
-        
+
         # Return DataTables-compatible response
         response = {
             'success': True,
@@ -914,12 +927,12 @@ class Miner:
             'recordsFiltered': records_filtered,
             'data': data_list
         }
-        
+
         if slim:
             response['metadata'] = self._get_model_metadata(model_class)
-        
+
         return jsonify(response)
-    
+
     def handle_count(self, model_class, data, audit_data):
         """Handle count operations with optional filtering"""
         db_session = db_registry._routing_session()
@@ -1333,14 +1346,14 @@ class Miner:
         validation_rules = self._get_form_validation_rules(model_class)
         
         # Detect which fields should be shown/hidden in forms
-        form_config = self._get_form_display_config(model_class)
+        form_config = self._get_form_label_config(model_class)
         
         # Build complete metadata
         metadata = {
             'model': {
                 'name': model_class.__name__,
                 'table_name': model_class.__tablename__,
-                'display_name': self._get_model_display_name(model_class),
+                'label': self._get_model_label(model_class),
                 'description': model_class.__doc__.strip() if model_class.__doc__ else None
             },
             'fields': basic_metadata,
@@ -1446,7 +1459,7 @@ class Miner:
                 'back_populates': rel.back_populates,
                 'cascade': rel.cascade,
                 'lazy': rel.lazy,
-                'display_field': self._detect_display_field(rel.mapper.class_),
+                'label_field': self._detect_label_field(rel.mapper.class_),
                 'foreign_keys': [str(fk) for fk in rel._calculated_foreign_keys],
                 'is_owned': False,  # Will be determined below
                 'back_reference_field': None,
@@ -1542,7 +1555,7 @@ class Miner:
         
         return rules
 
-    def _get_form_display_config(self, model_class):
+    def _get_form_label_config(self, model_class):
         """Get form display configuration"""
         # Define fields to exclude from forms
         excluded_fields = ['is_active']
@@ -1647,16 +1660,16 @@ class Miner:
         else:
             return ''
 
-    def _detect_display_field(self, model_class):
+    def _detect_label_field(self, model_class):
         """Auto-detect the best field to use for display in dropdowns"""
         # Priority order for display fields
-        display_field_priority = [
-            'display_name', 'display', 'name', 'title', 'label', 
+        label_field_priority = [
+            'label', 'display',  'title', 'label', 'name',
             'description', 'email', 'username', 'code', 'slug'
         ]
         
         # Check each priority field
-        for field_name in display_field_priority:
+        for field_name in label_field_priority:
             if hasattr(model_class, field_name):
                 column = model_class.__table__.columns.get(field_name)
                 if column is not None and 'VARCHAR' in str(column.type).upper():
@@ -1722,10 +1735,10 @@ class Miner:
         
         return model_name
 
-    def _get_model_display_name(self, model_class):
+    def _get_model_label(self, model_class):
         """Get human-readable display name for model"""
-        if hasattr(model_class, '__display_name__'):
-            return model_class.__display_name__
+        if hasattr(model_class, '__label__'):
+            return model_class.__label__
         
         # Convert CamelCase to Title Case
         import re

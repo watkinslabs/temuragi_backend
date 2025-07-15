@@ -11,8 +11,8 @@ def register_logger(app):
     Args:
         app: Flask app instance
     """
-    log_level = app.config['LOG_LEVEL']
-    log_file = app.config['LOG_FILE']
+    log_level = app.config['log_level']
+    log_file = app.config['log_file']
     max_bytes = 10485760
     backup_count = 5
 

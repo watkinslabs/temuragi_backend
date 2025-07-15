@@ -1,0 +1,39 @@
+# SiteConfig Template (Template)
+# Template file - edit values before importing
+# 
+# INSTRUCTIONS:
+# 1. AUTO-GENERATED fields are optional - uncomment to set specific values
+# 2. Update foreign key UUIDs to reference existing records
+# 3. Edit all other values as needed
+# 4. Foreign key constraints must be satisfied before import
+# Template file - edit values before importing
+# Exported from template CLI
+
+SiteConfig:
+  meta:
+    tablename: site_configs
+    schema: public
+  data:
+    name: Temuragi
+    notes: Default Dev Config
+    published: true
+    tagline: 
+    description: The temuragi default website
+    url: https://temuragi.watkinslabs.com/v2
+    admin_email: user@example.com
+    logo_desktop_dark: https://temuragi.watkinslabs.com//static/images/logo.svg
+    logo_mobile_dark: https://temuragi.watkinslabs.com//static/images/logo.svg
+    logo_desktop: https://temuragi.watkinslabs.com//static/images/logo.svg
+    logo_mobile: https://temuragi.watkinslabs.com//static/images/logo.svg
+    favicon: https://temuragi.watkinslabs.com//static/favicon.png
+    footer_text: Copyright Watkins Labs 2025
+    footer_links: 
+    social_links: 
+    google_analytics_id: 
+    other_tracking_codes: 
+    maintenance_mode: true
+    maintenance_message: Working on the things and the stuffs...
+    allow_registration: true
+    require_email_verification: 
+    is_active: true
+    

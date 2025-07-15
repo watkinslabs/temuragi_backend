@@ -18,6 +18,8 @@ from tabulate import tabulate
 from datetime import datetime
 from urllib.parse import urljoin
 
+from app.register.database import db_registry
+
 # Optional imports for token storage
 try:
     import keyring
@@ -35,6 +37,16 @@ class AuthenticationError(BackendError):
     """Authentication failed"""
     pass
 
+class AppBase:
+    logger=None
+
+    def __init__(self):
+        pass
+
+ 
+    def teardown_appcontext(self, f):
+        """Register a function to be called at the end of each request context."""
+        pass
 
 class Backend(ABC):
     """Abstract base class for CLI backends"""
@@ -618,7 +630,7 @@ class LocalBackend(Backend):
             from sqlalchemy.orm import sessionmaker
             from app.config import config
             
-            engine = create_engine(config['DATABASE_URI'])
+            engine = create_engine(config.database.uri)
             session_factory = sessionmaker(bind=engine)
             self.session = session_factory()
             self._log("Database session created", 'info')
@@ -788,9 +800,14 @@ class BaseCLI:
         self.console_logging = console_logging
         self.backend = None
         self.initialization_errors = []
-        
+        self.app=AppBase()
+                
+        db_registry.init_app(self.app)
         # Load configuration
         self.config = self._load_config(config)
+        self.app = AppBase()
+
+        db_registry.init_app(self.app)
         
         # Set up icons
         self._icons = {

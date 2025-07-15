@@ -29,6 +29,7 @@ keyring = "*"
 flort = "*"
 babel = "*"
 pandas = "*"
+wl-config-manager = "*"
 
 [dev-packages]
 

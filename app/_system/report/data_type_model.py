@@ -11,5 +11,5 @@ class DataType(BaseModel):
 
 
     name = Column(String, unique=True, nullable=False)
-    display = Column(String, nullable=False)
+    label = Column(String, nullable=False)
 

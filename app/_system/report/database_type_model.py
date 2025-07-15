@@ -14,7 +14,7 @@ class DatabaseType(BaseModel):
         unique=True,
         nullable=False
     )
-    display = Column(
+    label = Column(
         Text,
         nullable=False
     )

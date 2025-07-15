@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.append('/web/ahoy2.radiatorusa.com')
 
-from app.base.cli_v1 import BaseCLI
+from app.base.cli import BaseCLI
 from .exporter import ComponentExporter
 from .importer import ComponentImporter
 from .resolver import ImportDependencyResolver
@@ -33,6 +33,7 @@ class PorterCLI(BaseCLI):
         self.log_info("Starting Porter CLI initialization")
 
         try:
+
             # Initialize exporter and importer
             self.exporter = ComponentExporter(self)
             self.importer = ComponentImporter(self, self.get_model)

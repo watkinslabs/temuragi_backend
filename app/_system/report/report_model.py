@@ -25,7 +25,7 @@ class Report(BaseModel):
     # Core fields
     slug = Column(String(255), nullable=False, unique=True)  # Immutable identifier for permissions
     name = Column(String(255), nullable=False)  # Display name that can change
-    display = Column(String(255), nullable=True)  # Optional longer display name
+    label = Column(String(255), nullable=True)  # Optional longer display name
     query = Column(Text, nullable=True)
     description = Column(Text, nullable=True)
     model_id = Column(
@@ -59,6 +59,7 @@ class Report(BaseModel):
     is_download_xlsx = Column(Boolean, default=False)
     is_system = Column(Boolean, default=False)
     is_model = Column(Boolean, nullable=False, default=False)
+    is_auto_refresh = Column(Boolean, nullable=False, default=False)
     
     
     # Permission tracking
@@ -291,13 +292,13 @@ class Report(BaseModel):
             return False, "Permissions already created"
         
         report_actions = [
-            ('view', f'View report: {self.display or self.name}'),
-            ('execute', f'Execute report: {self.display or self.name}'),
-            ('export', f'Export data from report: {self.display or self.name}'),
-            ('schedule', f'Schedule report: {self.display or self.name}'),
-            ('edit', f'Edit report: {self.display or self.name}'),
-            ('delete', f'Delete report: {self.display or self.name}'),
-            ('share', f'Share report: {self.display or self.name}'),
+            ('view', f'View report: {self.label or self.name}'),
+            ('execute', f'Execute report: {self.label or self.name}'),
+            ('export', f'Export data from report: {self.label or self.name}'),
+            ('schedule', f'Schedule report: {self.label or self.name}'),
+            ('edit', f'Edit report: {self.label or self.name}'),
+            ('delete', f'Delete report: {self.label or self.name}'),
+            ('share', f'Share report: {self.label or self.name}'),
         ]
         
         created_permissions = []
@@ -329,13 +330,13 @@ class Report(BaseModel):
         
         for perm in permissions:
             action_descriptions = {
-                'view': f'View report: {self.display or self.name}',
-                'execute': f'Execute report: {self.display or self.name}',
-                'export': f'Export data from report: {self.display or self.name}',
-                'schedule': f'Schedule report: {self.display or self.name}',
-                'edit': f'Edit report: {self.display or self.name}',
-                'delete': f'Delete report: {self.display or self.name}',
-                'share': f'Share report: {self.display or self.name}',
+                'view': f'View report: {self.label or self.name}',
+                'execute': f'Execute report: {self.label or self.name}',
+                'export': f'Export data from report: {self.label or self.name}',
+                'schedule': f'Schedule report: {self.label or self.name}',
+                'edit': f'Edit report: {self.label or self.name}',
+                'delete': f'Delete report: {self.label or self.name}',
+                'share': f'Share report: {self.label or self.name}',
             }
             
             if perm.action in action_descriptions:
@@ -605,7 +606,7 @@ class Report(BaseModel):
         new_report = Report(
             slug=new_slug,
             name=new_name,
-            display=f"{self.display or self.name} (Copy)",
+            label=f"{self.label or self.name} (Copy)",
             query=self.query,
             description=self.description,
             connection_id=self.connection_id,
@@ -636,7 +637,7 @@ class Report(BaseModel):
             new_col = ReportColumn(
                 report_id=new_report.id,
                 name=col.name,
-                display_name=col.display_name,
+                label=col.label,
                 data_type_id=col.data_type_id,
                 is_searchable=col.is_searchable,
                 search_type=col.search_type,
@@ -657,7 +658,7 @@ class Report(BaseModel):
             new_var = ReportVariable(
                 report_id=new_report.id,
                 name=var.name,
-                display_name=var.display_name,
+                label=var.label,
                 variable_type_id=var.variable_type_id,
                 default_value=var.default_value,
                 placeholder=var.placeholder,

@@ -165,7 +165,7 @@ class ReportDataTableGenerator:
             'name': column.name,
             'order': column.order_index,
             'searchable': column.is_searchable,
-            'label': column.display_name,
+            'label': column.label,
             'visible': column.is_visible,
             'sortable': column.is_sortable,
         }
@@ -208,7 +208,7 @@ class ReportDataTableGenerator:
 
             filter_config = {
                 'id': f'{variable.name}_filter',
-                'label': variable.display_name,
+                'label': variable.label,
                 'column': variable.name,
                 'required': variable.is_required
             }
@@ -301,7 +301,7 @@ class ReportDataTableGenerator:
                     'icon': action.icon,
                     'data_index': action.data_index,
                     'color': action.color,
-                    'title': action.display,
+                    'title': action.label,
                 }
 
                 # Add confirmation if needed
@@ -394,7 +394,7 @@ class ReportDataTableGenerator:
             'report_name': report.name,
             'report_id': report.id,  # Add report ID
             'model_name': model_name,  # Add this for use in template
-            'table_title': report.display or report.name,
+            'table_title': report.label or report.name,
             'table_description': report.description or f'Data from {report.name}',
             'columns': columns,
             'visible_columns': visible_columns,

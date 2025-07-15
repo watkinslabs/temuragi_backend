@@ -7,10 +7,10 @@ PageAction:
       name: new
       icon: fas fa-plus
       color: success
-      display: New Report
+      label: New Report
       mode: page
-      action_type: htmx
-      url: /v2/reports/create
+      action_type: navigate
+      url: ReportBuilder
       url_for: 
       method: POST
       target: #main_content
@@ -24,10 +24,10 @@ PageAction:
       name: edit
       icon: fas fa-edit
       color: primary
-      display: Edit
-      url: /v2/reports/edit
+      label: Edit
+      url: ReportBuilder
       url_for: 
-      action_type: htmx
+      action_type: navigate
       method: POST
       target: #main_content
       mode: row
@@ -41,7 +41,7 @@ PageAction:
       name: delete
       icon: fas fa-trash
       color: danger
-      display: Delete
+      label: Delete
       mode: row
       action_type: api
       url: /v2/reports/delete

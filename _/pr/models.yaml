@@ -1,0 +1,210 @@
+# Model Template (Template)
+# Template file - edit values before importing
+# 
+# INSTRUCTIONS:
+# 1. AUTO-GENERATED fields are optional - uncomment to set specific values
+# 2. Update foreign key UUIDs to reference existing records
+# 3. Edit all other values as needed
+# 4. Foreign key constraints must be satisfied before import
+# Template file - edit values before importing
+# Exported from template CLI
+
+Model:
+  meta:
+    tablename: models
+    schema: public
+  data:
+
+    - name: JADVDATA_dbo_locations
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010001
+      is_active: true
+
+    - name: JADVDATA_dbo_po_log
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010002
+      is_active: true
+
+    - name: JADVDATA_dbo_po_lock
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010003
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKAPPO
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010004
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKAPPOL
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010005
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKPOERD
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010006
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKICLOC
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010007
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKSYMSTR
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010008
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKGLCOA
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010009
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKAPHPOL
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010010
+      is_active: true
+
+    - name: GPACIFIC_dbo_BKAPHPO
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010011
+      is_active: true
+
+    - name: GPACIFIC_dbo_po_details
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010012
+      is_active: true
+
+    - name: GCANADA_dbo_BKAPPO
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010013
+      is_active: true
+
+    - name: GCANADA_dbo_BKAPPOL
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010014
+      is_active: true
+
+    - name: GCANADA_dbo_BKAPHPO
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010015
+      is_active: true
+
+    - name: GCANADA_dbo_BKAPHPOL
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010016
+      is_active: true
+
+    - name: GCANADA_dbo_BKGLCOA
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010017
+      is_active: true
+
+    - name: GCANADA_dbo_BKICLOC
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010018
+      is_active: true
+
+    - name: GCANADA_dbo_BKPOERD
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010019
+      is_active: true
+
+    - name: GCANADA_dbo_BKSYMSTR
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010020
+      is_active: true
+
+    - name: GCANADA_dbo_po_details
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010021
+      is_active: true
+
+
+  
+    - name: PartsTrader_dbo_inventory_availability_request
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010022
+      is_active: true
+    - name: PartsTrader_dbo_inventory_availability_response
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010023
+      is_active: true
+    - name: PartsTrader_dbo_order_request
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010024
+      is_active: true
+    - name: PartsTrader_dbo_order_response
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010025
+      is_active: true
+    - name: PartsTrader_dbo_orders
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010026
+      is_active: true
+    - name: PartsTrader_dbo_parked_order_parts
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010027
+      is_active: true
+    - name: PartsTrader_dbo_parked_orders
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010028
+      is_active: true
+    - name: PartsTrader_dbo_quote_lines
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010029
+      is_active: true
+    - name: PartsTrader_dbo_quote_request
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010030
+      is_active: true
+    - name: PartsTrader_dbo_quote_response
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010031
+      is_active: true
+    - name: PartsTrader_dbo_quotes
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010032
+      is_active: true
+    - name: PartsTrader_dbo_repairers
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010033
+      is_active: true
+    - name: PartsTrader_dbo_requesters
+      version: 1.0.0
+      description: 
+      id: 00000001-0000-0000-0000-000000010034
+      is_active: true

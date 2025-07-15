@@ -1,0 +1,22 @@
+PageAction:
+  meta:
+    tablename: page_actions
+    schema: public
+  data:
+    - report_id: fb2d204e-5943-43b2-a20b-fe19fb1d1853
+      name: new
+      icon: fas fa-edit
+      color: primary
+      display: Manage
+      mode: row
+      action_type: htmx
+      url: /v2/parked_orders/manage
+      url_for: 
+      method: POST
+      target: #main_content
+      headers: null
+      payload: 
+      confirm: false
+      confirm_message: 
+      order_index: 0
+      is_active: true

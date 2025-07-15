@@ -1,0 +1,13 @@
+# admin-menu.yaml
+Menu:
+ meta:
+   tablename: menu
+   schema: public
+ data:
+   name: PR_MAIN
+   display: Operations
+   description: OPS
+   slug: /v2/f/dashboard/PR_MAIN
+   icon: fas fa-tasks
+   id: 00000001-0000-0000-0000-000000001000
+   is_active: true
