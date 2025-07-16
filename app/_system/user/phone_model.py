@@ -7,7 +7,7 @@ from app.base.model import BaseModel
 
 class PhoneNumber(BaseModel):
     """User phone number model"""
-    __depends_on__ = ['User']
+    __depends_on__ = []
     __tablename__ = 'phone_numbers'
     
     user_id = Column(

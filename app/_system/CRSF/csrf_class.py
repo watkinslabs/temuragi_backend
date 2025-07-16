@@ -19,7 +19,7 @@ class CSRFProtection:
     def init_app(self, app):
         """Initialize with Flask app and register before_request hook"""
         if not self.secret_key:
-            self.secret_key = app.config.get('SECRET_KEY')
+            self.secret_key = app.config.get('secret_key')
         if not self.secret_key:
             raise ValueError("SECRET_KEY must be set")
         

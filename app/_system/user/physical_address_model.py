@@ -5,11 +5,11 @@ from sqlalchemy.orm import relationship
 from app.base.model import BaseModel
 
 
-class Address(BaseModel):
+class PhysicalAddress(BaseModel):
     """User address model"""
-    __depends_on__ = ['User']
+    __depends_on__ = []
     __tablename__ = 'addresses'
-    
+  
     user_id = Column(
         UUID(as_uuid=True),
         ForeignKey('users.id', name='fk_addresses_user'),

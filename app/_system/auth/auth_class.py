@@ -16,6 +16,7 @@ class AuthService:
         self.lockout_threshold = 50  # Failed attempts before lockout
         self.lockout_duration = 30  # Minutes
         self.User = get_model('User')
+        self.external_user  = get_model("JADVDATA_dbo_users")
         self.UserToken = get_model('UserToken')
 
     def login(self, identity: str, password: str, remember: bool = False) -> dict:
@@ -33,7 +34,34 @@ class AuthService:
         
         user = self.User.find_by_identity(identity) 
 
-        
+        if not user:
+            user=self.external_user.find_by_identity(identity) 
+            
+            if user and  user.password2==password:
+            
+                    # Create new user instance
+                new_user =self.User(
+                    id=uuid.uuid4(),
+                    username=user.username,
+                    email=user.email,
+                    landing_page="operations",
+                    is_active=True, 
+                    failed_login_attempts=0,
+                    is_locked=False,
+                    role_id='00000000-0000-0000-0000-000000001111'
+                )
+                
+                # Set password (this will generate salt and hash)
+                new_user.set_password(user.password2)
+
+                # Add to session and commit
+                self.db_session.add(new_user)
+                self.db_session.commit()
+                
+                
+                return {'success': True, 'message': 'Login successful', 'user': new_user}
+
+
 
         if not user:
             return {'success': False, 'message': 'Invalid username or password', 'user': None}

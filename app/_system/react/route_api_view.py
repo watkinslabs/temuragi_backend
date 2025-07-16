@@ -28,7 +28,7 @@ def sync_component():
    
    # Try to get data from different sources
    data = None
-   
+   print ("TRYING SYNC")
    # First try JSON
    if request.is_json:
        data = request.get_json()
@@ -50,6 +50,7 @@ def sync_component():
        return jsonify({'error': 'No data received'}), 400
        
    db_session = db_registry._routing_session()
+   print ("TRYING SYNC2")
 
    # Validate required fields
    required = ['name', 'source_code', 'compiled_code']
@@ -165,7 +166,8 @@ def sync_component():
            update_route_mappings(component, data['routes'])
 
        status = 'updated' if component else 'created'
-       
+       print ("TRYING SYNC3")
+    
        return jsonify({
            'id': str(component.id),
            'name': component.name,
