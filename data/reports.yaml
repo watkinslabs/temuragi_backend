@@ -1,0 +1,909 @@
+# Report - All Records
+# Total records: 19
+# Exported from template CLI
+
+Report:
+  meta:
+    tablename: reports
+    schema: public
+  data:
+  - slug: databasetype/list
+    name: Manage Module
+    label: Manage Module
+    query: |-
+      SELECT
+          t.name,
+          t.label,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM database_types t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: Module specific configurations
+    model_id: 00000000-0000-0000-0000-000000000004
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''DatabaseType'', ''database_types'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    is_active: true
+    created_at: '2025-07-15T06:56:25.999167-04:00'
+    updated_at: '2025-07-15T06:56:26.021721-04:00'
+  - slug: connection/list
+    name: Manage Database Connections
+    label: Manage Database Connections
+    query: |-
+      SELECT
+          t.name,
+          t.database_type_id,
+          t.connection_string,
+          t.username,
+          t.password,
+          t.options,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM connections t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: System integrations into data sources
+    model_id: 00000000-0000-0000-0000-000000000002
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''Connection'', ''connections'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    is_active: true
+    created_at: '2025-07-15T06:57:58.334673-04:00'
+    updated_at: '2025-07-15T06:57:58.357490-04:00'
+  - slug: datatype/list
+    name: Manage Report Data Types
+    label: Manage Report Data Types
+    query: |-
+      SELECT
+          t.name,
+          t.label,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM data_types t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: Report data represention
+    model_id: 00000000-0000-0000-0000-000000000003
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''DataType'', ''data_types'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    is_active: true
+    created_at: '2025-07-15T06:58:12.498875-04:00'
+    updated_at: '2025-07-15T06:58:12.521545-04:00'
+  - slug: module/list
+    name: Manage Module
+    label: Manage Module
+    query: |-
+      SELECT
+          t.module_name,
+          t.config_data,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM modules t
+      WHERE 1=1
+      ORDER BY t.id DESC, t.created_at DESC
+    description: Module specific configurations
+    model_id: 00000000-0000-0000-0000-000000000011
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''Module'', ''modules'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    is_active: true
+    created_at: '2025-07-15T06:58:19.552974-04:00'
+    updated_at: '2025-07-15T06:58:19.575611-04:00'
+  - slug: user/list
+    name: Manage User
+    label: Manage User
+    query: "SELECT\n   id,\n   landing_page,\n   username,\n   email,\n   is_active,\n\
+      \   created_at\n  from users "
+    description: Profile configuration
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''User'', ''users'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: false
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    is_active: true
+    created_at: '2025-07-15T06:57:29.903106-04:00'
+    updated_at: '2025-07-15T06:57:29.926725-04:00'
+  - slug: rolepermission/list
+    name: Manage RolePermission
+    label: Manage RolePermission
+    query: |-
+      SELECT
+          t.role_id,
+          t.permission_id,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM role_permissions t
+      WHERE 1=1
+      ORDER BY t.id DESC, t.created_at DESC
+    description: Assign features to a role
+    model_id: 00000000-0000-0000-0000-000000000023
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''RolePermission'', ''role_permissions'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    is_active: true
+    created_at: '2025-07-15T06:57:51.263157-04:00'
+    updated_at: '2025-07-15T06:57:51.285808-04:00'
+  - slug: theme/list
+    name: Manage Themes
+    label: Manage Themes
+    query: |-
+      SELECT
+          t.name,
+          t.display_name,
+          t.description,
+          t.theme_version,
+          t.css_framework,
+          t.css_version,
+          t.custom_css,
+          t.css_variables,
+          t.mode,
+          t.primary_color,
+          t.secondary_color,
+          t.success_color,
+          t.warning_color,
+          t.danger_color,
+          t.info_color,
+          t.background_color,
+          t.surface_color,
+          t.text_color,
+          t.text_muted_color,
+          t.component_color,
+          t.sidebar_color,
+          t.content_area_color,
+          t.primary_color_dark,
+          t.secondary_color_dark,
+          t.success_color_dark,
+          t.warning_color_dark,
+          t.danger_color_dark,
+          t.info_color_dark,
+          t.background_color_dark,
+          t.surface_color_dark,
+          t.text_color_dark,
+          t.text_muted_color_dark,
+          t.border_color_dark,
+          t.component_color_dark,
+          t.sidebar_color_dark,
+          t.content_area_color_dark,
+          t.font_family_primary,
+          t.font_family_heading,
+          t.font_family_mono,
+          t.font_size_base,
+          t.font_weight_normal,
+          t.font_weight_bold,
+          t.line_height_base,
+          t.container_max_width,
+          t.grid_columns,
+          t.border_radius,
+          t.spacing_unit,
+          t.breakpoint_xs,
+          t.breakpoint_sm,
+          t.breakpoint_md,
+          t.breakpoint_lg,
+          t.breakpoint_xl,
+          t.breakpoint_xxl,
+          t.shadow_sm,
+          t.shadow_md,
+          t.shadow_lg,
+          t.border_width,
+          t.border_color,
+          t.focus_ring_color,
+          t.focus_ring_width,
+          t.transition_duration,
+          t.animation_easing,
+          t.enable_animations,
+          t.enable_transitions,
+          t.button_border_radius,
+          t.input_border_radius,
+          t.card_border_radius,
+          t.navbar_height,
+          t.sidebar_width,
+          t.footer_height,
+          t.topbar_height,
+          t.breadcrumb_height,
+          t.is_default,
+          t.is_system_theme,
+          t.supports_dark_mode,
+          t.supports_high_contrast,
+          t.rtl_support,
+          t.consolidate_css,
+          t.consolidate_js,
+          t.minify_css,
+          t.minify_js,
+          t.minify_html,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM themes t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: System Themes
+    model_id: 00000000-0000-0000-0000-000000000026
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''Theme'', ''themes'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    is_active: true
+    created_at: '2025-07-15T06:56:11.280098-04:00'
+    updated_at: '2025-07-15T06:56:11.302313-04:00'
+  - slug: siteconfig/list
+    name: Manage Site Config
+    label: Manage Site Config
+    query: |-
+      SELECT
+          t.name,
+          t.notes,
+          t.published,
+          t.tagline,
+          t.description,
+          t.url,
+          t.admin_email,
+          t.logo_desktop_dark,
+          t.logo_mobile_dark,
+          t.logo_desktop,
+          t.logo_mobile,
+          t.favicon,
+          t.footer_text,
+          t.footer_links,
+          t.social_links,
+          t.google_analytics_id,
+          t.other_tracking_codes,
+          t.maintenance_mode,
+          t.maintenance_message,
+          t.allow_registration,
+          t.require_email_verification,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM site_configs t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: Site specific configurations
+    model_id: 00000000-0000-0000-0000-000000000031
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''SiteConfig'', ''site_configs'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    is_active: true
+    created_at: '2025-07-15T06:56:33.060904-04:00'
+    updated_at: '2025-07-15T06:56:33.083578-04:00'
+  - slug: sitekeyword/list
+    name: Manage Site Keyword
+    label: Manage Site Keyword
+    query: |-
+      SELECT
+          t.keyword,
+          t.site_config_id,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM site_keywords t
+      WHERE 1=1
+      ORDER BY t.id DESC, t.created_at DESC
+    description: Site keyword configurations
+    model_id: 00000000-0000-0000-0000-000000000033
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''SiteKeyword'', ''site_keywords'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    is_active: true
+    created_at: '2025-07-15T06:56:54.363799-04:00'
+    updated_at: '2025-07-15T06:56:54.388279-04:00'
+  - slug: sitetag/list
+    name: Manage Site Tag
+    label: Manage Site Tag
+    query: |-
+      SELECT
+          t.tag_name,
+          t.tag_slug,
+          t.site_config_id,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM site_tags t
+      WHERE 1=1
+      ORDER BY t.id DESC, t.created_at DESC
+    description: Site tag configurations
+    model_id: 00000000-0000-0000-0000-000000000032
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''SiteTag'', ''site_tags'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    is_active: true
+    created_at: '2025-07-15T06:56:47.314224-04:00'
+    updated_at: '2025-07-15T06:56:47.336669-04:00'
+  - slug: siteprefix/list
+    name: Manage Site Prefix
+    label: Manage Site Prefix
+    query: |-
+      SELECT
+          t.prefix_type,
+          t.prefix_value,
+          t.prefix_url,
+          t.site_config_id,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM site_prefixes t
+      WHERE 1=1
+      ORDER BY t.id DESC, t.created_at DESC
+    description: Site prefix configurations
+    model_id: 00000000-0000-0000-0000-000000000034
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''SitePrefix'', ''site_prefixes'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    is_active: true
+    created_at: '2025-07-15T06:56:40.213112-04:00'
+    updated_at: '2025-07-15T06:56:40.235401-04:00'
+  - slug: templatefragment/list
+    name: Tempalte Fragment Module
+    label: Tempalte Fragment Module
+    query: |-
+      SELECT
+          t.template_id,
+          t.fragment_type,
+          t.fragment_name,
+          t.fragment_key,
+          t.template_file_path,
+          t.compiled_file_path,
+          t.content_type,
+          t.version_number,
+          t.version_label,
+          t.is_active,
+          t.template_source,
+          t.template_hash,
+          t.variables_schema,
+          t.sample_data,
+          t.required_context,
+          t.dependencies,
+          t.css_dependencies,
+          t.js_dependencies,
+          t.description,
+          t.usage_notes,
+          t.preview_template,
+          t.sort_order,
+          t.is_partial,
+          t.cache_strategy,
+          t.cache_duration,
+          t.last_compiled,
+          t.change_description,
+          t.created_by_user_id,
+          t.id,
+          t.created_at,
+          t.updated_at
+      FROM template_fragments t
+      WHERE 1=1
+      ORDER BY t.id DESC, t.created_at DESC
+    description: Tempalte content
+    model_id: 00000000-0000-0000-0000-000000000025
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''TemplateFragment'', ''template_fragments'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 90887e20-e581-4766-bc6b-00815051f105
+    is_active: true
+    created_at: '2025-07-15T06:57:08.688208-04:00'
+    updated_at: '2025-07-15T06:57:08.711267-04:00'
+  - slug: report2/list
+    name: reports-list
+    label: Manage Report Definitions
+    query: |-
+      SELECT
+          t.slug,
+          t.name,
+          t.label,
+          t.query,
+          t.description,
+          t.model_id,
+          t.connection_id,
+          t.category,
+          t.tags,
+          t.icon,
+          t.color,
+          t.is_wide,
+          t.is_ajax,
+          t.is_auto_run,
+          t.is_searchable,
+          t.is_public,
+          t.is_published,
+          t.is_download_csv,
+          t.is_download_xlsx,
+          t.is_system,
+          t.is_model,
+          t.permissions_created,
+          t.options,
+          t.last_run,
+          t.version,
+          t.report_template_id,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM reports t
+    description: Template metadata specific configurations
+    model_id: 00000000-0000-0000-0000-000000000016
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '["[''Report''", "''reports'']"]'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: true
+    is_download_csv: false
+    is_download_xlsx: false
+    is_system: true
+    is_model: false
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    is_active: true
+    created_at: '2025-07-15T06:56:04.107943-04:00'
+    updated_at: '2025-07-15T06:56:04.107946-04:00'
+  - slug: page/list
+    name: Manage Pages
+    label: Manage Pages
+    query: |-
+      SELECT
+          t.name,
+          t.title,
+          t.slug,
+          t.template_id,
+          t.meta_description,
+          t.meta_keywords,
+          t.og_title,
+          t.og_description,
+          t.og_image,
+          t.canonical_url,
+          t.published,
+          t.featured,
+          t.sort_order,
+          t.publish_date,
+          t.expire_date,
+          t.view_count,
+          t.requires_auth,
+          t.cache_duration,
+          t.module_id,
+          t.is_system,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM pages t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: System Pages
+    model_id: 00000000-0000-0000-0000-000000000012
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''Page'', ''pages'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    is_active: true
+    created_at: '2025-07-15T06:56:18.644781-04:00'
+    updated_at: '2025-07-15T06:56:18.668492-04:00'
+  - slug: permission/list
+    name: Manage Permission
+    label: Manage Permission
+    query: |-
+      SELECT
+          t.name,
+          t.service,
+          t.action,
+          t.resource,
+          t.description,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM permissions t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: RBAC Permissions
+    model_id: 00000000-0000-0000-0000-000000000014
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''Permission'', ''permissions'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    is_active: true
+    created_at: '2025-07-15T06:57:44.155573-04:00'
+    updated_at: '2025-07-15T06:57:44.179401-04:00'
+  - slug: variabletype/list
+    name: Manage Variable Types
+    label: Manage Variable Types
+    query: |-
+      SELECT
+          t.name,
+          t.label,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM variable_types t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: Report Variable representations
+    model_id: 00000000-0000-0000-0000-000000000030
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''VariableType'', ''variable_types'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    is_active: true
+    created_at: '2025-07-15T06:58:05.434166-04:00'
+    updated_at: '2025-07-15T06:58:05.457096-04:00'
+  - slug: template/list
+    name: Manage Templates
+    label: Manage Templates
+    query: |-
+      SELECT
+          t.name,
+          t.display_name,
+          t.description,
+          t.theme_id,
+          t.menu_id,
+          t.layout_type,
+          t.container_class,
+          t.sidebar_enabled,
+          t.header_type,
+          t.footer_type,
+          t.breadcrumbs_enabled,
+          t.module_id,
+          t.is_system,
+          t.is_admin_template,
+          t.is_default_template,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM templates t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: UI/HTML Fragments for system design
+    model_id: 00000000-0000-0000-0000-000000000024
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''Template'', ''templates'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: c8537d09-b448-4865-9218-04131058142f
+    is_active: true
+    created_at: '2025-07-15T06:57:22.781430-04:00'
+    updated_at: '2025-07-15T06:57:22.803890-04:00'
+  - slug: role/list
+    name: Manage Role
+    label: Manage Role
+    query: |-
+      SELECT
+          t.name,
+          t.display,
+          t.description,
+          t.is_admin,
+          t.id,
+          t.is_active,
+          t.created_at,
+          t.updated_at
+      FROM roles t
+      WHERE 1=1
+      ORDER BY t.name ASC
+    description: User feature grouping
+    model_id: 00000000-0000-0000-0000-000000000022
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''Role'', ''roles'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: e655a749-75ae-4c11-8848-90203ffa7baa
+    is_active: true
+    created_at: '2025-07-15T06:57:36.977050-04:00'
+    updated_at: '2025-07-15T06:57:36.999511-04:00'
+  - slug: pagefragment/list
+    name: Page Fragment Module
+    label: Page Fragment Module
+    query: |-
+      SELECT
+          t.page_id,
+          t.fragment_type,
+          t.fragment_name,
+          t.fragment_key,
+          t.content_type,
+          t.version_number,
+          t.version_label,
+          t.is_active,
+          t.content_source,
+          t.content_hash,
+          t.variables_data,
+          t.template_fragment_key,
+          t.description,
+          t.sort_order,
+          t.is_published,
+          t.publish_date,
+          t.expire_date,
+          t.cache_duration,
+          t.last_rendered,
+          t.change_description,
+          t.created_by_user_id,
+          t.id,
+          t.created_at,
+          t.updated_at
+      FROM page_fragments t
+      WHERE 1=1
+      ORDER BY t.id DESC, t.created_at DESC
+    description: PAge Content
+    model_id: 00000000-0000-0000-0000-000000000013
+    connection_id: 2eb2d272-f35f-421d-a06b-2a319b4e1e1e
+    category: Model Reports
+    tags: '[''PageFragment'', ''page_fragments'']'
+    is_wide: false
+    is_ajax: true
+    is_auto_run: false
+    is_searchable: true
+    is_public: false
+    is_published: false
+    is_download_csv: true
+    is_download_xlsx: true
+    is_system: true
+    is_model: true
+    is_auto_refresh: false
+    permissions_created: true
+    options: {}
+    version: 1
+    id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    is_active: true
+    created_at: '2025-07-15T06:57:01.495028-04:00'
+    updated_at: '2025-07-15T06:57:01.517734-04:00'

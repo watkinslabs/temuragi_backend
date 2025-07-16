@@ -1,0 +1,113 @@
+# PageAction - All Records
+# Total records: 5
+# Exported from template CLI
+
+PageAction:
+  meta:
+    tablename: page_actions
+    schema: public
+  data:
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: delete
+    label: Delete
+    mode: row
+    action_type: api
+    icon: fas fa-trash
+    color: danger
+    data_index: 0
+    url: /v2/reports/delete
+    method: POST
+    target: _self
+    headers: {}
+    payload: id
+    confirm: true
+    confirm_message: Delete this report?
+    order_index: 0
+    id: 3b4bbfdd-f888-4647-9446-8e862cc42d37
+    is_active: true
+    created_at: '2025-07-15T10:43:21.523464-04:00'
+    updated_at: '2025-07-15T10:43:21.523467-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    route_id: 11b8f9ac-efa3-47c1-b06a-30dd8ee2f981
+    name: new
+    label: Create User
+    mode: page
+    action_type: navigate
+    icon: ''
+    color: ''
+    data_index: 0
+    url: UserEditor
+    url_for: ''
+    method: GET
+    target: _self
+    headers: {}
+    payload: {}
+    confirm: false
+    confirm_message: Are you sure you want to perform this action?
+    order_index: 0
+    id: 540fe532-0ce4-49db-b2b2-a57ff247591e
+    is_active: true
+    created_at: '2025-07-15T10:43:21.526414-04:00'
+    updated_at: '2025-07-15T10:43:21.526417-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    route_id: 11b8f9ac-efa3-47c1-b06a-30dd8ee2f981
+    name: edit
+    label: Edit
+    mode: row
+    action_type: navigate
+    icon: ''
+    color: ''
+    data_index: 0
+    url: UserEditor
+    url_for: ''
+    method: POST
+    target: _self
+    headers: {}
+    payload: id
+    confirm: false
+    confirm_message: Are you sure you want to perform this action?
+    order_index: 1
+    id: b28f5968-84b9-41b3-a1b0-973286c51c8a
+    is_active: true
+    created_at: '2025-07-15T10:43:21.528195-04:00'
+    updated_at: '2025-07-15T10:43:21.528198-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    route_id: 49899a3e-e019-40d4-80a3-4b06658374cd
+    name: edit
+    label: Edit
+    mode: row
+    action_type: navigate
+    icon: fas fa-edit
+    color: primary
+    data_index: 0
+    url: ReportBuilder
+    method: POST
+    target: _self
+    headers: {}
+    payload: id
+    confirm: false
+    order_index: 1
+    id: e27372a1-f2cd-46a8-b693-a44c25f18273
+    is_active: true
+    created_at: '2025-07-15T10:43:21.529842-04:00'
+    updated_at: '2025-07-15T10:43:21.529845-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    route_id: 49899a3e-e019-40d4-80a3-4b06658374cd
+    name: new
+    label: New Report
+    mode: page
+    action_type: navigate
+    icon: fas fa-plus
+    color: success
+    data_index: 0
+    url: ReportBuilder
+    method: POST
+    target: _self
+    headers: {}
+    payload: {}
+    confirm: false
+    order_index: 2
+    id: f527ddc9-6eb3-4042-9aa6-414f7ba66ee6
+    is_active: true
+    created_at: '2025-07-15T10:43:21.531932-04:00'
+    updated_at: '2025-07-15T10:43:21.531935-04:00'

@@ -1,0 +1,909 @@
+# ReportVariable - All Records
+# Total records: 72
+# Exported from template CLI
+
+ReportVariable:
+  meta:
+    tablename: report_variables
+    schema: public
+  data:
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 00641766-9817-45a4-9fe3-88eb6b129601
+    is_active: true
+    created_at: '2025-07-15T06:58:05.496127-04:00'
+    updated_at: '2025-07-15T06:58:05.496129-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 07ddb825-24f4-4e8d-b288-d0b590e4a894
+    is_active: true
+    created_at: '2025-07-15T06:57:58.398489-04:00'
+    updated_at: '2025-07-15T06:57:58.398492-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 14d16dce-0a1e-4658-bde8-ec47608b387e
+    is_active: true
+    created_at: '2025-07-15T06:58:19.603807-04:00'
+    updated_at: '2025-07-15T06:58:19.603810-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 1886c530-4811-4ab5-9aad-0c86978580fc
+    is_active: true
+    created_at: '2025-07-15T06:56:40.277641-04:00'
+    updated_at: '2025-07-15T06:56:40.277643-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 1e0da070-a6dd-4140-af45-e0248fd56972
+    is_active: true
+    created_at: '2025-07-15T06:57:37.033622-04:00'
+    updated_at: '2025-07-15T06:57:37.033625-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 1fbb0237-f766-4922-9919-9b283a0571cb
+    is_active: true
+    created_at: '2025-07-15T06:57:29.986673-04:00'
+    updated_at: '2025-07-15T08:44:58.570256-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 20135d6f-fd2a-45eb-93ff-d5338565d76c
+    is_active: true
+    created_at: '2025-07-15T06:56:33.177033-04:00'
+    updated_at: '2025-07-15T06:56:33.177035-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 21c7903e-5c69-4a34-b8c1-4042f9dbd17f
+    is_active: true
+    created_at: '2025-07-15T06:56:47.370514-04:00'
+    updated_at: '2025-07-15T06:56:47.370516-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 225c991d-4ef7-4c86-8cc8-fda4c6879958
+    is_active: true
+    created_at: '2025-07-15T06:58:05.486837-04:00'
+    updated_at: '2025-07-15T06:58:05.486839-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 29e5b76c-10a6-4dfa-b4b3-0535c12af72b
+    is_active: true
+    created_at: '2025-07-15T06:56:33.170791-04:00'
+    updated_at: '2025-07-15T06:56:33.170793-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 2
+    id: 2c538f81-875f-4c44-aa80-ec861e928891
+    is_active: true
+    created_at: '2025-07-15T06:56:11.585688-04:00'
+    updated_at: '2025-07-15T09:37:31.668628-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 3081e8e2-e968-4e11-9e27-0c063b6ac416
+    is_active: true
+    created_at: '2025-07-15T06:57:01.601623-04:00'
+    updated_at: '2025-07-15T06:57:01.601625-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 311c100d-29d8-471f-aeab-2f83f7ad2cbc
+    is_active: true
+    created_at: '2025-07-15T06:56:11.591406-04:00'
+    updated_at: '2025-07-15T09:37:31.629018-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 38d49b05-49ee-4bc4-946a-3babd445a854
+    is_active: true
+    created_at: '2025-07-15T06:57:44.220039-04:00'
+    updated_at: '2025-07-15T06:57:44.220041-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 38fe2a78-536f-4d8b-ad91-019161bcbe09
+    is_active: true
+    created_at: '2025-07-15T06:57:58.405234-04:00'
+    updated_at: '2025-07-15T06:57:58.405237-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 3ca2ff4d-c782-4b22-a094-df8356853c8c
+    is_active: true
+    created_at: '2025-07-15T06:58:12.558881-04:00'
+    updated_at: '2025-07-15T06:58:12.558883-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 3d0026f7-ba8b-4414-9fe1-16ee98bb5812
+    is_active: true
+    created_at: '2025-07-15T06:57:22.880036-04:00'
+    updated_at: '2025-07-15T06:57:22.880038-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 3de7ed9e-712f-43a5-8f5e-7144c1a421ce
+    is_active: true
+    created_at: '2025-07-15T06:57:08.815764-04:00'
+    updated_at: '2025-07-15T06:57:08.815767-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 41b38451-f253-455f-91c5-86d7a4e1b9f5
+    is_active: true
+    created_at: '2025-07-15T06:56:33.174084-04:00'
+    updated_at: '2025-07-15T06:56:33.174086-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 3
+    id: 42f4f689-86e6-46eb-8a0a-71407d018f54
+    is_active: true
+    created_at: '2025-07-15T06:56:26.050384-04:00'
+    updated_at: '2025-07-15T09:11:26.361008-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 51590c17-2016-47ce-81e6-a6294f92fbad
+    is_active: true
+    created_at: '2025-07-15T06:58:12.549615-04:00'
+    updated_at: '2025-07-15T06:58:12.549617-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 58a57d1f-2b79-43dc-9185-de0af059f834
+    is_active: true
+    created_at: '2025-07-15T06:56:40.274712-04:00'
+    updated_at: '2025-07-15T06:56:40.274714-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 5c525bb6-1eba-4710-90d6-a6754e1341ea
+    is_active: true
+    created_at: '2025-07-15T06:58:05.490220-04:00'
+    updated_at: '2025-07-15T06:58:05.490223-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 1
+    id: 5e906106-bbf5-401f-aabc-6bbc48be6426
+    is_active: true
+    created_at: '2025-07-15T06:57:29.983818-04:00'
+    updated_at: '2025-07-15T08:44:58.597826-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 5ee8b2ef-52d5-4d7e-92bb-36b5c2f760a9
+    is_active: true
+    created_at: '2025-07-15T06:56:40.268551-04:00'
+    updated_at: '2025-07-15T06:56:40.268553-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 61b4aae7-e57a-4e45-8aa0-0898066b5bf0
+    is_active: true
+    created_at: '2025-07-15T06:57:51.317016-04:00'
+    updated_at: '2025-07-15T06:57:51.317018-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 61eca37e-46f9-49f2-8344-2a531b81c90c
+    is_active: true
+    created_at: '2025-07-15T06:57:58.408169-04:00'
+    updated_at: '2025-07-15T06:57:58.408171-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 655186b9-4a8b-4807-a0ac-bbe89ee4cea9
+    is_active: true
+    created_at: '2025-07-15T06:57:44.225915-04:00'
+    updated_at: '2025-07-15T06:57:44.225917-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 2
+    id: 657c2263-11f1-418d-a4d7-cfdaf760803c
+    is_active: true
+    created_at: '2025-07-15T06:56:26.053697-04:00'
+    updated_at: '2025-07-15T09:11:26.338443-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 67b90656-c1ed-47ce-a16b-5c1b86d7ce39
+    is_active: true
+    created_at: '2025-07-15T06:58:19.610881-04:00'
+    updated_at: '2025-07-15T06:58:19.610883-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 6a2d0b8d-41ba-44d6-a994-565809550566
+    is_active: true
+    created_at: '2025-07-15T06:58:12.553022-04:00'
+    updated_at: '2025-07-15T06:58:12.553025-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 6b56cea9-d34e-41e0-8dae-bb40414bbe17
+    is_active: true
+    created_at: '2025-07-15T06:57:58.401859-04:00'
+    updated_at: '2025-07-15T06:57:58.401861-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 1
+    id: 716b621d-34c1-4891-b937-ddaa0bf269fd
+    is_active: true
+    created_at: '2025-07-15T06:56:11.588535-04:00'
+    updated_at: '2025-07-15T09:37:31.648379-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 71b1a257-0530-4bb7-afaa-3bc0cf1b86dc
+    is_active: true
+    created_at: '2025-07-15T06:57:37.039785-04:00'
+    updated_at: '2025-07-15T06:57:37.039787-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 839a470b-5844-4c9d-8552-b7bab57a50ef
+    is_active: true
+    created_at: '2025-07-15T06:56:54.425644-04:00'
+    updated_at: '2025-07-15T06:56:54.425646-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 8713057e-793f-4eae-936e-dfeea3b75dab
+    is_active: true
+    created_at: '2025-07-15T06:56:54.419459-04:00'
+    updated_at: '2025-07-15T06:56:54.419461-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 3
+    id: 87f26242-1ca9-4a84-996c-f950f685f9e5
+    is_active: true
+    created_at: '2025-07-15T06:57:29.977787-04:00'
+    updated_at: '2025-07-15T08:44:58.646368-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 9439657d-a8a2-430f-a62b-5a1b50fc9020
+    is_active: true
+    created_at: '2025-07-15T06:57:22.874243-04:00'
+    updated_at: '2025-07-15T06:57:22.874245-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 95a4aa7b-486e-463b-837c-a8172cdf0adf
+    is_active: true
+    created_at: '2025-07-15T06:56:47.373427-04:00'
+    updated_at: '2025-07-15T06:56:47.373429-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: 9f8f2668-6ee5-49ad-acd7-6ae712465918
+    is_active: true
+    created_at: '2025-07-15T06:57:37.036890-04:00'
+    updated_at: '2025-07-15T06:57:37.036892-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: a0f928a6-ab78-4f51-ac58-486638538eb2
+    is_active: true
+    created_at: '2025-07-15T06:57:44.222967-04:00'
+    updated_at: '2025-07-15T06:57:44.222970-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: a3d1139c-44f9-4372-b252-de3fd337d03b
+    is_active: true
+    created_at: '2025-07-15T06:57:08.812547-04:00'
+    updated_at: '2025-07-15T06:57:08.812549-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: a53c7930-6f26-484e-bacf-979b85968aee
+    is_active: true
+    created_at: '2025-07-15T06:56:26.059534-04:00'
+    updated_at: '2025-07-15T09:11:26.290983-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: a90e920e-7e7e-4cf9-a218-163ef675e7c5
+    is_active: true
+    created_at: '2025-07-15T06:56:18.752426-04:00'
+    updated_at: '2025-07-15T06:56:18.752428-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: aa9c92d3-33b1-4baa-8e1f-8b3f3eae001d
+    is_active: true
+    created_at: '2025-07-15T06:56:18.749109-04:00'
+    updated_at: '2025-07-15T06:56:18.749111-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: aaa6e7f2-8c70-4cd1-a2e2-3971c03cb95e
+    is_active: true
+    created_at: '2025-07-15T06:57:44.216712-04:00'
+    updated_at: '2025-07-15T06:57:44.216714-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: aad403b8-a5e5-4d13-a97d-5633a21816c0
+    is_active: true
+    created_at: '2025-07-15T06:56:18.755368-04:00'
+    updated_at: '2025-07-15T06:56:18.755370-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: ac869527-536a-44a1-b522-66c415dfd652
+    is_active: true
+    created_at: '2025-07-15T06:58:19.607145-04:00'
+    updated_at: '2025-07-15T06:58:19.607147-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 2
+    id: aee18361-276a-4fe7-a860-bc3c990d016f
+    is_active: true
+    created_at: '2025-07-15T06:57:29.980968-04:00'
+    updated_at: '2025-07-15T08:44:58.622287-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: b298ec60-7986-414f-8d3e-1a869af49bbb
+    is_active: true
+    created_at: '2025-07-15T06:57:51.313714-04:00'
+    updated_at: '2025-07-15T06:57:51.313717-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: b481023e-542b-4757-a360-a85daa3e17b6
+    is_active: true
+    created_at: '2025-07-15T06:58:19.613840-04:00'
+    updated_at: '2025-07-15T06:58:19.613842-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: b6f92780-b6be-475a-ad38-c9217acf76d6
+    is_active: true
+    created_at: '2025-07-15T06:57:22.870988-04:00'
+    updated_at: '2025-07-15T06:57:22.870990-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: b82a555f-3651-42cb-aff8-b94ad802463f
+    is_active: true
+    created_at: '2025-07-15T06:56:40.271853-04:00'
+    updated_at: '2025-07-15T06:56:40.271856-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: b92de6ac-18c4-4e23-bb9b-b546429dda41
+    is_active: true
+    created_at: '2025-07-15T06:57:08.818652-04:00'
+    updated_at: '2025-07-15T06:57:08.818655-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: c18c2775-78f0-4e8e-86a5-319d49dcc3c2
+    is_active: true
+    created_at: '2025-07-15T06:56:18.758397-04:00'
+    updated_at: '2025-07-15T06:56:18.758400-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: c523e6b0-d031-4dfa-95a6-37339a7f5583
+    is_active: true
+    created_at: '2025-07-15T06:57:01.607460-04:00'
+    updated_at: '2025-07-15T06:57:01.607463-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: c6dd19f4-3e7c-4b95-b2a1-c359532e612a
+    is_active: true
+    created_at: '2025-07-15T06:56:33.179940-04:00'
+    updated_at: '2025-07-15T06:56:33.179942-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: cdd8f27f-851a-45f7-9195-12ad16795312
+    is_active: true
+    created_at: '2025-07-15T06:56:54.428645-04:00'
+    updated_at: '2025-07-15T06:56:54.428647-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: cf9b24dd-cf63-4367-a923-01b419342c3e
+    is_active: true
+    created_at: '2025-07-15T06:57:22.877151-04:00'
+    updated_at: '2025-07-15T06:57:22.877153-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: d0442c78-843e-4d2f-b654-aae6dcb769e7
+    is_active: true
+    created_at: '2025-07-15T06:58:05.493192-04:00'
+    updated_at: '2025-07-15T06:58:05.493194-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 3
+    id: d4cce94d-b712-4848-bbde-270707b9b8db
+    is_active: true
+    created_at: '2025-07-15T06:56:11.582234-04:00'
+    updated_at: '2025-07-15T09:37:31.689009-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: d78be9cf-afd0-44b7-8805-10687aa7867e
+    is_active: true
+    created_at: '2025-07-15T06:57:51.323901-04:00'
+    updated_at: '2025-07-15T06:57:51.323904-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 1
+    id: d9592fb3-956b-4b90-a8da-12826746fe91
+    is_active: true
+    created_at: '2025-07-15T06:56:26.056611-04:00'
+    updated_at: '2025-07-15T09:11:26.315397-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: da8b8e27-3243-41f7-ba09-2a8889b74a3a
+    is_active: true
+    created_at: '2025-07-15T06:57:37.042682-04:00'
+    updated_at: '2025-07-15T06:57:37.042684-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: db59861f-84b2-4f43-8c6b-bf658c70654c
+    is_active: true
+    created_at: '2025-07-15T06:58:12.555954-04:00'
+    updated_at: '2025-07-15T06:58:12.555957-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: ddf3bae4-de1a-479d-9e3b-9e44deac76d2
+    is_active: true
+    created_at: '2025-07-15T06:57:08.821519-04:00'
+    updated_at: '2025-07-15T06:57:08.821522-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: e35b522b-3aff-49ed-b8db-78367abf1438
+    is_active: true
+    created_at: '2025-07-15T06:56:47.367252-04:00'
+    updated_at: '2025-07-15T06:56:47.367254-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: limit
+    label: Results Limit
+    variable_type_id: dd205ef4-314e-40d6-9fbf-b3fb013704f8
+    default_value: '1000'
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: e52ba1c3-4f3d-4a44-b9a3-ee98dd78ed5b
+    is_active: true
+    created_at: '2025-07-15T06:56:54.422711-04:00'
+    updated_at: '2025-07-15T06:56:54.422713-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: f0798f51-a2ae-4782-afbf-7eb8d9dfdd75
+    is_active: true
+    created_at: '2025-07-15T06:57:51.319964-04:00'
+    updated_at: '2025-07-15T06:57:51.319966-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: search_term
+    label: Search
+    variable_type_id: 3751f8d5-0ac1-41c7-8a09-5b7cf0fd9dbd
+    placeholder: Search all columns...
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: f30f47d8-ca27-4586-9fe9-39a6e368c6a5
+    is_active: true
+    created_at: '2025-07-15T06:57:01.598355-04:00'
+    updated_at: '2025-07-15T06:57:01.598357-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: date_from
+    label: Date From
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: fba732bc-15fc-4515-91c6-e1d7a0deacbb
+    is_active: true
+    created_at: '2025-07-15T06:57:01.604556-04:00'
+    updated_at: '2025-07-15T06:57:01.604558-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: date_to
+    label: Date To
+    variable_type_id: d4b18abc-71b0-4b6b-abb6-e6659aa1a42e
+    is_required: false
+    is_hidden: false
+    limits: '{}'
+    order_index: 0
+    id: ff9c994c-c33f-4831-a72e-146f72ee9b38
+    is_active: true
+    created_at: '2025-07-15T06:56:47.376300-04:00'
+    updated_at: '2025-07-15T06:56:47.376303-04:00'

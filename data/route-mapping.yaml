@@ -1,0 +1,74 @@
+# RouteMapping - All Records
+# Total records: 5
+# Exported from template CLI
+
+RouteMapping:
+  meta:
+    tablename: route_mappings
+    schema: public
+  data:
+  - path: ReportList
+    name: ReportList - ReportList
+    component_id: ab23677d-3ff1-4623-813c-d9d13f3fa507
+    props: {}
+    config: {}
+    requires_auth: true
+    required_permissions: []
+    required_roles: []
+    is_active: true
+    meta_tags: {}
+    id: 0b38d910-c095-4162-af95-03be7fd3606b
+    created_at: '2025-07-15T10:29:22.553490-04:00'
+    updated_at: '2025-07-15T10:29:22.553492-04:00'
+  - path: UserEditor
+    name: UserEditor - UserEditor
+    component_id: 911fb2e4-e361-4a29-969c-4ab7aa3f4b71
+    props: {}
+    config: {}
+    requires_auth: true
+    required_permissions: []
+    required_roles: []
+    is_active: true
+    meta_tags: {}
+    id: 11b8f9ac-efa3-47c1-b06a-30dd8ee2f981
+    created_at: '2025-07-15T10:29:22.540054-04:00'
+    updated_at: '2025-07-15T10:29:22.540057-04:00'
+  - path: ReportBuilder
+    name: ReportBuilder - ReportBuilder
+    component_id: cbcbe897-a8c7-49e2-a27d-90cd47fbba95
+    props: {}
+    config: {}
+    requires_auth: true
+    required_permissions: []
+    required_roles: []
+    is_active: true
+    meta_tags: {}
+    id: 49899a3e-e019-40d4-80a3-4b06658374cd
+    created_at: '2025-07-15T10:29:22.597286-04:00'
+    updated_at: '2025-07-15T10:29:22.597289-04:00'
+  - path: UserList
+    name: UserList - UserList
+    component_id: e7332064-4747-4ecb-ba65-b6b3b92ff659
+    props: {}
+    config: {}
+    requires_auth: true
+    required_permissions: []
+    required_roles: []
+    is_active: true
+    meta_tags: {}
+    id: 4ef051cf-c764-43ba-9d26-259b79d4d1c3
+    created_at: '2025-07-15T10:29:22.501146-04:00'
+    updated_at: '2025-07-15T10:29:22.501148-04:00'
+  - path: /login
+    name: Login - /login
+    component_id: 910f3725-9607-4d4a-ba1e-d9cbf2d76c71
+    props: {}
+    config: {}
+    requires_auth: true
+    required_permissions: []
+    required_roles: []
+    is_active: true
+    meta_tags: {}
+    id: bb7ca299-fc37-4c15-b233-652fe97bae1a
+    created_at: '2025-07-15T10:29:22.618464-04:00'
+    updated_at: '2025-07-15T10:29:22.618466-04:00'

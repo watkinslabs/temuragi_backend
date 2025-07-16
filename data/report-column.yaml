@@ -1,0 +1,5823 @@
+# ReportColumn - All Records
+# Total records: 323
+# Exported from template CLI
+
+ReportColumn:
+  meta:
+    tablename: report_columns
+    schema: public
+  data:
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: meta_keywords
+    label: Meta Keywords
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0027658d-5de6-4b51-bc27-5063c53c15cb
+    is_active: true
+    created_at: '2025-07-15T06:56:18.691404-04:00'
+    updated_at: '2025-07-15T06:56:18.691407-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 0180ad96-631e-442e-b48b-45278ededfb3
+    is_active: true
+    created_at: '2025-07-15T06:57:01.590618-04:00'
+    updated_at: '2025-07-15T06:57:01.590620-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: breadcrumbs_enabled
+    label: Breadcrumbs Enabled
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0209908b-56f3-4aea-aacc-73d8bc1cbbb0
+    is_active: true
+    created_at: '2025-07-15T06:57:22.842567-04:00'
+    updated_at: '2025-07-15T06:57:22.842570-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 025a6311-53a1-4d31-b8d9-acb4d3bbde9a
+    is_active: true
+    created_at: '2025-07-15T06:56:47.352985-04:00'
+    updated_at: '2025-07-15T06:56:47.352987-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: usage_notes
+    label: Usage Notes
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 02a8476b-1c6b-4df2-97d7-e2a436001f6a
+    is_active: true
+    created_at: '2025-07-15T06:57:08.775639-04:00'
+    updated_at: '2025-07-15T06:57:08.775641-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: display_name
+    label: Display Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 84
+    id: 02f9deb9-936e-4bbb-b181-680a782caf9c
+    is_active: true
+    created_at: '2025-07-15T06:56:11.312707-04:00'
+    updated_at: '2025-07-15T09:37:33.085162-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 03e5f7c5-e8d8-426a-bd26-37f637577b56
+    is_active: true
+    created_at: '2025-07-15T06:58:05.474956-04:00'
+    updated_at: '2025-07-15T06:58:05.474958-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: input_border_radius
+    label: Input Border Radius
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 20
+    id: 0428a782-85e9-4fa3-8275-ad7adcaecd1a
+    is_active: true
+    created_at: '2025-07-15T06:56:11.520698-04:00'
+    updated_at: '2025-07-15T09:37:31.992412-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_auto_run
+    label: Is Auto Run
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 29
+    id: 056ae87d-e2df-4317-9df0-f8c68b05cb79
+    is_active: true
+    created_at: '2025-07-15T06:56:04.220071-04:00'
+    updated_at: '2025-07-15T09:40:10.620559-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 2
+    id: 056fafa9-de36-4da5-acd0-522dcd7d95c2
+    is_active: true
+    created_at: '2025-07-15T06:56:11.571575-04:00'
+    updated_at: '2025-07-15T09:37:31.676566-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: publish_date
+    label: Publish Date
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 061b83a3-98c7-4e05-b364-4d2b2b464ddc
+    is_active: true
+    created_at: '2025-07-15T06:57:01.570440-04:00'
+    updated_at: '2025-07-15T06:57:01.570442-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: template_file_path
+    label: Template File Path
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 06623c0e-7198-4983-be8b-22aab3723558
+    is_active: true
+    created_at: '2025-07-15T06:57:08.731041-04:00'
+    updated_at: '2025-07-15T06:57:08.731043-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 066bdd16-d438-4f0e-87f8-914a4f23c43b
+    is_active: true
+    created_at: '2025-07-15T06:56:33.106309-04:00'
+    updated_at: '2025-07-15T06:56:33.106311-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: mode
+    label: Mode
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 77
+    id: 0779b1b7-43c8-42a1-b41b-0ae581441c1f
+    is_active: true
+    created_at: '2025-07-15T06:56:11.333240-04:00'
+    updated_at: '2025-07-15T09:37:32.969238-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: query
+    label: Query
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 28
+    id: 07c4e0da-91db-44e1-9f3b-0dcfe54f80e6
+    is_active: true
+    created_at: '2025-07-15T06:56:04.222620-04:00'
+    updated_at: '2025-07-15T09:40:10.603901-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: font_family_primary
+    label: Font Family Primary
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 49
+    id: 07f58681-ab95-411c-ab16-449d23419fdc
+    is_active: true
+    created_at: '2025-07-15T06:56:11.436973-04:00'
+    updated_at: '2025-07-15T09:37:32.491686-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: permission_id
+    label: Permission Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0a2a7f3a-25ae-49b6-9328-7633abb12306
+    is_active: true
+    created_at: '2025-07-15T06:57:51.296444-04:00'
+    updated_at: '2025-07-15T06:57:51.296447-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: content_source
+    label: Content Source
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0adc53d9-0dc5-47b3-9618-c5bc3bfaca29
+    is_active: true
+    created_at: '2025-07-15T06:57:01.550128-04:00'
+    updated_at: '2025-07-15T06:57:01.550130-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: title
+    label: Title
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0b0811d4-43e0-4984-9371-c52262220726
+    is_active: true
+    created_at: '2025-07-15T06:56:18.679131-04:00'
+    updated_at: '2025-07-15T06:56:18.679133-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: sidebar_color
+    label: Sidebar Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 65
+    id: 0c7eb7e9-1c58-471d-ab5b-6796327e20c7
+    is_active: true
+    created_at: '2025-07-15T06:56:11.388473-04:00'
+    updated_at: '2025-07-15T09:37:32.768151-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: surface_color
+    label: Surface Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 69
+    id: 0cf1cc47-2ba6-4bd6-bf9b-412a0656407d
+    is_active: true
+    created_at: '2025-07-15T06:56:11.371484-04:00'
+    updated_at: '2025-07-15T09:37:32.835986-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: primary_color_dark
+    label: Primary Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 63
+    id: 0d9c2808-6942-449b-a2f1-1b71eea0d2d7
+    is_active: true
+    created_at: '2025-07-15T06:56:11.395802-04:00'
+    updated_at: '2025-07-15T09:37:32.733717-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: database_type_id
+    label: Database Type Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0e71ec76-1cf1-4c94-b389-1f59288db26b
+    is_active: true
+    created_at: '2025-07-15T06:57:58.368012-04:00'
+    updated_at: '2025-07-15T06:57:58.368014-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: created_by_user_id
+    label: Created By User Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0e72954f-3ec7-47fa-9f63-a446932be40d
+    is_active: true
+    created_at: '2025-07-15T06:57:01.584840-04:00'
+    updated_at: '2025-07-15T06:57:01.584842-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: url
+    label: Url
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 0e732187-cda7-46e3-96c9-6a3c7474eefa
+    is_active: true
+    created_at: '2025-07-15T06:56:33.109343-04:00'
+    updated_at: '2025-07-15T06:56:33.109346-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: connection_id
+    label: Connection Id
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 27
+    id: 0f1864a8-e724-4f11-b187-8a197228284a
+    is_active: true
+    created_at: '2025-07-15T06:56:04.224270-04:00'
+    updated_at: '2025-07-15T09:40:10.587166-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: shadow_lg
+    label: Shadow Lg
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 30
+    id: 1001f70f-9e0f-4be0-840d-8fff909fe28a
+    is_active: true
+    created_at: '2025-07-15T06:56:11.492378-04:00'
+    updated_at: '2025-07-15T09:37:32.162936-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: topbar_height
+    label: Topbar Height
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 15
+    id: 12142c2c-76f7-4c97-87eb-3cf502fd4d7e
+    is_active: true
+    created_at: '2025-07-15T06:56:11.534860-04:00'
+    updated_at: '2025-07-15T09:37:31.905357-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 153d1dd4-7a9a-46b3-95a8-53496b45b4d3
+    is_active: true
+    created_at: '2025-07-15T06:56:33.090685-04:00'
+    updated_at: '2025-07-15T06:56:33.090687-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: cache_strategy
+    label: Cache Strategy
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 15d3bcbd-0ca2-4ae9-8824-99960a854d1e
+    is_active: true
+    created_at: '2025-07-15T06:57:08.787277-04:00'
+    updated_at: '2025-07-15T06:57:08.787279-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 1670f4e7-1f2d-4e6c-864b-a453956be693
+    is_active: true
+    created_at: '2025-07-15T06:57:22.863203-04:00'
+    updated_at: '2025-07-15T06:57:22.863205-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: version_label
+    label: Version Label
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 16c27eed-1969-4dbb-86f9-d45de102dc7e
+    is_active: true
+    created_at: '2025-07-15T06:57:01.544271-04:00'
+    updated_at: '2025-07-15T06:57:01.544273-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: border_width
+    label: Border Width
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 29
+    id: 177c68f9-88d4-4ff0-ae85-9da8b62d5603
+    is_active: true
+    created_at: '2025-07-15T06:56:11.495190-04:00'
+    updated_at: '2025-07-15T09:37:32.145770-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: sort_order
+    label: Sort Order
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: 186ec94e-0c53-448f-aa42-a6e48061e471
+    is_active: true
+    created_at: '2025-07-15T06:57:08.781492-04:00'
+    updated_at: '2025-07-15T06:57:08.781494-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: line_height_base
+    label: Line Height Base
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 43
+    id: 189c362a-943f-4537-be27-7639c58593f4
+    is_active: true
+    created_at: '2025-07-15T06:56:11.454604-04:00'
+    updated_at: '2025-07-15T09:37:32.388465-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: component_color_dark
+    label: Component Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 52
+    id: 19897cdb-8630-4371-bfbb-bde6c01ed313
+    is_active: true
+    created_at: '2025-07-15T06:56:11.428147-04:00'
+    updated_at: '2025-07-15T09:37:32.543013-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: display
+    label: Display
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 1a3cf879-9509-417d-855d-4ea3f7637c5d
+    is_active: true
+    created_at: '2025-07-15T06:57:37.010263-04:00'
+    updated_at: '2025-07-15T06:57:37.010265-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 1c43b0a8-7d13-4ae9-b99c-59c01c922221
+    is_active: true
+    created_at: '2025-07-15T06:57:44.211844-04:00'
+    updated_at: '2025-07-15T06:57:44.211846-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: js_dependencies
+    label: Js Dependencies
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 1d293198-4e46-494a-9060-7a5623ee4572
+    is_active: true
+    created_at: '2025-07-15T06:57:08.769719-04:00'
+    updated_at: '2025-07-15T06:57:08.769722-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: change_description
+    label: Change Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 1dc026b6-67fb-47eb-8c3d-54950f507604
+    is_active: true
+    created_at: '2025-07-15T06:57:01.581974-04:00'
+    updated_at: '2025-07-15T06:57:01.581976-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: surface_color_dark
+    label: Surface Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 56
+    id: 1e848371-42aa-4072-a8db-922aa6f81579
+    is_active: true
+    created_at: '2025-07-15T06:56:11.416406-04:00'
+    updated_at: '2025-07-15T09:37:32.612527-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 3
+    id: 1ed4e35f-e4a3-403b-ae2d-d53ea2c2af09
+    is_active: true
+    created_at: '2025-07-15T06:56:11.568758-04:00'
+    updated_at: '2025-07-15T09:37:31.696386-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: font_weight_normal
+    label: Font Weight Normal
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 45
+    id: 1f246fcd-ac66-4b0d-b37e-c21cc75d5d51
+    is_active: true
+    created_at: '2025-07-15T06:56:11.448906-04:00'
+    updated_at: '2025-07-15T09:37:32.421956-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: content_type
+    label: Content Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 1fcf7f22-b5fe-4ebe-84fb-24eeddcd99f4
+    is_active: true
+    created_at: '2025-07-15T06:57:08.737109-04:00'
+    updated_at: '2025-07-15T06:57:08.737111-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 1ff8bfdc-bb99-440b-a9e9-525bde096db4
+    is_active: true
+    created_at: '2025-07-15T06:58:05.464225-04:00'
+    updated_at: '2025-07-15T06:58:05.464227-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: is_system
+    label: Is System
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 2021dd5b-4c8e-4a8b-80ea-f3f594483717
+    is_active: true
+    created_at: '2025-07-15T06:56:18.732711-04:00'
+    updated_at: '2025-07-15T06:56:18.732713-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: preview_template
+    label: Preview Template
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 203dc13d-d511-4f73-a2dc-08f86178d655
+    is_active: true
+    created_at: '2025-07-15T06:57:08.778581-04:00'
+    updated_at: '2025-07-15T06:57:08.778583-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: border_color
+    label: Border Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 28
+    id: 205dbe1e-6e36-40b0-b37b-490a1c6f2ac6
+    is_active: true
+    created_at: '2025-07-15T06:56:11.498037-04:00'
+    updated_at: '2025-07-15T09:37:32.128500-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: require_email_verification
+    label: Require Email Verification
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 2192626a-f661-4d90-b7d7-51f0b605a35a
+    is_active: true
+    created_at: '2025-07-15T06:56:33.153826-04:00'
+    updated_at: '2025-07-15T06:56:33.153828-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: publish_date
+    label: Publish Date
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 21b83300-a633-4653-8969-5cd1ed0b0ade
+    is_active: true
+    created_at: '2025-07-15T06:56:18.715308-04:00'
+    updated_at: '2025-07-15T06:56:18.715310-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: minify_js
+    label: Minify Js
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 5
+    id: 21bcf649-0080-48b2-b08f-a576e16551d1
+    is_active: true
+    created_at: '2025-07-15T06:56:11.563136-04:00'
+    updated_at: '2025-07-15T09:37:31.730364-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 2
+    id: 223105dd-ac69-427d-a16b-a173fd1dbdd4
+    is_active: true
+    created_at: '2025-07-15T06:56:26.037847-04:00'
+    updated_at: '2025-07-15T09:11:26.339475-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: text_muted_color_dark
+    label: Text Muted Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 54
+    id: 2241f000-c8ee-449d-b514-402b5faf2df1
+    is_active: true
+    created_at: '2025-07-15T06:56:11.422254-04:00'
+    updated_at: '2025-07-15T09:37:32.578278-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 22670cba-4d2a-48f8-9552-3e49f8b030f5
+    is_active: true
+    created_at: '2025-07-15T06:57:44.202441-04:00'
+    updated_at: '2025-07-15T06:57:44.202443-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: supports_dark_mode
+    label: Supports Dark Mode
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 11
+    id: 236fd85d-b68c-4af4-9fbc-6f67dd634e4f
+    is_active: true
+    created_at: '2025-07-15T06:56:11.546190-04:00'
+    updated_at: '2025-07-15T09:37:31.836194-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: template_id
+    label: Template Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 23808fcc-ed17-48a7-a35e-d8454e83488f
+    is_active: true
+    created_at: '2025-07-15T06:57:08.718512-04:00'
+    updated_at: '2025-07-15T06:57:08.718515-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: label
+    label: Label
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 23979fac-f6c0-4bec-a0d2-1d018ae91ee7
+    is_active: true
+    created_at: '2025-07-15T06:58:12.532043-04:00'
+    updated_at: '2025-07-15T06:58:12.532045-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: info_color
+    label: Info Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 71
+    id: 264b0c2f-9352-4464-8ba7-2b14be866816
+    is_active: true
+    created_at: '2025-07-15T06:56:11.362597-04:00'
+    updated_at: '2025-07-15T09:37:32.869918-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: expire_date
+    label: Expire Date
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 26b14669-fb86-4656-96b3-32eb9e307601
+    is_active: true
+    created_at: '2025-07-15T06:57:01.573305-04:00'
+    updated_at: '2025-07-15T06:57:01.573308-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: module_id
+    label: Module Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 26ef775b-4916-4b31-8c3f-c68c572c14e0
+    is_active: true
+    created_at: '2025-07-15T06:57:22.845418-04:00'
+    updated_at: '2025-07-15T06:57:22.845420-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: prefix_value
+    label: Prefix Value
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 27115876-a217-45a7-91a2-8c4fba5139d3
+    is_active: true
+    created_at: '2025-07-15T06:56:40.245876-04:00'
+    updated_at: '2025-07-15T06:56:40.245878-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 27fd3cdf-d87f-4d92-b280-05de9a7f6f19
+    is_active: true
+    created_at: '2025-07-15T06:57:44.199432-04:00'
+    updated_at: '2025-07-15T06:57:44.199435-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: shadow_md
+    label: Shadow Md
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 31
+    id: 29ec90ee-69e4-4f00-8e61-921a5c32067b
+    is_active: true
+    created_at: '2025-07-15T06:56:11.489529-04:00'
+    updated_at: '2025-07-15T09:37:32.179723-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: slug
+    label: Slug
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 2a638032-2046-499d-87cf-528142b346bb
+    is_active: true
+    created_at: '2025-07-15T06:56:18.682149-04:00'
+    updated_at: '2025-07-15T06:56:18.682151-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: permissions_created
+    label: Permissions Created
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 26
+    id: 2c4908be-77ba-4765-a71d-4b08ec362bbe
+    is_active: true
+    created_at: '2025-07-15T06:56:04.225944-04:00'
+    updated_at: '2025-07-15T09:40:10.570216-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: fragment_key
+    label: Fragment Key
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 2d0fcf4c-e86b-43b6-a366-d8e4951ec21c
+    is_active: true
+    created_at: '2025-07-15T06:57:08.727991-04:00'
+    updated_at: '2025-07-15T06:57:08.727994-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: background_color_dark
+    label: Background Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 57
+    id: 2d6b7659-11e9-4e30-82a4-5f775451c03a
+    is_active: true
+    created_at: '2025-07-15T06:56:11.413409-04:00'
+    updated_at: '2025-07-15T09:37:32.629905-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 2f434132-b2f8-41f7-8c1b-b9d877fa1034
+    is_active: true
+    created_at: '2025-07-15T06:56:40.263849-04:00'
+    updated_at: '2025-07-15T06:56:40.263851-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: menu_id
+    label: Menu Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 2f497d7e-d895-4d6a-9786-26581a20dda4
+    is_active: true
+    created_at: '2025-07-15T06:57:22.823364-04:00'
+    updated_at: '2025-07-15T06:57:22.823366-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: maintenance_message
+    label: Maintenance Message
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 306e5415-bed1-4e9c-bb77-d7e18ed9e9c1
+    is_active: true
+    created_at: '2025-07-15T06:56:33.148012-04:00'
+    updated_at: '2025-07-15T06:56:33.148014-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: breadcrumb_height
+    label: Breadcrumb Height
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 14
+    id: 30ba603d-2bed-40f1-8024-d19bd5e2e337
+    is_active: true
+    created_at: '2025-07-15T06:56:11.537696-04:00'
+    updated_at: '2025-07-15T09:37:31.888627-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: breakpoint_lg
+    label: Breakpoint Lg
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 35
+    id: 320837a3-7906-4468-bbb7-91b6bde0f353
+    is_active: true
+    created_at: '2025-07-15T06:56:11.477250-04:00'
+    updated_at: '2025-07-15T09:37:32.252638-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: username
+    label: Username
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 324bb61c-be9c-47ae-86b5-3d42e9af4084
+    is_active: true
+    created_at: '2025-07-15T06:57:58.374018-04:00'
+    updated_at: '2025-07-15T06:57:58.374021-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 33754122-43e5-4f85-a9f0-c66da1890ae6
+    is_active: true
+    created_at: '2025-07-15T06:57:44.208837-04:00'
+    updated_at: '2025-07-15T06:57:44.208839-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 351b66dc-b5cf-4287-ad7f-5b8743a16b80
+    is_active: true
+    created_at: '2025-07-15T06:57:51.299444-04:00'
+    updated_at: '2025-07-15T06:57:51.299446-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: fragment_name
+    label: Fragment Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 3520d5fd-0a9d-44e6-b5e6-b591f6381e43
+    is_active: true
+    created_at: '2025-07-15T06:57:08.724995-04:00'
+    updated_at: '2025-07-15T06:57:08.724998-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: is_system
+    label: Is System
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 35642ed1-ff0a-4348-8308-e529fb7fc045
+    is_active: true
+    created_at: '2025-07-15T06:57:22.848269-04:00'
+    updated_at: '2025-07-15T06:57:22.848271-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 3564d3b5-2e92-4f65-a600-1a80be5ab44f
+    is_active: true
+    created_at: '2025-07-15T06:57:37.028904-04:00'
+    updated_at: '2025-07-15T06:57:37.028906-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: card_border_radius
+    label: Card Border Radius
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 19
+    id: 35a05cfc-ae32-40b4-a268-50c208e89aeb
+    is_active: true
+    created_at: '2025-07-15T06:56:11.523524-04:00'
+    updated_at: '2025-07-15T09:37:31.975367-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: label
+    label: Label
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 364eed58-9648-4d0e-821d-9cea5cc58999
+    is_active: true
+    created_at: '2025-07-15T06:58:05.468801-04:00'
+    updated_at: '2025-07-15T06:58:05.468804-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: social_links
+    label: Social Links
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 39ce63a2-2037-4dc5-882d-383dca866b4c
+    is_active: true
+    created_at: '2025-07-15T06:56:33.136393-04:00'
+    updated_at: '2025-07-15T06:56:33.136395-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 3aee84a4-0402-4f99-bbf3-ec3e5824e851
+    is_active: true
+    created_at: '2025-07-15T06:57:44.205491-04:00'
+    updated_at: '2025-07-15T06:57:44.205494-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: created_by_user_id
+    label: Created By User Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 3b6385f3-5033-4c36-bf47-a541f39ffe5d
+    is_active: true
+    created_at: '2025-07-15T06:57:08.798896-04:00'
+    updated_at: '2025-07-15T06:57:08.798899-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: sidebar_width
+    label: Sidebar Width
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 17
+    id: 3ba020cf-4854-4cbf-800b-395d0ce67a8e
+    is_active: true
+    created_at: '2025-07-15T06:56:11.529159-04:00'
+    updated_at: '2025-07-15T09:37:31.940282-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 5
+    id: 3d156cac-813f-4ea2-ad88-bde3a5e3974d
+    is_active: true
+    created_at: '2025-07-15T06:56:26.028649-04:00'
+    updated_at: '2025-07-15T09:11:26.397779-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 25
+    id: 3d1aee76-2b10-449b-883b-380ed78ab6da
+    is_active: true
+    created_at: '2025-07-15T06:56:04.228009-04:00'
+    updated_at: '2025-07-15T09:40:10.553270-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 402f2656-6812-4855-817b-f4f714809ff2
+    is_active: true
+    created_at: '2025-07-15T06:56:18.744346-04:00'
+    updated_at: '2025-07-15T06:56:18.744349-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 41250b1b-015d-4614-ba80-2a4c8a9823d3
+    is_active: true
+    created_at: '2025-07-15T06:56:33.159616-04:00'
+    updated_at: '2025-07-15T06:56:33.159618-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 412a309c-7d6a-488d-9e9e-179d53bfece6
+    is_active: true
+    created_at: '2025-07-15T06:56:54.406500-04:00'
+    updated_at: '2025-07-15T06:56:54.406502-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: version_label
+    label: Version Label
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 414a4bde-3311-4bc8-90f9-27686d067f48
+    is_active: true
+    created_at: '2025-07-15T06:57:08.743435-04:00'
+    updated_at: '2025-07-15T06:57:08.743437-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4265a37d-e965-4e98-add5-7a2f31f1a3b4
+    is_active: true
+    created_at: '2025-07-15T06:57:01.547235-04:00'
+    updated_at: '2025-07-15T06:57:01.547237-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_published
+    label: Is Published
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 24
+    id: 4273e5cb-3f7c-440a-8b89-6e6ad6f92f78
+    is_active: true
+    created_at: '2025-07-15T06:56:04.229670-04:00'
+    updated_at: '2025-07-15T09:40:10.536534-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: secondary_color_dark
+    label: Secondary Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 62
+    id: 42f14c68-b6a3-4d23-9081-a1e459c100c5
+    is_active: true
+    created_at: '2025-07-15T06:56:11.398750-04:00'
+    updated_at: '2025-07-15T09:37:32.716746-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 438bc23c-7cc8-4d9c-859d-f06e75037fb7
+    is_active: true
+    created_at: '2025-07-15T06:57:58.392582-04:00'
+    updated_at: '2025-07-15T06:57:58.392584-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: danger_color
+    label: Danger Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 72
+    id: 445574b6-9386-4a15-9049-85a52ddb22dd
+    is_active: true
+    created_at: '2025-07-15T06:56:11.357741-04:00'
+    updated_at: '2025-07-15T09:37:32.885788-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: resource
+    label: Resource
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 44a6ab2e-6e59-480b-905b-a5d7760e98f9
+    is_active: true
+    created_at: '2025-07-15T06:57:44.196260-04:00'
+    updated_at: '2025-07-15T06:57:44.196262-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4555e687-8192-4021-8358-b53b4cbb3692
+    is_active: true
+    created_at: '2025-07-15T06:58:12.534987-04:00'
+    updated_at: '2025-07-15T06:58:12.534989-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_active
+    label: Is Active
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 23
+    id: 45699760-bea2-405e-a31f-a355fa17df30
+    is_active: true
+    created_at: '2025-07-15T06:56:04.231315-04:00'
+    updated_at: '2025-07-15T09:40:10.519464-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: tag_slug
+    label: Tag Slug
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 45b92191-0bed-41d4-b736-5137b750fd0d
+    is_active: true
+    created_at: '2025-07-15T06:56:47.347031-04:00'
+    updated_at: '2025-07-15T06:56:47.347033-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: site_config_id
+    label: Site Config Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 45c5baea-63b5-4d38-bdfc-a3a2e7cf4db2
+    is_active: true
+    created_at: '2025-07-15T06:56:47.350039-04:00'
+    updated_at: '2025-07-15T06:56:47.350042-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 46ee54d4-609d-4f5d-8363-c6f1dfe290df
+    is_active: true
+    created_at: '2025-07-15T06:57:51.308889-04:00'
+    updated_at: '2025-07-15T06:57:51.308891-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: primary_color
+    label: Primary Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 76
+    id: 475f5f4c-0536-4fb9-9624-0facb00aa66f
+    is_active: true
+    created_at: '2025-07-15T06:56:11.338998-04:00'
+    updated_at: '2025-07-15T09:37:32.953203-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: action
+    label: Action
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 481465a4-e719-4047-8e72-10b196a0b575
+    is_active: true
+    created_at: '2025-07-15T06:57:44.193147-04:00'
+    updated_at: '2025-07-15T06:57:44.193150-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: logo_desktop_dark
+    label: Logo Desktop Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 481475fa-78f6-4b3f-8ee7-6c3242d6819b
+    is_active: true
+    created_at: '2025-07-15T06:56:33.116109-04:00'
+    updated_at: '2025-07-15T06:56:33.116111-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: focus_ring_width
+    label: Focus Ring Width
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 26
+    id: 48a61897-b04c-462c-aac6-38358127e67e
+    is_active: true
+    created_at: '2025-07-15T06:56:11.503680-04:00'
+    updated_at: '2025-07-15T09:37:32.094824-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: shadow_sm
+    label: Shadow Sm
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 32
+    id: 492fdbeb-0ed9-4cd3-8e7c-0602da5a01aa
+    is_active: true
+    created_at: '2025-07-15T06:56:11.486702-04:00'
+    updated_at: '2025-07-15T09:37:32.198511-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: success_color
+    label: Success Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 74
+    id: 495b2944-db1e-4a88-b022-f53c443ab9c1
+    is_active: true
+    created_at: '2025-07-15T06:56:11.348918-04:00'
+    updated_at: '2025-07-15T09:37:32.919088-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 85
+    id: 49655557-02e3-490f-bb00-693ce6fb9212
+    is_active: true
+    created_at: '2025-07-15T06:56:11.309332-04:00'
+    updated_at: '2025-07-15T09:37:33.102191-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: category
+    label: Category
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 22
+    id: 49772bd4-1d97-4fc2-bc4d-d85be0287c0b
+    is_active: true
+    created_at: '2025-07-15T06:56:04.232930-04:00'
+    updated_at: '2025-07-15T09:40:10.502115-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: component_color
+    label: Component Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 66
+    id: 49f2f9e1-b3d0-4358-9790-4738ba34e7f0
+    is_active: true
+    created_at: '2025-07-15T06:56:11.385025-04:00'
+    updated_at: '2025-07-15T09:37:32.785486-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: favicon
+    label: Favicon
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4b067079-a6ad-4cc7-9ec2-3a22882c62ba
+    is_active: true
+    created_at: '2025-07-15T06:56:33.127691-04:00'
+    updated_at: '2025-07-15T06:56:33.127693-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: google_analytics_id
+    label: Google Analytics Id
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4b3d5c66-0178-4df0-849e-d282e9463ff9
+    is_active: true
+    created_at: '2025-07-15T06:56:33.139270-04:00'
+    updated_at: '2025-07-15T06:56:33.139273-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: sidebar_enabled
+    label: Sidebar Enabled
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4b727717-8042-4298-9b43-579bb6815cae
+    is_active: true
+    created_at: '2025-07-15T06:57:22.833961-04:00'
+    updated_at: '2025-07-15T06:57:22.833964-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_system
+    label: Is System
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 21
+    id: 4c685d92-32c4-42a9-96fc-12e919540120
+    is_active: true
+    created_at: '2025-07-15T06:56:04.234755-04:00'
+    updated_at: '2025-07-15T09:40:10.485511-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: enable_animations
+    label: Enable Animations
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 23
+    id: 4dd2a3ae-957b-4e88-8ac7-d2f1819f412f
+    is_active: true
+    created_at: '2025-07-15T06:56:11.512140-04:00'
+    updated_at: '2025-07-15T09:37:32.043438-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: og_description
+    label: Og Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4e5950ac-ef89-4571-a021-6233e06abe8d
+    is_active: true
+    created_at: '2025-07-15T06:56:18.697395-04:00'
+    updated_at: '2025-07-15T06:56:18.697398-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: logo_mobile_dark
+    label: Logo Mobile Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4e799e1f-ede4-48d8-be02-b9672ac5bf03
+    is_active: true
+    created_at: '2025-07-15T06:56:33.119013-04:00'
+    updated_at: '2025-07-15T06:56:33.119015-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 4f7046ba-2ad8-43ed-b6a1-b764b385f184
+    is_active: true
+    created_at: '2025-07-15T06:56:33.156695-04:00'
+    updated_at: '2025-07-15T06:56:33.156698-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 52ddf48d-b06b-4b9f-9e18-658ffb70f79e
+    is_active: true
+    created_at: '2025-07-15T06:57:22.859853-04:00'
+    updated_at: '2025-07-15T06:57:22.859855-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 53de525d-92e5-405b-9a13-1941cd23f7a0
+    is_active: true
+    created_at: '2025-07-15T06:57:58.383147-04:00'
+    updated_at: '2025-07-15T06:57:58.383149-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_model
+    label: Is Model
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 20
+    id: 54dac134-09e7-4d35-b5ba-f4b53f3d8c34
+    is_active: true
+    created_at: '2025-07-15T06:56:04.236392-04:00'
+    updated_at: '2025-07-15T09:40:10.467595-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: logo_mobile
+    label: Logo Mobile
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 55aced8e-d517-468e-a00a-b63087c951f1
+    is_active: true
+    created_at: '2025-07-15T06:56:33.124794-04:00'
+    updated_at: '2025-07-15T06:56:33.124796-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: font_family_heading
+    label: Font Family Heading
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 48
+    id: 5645aab2-184f-48be-ae77-d54334242588
+    is_active: true
+    created_at: '2025-07-15T06:56:11.439890-04:00'
+    updated_at: '2025-07-15T09:37:32.474254-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 5704e691-70dd-4c0f-8d15-2c8d032c36f7
+    is_active: true
+    created_at: '2025-07-15T06:57:51.302492-04:00'
+    updated_at: '2025-07-15T06:57:51.302494-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: compiled_file_path
+    label: Compiled File Path
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 5845f162-01f7-45ee-a2e6-b7eb532ee439
+    is_active: true
+    created_at: '2025-07-15T06:57:08.734052-04:00'
+    updated_at: '2025-07-15T06:57:08.734054-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: password
+    label: Password
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 58539b84-f90c-4ecf-802a-b9c31796273e
+    is_active: true
+    created_at: '2025-07-15T06:57:58.377020-04:00'
+    updated_at: '2025-07-15T06:57:58.377022-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 586329ed-bfb2-4835-81ec-95842db94143
+    is_active: true
+    created_at: '2025-07-15T06:56:54.411246-04:00'
+    updated_at: '2025-07-15T06:56:54.411249-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: fragment_key
+    label: Fragment Key
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 58643a53-a86e-4174-a802-99ca60e420df
+    is_active: true
+    created_at: '2025-07-15T06:57:01.534180-04:00'
+    updated_at: '2025-07-15T06:57:01.534182-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: font_size_base
+    label: Font Size Base
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 46
+    id: 58a38e04-92b4-4844-8a0c-f173df826317
+    is_active: true
+    created_at: '2025-07-15T06:56:11.445537-04:00'
+    updated_at: '2025-07-15T09:37:32.439510-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: focus_ring_color
+    label: Focus Ring Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 27
+    id: 5956f91b-cb5b-4901-bc36-d71f4a357068
+    is_active: true
+    created_at: '2025-07-15T06:56:11.500878-04:00'
+    updated_at: '2025-07-15T09:37:32.111691-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: prefix_type
+    label: Prefix Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 59974ae2-01b9-4ca2-87d6-8260475e2790
+    is_active: true
+    created_at: '2025-07-15T06:56:40.242480-04:00'
+    updated_at: '2025-07-15T06:56:40.242482-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 5a3ad8c0-ddfb-4f90-ad74-e36d70368cc8
+    is_active: true
+    created_at: '2025-07-15T06:56:47.359662-04:00'
+    updated_at: '2025-07-15T06:56:47.359664-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: last_compiled
+    label: Last Compiled
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 5a4d709f-d6d6-4894-9dd2-0f94a63bba86
+    is_active: true
+    created_at: '2025-07-15T06:57:08.793123-04:00'
+    updated_at: '2025-07-15T06:57:08.793125-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 5f43441a-6c18-4c18-906e-4a65ccbb3979
+    is_active: true
+    created_at: '2025-07-15T06:56:40.257591-04:00'
+    updated_at: '2025-07-15T06:56:40.257593-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: rtl_support
+    label: Rtl Support
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 9
+    id: 62894add-531d-492a-8ee6-8b3281cd333e
+    is_active: true
+    created_at: '2025-07-15T06:56:11.551832-04:00'
+    updated_at: '2025-07-15T09:37:31.800899-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: page_id
+    label: Page Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 63c3fe54-ecf4-47df-b747-ea4d43905215
+    is_active: true
+    created_at: '2025-07-15T06:57:01.524783-04:00'
+    updated_at: '2025-07-15T06:57:01.524785-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: fragment_name
+    label: Fragment Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 64852b5d-e6ce-4e53-823a-8fd0e7e84914
+    is_active: true
+    created_at: '2025-07-15T06:57:01.531223-04:00'
+    updated_at: '2025-07-15T06:57:01.531225-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 64a7e591-9acd-46e1-8458-c956d3271e76
+    is_active: true
+    created_at: '2025-07-15T06:58:19.589363-04:00'
+    updated_at: '2025-07-15T06:58:19.589365-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: consolidate_js
+    label: Consolidate Js
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 7
+    id: 65fdf55d-bbb8-48dd-b9f6-f07cc55f022f
+    is_active: true
+    created_at: '2025-07-15T06:56:11.557448-04:00'
+    updated_at: '2025-07-15T09:37:31.765913-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: success_color_dark
+    label: Success Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 61
+    id: 6a1328a9-65e3-4d1c-bcf0-1bde8df86011
+    is_active: true
+    created_at: '2025-07-15T06:56:11.401629-04:00'
+    updated_at: '2025-07-15T09:37:32.699130-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: css_framework
+    label: Css Framework
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 81
+    id: 6ac61b30-68cf-4447-88bb-3010b26619b2
+    is_active: true
+    created_at: '2025-07-15T06:56:11.321537-04:00'
+    updated_at: '2025-07-15T09:37:33.033277-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 6b0ee47f-b688-490a-b2ed-171f65d6d87e
+    is_active: true
+    created_at: '2025-07-15T06:57:08.746347-04:00'
+    updated_at: '2025-07-15T06:57:08.746349-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: breakpoint_xl
+    label: Breakpoint Xl
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 34
+    id: 6b2cbe14-fc1f-4c64-8284-401636f3f812
+    is_active: true
+    created_at: '2025-07-15T06:56:11.480080-04:00'
+    updated_at: '2025-07-15T09:37:32.234904-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: requires_auth
+    label: Requires Auth
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 6e781bea-ea3c-41b4-ae1a-f88f06f201f2
+    is_active: true
+    created_at: '2025-07-15T06:56:18.723991-04:00'
+    updated_at: '2025-07-15T06:56:18.723993-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: options
+    label: Options
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 6e8c7604-88d3-48bd-9444-05b3adefb755
+    is_active: true
+    created_at: '2025-07-15T06:57:58.380070-04:00'
+    updated_at: '2025-07-15T06:57:58.380072-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: version_number
+    label: Version Number
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: 6eb72cda-e68f-4b58-86c1-d6a6d6995a61
+    is_active: true
+    created_at: '2025-07-15T06:57:08.740481-04:00'
+    updated_at: '2025-07-15T06:57:08.740483-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: is_admin
+    label: Is Admin
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 6f5f07b0-8120-4ba7-a41a-38f227674800
+    is_active: true
+    created_at: '2025-07-15T06:57:37.016188-04:00'
+    updated_at: '2025-07-15T06:57:37.016190-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: container_class
+    label: Container Class
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 6f8e3cac-201c-4c6e-80db-5802ecaf9185
+    is_active: true
+    created_at: '2025-07-15T06:57:22.830979-04:00'
+    updated_at: '2025-07-15T06:57:22.830981-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: css_variables
+    label: Css Variables
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 78
+    id: 6fcd3c9c-d016-4e8f-92b5-54e674cc7c4f
+    is_active: true
+    created_at: '2025-07-15T06:56:11.330345-04:00'
+    updated_at: '2025-07-15T09:37:32.984615-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: container_max_width
+    label: Container Max Width
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 42
+    id: 70005e60-e9b8-4a3f-8e28-b3b2ab59da5a
+    is_active: true
+    created_at: '2025-07-15T06:56:11.457436-04:00'
+    updated_at: '2025-07-15T09:37:32.371716-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: footer_height
+    label: Footer Height
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 16
+    id: 7042fa70-7f7e-478f-bf9c-b5200cdd613d
+    is_active: true
+    created_at: '2025-07-15T06:56:11.532038-04:00'
+    updated_at: '2025-07-15T09:37:31.922473-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: template_fragment_key
+    label: Template Fragment Key
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 70536188-f722-405f-8c8c-6c7aa47a4b88
+    is_active: true
+    created_at: '2025-07-15T06:57:01.558786-04:00'
+    updated_at: '2025-07-15T06:57:01.558788-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: module_name
+    label: Module Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 70fab995-3308-492d-bcb7-eaa1eb63b818
+    is_active: true
+    created_at: '2025-07-15T06:58:19.582684-04:00'
+    updated_at: '2025-07-15T06:58:19.582686-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: animation_easing
+    label: Animation Easing
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 24
+    id: 71003d8c-c08a-428e-a434-0bbdd4082a94
+    is_active: true
+    created_at: '2025-07-15T06:56:11.509342-04:00'
+    updated_at: '2025-07-15T09:37:32.060341-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: font_weight_bold
+    label: Font Weight Bold
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 44
+    id: 71b70192-ebd7-4936-8471-d96e2ec61427
+    is_active: true
+    created_at: '2025-07-15T06:56:11.451805-04:00'
+    updated_at: '2025-07-15T09:37:32.405381-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: slug
+    label: Slug
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 19
+    id: 7281a61b-6034-4686-bd42-2f4a4b69da56
+    is_active: true
+    created_at: '2025-07-15T06:56:04.238096-04:00'
+    updated_at: '2025-07-15T09:40:10.450856-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: expire_date
+    label: Expire Date
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 72d41483-0013-4075-a06f-3ff916732c6a
+    is_active: true
+    created_at: '2025-07-15T06:56:18.718199-04:00'
+    updated_at: '2025-07-15T06:56:18.718201-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_ajax
+    label: Is Ajax
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 18
+    id: 7306c21e-4ac3-4a41-9426-bd27a58504ad
+    is_active: true
+    created_at: '2025-07-15T06:56:04.239806-04:00'
+    updated_at: '2025-07-15T09:40:10.433881-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: sort_order
+    label: Sort Order
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: 73561aa3-f997-4f3f-b980-5e3f29921d0d
+    is_active: true
+    created_at: '2025-07-15T06:56:18.712309-04:00'
+    updated_at: '2025-07-15T06:56:18.712311-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: og_title
+    label: Og Title
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 73a81683-1f0b-45d8-9170-09459d31cbdd
+    is_active: true
+    created_at: '2025-07-15T06:56:18.694453-04:00'
+    updated_at: '2025-07-15T06:56:18.694456-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 7484d8fb-233f-4b6f-bba8-040a151ecfdb
+    is_active: true
+    created_at: '2025-07-15T06:57:58.364577-04:00'
+    updated_at: '2025-07-15T06:57:58.364580-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: text_muted_color
+    label: Text Muted Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 67
+    id: 753fe6c3-d975-45d9-b812-93f06605f539
+    is_active: true
+    created_at: '2025-07-15T06:56:11.380899-04:00'
+    updated_at: '2025-07-15T09:37:32.802248-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: site_config_id
+    label: Site Config Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 76290181-7acb-4e91-b57b-259755558939
+    is_active: true
+    created_at: '2025-07-15T06:56:40.251736-04:00'
+    updated_at: '2025-07-15T06:56:40.251738-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: is_admin_template
+    label: Is Admin Template
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 76e5d1ee-625c-43ab-9e14-616b03f71058
+    is_active: true
+    created_at: '2025-07-15T06:57:22.851235-04:00'
+    updated_at: '2025-07-15T06:57:22.851237-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: background_color
+    label: Background Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 70
+    id: 779f85f4-9024-45b8-88c4-1a6af2be881f
+    is_active: true
+    created_at: '2025-07-15T06:56:11.367030-04:00'
+    updated_at: '2025-07-15T09:37:32.853437-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: id
+    label: Id
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: true
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 17
+    id: 78eb2e23-34c4-454a-bccb-d3925d722c2e
+    is_active: true
+    created_at: '2025-07-15T06:56:04.241785-04:00'
+    updated_at: '2025-07-15T09:40:10.416508-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: border_color_dark
+    label: Border Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 53
+    id: 7910687e-f456-4f20-9d25-cf6ab14b933e
+    is_active: true
+    created_at: '2025-07-15T06:56:11.425195-04:00'
+    updated_at: '2025-07-15T09:37:32.561182-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: footer_text
+    label: Footer Text
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 797c4033-44e8-473c-a6a1-60c1112a9d5f
+    is_active: true
+    created_at: '2025-07-15T06:56:33.130606-04:00'
+    updated_at: '2025-07-15T06:56:33.130608-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: model_id
+    label: Model Id
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 16
+    id: 7b721ae8-5c06-4f59-bf25-2d5a07ed0280
+    is_active: true
+    created_at: '2025-07-15T06:56:04.243363-04:00'
+    updated_at: '2025-07-15T09:40:10.399623-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: is_default
+    label: Is Default
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 13
+    id: 7c028373-82c3-4f57-a019-3c8bba7231a7
+    is_active: true
+    created_at: '2025-07-15T06:56:11.540533-04:00'
+    updated_at: '2025-07-15T09:37:31.871786-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: breakpoint_xxl
+    label: Breakpoint Xxl
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 33
+    id: 7c3a6990-3615-4562-bcdb-a753288291e9
+    is_active: true
+    created_at: '2025-07-15T06:56:11.483811-04:00'
+    updated_at: '2025-07-15T09:37:32.216548-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 7c7a67fc-5174-4610-b7bc-9ae5baa52d73
+    is_active: true
+    created_at: '2025-07-15T06:56:18.735620-04:00'
+    updated_at: '2025-07-15T06:56:18.735623-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 7d170f6c-5979-4686-867a-9fb285c7fb06
+    is_active: true
+    created_at: '2025-07-15T06:56:40.260974-04:00'
+    updated_at: '2025-07-15T06:56:40.260976-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: secondary_color
+    label: Secondary Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 75
+    id: 7d3d0e44-b173-4a15-91d2-0dc70a502d54
+    is_active: true
+    created_at: '2025-07-15T06:56:11.343564-04:00'
+    updated_at: '2025-07-15T09:37:32.936506-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: report_template_id
+    label: Report Template Id
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 15
+    id: 81c61a3b-bb41-4ee5-b293-e1877f15dca4
+    is_active: true
+    created_at: '2025-07-15T06:56:04.244963-04:00'
+    updated_at: '2025-07-15T09:40:10.382224-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: fragment_type
+    label: Fragment Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 81dc372b-6129-4b99-acc3-81cfe00a2255
+    is_active: true
+    created_at: '2025-07-15T06:57:01.528209-04:00'
+    updated_at: '2025-07-15T06:57:01.528212-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: version
+    label: Version
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: right
+    options: '{}'
+    order_index: 14
+    id: 8228154e-119c-4c18-aedd-0b9076063a12
+    is_active: true
+    created_at: '2025-07-15T06:56:04.246588-04:00'
+    updated_at: '2025-07-15T09:40:10.365095-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: allow_registration
+    label: Allow Registration
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 823f9d65-84b3-43f7-ba21-13dacbbe7eab
+    is_active: true
+    created_at: '2025-07-15T06:56:33.150914-04:00'
+    updated_at: '2025-07-15T06:56:33.150916-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 8303487a-4611-4da4-98bf-b7f1179e12b8
+    is_active: true
+    created_at: '2025-07-15T06:58:05.471891-04:00'
+    updated_at: '2025-07-15T06:58:05.471894-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: custom_css
+    label: Custom Css
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 79
+    id: 8458eb15-3dd2-4eca-bd60-559539b710f3
+    is_active: true
+    created_at: '2025-07-15T06:56:11.327472-04:00'
+    updated_at: '2025-07-15T09:37:33.000213-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: fragment_type
+    label: Fragment Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 85ab8203-53e6-47d4-b41e-bc86345519e7
+    is_active: true
+    created_at: '2025-07-15T06:57:08.721967-04:00'
+    updated_at: '2025-07-15T06:57:08.721970-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: cache_duration
+    label: Cache Duration
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: 873292d1-eb8e-4b58-a570-5202eccd5d82
+    is_active: true
+    created_at: '2025-07-15T06:56:18.726916-04:00'
+    updated_at: '2025-07-15T06:56:18.726918-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: featured
+    label: Featured
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 87bb2533-7adb-4523-9c7b-de7d7e766150
+    is_active: true
+    created_at: '2025-07-15T06:56:18.708967-04:00'
+    updated_at: '2025-07-15T06:56:18.708969-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: created_at
+    label: Created At
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: center
+    options: '{}'
+    order_index: 13
+    id: 8848d677-51e2-47c4-b616-ddb15ddf83b1
+    is_active: true
+    created_at: '2025-07-15T06:56:04.248132-04:00'
+    updated_at: '2025-07-15T09:40:10.347830-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: breakpoint_xs
+    label: Breakpoint Xs
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 38
+    id: 8854c3ae-42f2-43d0-978b-263552fc583c
+    is_active: true
+    created_at: '2025-07-15T06:56:11.468768-04:00'
+    updated_at: '2025-07-15T09:37:32.303601-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: label
+    label: Label
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 4
+    id: 88b78948-9366-4b8e-94cf-575bd1fc3ac3
+    is_active: true
+    created_at: '2025-07-15T06:56:26.032008-04:00'
+    updated_at: '2025-07-15T09:11:26.379445-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 8b4796d2-d6ed-4ca7-b84a-2583d461d797
+    is_active: true
+    created_at: '2025-07-15T06:58:05.481727-04:00'
+    updated_at: '2025-07-15T06:58:05.481730-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: tagline
+    label: Tagline
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 8baee3b7-ded8-4917-b89f-118d0960a260
+    is_active: true
+    created_at: '2025-07-15T06:56:33.103208-04:00'
+    updated_at: '2025-07-15T06:56:33.103211-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 8bc16128-4a47-4870-b0f0-ce5d6dba4bb7
+    is_active: true
+    created_at: '2025-07-15T06:57:22.856960-04:00'
+    updated_at: '2025-07-15T06:57:22.856962-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 1
+    id: 8ccdac1a-0880-40a2-bf61-f4f810bedcf9
+    is_active: true
+    created_at: '2025-07-15T06:56:26.041148-04:00'
+    updated_at: '2025-07-15T09:11:26.315863-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: minify_css
+    label: Minify Css
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 6
+    id: 8f04f7ad-18d7-46b9-8402-f191b2ad2500
+    is_active: true
+    created_at: '2025-07-15T06:56:11.560254-04:00'
+    updated_at: '2025-07-15T09:37:31.748489-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: content_hash
+    label: Content Hash
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 8f194689-0b0a-461e-93eb-ef8dcae8936d
+    is_active: true
+    created_at: '2025-07-15T06:57:01.553026-04:00'
+    updated_at: '2025-07-15T06:57:01.553028-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: admin_email
+    label: Admin Email
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 92831c2f-293e-409f-9c0d-2d58d7fbd79b
+    is_active: true
+    created_at: '2025-07-15T06:56:33.112425-04:00'
+    updated_at: '2025-07-15T06:56:33.112427-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: canonical_url
+    label: Canonical Url
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 93fab4f4-abaa-47be-a461-b55134a1835d
+    is_active: true
+    created_at: '2025-07-15T06:56:18.703215-04:00'
+    updated_at: '2025-07-15T06:56:18.703217-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 94656871-bf29-43a6-beff-1e46623ce836
+    is_active: true
+    created_at: '2025-07-15T06:57:58.386094-04:00'
+    updated_at: '2025-07-15T06:57:58.386096-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: username
+    label: Username
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 4
+    id: 94c309c5-a982-4c83-aabe-5f3350685843
+    is_active: true
+    created_at: '2025-07-15T06:57:29.937305-04:00'
+    updated_at: '2025-07-15T08:44:58.672363-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 83
+    id: 954aa62e-402b-45fe-a45e-c3c9bb0c9aec
+    is_active: true
+    created_at: '2025-07-15T06:56:11.315673-04:00'
+    updated_at: '2025-07-15T09:37:33.068376-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_wide
+    label: Is Wide
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 12
+    id: 957235e7-5484-4a9c-ab19-3121d9f503f3
+    is_active: true
+    created_at: '2025-07-15T06:56:04.249698-04:00'
+    updated_at: '2025-07-15T09:40:10.328961-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 9720d687-cf83-424f-9a96-40056f637ed4
+    is_active: true
+    created_at: '2025-07-15T06:56:47.356110-04:00'
+    updated_at: '2025-07-15T06:56:47.356112-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: footer_type
+    label: Footer Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 99a47d26-604e-4b1e-b791-f7875888a886
+    is_active: true
+    created_at: '2025-07-15T06:57:22.839725-04:00'
+    updated_at: '2025-07-15T06:57:22.839727-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 9b130263-3cd4-4a65-95d4-671ac107e3dd
+    is_active: true
+    created_at: '2025-07-15T06:57:22.866139-04:00'
+    updated_at: '2025-07-15T06:57:22.866142-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: variables_schema
+    label: Variables Schema
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 9c5fbd3a-7e33-4905-80c5-399856bcc548
+    is_active: true
+    created_at: '2025-07-15T06:57:08.755053-04:00'
+    updated_at: '2025-07-15T06:57:08.755055-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: template_id
+    label: Template Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: 9cef7d63-1c10-4031-8399-bd99b6067c56
+    is_active: true
+    created_at: '2025-07-15T06:56:18.685314-04:00'
+    updated_at: '2025-07-15T06:56:18.685339-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: 9ed8a842-8fd3-4d4b-b43a-8a1b30dbfd10
+    is_active: true
+    created_at: '2025-07-15T06:56:47.362739-04:00'
+    updated_at: '2025-07-15T06:56:47.362741-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: content_area_color_dark
+    label: Content Area Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 50
+    id: 9ef158b3-05b2-447f-b146-36f0cb099cb9
+    is_active: true
+    created_at: '2025-07-15T06:56:11.433972-04:00'
+    updated_at: '2025-07-15T09:37:32.509184-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: last_run
+    label: Last Run
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: center
+    options: '{}'
+    order_index: 11
+    id: 9f2e15fb-0517-417e-96e9-8e6d9e4ad939
+    is_active: true
+    created_at: '2025-07-15T06:56:04.251285-04:00'
+    updated_at: '2025-07-15T09:40:10.311675-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: prefix_url
+    label: Prefix Url
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: a1a8a86c-f76d-4fbe-a5d6-625901f6e5aa
+    is_active: true
+    created_at: '2025-07-15T06:56:40.248818-04:00'
+    updated_at: '2025-07-15T06:56:40.248820-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: breakpoint_sm
+    label: Breakpoint Sm
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 37
+    id: a32d37c6-259a-4676-881b-9196670e9605
+    is_active: true
+    created_at: '2025-07-15T06:56:11.471589-04:00'
+    updated_at: '2025-07-15T09:37:32.286888-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: a39ae8db-b968-4687-9501-a9b2d76df955
+    is_active: true
+    created_at: '2025-07-15T06:57:37.022449-04:00'
+    updated_at: '2025-07-15T06:57:37.022451-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: theme_id
+    label: Theme Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: a3ae8665-31e6-470f-aa25-0d2fabc9027c
+    is_active: true
+    created_at: '2025-07-15T06:57:22.820398-04:00'
+    updated_at: '2025-07-15T06:57:22.820400-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: a46ee2d0-e028-401e-b29a-8391eec08118
+    is_active: true
+    created_at: '2025-07-15T06:57:37.013246-04:00'
+    updated_at: '2025-07-15T06:57:37.013249-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: a49c838f-ef6b-403d-977f-6302101e912d
+    is_active: true
+    created_at: '2025-07-15T06:56:26.045118-04:00'
+    updated_at: '2025-07-15T09:11:26.291505-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: published
+    label: Published
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: a4c162ed-27ab-4a50-8d65-9f61b700ced1
+    is_active: true
+    created_at: '2025-07-15T06:56:18.706092-04:00'
+    updated_at: '2025-07-15T06:56:18.706094-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: template_hash
+    label: Template Hash
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: a4e324f2-6696-4fa0-b728-6696089399d0
+    is_active: true
+    created_at: '2025-07-15T06:57:08.752142-04:00'
+    updated_at: '2025-07-15T06:57:08.752144-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: content_area_color
+    label: Content Area Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 64
+    id: a5d1365b-d44b-4b08-8c53-290238b125a4
+    is_active: true
+    created_at: '2025-07-15T06:56:11.392663-04:00'
+    updated_at: '2025-07-15T09:37:32.750469-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: display_name
+    label: Display Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: a6ba2a87-7a4c-4114-a163-712376ebfc16
+    is_active: true
+    created_at: '2025-07-15T06:57:22.814360-04:00'
+    updated_at: '2025-07-15T06:57:22.814363-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 1
+    id: a6cebb20-eb5f-4ef2-a061-1e99fc697754
+    is_active: true
+    created_at: '2025-07-15T06:56:11.574418-04:00'
+    updated_at: '2025-07-15T09:37:31.655933-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: supports_high_contrast
+    label: Supports High Contrast
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 10
+    id: a91eb9ec-221c-4330-857d-54538031a322
+    is_active: true
+    created_at: '2025-07-15T06:56:11.549017-04:00'
+    updated_at: '2025-07-15T09:37:31.819172-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: a97edf6a-9fc9-458e-8521-21e9c69e11f4
+    is_active: true
+    created_at: '2025-07-15T06:56:54.414453-04:00'
+    updated_at: '2025-07-15T06:56:54.414456-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: ab3ca9d4-d9d2-4fa1-8fc5-8ddc07fa6f1d
+    is_active: true
+    created_at: '2025-07-15T06:56:54.403449-04:00'
+    updated_at: '2025-07-15T06:56:54.403452-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: transition_duration
+    label: Transition Duration
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 25
+    id: ad80177e-d891-48b3-9529-768ee29996c5
+    is_active: true
+    created_at: '2025-07-15T06:56:11.506525-04:00'
+    updated_at: '2025-07-15T09:37:32.077632-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: danger_color_dark
+    label: Danger Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 59
+    id: ae1a9f51-8c32-47ad-9807-9515b9b99ea5
+    is_active: true
+    created_at: '2025-07-15T06:56:11.407502-04:00'
+    updated_at: '2025-07-15T09:37:32.664198-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: is_partial
+    label: Is Partial
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: af49d11e-7e68-4956-a2a2-5f8241efcce6
+    is_active: true
+    created_at: '2025-07-15T06:57:08.784399-04:00'
+    updated_at: '2025-07-15T06:57:08.784401-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: sort_order
+    label: Sort Order
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: afdea77c-647f-4c85-89e8-09ebd6d99b79
+    is_active: true
+    created_at: '2025-07-15T06:57:01.564592-04:00'
+    updated_at: '2025-07-15T06:57:01.564594-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: layout_type
+    label: Layout Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: b1030359-9467-45e0-9383-e99f9aec3213
+    is_active: true
+    created_at: '2025-07-15T06:57:22.827394-04:00'
+    updated_at: '2025-07-15T06:57:22.827397-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: b1a9c4d1-6622-4009-9232-476d9e7422dd
+    is_active: true
+    created_at: '2025-07-15T06:56:11.577261-04:00'
+    updated_at: '2025-07-15T09:37:31.636599-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: b3005f26-c574-4669-b4ca-bcbc97d7ff00
+    is_active: true
+    created_at: '2025-07-15T06:57:08.807511-04:00'
+    updated_at: '2025-07-15T06:57:08.807514-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: b35d79a7-7d55-4a2d-b0b1-eeaf6baa239a
+    is_active: true
+    created_at: '2025-07-15T06:57:37.019150-04:00'
+    updated_at: '2025-07-15T06:57:37.019152-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: warning_color
+    label: Warning Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 73
+    id: b3600241-8c67-4983-bac7-c02d4f81a801
+    is_active: true
+    created_at: '2025-07-15T06:56:11.353020-04:00'
+    updated_at: '2025-07-15T09:37:32.901961-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: button_border_radius
+    label: Button Border Radius
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 21
+    id: b383cb8c-b180-49e5-952d-1acbe5719616
+    is_active: true
+    created_at: '2025-07-15T06:56:11.517853-04:00'
+    updated_at: '2025-07-15T09:37:32.009475-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: change_description
+    label: Change Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: b4da239a-4f4d-41cc-ab7a-a2ffeb6aa5d7
+    is_active: true
+    created_at: '2025-07-15T06:57:08.796021-04:00'
+    updated_at: '2025-07-15T06:57:08.796023-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: b5222655-fabc-4fcc-a12b-5d43cda74519
+    is_active: true
+    created_at: '2025-07-15T06:58:19.598940-04:00'
+    updated_at: '2025-07-15T06:58:19.598942-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: b592a92f-3e35-4311-980c-81d28bda1bce
+    is_active: true
+    created_at: '2025-07-15T06:58:12.544644-04:00'
+    updated_at: '2025-07-15T06:58:12.544646-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: b6827916-b560-4edd-a8fc-edecb5e6e416
+    is_active: true
+    created_at: '2025-07-15T06:57:58.389607-04:00'
+    updated_at: '2025-07-15T06:57:58.389609-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: warning_color_dark
+    label: Warning Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 60
+    id: b68bcc43-133a-4ba8-afcc-717764901887
+    is_active: true
+    created_at: '2025-07-15T06:56:11.404558-04:00'
+    updated_at: '2025-07-15T09:37:32.681557-04:00'
+  - report_id: 076f7ff7-3dd0-4225-b3f8-80ea489d640b
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 3
+    id: b7de0b63-f153-40aa-96ec-822f78ab9b6d
+    is_active: true
+    created_at: '2025-07-15T06:56:26.034935-04:00'
+    updated_at: '2025-07-15T09:11:26.361986-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: b7f5757b-1c2e-4c10-9598-713bc5606317
+    is_active: true
+    created_at: '2025-07-15T06:57:22.817390-04:00'
+    updated_at: '2025-07-15T06:57:22.817392-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: b9847710-49c9-4560-82c9-53bdca7e7ba3
+    is_active: true
+    created_at: '2025-07-15T06:58:12.528653-04:00'
+    updated_at: '2025-07-15T06:58:12.528656-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: config_data
+    label: Config Data
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: b9e7a06b-44c5-4022-a412-c79c9716e5cf
+    is_active: true
+    created_at: '2025-07-15T06:58:19.586291-04:00'
+    updated_at: '2025-07-15T06:58:19.586293-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: service
+    label: Service
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: ba5bf4e8-d31d-4946-87ee-ffd49e0339c1
+    is_active: true
+    created_at: '2025-07-15T06:57:44.190068-04:00'
+    updated_at: '2025-07-15T06:57:44.190071-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: spacing_unit
+    label: Spacing Unit
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 39
+    id: bb4c3c7d-0d46-46ab-892a-c2b6f3f7fbf3
+    is_active: true
+    created_at: '2025-07-15T06:56:11.465929-04:00'
+    updated_at: '2025-07-15T09:37:32.320466-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: template_source
+    label: Template Source
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: bb881b9d-aee9-4016-bebe-96a2920ecb1a
+    is_active: true
+    created_at: '2025-07-15T06:57:08.749237-04:00'
+    updated_at: '2025-07-15T06:57:08.749239-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: footer_links
+    label: Footer Links
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: bc5e3d66-5570-444b-958a-4af5808edaea
+    is_active: true
+    created_at: '2025-07-15T06:56:33.133499-04:00'
+    updated_at: '2025-07-15T06:56:33.133501-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: css_dependencies
+    label: Css Dependencies
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: bc808767-a76c-4217-8de8-a84218109c04
+    is_active: true
+    created_at: '2025-07-15T06:57:08.766817-04:00'
+    updated_at: '2025-07-15T06:57:08.766820-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: dependencies
+    label: Dependencies
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: bca16a21-ee1e-4698-8265-97f3d96e61cd
+    is_active: true
+    created_at: '2025-07-15T06:57:08.763918-04:00'
+    updated_at: '2025-07-15T06:57:08.763920-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: module_id
+    label: Module Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: bca77467-1304-428e-80d7-de54fc3d3633
+    is_active: true
+    created_at: '2025-07-15T06:56:18.729832-04:00'
+    updated_at: '2025-07-15T06:56:18.729835-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: bd61106b-ef18-43f1-a60a-bee5438bc484
+    is_active: true
+    created_at: '2025-07-15T06:57:37.025901-04:00'
+    updated_at: '2025-07-15T06:57:37.025903-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_download_xlsx
+    label: Is Download Xlsx
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 10
+    id: bdd5c8ee-3b08-4f17-a47c-8ce78c84bb4d
+    is_active: true
+    created_at: '2025-07-15T06:56:04.252911-04:00'
+    updated_at: '2025-07-15T09:40:10.293698-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: created_at
+    label: Created At
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 1
+    id: be3fcdac-ad75-48cb-b15d-7d088164b677
+    is_active: true
+    created_at: '2025-07-15T08:23:13.621271-04:00'
+    updated_at: '2025-07-15T08:44:58.601177-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: id
+    label: Id
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: true
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: be90448a-fec3-4983-b46f-603e89b1dae3
+    is_active: true
+    created_at: '2025-07-15T06:57:29.964528-04:00'
+    updated_at: '2025-07-15T08:44:58.571581-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: border_radius
+    label: Border Radius
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 40
+    id: bf2cb08b-a871-4e32-affa-c702d0cc245d
+    is_active: true
+    created_at: '2025-07-15T06:56:11.463111-04:00'
+    updated_at: '2025-07-15T09:37:32.337023-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: other_tracking_codes
+    label: Other Tracking Codes
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c0052db2-d9b4-4bbc-bc7b-0f683aaf1607
+    is_active: true
+    created_at: '2025-07-15T06:56:33.142162-04:00'
+    updated_at: '2025-07-15T06:56:33.142165-04:00'
+  - report_id: a5bb404f-2ba2-45fa-8228-a4c7c06e295e
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c02d91e8-00c0-41da-896b-7704ccea4d0c
+    is_active: true
+    created_at: '2025-07-15T06:57:44.186596-04:00'
+    updated_at: '2025-07-15T06:57:44.186598-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: sample_data
+    label: Sample Data
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c05f4588-4a90-48aa-8d54-70f390986b65
+    is_active: true
+    created_at: '2025-07-15T06:57:08.758107-04:00'
+    updated_at: '2025-07-15T06:57:08.758109-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_download_csv
+    label: Is Download Csv
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 9
+    id: c1917678-6f51-4dcc-8191-ed1d87acbb65
+    is_active: true
+    created_at: '2025-07-15T06:56:04.254462-04:00'
+    updated_at: '2025-07-15T09:40:10.276274-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: role_id
+    label: Role Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c23359d5-f8b8-49c4-9af6-6b6e51d43964
+    is_active: true
+    created_at: '2025-07-15T06:57:51.292992-04:00'
+    updated_at: '2025-07-15T06:57:51.292995-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: font_family_mono
+    label: Font Family Mono
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 47
+    id: c2f1e6f0-0282-4a62-b8b4-470fe710c183
+    is_active: true
+    created_at: '2025-07-15T06:56:11.442713-04:00'
+    updated_at: '2025-07-15T09:37:32.456880-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c3004af0-cac6-462c-9fea-d313a5cad232
+    is_active: true
+    created_at: '2025-07-15T06:58:19.592412-04:00'
+    updated_at: '2025-07-15T06:58:19.592415-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c4355100-fc9c-49d1-a85c-2963a0e054ec
+    is_active: true
+    created_at: '2025-07-15T06:56:18.738550-04:00'
+    updated_at: '2025-07-15T06:56:18.738552-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: is_published
+    label: Is Published
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c485d090-24bf-489e-a7b5-7eba52be3006
+    is_active: true
+    created_at: '2025-07-15T06:57:01.567528-04:00'
+    updated_at: '2025-07-15T06:57:01.567530-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: keyword
+    label: Keyword
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c6e3796c-7aa5-48ad-8c17-4834ac066652
+    is_active: true
+    created_at: '2025-07-15T06:56:54.396712-04:00'
+    updated_at: '2025-07-15T06:56:54.396715-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: icon
+    label: Icon
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 8
+    id: c6f09ee9-240b-415d-812f-5db9a5861ee6
+    is_active: true
+    created_at: '2025-07-15T06:56:04.256016-04:00'
+    updated_at: '2025-07-15T09:40:10.258847-04:00'
+  - report_id: 6b1478d5-e3c7-4982-be61-52d593d1bef2
+    name: site_config_id
+    label: Site Config Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: c8bdcfa4-9f0c-4f73-b73b-5e7d33929b02
+    is_active: true
+    created_at: '2025-07-15T06:56:54.400311-04:00'
+    updated_at: '2025-07-15T06:56:54.400314-04:00'
+  - report_id: 7e191ef9-7eb1-4b0c-a4e3-e098e1076db5
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: caa56000-df0f-4fb9-a329-05871ecfe5c0
+    is_active: true
+    created_at: '2025-07-15T06:56:40.254668-04:00'
+    updated_at: '2025-07-15T06:56:40.254670-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: header_type
+    label: Header Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: cc56e173-2b06-4fe0-bae9-237130135a02
+    is_active: true
+    created_at: '2025-07-15T06:57:22.836862-04:00'
+    updated_at: '2025-07-15T06:57:22.836864-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: cd546e15-782a-4096-9679-88d49509b2a5
+    is_active: true
+    created_at: '2025-07-15T06:57:08.801815-04:00'
+    updated_at: '2025-07-15T06:57:08.801818-04:00'
+  - report_id: c30ae534-9935-40e3-92bd-b2cece6d85cd
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: cf14bd20-5851-426b-ad7b-eba5a17c3c5d
+    is_active: true
+    created_at: '2025-07-15T06:58:05.478660-04:00'
+    updated_at: '2025-07-15T06:58:05.478662-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: cf23c5a6-898a-452c-8dbb-9bc947270582
+    is_active: true
+    created_at: '2025-07-15T06:57:01.561697-04:00'
+    updated_at: '2025-07-15T06:57:01.561699-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: enable_transitions
+    label: Enable Transitions
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 22
+    id: cf81b38c-9721-4229-b6ff-73c4c0ca2fd8
+    is_active: true
+    created_at: '2025-07-15T06:56:11.514955-04:00'
+    updated_at: '2025-07-15T09:37:32.026710-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: required_context
+    label: Required Context
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: cfad1a23-66b5-4656-bd6e-95ef0eda2f44
+    is_active: true
+    created_at: '2025-07-15T06:57:08.760993-04:00'
+    updated_at: '2025-07-15T06:57:08.760996-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: grid_columns
+    label: Grid Columns
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 41
+    id: d088bb45-cbfa-43e3-90ad-e561ce86084e
+    is_active: true
+    created_at: '2025-07-15T06:56:11.460270-04:00'
+    updated_at: '2025-07-15T09:37:32.354075-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: d26d6f2c-8797-4cb0-a25e-1a15ae7fac16
+    is_active: true
+    created_at: '2025-07-15T06:56:33.165902-04:00'
+    updated_at: '2025-07-15T06:56:33.165905-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: cache_duration
+    label: Cache Duration
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: d30d1dca-f7e9-494a-927d-ab37dbaa5679
+    is_active: true
+    created_at: '2025-07-15T06:57:08.790230-04:00'
+    updated_at: '2025-07-15T06:57:08.790233-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: description
+    label: Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: d3bea0ec-1eda-4bd8-bf9f-a2e6f3cf2579
+    is_active: true
+    created_at: '2025-07-15T06:57:08.772741-04:00'
+    updated_at: '2025-07-15T06:57:08.772743-04:00'
+  - report_id: e655a749-75ae-4c11-8848-90203ffa7baa
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: d3c79ed1-36b0-4f49-b19f-a9ae7e806cb2
+    is_active: true
+    created_at: '2025-07-15T06:57:37.006721-04:00'
+    updated_at: '2025-07-15T06:57:37.006723-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: consolidate_css
+    label: Consolidate Css
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 8
+    id: d3d77467-1aa0-4852-b9e2-2c7574c34231
+    is_active: true
+    created_at: '2025-07-15T06:56:11.554621-04:00'
+    updated_at: '2025-07-15T09:37:31.783862-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: d5d51076-2668-436d-a37f-b9a5c0fd4d14
+    is_active: true
+    created_at: '2025-07-15T06:56:18.675672-04:00'
+    updated_at: '2025-07-15T06:56:18.675674-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: landing_page
+    label: Landing Page
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 5
+    id: d6883bcf-1ed1-47a7-b525-b9892f9b8e67
+    is_active: true
+    created_at: '2025-07-15T06:57:29.933795-04:00'
+    updated_at: '2025-07-15T08:44:58.691219-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: email
+    label: Email
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 2
+    id: d6b45298-dac7-4641-b3b4-48835bcde898
+    is_active: true
+    created_at: '2025-07-15T08:23:13.566714-04:00'
+    updated_at: '2025-07-15T08:44:58.623363-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: is_active
+    label: Is Active
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: d7282c25-5589-429a-b87d-49efddaa2727
+    is_active: true
+    created_at: '2025-07-15T06:58:12.537959-04:00'
+    updated_at: '2025-07-15T06:58:12.537962-04:00'
+  - report_id: 2fea20f3-902f-4a1f-a7d8-623fd6138770
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: d93654e3-aab1-4aa4-a146-10729b67bea7
+    is_active: true
+    created_at: '2025-07-15T06:57:51.305860-04:00'
+    updated_at: '2025-07-15T06:57:51.305863-04:00'
+  - report_id: 90887e20-e581-4766-bc6b-00815051f105
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: da721046-b605-4eb8-a9c0-6b25bb175336
+    is_active: true
+    created_at: '2025-07-15T06:57:08.804672-04:00'
+    updated_at: '2025-07-15T06:57:08.804674-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: meta_description
+    label: Meta Description
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: daeb854e-a65c-464a-b094-de0019401922
+    is_active: true
+    created_at: '2025-07-15T06:56:18.688389-04:00'
+    updated_at: '2025-07-15T06:56:18.688391-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: color
+    label: Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 7
+    id: db172f7a-5ec4-47d1-862b-78ceb0e3897a
+    is_active: true
+    created_at: '2025-07-15T06:56:04.257634-04:00'
+    updated_at: '2025-07-15T09:40:10.240758-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: id
+    label: Id
+    data_type_id: e156d77c-4b73-4587-b6d3-8eaaf9191728
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: db740d81-1e51-47d6-a9fe-4aa8037e1d7b
+    is_active: true
+    created_at: '2025-07-15T06:57:01.587748-04:00'
+    updated_at: '2025-07-15T06:57:01.587750-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: label
+    label: Label
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 6
+    id: dc741d97-51e0-484f-af96-0e32313eb7bb
+    is_active: true
+    created_at: '2025-07-15T06:56:04.259166-04:00'
+    updated_at: '2025-07-15T09:40:10.222587-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: minify_html
+    label: Minify Html
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 4
+    id: dd54b113-58f6-4377-8d34-131498b6fc18
+    is_active: true
+    created_at: '2025-07-15T06:56:11.565945-04:00'
+    updated_at: '2025-07-15T09:37:31.713439-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: updated_at
+    label: Updated At
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: center
+    options: '{}'
+    order_index: 5
+    id: de0c0d22-c1f6-479f-8c56-83dcaba1748d
+    is_active: true
+    created_at: '2025-07-15T06:56:04.260721-04:00'
+    updated_at: '2025-07-15T09:40:10.205413-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: notes
+    label: Notes
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: df75d220-0b55-4b3a-8cb0-2d6360fcd776
+    is_active: true
+    created_at: '2025-07-15T06:56:33.095789-04:00'
+    updated_at: '2025-07-15T06:56:33.095791-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: version_number
+    label: Version Number
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: e004ced2-caa8-4f8c-ae68-660ee346bd01
+    is_active: true
+    created_at: '2025-07-15T06:57:01.541142-04:00'
+    updated_at: '2025-07-15T06:57:01.541144-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_searchable
+    label: Is Searchable
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 4
+    id: e1fd1b8a-1242-4efc-bef4-79000ff5f092
+    is_active: true
+    created_at: '2025-07-15T06:56:04.262256-04:00'
+    updated_at: '2025-07-15T09:40:10.188546-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: published
+    label: Published
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: e33196d8-7a49-4690-af40-e783f72bae33
+    is_active: true
+    created_at: '2025-07-15T06:56:33.100120-04:00'
+    updated_at: '2025-07-15T06:56:33.100123-04:00'
+  - report_id: 2b8d43ac-d293-41fd-bfaa-bfd91882c02f
+    name: is_active
+    label: Is Active
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 3
+    id: e54c2d75-f5da-4d4f-9fa5-d8c7a0f8a126
+    is_active: true
+    created_at: '2025-07-15T06:57:29.967429-04:00'
+    updated_at: '2025-07-15T08:44:58.648013-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: updated_at
+    label: Updated At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: e55e1e8a-f7d9-4117-8281-1f5264213b1f
+    is_active: true
+    created_at: '2025-07-15T06:57:01.593516-04:00'
+    updated_at: '2025-07-15T06:57:01.593518-04:00'
+  - report_id: 24edc7a2-dead-435e-b9cf-4d5dc3040611
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: e5848e4e-948b-489b-abfd-c26a6af73b25
+    is_active: true
+    created_at: '2025-07-15T06:58:19.595835-04:00'
+    updated_at: '2025-07-15T06:58:19.595838-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: e5ab66a3-3240-48c2-9dbd-9b1c9f762807
+    is_active: true
+    created_at: '2025-07-15T06:57:22.810926-04:00'
+    updated_at: '2025-07-15T06:57:22.810928-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: content_type
+    label: Content Type
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: e79d413b-f1e8-47a5-b76f-c5d9f572980c
+    is_active: true
+    created_at: '2025-07-15T06:57:01.537728-04:00'
+    updated_at: '2025-07-15T06:57:01.537730-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: e7fe0964-6cb1-40c8-a751-1ef6d03ddc58
+    is_active: true
+    created_at: '2025-07-15T06:56:33.162955-04:00'
+    updated_at: '2025-07-15T06:56:33.162957-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: navbar_height
+    label: Navbar Height
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 18
+    id: e9268ef7-532e-41de-847d-3d34d007db2b
+    is_active: true
+    created_at: '2025-07-15T06:56:11.526360-04:00'
+    updated_at: '2025-07-15T09:37:31.958010-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: last_rendered
+    label: Last Rendered
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: eb2bf141-654e-4cf0-85d5-da207fa52eb4
+    is_active: true
+    created_at: '2025-07-15T06:57:01.579098-04:00'
+    updated_at: '2025-07-15T06:57:01.579100-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: og_image
+    label: Og Image
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: ec646d38-8c86-493e-9d1c-2de7237b7f40
+    is_active: true
+    created_at: '2025-07-15T06:56:18.700283-04:00'
+    updated_at: '2025-07-15T06:56:18.700286-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: text_color
+    label: Text Color
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 68
+    id: ed1047d0-3ba8-43ed-91ab-464ee93f4d60
+    is_active: true
+    created_at: '2025-07-15T06:56:11.375520-04:00'
+    updated_at: '2025-07-15T09:37:32.819168-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: breakpoint_md
+    label: Breakpoint Md
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 36
+    id: ee847b4b-316e-4a77-a2b1-aba6a631d8ea
+    is_active: true
+    created_at: '2025-07-15T06:56:11.474444-04:00'
+    updated_at: '2025-07-15T09:37:32.269954-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: tags
+    label: Tags
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 3
+    id: ef4dc685-f73d-47d4-8659-8d773a305443
+    is_active: true
+    created_at: '2025-07-15T06:56:04.263845-04:00'
+    updated_at: '2025-07-15T09:40:10.170487-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: theme_version
+    label: Theme Version
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 82
+    id: efdef5d8-1abe-4711-b535-6d796d91f252
+    is_active: true
+    created_at: '2025-07-15T06:56:11.318603-04:00'
+    updated_at: '2025-07-15T09:37:33.050989-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: sidebar_color_dark
+    label: Sidebar Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 51
+    id: f1caf1da-5fb6-4132-8930-b798c78d5b0d
+    is_active: true
+    created_at: '2025-07-15T06:56:11.431062-04:00'
+    updated_at: '2025-07-15T09:37:32.526069-04:00'
+  - report_id: 08f5653a-a30a-4b30-8832-ec3a6801cfde
+    name: connection_string
+    label: Connection String
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: f2069704-b7d3-485f-99ea-110785092cf8
+    is_active: true
+    created_at: '2025-07-15T06:57:58.371035-04:00'
+    updated_at: '2025-07-15T06:57:58.371037-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: is_system_theme
+    label: Is System Theme
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 12
+    id: f2a5161f-7de3-4e39-949b-ccbdb8f90e1c
+    is_active: true
+    created_at: '2025-07-15T06:56:11.543383-04:00'
+    updated_at: '2025-07-15T09:37:31.853959-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: variables_data
+    label: Variables Data
+    data_type_id: 648430fe-c500-473b-89b8-fc90fd68e63f
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: f3416270-62f2-41f2-b48e-ff47524ba395
+    is_active: true
+    created_at: '2025-07-15T06:57:01.555906-04:00'
+    updated_at: '2025-07-15T06:57:01.555909-04:00'
+  - report_id: 1363a0d5-c4ce-4934-8985-67ea773a155d
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: f3dbc19e-e5ae-4213-afc8-50370b71ac46
+    is_active: true
+    created_at: '2025-07-15T06:58:12.541594-04:00'
+    updated_at: '2025-07-15T06:58:12.541597-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: css_version
+    label: Css Version
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 80
+    id: f6ba16d8-0ade-4efa-b199-03c76a8b608a
+    is_active: true
+    created_at: '2025-07-15T06:56:11.324463-04:00'
+    updated_at: '2025-07-15T09:37:33.016083-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: is_public
+    label: Is Public
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 2
+    id: f893bc3f-3e0a-4e18-9b31-2adaed48b41d
+    is_active: true
+    created_at: '2025-07-15T06:56:04.265421-04:00'
+    updated_at: '2025-07-15T09:40:10.152497-04:00'
+  - report_id: c8537d09-b448-4865-9218-04131058142f
+    name: is_default_template
+    label: Is Default Template
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: f90ed1da-33a6-49b9-8399-aebb80b7823a
+    is_active: true
+    created_at: '2025-07-15T06:57:22.854117-04:00'
+    updated_at: '2025-07-15T06:57:22.854119-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: created_at
+    label: Created At
+    data_type_id: ffed1acb-2ca5-4c51-b289-703cbaff2a44
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: center
+    options: '{}'
+    order_index: 0
+    id: fa22512c-059b-4449-a07e-a24ae737d812
+    is_active: true
+    created_at: '2025-07-15T06:56:18.741456-04:00'
+    updated_at: '2025-07-15T06:56:18.741458-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: logo_desktop
+    label: Logo Desktop
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: fafd7d52-a3ba-448f-b27a-338c8e92c9c2
+    is_active: true
+    created_at: '2025-07-15T06:56:33.121913-04:00'
+    updated_at: '2025-07-15T06:56:33.121915-04:00'
+  - report_id: 61713f26-9f4c-4df9-979f-8beab1b73f8e
+    name: maintenance_mode
+    label: Maintenance Mode
+    data_type_id: 81870d70-c6a1-4212-afe9-ad5459b661c8
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: fb11fa61-7179-4001-bd01-fc0b58612738
+    is_active: true
+    created_at: '2025-07-15T06:56:33.145102-04:00'
+    updated_at: '2025-07-15T06:56:33.145104-04:00'
+  - report_id: 70ca46ca-29fb-4a4b-af14-a91a12105e79
+    name: tag_name
+    label: Tag Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: fb768ad1-df21-4e1a-8b79-b9d3707f0d77
+    is_active: true
+    created_at: '2025-07-15T06:56:47.343623-04:00'
+    updated_at: '2025-07-15T06:56:47.343626-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: text_color_dark
+    label: Text Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 55
+    id: fb9eaf58-027f-4a62-9043-4a0088328548
+    is_active: true
+    created_at: '2025-07-15T06:56:11.419331-04:00'
+    updated_at: '2025-07-15T09:37:32.595523-04:00'
+  - report_id: 4ac56738-e8f0-48f1-8d34-86b184d1da75
+    name: info_color_dark
+    label: Info Color Dark
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 58
+    id: fbb84c1c-e4ff-4c87-b41a-4caf15e61715
+    is_active: true
+    created_at: '2025-07-15T06:56:11.410471-04:00'
+    updated_at: '2025-07-15T09:37:32.647178-04:00'
+  - report_id: f30bb301-6e02-46a3-87a8-d65a97284a31
+    name: cache_duration
+    label: Cache Duration
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: fc0e388f-f67a-415a-8b1a-3ae80effc002
+    is_active: true
+    created_at: '2025-07-15T06:57:01.576180-04:00'
+    updated_at: '2025-07-15T06:57:01.576183-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: name
+    label: Name
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: left
+    options: '{}'
+    order_index: 1
+    id: fc820597-760c-4c7e-bae1-0cd2ec5b6cb5
+    is_active: true
+    created_at: '2025-07-15T06:56:04.266980-04:00'
+    updated_at: '2025-07-15T09:40:10.131548-04:00'
+  - report_id: 982c9323-c62a-4276-87dc-f5eafde78dbc
+    name: options
+    label: Options
+    data_type_id: e59e834e-7493-47db-925d-f6ab5e5e69de
+    is_searchable: false
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: false
+    is_sortable: false
+    alignment: left
+    options: '{}'
+    order_index: 0
+    id: fdc4e7cf-4c59-485c-8dd8-41fcc40553eb
+    is_active: true
+    created_at: '2025-07-15T06:56:04.268528-04:00'
+    updated_at: '2025-07-15T09:40:10.111403-04:00'
+  - report_id: a4f6a6ad-3af5-48af-9618-589d907ada31
+    name: view_count
+    label: View Count
+    data_type_id: 44a52263-cec6-40fe-89e9-525bcd9ef955
+    is_searchable: true
+    search_type: contains
+    is_pk: false
+    is_identity: false
+    is_default_sort: false
+    is_visible: true
+    is_sortable: true
+    alignment: right
+    options: '{}'
+    order_index: 0
+    id: fe78ffae-6af2-4902-abea-b98669eee89a
+    is_active: true
+    created_at: '2025-07-15T06:56:18.721061-04:00'
+    updated_at: '2025-07-15T06:56:18.721064-04:00'

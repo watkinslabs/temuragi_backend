@@ -44,6 +44,23 @@ class ComponentExporter:
         if value is None:
             return None
 
+        # Handle Python native collections (dict, list) from JSONB columns
+        if isinstance(value, (dict, list)):
+            return value
+
+        # Check if string value might be JSON and try to parse it
+        if isinstance(value, str):
+            # Common JSON patterns
+            if (value.startswith('{') and value.endswith('}')) or \
+               (value.startswith('[') and value.endswith(']')):
+                try:
+                    import json
+                    parsed = json.loads(value)
+                    return parsed
+                except (json.JSONDecodeError, ValueError):
+                    # Not valid JSON, return as string
+                    pass
+
         # Convert UUID objects to strings
         if hasattr(value, 'hex'):
             return str(value)
@@ -58,7 +75,7 @@ class ComponentExporter:
             
         # Additional safety for any SQLAlchemy objects
         return self._safe_string_convert(value)
-
+    
     def _get_foreign_key_name(self, model_instance, id_field, name_field='name'):
         """Get the name for a foreign key UUID field"""
         relation_attr = id_field.replace('_id', '')
