@@ -7,7 +7,7 @@ from app.base.model import BaseModel
 
 class SocialContact(BaseModel):
     """User social/messaging contact model"""
-    __depends_on__ = []
+    __depends_on__ = ['User']
     __tablename__ = 'social_contacts'
     
     user_id = Column(

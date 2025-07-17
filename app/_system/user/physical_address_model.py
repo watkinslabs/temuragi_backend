@@ -7,7 +7,7 @@ from app.base.model import BaseModel
 
 class PhysicalAddress(BaseModel):
     """User address model"""
-    __depends_on__ = []
+    __depends_on__ = ['User']
     __tablename__ = 'addresses'
   
     user_id = Column(

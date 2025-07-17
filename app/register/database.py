@@ -174,12 +174,12 @@ class DynamicDatabaseRegistry:
                 traceback.print_exc()
                 return None
 
-    def create_all_tables(self, base_model, app):
-        """Create tables in main database only"""
-        if not hasattr(base_model, 'metadata'):
-            raise AttributeError("Base model must have metadata attribute")
-
-        base_model.metadata.create_all(self.main_engine, checkfirst=True)
+    #def create_all_tables(self, base_model, app):
+    #    """Create tables in main database only"""
+    #    if not hasattr(base_model, 'metadata'):
+    #        raise AttributeError("Base model must have metadata attribute")
+#
+#        base_model.metadata.create_all(self.main_engine, checkfirst=True)
 
 
 # Global registry
@@ -219,28 +219,44 @@ def refresh_dynamic_engine(bind_key):
 
     return db_registry.get_or_create_engine(bind_key)
 
-
 def create_all_tables(app, engine=None):
-    """Create tables in main database"""
+    """Create tables in main database (only tables without bind_key or with bind_key='SYSTEM')"""
     from app.base.model import Base
-
-    if Base and hasattr(Base, 'metadata'):
-        # Only create tables without bind_key in main database
-        from sqlalchemy import MetaData
-
-        filtered_metadata = MetaData()
-
-        for table_name, table in Base.metadata.tables.items():
-            model_class = None
-
-            # Find model for this table
-            for mapper in Base.registry.mappers:
-                if hasattr(mapper.class_, '__table__') and mapper.class_.__table__.name == table.name:
-                    model_class = mapper.class_
-                    break
-
-            # Only include tables without bind_key
-            if not model_class or not getattr(model_class, '__bind_key__', None):
-                table.tometadata(filtered_metadata)
-
-        filtered_metadata.create_all(engine or db_registry.main_engine, checkfirst=True)
+    
+    if not Base or not hasattr(Base, 'metadata'):
+        return
+        
+    from sqlalchemy import MetaData
+    
+    # Create fresh metadata for main database tables only
+    main_metadata = MetaData()
+    
+    # Build a set of table names that should be included
+    included_table_names = set()
+    
+    # First pass: identify which tables to include based on model bind_key
+    for mapper in Base.registry.mappers:
+        model_class = mapper.class_
+        if not model_class or not hasattr(model_class, '__table__'):
+            continue
+            
+        # Check bind key
+        bind_key = getattr(model_class, '__bind_key__', None)
+        
+        # Only include if no bind_key or bind_key is 'SYSTEM'
+        if bind_key is None or bind_key == 'SYSTEM':
+            included_table_names.add(model_class.__table__.name)
+            if app and hasattr(app, 'logger'):
+                app.logger.debug(f"Including table: {model_class.__table__.name} from model: {model_class.__name__} (bind_key={bind_key})")
+        else:
+            if app and hasattr(app, 'logger'):
+                app.logger.debug(f"EXCLUDING table: {model_class.__table__.name} from model: {model_class.__name__} (bind_key={bind_key})")
+    
+    # Second pass: copy only the included tables to main_metadata
+    for table_name, table in Base.metadata.tables.items():
+        if table_name in included_table_names:
+            # Copy table without schema to avoid cross-database references
+            table.tometadata(main_metadata, schema=None)
+    
+    # Create tables using the filtered metadata
+    main_metadata.create_all(engine or db_registry.main_engine, checkfirst=True)

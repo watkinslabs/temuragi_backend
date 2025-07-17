@@ -53,7 +53,7 @@ def sync_component():
    print ("TRYING SYNC2")
 
    # Validate required fields
-   required = ['name', 'source_code', 'compiled_code']
+   required = ['name', 'compiled_code']
    for field in required:
        if not data.get(field):
            return jsonify({'error': f'{field} is required'}), 400

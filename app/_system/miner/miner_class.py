@@ -81,27 +81,8 @@ class Miner:
                 logger=self.logger
             )
             
-            # Determine which method to call on the handler
-            method_map = {
-                'create': 'handle_create',
-                'update': 'handle_update',
-                'delete': 'handle_delete',
-                'metadata': 'handle_metadata',
-                'process': 'handle_process',
-                'batch_create': 'handle_batch_create',
-                'batch_update': 'handle_batch_update',
-                'validate': 'handle_validate',
-                'transform': 'handle_transform',
-                'import': 'handle_import',
-                'export': 'handle_export',
-                'list': 'handle_list',
-                'get': 'handle_get',
-                'read': 'handle_read',
-                'prefill': 'handle_prefill',
-                'rni_inv': 'handle_rni_inv'
-            }
-            
-            method_name = method_map.get(operation)
+            method_name = f"handle_{operation}"
+
             if None == method_name :
                 self.logger.error(f"{operation}: not supported")
 

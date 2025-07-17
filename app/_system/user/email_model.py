@@ -8,7 +8,7 @@ from app.base.model import BaseModel
 
 class Email(BaseModel):
     """User email model"""
-    __depends_on__ = []
+    __depends_on__ = ['User']
     __tablename__ = 'emails'
     
     user_id = Column(
