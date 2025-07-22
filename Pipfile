@@ -30,6 +30,8 @@ flort = "*"
 babel = "*"
 pandas = "*"
 wl-config-manager = "*"
+wl-version-manager = "*"
+gunicorn = "*"
 
 [dev-packages]
 

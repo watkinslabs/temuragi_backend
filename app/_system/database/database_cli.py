@@ -613,7 +613,7 @@ class DatabaseCLI(BaseCLI):
 
                 if result.fetchone():
                     self.output_warning(f"Database '{database_name}' already exists")
-                    return 1
+                    return 0
 
                 # Create the database
                 owner_clause = f' OWNER "{owner}"' if owner else ''

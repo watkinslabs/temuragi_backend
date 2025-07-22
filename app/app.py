@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 print(f"=== PROCESS INFO ===")
 print(f"PID: {os.getpid()}")
@@ -17,7 +18,7 @@ from .register.template_hooks import register_hooks
 from .register.database import register_db
 from .register.classes import register_classes
 
-from flask import Blueprint, redirect, request
+from flask import Blueprint, redirect
 
 from .config import config
 
@@ -25,11 +26,11 @@ bp = Blueprint('V1', __name__,)
 
 @bp.route('/<path:path>')
 def catch_all(path):
-    return redirect(f'/v2/')
+    return redirect(config.route_prefix)
 
 @bp.route('/')
 def catch_all2():
-    return redirect(f'/v2/')
+    return redirect(config.route_prefix)
 
 app=None
 
@@ -45,32 +46,53 @@ def get_app():
     return app
 
 def create_app():
+    print("=== CREATE APP START ===")
     
     app = Flask(__name__)
     app.extensions={}
     
     app.config.update(config)
-    register_logger(app)
+    print("Config updated")
     
-    # registeres the scan paths internally
-    register_classes()
+    # Register logger first
+    register_logger(app)
+    print("Logger registered")
+    
+    # Test if logging is working
+    test_logger = logging.getLogger(__name__)
+    test_logger.info("Test log after register_logger")
+    print(f"Root logger level: {logging.root.level}")
+    print(f"Root logger handlers: {logging.root.handlers}")
+    
+    # Now register classes with logging enabled
+    print("About to register classes...")
+    print(f"Scan paths: {config.scan_paths}")
+    print(f"Base dir: {getattr(config, 'base_dir', 'NOT SET')}")
+    
+    try:
+        register_classes()
+        print("Classes registered successfully")
+    except Exception as e:
+        print(f"ERROR registering classes: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
 
     register_db(app)
-    
+    print("Database registered")
         
     app.register_blueprint(bp)
-
+    print("Blueprint registered")
 
     # Register hooks for all scan paths
     for path in config.scan_paths:
+        print(f"Registering hooks for path: {path}")
         register_hooks(path, app)
     
     for path in config.scan_paths:
-        register_blueprints(config.route_prefix,path, app)
+        print(f"Registering blueprints for path: {path}")
+        register_blueprints(config.route_prefix, path, app)
     
-  
-
-
+    print("=== CREATE APP COMPLETE ===")
     return app
 
 
@@ -78,4 +100,5 @@ app = create_app()
 
     
 if __name__ == "__main__":
+    print(f"Starting app on port {config.port}")
     app.run(debug=True, host='0.0.0.0', port=config.port)
