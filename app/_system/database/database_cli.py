@@ -44,7 +44,7 @@ class DatabaseCLI(BaseCLI):
             self.log_info("Engine reference created from session")
         else:
             # Create engine directly if session doesn't have one
-            self.engine = create_engine(config.database.uri)
+            self.engine = create_engine(config['database_uri'])
             self.log_info("Engine created directly from DATABASE_URI")
 
         # Store app reference for compatibility
@@ -560,7 +560,7 @@ class DatabaseCLI(BaseCLI):
 
             # Create connection to postgres database for admin operations
             from urllib.parse import urlparse
-            db_url = config.database.uri
+            db_url = config['database_uri']
             parsed = urlparse(db_url)
 
             # Connect to postgres database instead of target database
@@ -598,7 +598,7 @@ class DatabaseCLI(BaseCLI):
 
             # Create connection to postgres database for admin operations
             from urllib.parse import urlparse
-            db_url = config.database.uri
+            db_url = config['database_uri']
             parsed = urlparse(db_url)
 
             # Connect to postgres database instead of target database
@@ -915,10 +915,10 @@ class DatabaseCLI(BaseCLI):
             # Check config
             try:
                 from app.config import config
-                scan_paths = config.get('SYSTEM_SCAN_PATHS', [])
-                self.output_success(f"✓ SYSTEM_SCAN_PATHS found: {scan_paths}")
+                scan_paths = config.get('scan_paths', [])
+                self.output_success(f"✓ scan_paths found: {scan_paths}")
             except KeyError:
-                self.output_error("✗ SYSTEM_SCAN_PATHS not found in config")
+                self.output_error("✗ scan_paths not found in config")
                 return 1
             except Exception as e:
                 self.output_error(f"✗ Error importing config: {e}")

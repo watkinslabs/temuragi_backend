@@ -8,8 +8,8 @@ from flask import current_app, abort, request,jsonify
 class CSRFProtection:
     """Simple CSRF protection with daily token validation"""
     
-    def __init__(self, app=None, secret_key=None):
-        self.secret_key = secret_key
+    def __init__(self, app=None, csrf_secret=None):
+        self.csrf_secret = csrf_secret
         self.exempt_endpoints = set()
         self.exempt_blueprints = set()
         
@@ -18,10 +18,10 @@ class CSRFProtection:
     
     def init_app(self, app):
         """Initialize with Flask app and register before_request hook"""
-        if not self.secret_key:
-            self.secret_key = app.config.get('secret_key')
-        if not self.secret_key:
-            raise ValueError("SECRET_KEY must be set")
+        if not self.csrf_secret:
+            self.csrf_secret = app.config.get('csrf_secret')
+        if not self.csrf_secret:
+            raise ValueError("csrf_secret must be set")
         
         # Register global before_request handler
         app.before_request(self._before_request)
@@ -46,6 +46,12 @@ class CSRFProtection:
                 current_app.logger.debug(f"CSRF check skipped for localhost request from {client_ip} (via X-Forwarded-For)")
                 return
         
+        # Exempt internal requests with specific headers
+        if (request.headers.get('X-Internal-Request') == 'true' and 
+            request.headers.get('X-Source') == 'temuragi-web-init'):
+            current_app.logger.debug("CSRF check skipped for internal request (X-Internal-Request + X-Source headers)")
+            return
+        
         # Check if endpoint is exempt
         if request.endpoint in self.exempt_endpoints:
             return
@@ -58,7 +64,7 @@ class CSRFProtection:
         
         # Validate CSRF token
         self.protect(request)
-    
+        
     def exempt(self, endpoint):
         """Exempt an endpoint from CSRF protection"""
         self.exempt_endpoints.add(endpoint)
@@ -76,7 +82,7 @@ class CSRFProtection:
         daily_salt = date.today().isoformat()
         
         # Create signature for the daily validation
-        message = f"{self.secret_key}:{daily_salt}:{random_part}".encode('utf-8')
+        message = f"{self.csrf_secret}:{daily_salt}:{random_part}".encode('utf-8')
         signature = hashlib.sha256(message).hexdigest()[:16]  # First 16 chars is enough
         
         # Combine random part with signature
@@ -95,7 +101,7 @@ class CSRFProtection:
         
         # Recreate signature with today's date
         daily_salt = date.today().isoformat()
-        message = f"{self.secret_key}:{daily_salt}:{random_part}".encode('utf-8')
+        message = f"{self.csrf_secret}:{daily_salt}:{random_part}".encode('utf-8')
         expected_signature = hashlib.sha256(message).hexdigest()[:16]
         
         # Compare signatures

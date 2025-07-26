@@ -630,7 +630,7 @@ class LocalBackend(Backend):
             from sqlalchemy.orm import sessionmaker
             from app.config import config
             
-            engine = create_engine(config.database.uri)
+            engine = create_engine(config['database_uri'])
             session_factory = sessionmaker(bind=engine)
             self.session = session_factory()
             self._log("Database session created", 'info')

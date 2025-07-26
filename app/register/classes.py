@@ -25,8 +25,8 @@ def register_classes():
     if not _class_registry:  # Only load once
         logger.info("Starting class registry initialization", extra={
             "event": "registry_init_start",
-            "base_dir": config.base_dir,
-            "scan_paths": config.scan_paths
+            "base_dir": config['base_dir'],
+            "scan_paths": config['scan_paths']
         })
         
         try:
@@ -36,14 +36,14 @@ def register_classes():
             logger.info("Auto-loading classes", extra={
                 "event": "auto_load_start",
                 "patterns": patterns,
-                "base_directories": config.scan_paths
+                "base_directories": config['scan_paths']
             })
             
             auto_load_classes(
                 _class_registry,
-                base_directories=config.scan_paths,
+                base_directories=config['scan_paths'],
                 patterns=patterns,
-                base_dir=config.base_dir
+                base_dir=config['base_dir']
             )
             
             # Log successful class loading
@@ -76,8 +76,8 @@ def register_classes():
                 "event": "auto_load_failed",
                 "error_type": type(e).__name__,
                 "error_message": str(e),
-                "scan_paths": config.scan_paths,
-                "base_dir": config.base_dir
+                "scan_paths": config['scan_paths'],
+                "base_dir": config['base_dir']
             }, exc_info=True)
             raise
 
@@ -98,11 +98,6 @@ def get_model(name: str) -> Optional[Any]:
             "event": "model_not_found",
             "model_name": name,
             "available_models": list(_model_registry.keys())
-        })
-    else:
-        logger.debug("Model retrieved", extra={
-            "event": "model_retrieved",
-            "model_name": name
         })
     return model
 

@@ -43,7 +43,7 @@ class DynamicDatabaseRegistry:
         """Initialize the main database connection"""
         self._app = app
 
-        main_uri = config.database.uri
+        main_uri = config['database_uri']
         if not main_uri:
             raise ValueError("DATABASE_URI not configured")
 
@@ -115,7 +115,7 @@ class DynamicDatabaseRegistry:
 
     def get_or_create_engine(self, bind_key):
         """Get or create an engine for the given bind key"""
-        if not bind_key:
+        if not bind_key or bind_key=='SYSTEM':
             return self.main_engine
 
         # Check cache without lock first

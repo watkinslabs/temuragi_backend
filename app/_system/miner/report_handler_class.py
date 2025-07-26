@@ -33,11 +33,11 @@ class ReportDataHandler(BaseDataHandler):
         if report.is_model:
             raise MinerError(f'Report {report_id} is not available as a data model', 'ValidationError', 400)
         
-        # Use ReportQueryExecutor
+
         executor = ReportQueryExecutor(report.connection.database_type.name.lower())
         
         from app.models import Connection
-
+        print("X?"*20)
         ##SQL ACHMEY DB MODEL CONECTION 
         # The data from Miner already has DataTables format
         # Just pass it through to the executor

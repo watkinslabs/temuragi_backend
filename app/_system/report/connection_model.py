@@ -10,7 +10,7 @@ from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 from app.base.model import BaseModel
 from app.config import config
 
-encryption_key = config.db_conn_enc_key
+encryption_key = config['encryption_key']
 
 class Connection(BaseModel):
     __depends_on__ = ['DatabaseType']

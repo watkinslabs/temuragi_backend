@@ -18,14 +18,16 @@ DEFAULT_CONFIG = {
     "db_host": "localhost",
     "db_port": "5432",
     "db_name": "temuragi_db",
-    "secret_key": "",
+    "csrf_secret": "fgmdklajfg89r0gfj3490thjkl;tjh43890tuhjiroeqtjoreiqt",
     "debug": True,
     "log_level": "DEBUG",
     "route_prefix": "/v2",
     "log_file": "logs/app.log",
+    "encryption_key":"u1tOOtBW2ECTWXSMS_pZ9wwdn4dEZzg_-ihYJfbYbd8="
 }
 
-CONFIG = {
+
+config = {
     "in_container": running_in_container(),
     "port": int(os.environ.get("TEMURAGI_PORT", DEFAULT_CONFIG["port"])),
     "scan_paths": DEFAULT_CONFIG["scan_paths"],
@@ -35,14 +37,16 @@ CONFIG = {
     "db_host": os.environ.get("TEMURAGI_DB_HOST", DEFAULT_CONFIG["db_host"]),
     "db_port": os.environ.get("TEMURAGI_DB_PORT", DEFAULT_CONFIG["db_port"]),
     "db_name": os.environ.get("TEMURAGI_DB_NAME", DEFAULT_CONFIG["db_name"]),
-    "secret_key": os.environ.get("TEMURAGI_SECRET_KEY", DEFAULT_CONFIG["secret_key"]),
+    "csrf_secret": os.environ.get("TEMURAGI_CRSF_KEY", DEFAULT_CONFIG["csrf_secret"]),
     "debug": os.environ.get("TEMURAGI_DEBUG", str(DEFAULT_CONFIG["debug"])).lower() == "true",
     "log_level": os.environ.get("TEMURAGI_LOG_LEVEL", DEFAULT_CONFIG["log_level"]),
     "route_prefix": DEFAULT_CONFIG["route_prefix"],
     "log_file": DEFAULT_CONFIG["log_file"],
+    "encryption_key": os.environ.get("TEMURAGI_ENCRYPTION_KEY", DEFAULT_CONFIG["encryption_key"])
 }
 
-CONFIG["db_uri"] = (
-    f"postgresql+psycopg2://{CONFIG['db_user']}:{CONFIG['db_password']}"
-    f"@{CONFIG['db_host']}:{CONFIG['db_port']}/{CONFIG['db_name']}"
+
+config["database_uri"] = (
+    f"postgresql+psycopg2://{config['db_user']}:{config['db_password']}"
+    f"@{config['db_host']}:{config['db_port']}/{config['db_name']}"
 )

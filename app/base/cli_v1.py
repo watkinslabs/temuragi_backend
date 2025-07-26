@@ -186,7 +186,7 @@ class BaseCLI:
             from sqlalchemy.orm import sessionmaker
             
             # Create engine and session
-            engine = create_engine(config.database.uri)
+            engine = create_engine(config['database_uri'])
             session_factory = sessionmaker(bind=engine)
             self.session = session_factory()
             self.log_info("Database session created successfully")

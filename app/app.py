@@ -26,11 +26,11 @@ bp = Blueprint('V1', __name__,)
 
 @bp.route('/<path:path>')
 def catch_all(path):
-    return redirect(config.route_prefix)
+    return redirect(config['route_prefix'])
 
 @bp.route('/')
 def catch_all2():
-    return redirect(config.route_prefix)
+    return redirect(config['route_prefix'])
 
 app=None
 
@@ -66,7 +66,7 @@ def create_app():
     
     # Now register classes with logging enabled
     print("About to register classes...")
-    print(f"Scan paths: {config.scan_paths}")
+    print(f"Scan paths: {config['scan_paths']}")
     print(f"Base dir: {getattr(config, 'base_dir', 'NOT SET')}")
     
     try:
@@ -84,13 +84,13 @@ def create_app():
     print("Blueprint registered")
 
     # Register hooks for all scan paths
-    for path in config.scan_paths:
+    for path in config['scan_paths']:
         print(f"Registering hooks for path: {path}")
         register_hooks(path, app)
     
-    for path in config.scan_paths:
+    for path in config['scan_paths']:
         print(f"Registering blueprints for path: {path}")
-        register_blueprints(config.route_prefix, path, app)
+        register_blueprints(config['route_prefix'], path, app)
     
     print("=== CREATE APP COMPLETE ===")
     return app
@@ -100,5 +100,5 @@ app = create_app()
 
     
 if __name__ == "__main__":
-    print(f"Starting app on port {config.port}")
-    app.run(debug=True, host='0.0.0.0', port=config.port)
+    print(f"Starting app on port {config['port']}")
+    app.run(debug=True, host='0.0.0.0', port=config['port'])

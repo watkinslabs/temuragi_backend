@@ -9,12 +9,12 @@ def register_blueprints(prefix, path, app):
    Treat a dir as a module if it has files other than __init__.py.
    Stop recursion once a module is found. Categorization dirs are recursed."""
 
-   base_dir = os.path.join(config.base_dir, path)
+   base_dir = os.path.join(config['base_dir'], path)
    base_pkg = 'app.' + path.replace(os.sep, '.').strip('.')
 
    # Add BASE_DIR to sys.path once, so imports work cleanly
-   if config.base_dir not in sys.path:
-       sys.path.insert(0, config.base_dir)
+   if config['base_dir'] not in sys.path:
+       sys.path.insert(0, config['base_dir'])
 
    for dirpath, dirnames, filenames in os.walk(base_dir, topdown=True):
        # Skip unwanted dirs
