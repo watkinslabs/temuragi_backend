@@ -10,9 +10,10 @@ def running_in_container():
         return False
 
 DEFAULT_CONFIG = {
-    "port": 5050,
+    "port": 5000,
     "scan_paths": ["_system", "admin", "user"],
     "base_dir": os.path.join(os.getcwd(), "app"),
+    "base_url": "http://localhost",
     "db_user": "temuragi_user",
     "db_password": "fjk3490qnfmkldsavnmi934qgj03598340-jfklfdsgt34rt23rfdas",
     "db_host": "localhost",
@@ -21,7 +22,7 @@ DEFAULT_CONFIG = {
     "csrf_secret": "fgmdklajfg89r0gfj3490thjkl;tjh43890tuhjiroeqtjoreiqt",
     "debug": True,
     "log_level": "DEBUG",
-    "route_prefix": "/v2",
+    "route_prefix": "",
     "log_file": "logs/app.log",
     "encryption_key":"u1tOOtBW2ECTWXSMS_pZ9wwdn4dEZzg_-ihYJfbYbd8="
 }
@@ -31,6 +32,7 @@ config = {
     "in_container": running_in_container(),
     "port": int(os.environ.get("TEMURAGI_PORT", DEFAULT_CONFIG["port"])),
     "scan_paths": DEFAULT_CONFIG["scan_paths"],
+    "base_url": os.environ.get("TEMURAGI_BASE_URL", DEFAULT_CONFIG["base_url"]),
     "base_dir": os.environ.get("TEMURAGI_BASE_DIR", DEFAULT_CONFIG["base_dir"]),
     "db_user": os.environ.get("TEMURAGI_DB_USER", DEFAULT_CONFIG["db_user"]),
     "db_password": os.environ.get("TEMURAGI_DB_PASSWORD", DEFAULT_CONFIG["db_password"]),
@@ -40,7 +42,7 @@ config = {
     "csrf_secret": os.environ.get("TEMURAGI_CRSF_KEY", DEFAULT_CONFIG["csrf_secret"]),
     "debug": os.environ.get("TEMURAGI_DEBUG", str(DEFAULT_CONFIG["debug"])).lower() == "true",
     "log_level": os.environ.get("TEMURAGI_LOG_LEVEL", DEFAULT_CONFIG["log_level"]),
-    "route_prefix": DEFAULT_CONFIG["route_prefix"],
+    "route_prefix": os.environ.get("TEMURAGI_ROUTE_PREFIX",DEFAULT_CONFIG["route_prefix"]),
     "log_file": DEFAULT_CONFIG["log_file"],
     "encryption_key": os.environ.get("TEMURAGI_ENCRYPTION_KEY", DEFAULT_CONFIG["encryption_key"])
 }

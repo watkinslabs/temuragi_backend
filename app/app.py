@@ -22,15 +22,15 @@ from flask import Blueprint, redirect
 
 from .config import config
 
-bp = Blueprint('V1', __name__,)
+#bp = Blueprint('V1', __name__,)
 
-@bp.route('/<path:path>')
-def catch_all(path):
-    return redirect(config['route_prefix'])
+#@bp.route('/<path:path>')
+#def catch_all(path):
+#    return redirect(config['route_prefix'])
 
-@bp.route('/')
-def catch_all2():
-    return redirect(config['route_prefix'])
+#@bp.route('/')
+#def catch_all2():
+#    return redirect(config['route_prefix'])
 
 app=None
 
@@ -80,8 +80,8 @@ def create_app():
     register_db(app)
     print("Database registered")
         
-    app.register_blueprint(bp)
-    print("Blueprint registered")
+    #app.register_blueprint(bp)
+    #print("Blueprint registered")
 
     # Register hooks for all scan paths
     for path in config['scan_paths']:

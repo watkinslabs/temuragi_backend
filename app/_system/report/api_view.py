@@ -5,6 +5,7 @@ JSON API endpoints for report operations
 
 from flask import Blueprint, request, jsonify, g, send_file
 from app.classes import ReportService
+from app.config import config
 import io
 
 # Create blueprint
@@ -137,7 +138,7 @@ def get_report_config():
         config = {
             'model_name': report.name,
             'report_name': report.slug,
-            'api_url': '/v2/api/data',  # Your data endpoint
+            'api_url': f"{config['route_prefix']}api/data",  # Your data endpoint
             'page_length': datatable_options.get('page_length', 25),
             'show_search': datatable_options.get('is_searchable', True),
             'show_column_search': datatable_options.get('show_column_search', False),

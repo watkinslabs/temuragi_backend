@@ -7,8 +7,7 @@ def register_csrf(app):
     csrf = CSRFProtection(app)
     app.csrf = csrf
     app.extensions['csrf'] = csrf
-    
-    # Generate token for templates
+    csrf.exempt("api_auth.login")
     @app.context_processor
     def inject_csrf_token():
         token_func = csrf.generate_token

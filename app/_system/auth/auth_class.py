@@ -5,6 +5,8 @@ from flask import  g, current_app, jsonify
 
 from app.register.classes import get_model
 from app.register.database import db_registry
+from app.config import config
+
 
 class AuthService:
     """Authentication service for handling user auth operations"""
@@ -118,7 +120,7 @@ class AuthService:
                     'user_id': str(user['id']),
                     'landing_page': str(user['landing_page']),
                     'expires_in': access_token.expires_in_seconds(),
-                    'redirect_url': '/v2/'
+                    'redirect_url': config['route_prefix']
                 }
             except Exception as e:
                 # If reuse fails, create new tokens below
@@ -144,7 +146,7 @@ class AuthService:
                 'user_id': str(user['id']),
                 'landing_page': str(user['landing_page']),
                 'expires_in': tokens['access_token'].expires_in_seconds(),
-                'redirect_url': '/v2/'
+                'redirect_url': config['route_prefix']
             }
             
         except Exception as e:

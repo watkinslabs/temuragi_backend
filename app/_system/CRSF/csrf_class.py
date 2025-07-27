@@ -29,6 +29,7 @@ class CSRFProtection:
     def _before_request(self):
         """Check CSRF on every request"""
         # Only check on state-changing methods
+
         if request.method not in ['POST', 'PUT', 'PATCH', 'DELETE']:
             return
         

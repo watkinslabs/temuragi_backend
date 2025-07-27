@@ -17,7 +17,7 @@ from logging.handlers import RotatingFileHandler
 from tabulate import tabulate
 from datetime import datetime
 from urllib.parse import urljoin
-
+from app.config import config
 from app.register.database import db_registry
 
 # Optional imports for token storage
@@ -102,7 +102,10 @@ class RemoteBackend(Backend):
     
     def __init__(self, config: Dict[str, Any], logger=None):
         super().__init__(config, logger)
-        self.base_url = config.get('base_url', 'https://ahoy2.perfrad.com').rstrip('/')
+        
+        base_url=config.get('base_url','http://localhost')
+        base_port=config.get('port')
+        self.base_url = f"{base_url}:{base_port}"
         self.api_token = None
         self.refresh_token = None
         self.user_id = None
@@ -111,12 +114,12 @@ class RemoteBackend(Backend):
         
         # API endpoints configuration
         self.endpoints = {
-            'login_page': config.get('login_url', '/v2/auth/login'),
-            'auth': config.get('auth_url', '/v2/api/auth/'),
-            'data': config.get('api_url', '/v2/api/data'),
-            'validate': config.get('validate_url', '/v2/api/validate'),
-            'refresh': config.get('refresh_url', '/v2/api/auth/refresh'),
-            'logout': config.get('logout_url', '/v2/api/auth/logout')
+            'login_page': config.get('login_url' , f"{config['route_prefix']}/auth/login"),
+            'auth': config.get('auth_url'        , f"{config['route_prefix']}/api/auth/"),
+            'data': config.get('api_url'         , f"{config['route_prefix']}/api/data"),
+            'validate': config.get('validate_url', f"{config['route_prefix']}/api/validate"),
+            'refresh': config.get('refresh_url'  , f"{config['route_prefix']}/api/auth/refresh"),
+            'logout': config.get('logout_url'    , f"{config['route_prefix']}/api/auth/logout")
         }
         
         # Token storage configuration
@@ -134,10 +137,11 @@ class RemoteBackend(Backend):
         """Initialize remote backend"""
         try:
             # Check if we have a base URL
-            if not self.base_url or self.base_url == 'https://ahoy2.perfrad.com':
+            if not self.base_url:
                 # Default URL is fine, just check if it's accessible
                 pass
-            
+            print(f"Endpoint: {self.base_url}")
+
             # Test connection to base URL
             response = self.session.get(self.base_url, timeout=self.timeout)
             self._initialized = response.status_code < 500
